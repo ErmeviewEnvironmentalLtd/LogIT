@@ -1,0 +1,261 @@
+2014-11-19 16:47:28,834 __main__                                           line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:47:34,736 logit                                              line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:48:11,986 __main__                                           line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:48:12,069 logit                                              line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:53:14,448 __main__                                           line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:53:14,512 logit                                              line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:56:12,453 LogitMainGui                                       line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:56:12,525 logit.LogitMainGui                                 line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:56:38,686 LogitMainGui                                       line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:56:38,753 logit.LogitMainGui                                 line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:57:36,542 LogitMainGui                                       line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:57:36,608 logit.LogitMainGui                                 line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:59:08,131 __main__                                           line:20   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 16:59:53,892 __main__                                           line:20   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:00:13,865 __main__                                           line:20   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:15:13,352 __main__                                           line:20   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:18:25,392 __main__                                           line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:18:41,861 tmac_tools_lib.utils.qtclasses                     line:82   INFO     Saving file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/log.logdb
+2014-11-19 17:18:43,950 DatabaseFunctions                                  line:372  WARNING  Database already exists - Resetting to new
+2014-11-19 17:18:44,125 DatabaseFunctions                                  line:382  INFO     Run table created
+2014-11-19 17:18:44,154 DatabaseFunctions                                  line:385  INFO     Tgc table created
+2014-11-19 17:18:44,190 DatabaseFunctions                                  line:388  INFO     Tbc table created
+2014-11-19 17:18:44,223 DatabaseFunctions                                  line:391  INFO     Dat table created
+2014-11-19 17:18:44,255 DatabaseFunctions                                  line:394  INFO     Tgc Files table created
+2014-11-19 17:18:44,263 DatabaseFunctions                                  line:397  INFO     Tbc Files table created
+2014-11-19 17:18:44,293 DatabaseFunctions                                  line:400  INFO     BC Database Files table created
+2014-11-19 17:19:08,141 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.6.ief
+2014-11-19 17:19:08,141 LogBuilder                                         line:88   INFO     loading model at filepath: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.6.ief
+2014-11-19 17:19:08,142 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
+2014-11-19 17:19:08,142 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
+2014-11-19 17:19:08,142 tmac_tools_lib.utils.fileloaders.IefLoader         line:179  INFO     loading File: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.6.ief
+2014-11-19 17:19:08,144 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
+2014-11-19 17:19:08,144 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:72   INFO     Loading Tuflow model
+2014-11-19 17:19:08,144 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
+2014-11-19 17:19:08,144 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tcf file
+2014-11-19 17:19:08,145 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tgc file
+2014-11-19 17:19:08,147 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tbc file
+2014-11-19 17:19:08,157 DatabaseFunctions                                  line:275  INFO     TGC file does not yet exist in database
+2014-11-19 17:19:08,157 DatabaseFunctions                                  line:275  INFO     TBC file does not yet exist in database
+2014-11-19 17:19:08,158 DatabaseFunctions                                  line:275  INFO     DAT file does not yet exist in database
+2014-11-19 17:19:11,483 __main__                                           line:610  INFO     Log Database updated successfully
+2014-11-19 17:19:22,240 __main__                                           line:721  INFO     Closing program
+2014-11-19 17:19:22,242 __main__                                           line:722  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-19 17:20:53,325 __main__                                           line:19   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:22:16,355 __main__                                           line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:22:16,483 LogIT                                              line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:22:56,588 __main__                                           line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:22:56,700 LogIT                                              line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:23:53,875 __main__                                           line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:23:53,986 LogIT                                              line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:33:36,411 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:33:36,552 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:34:41,062 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:34:44,776 __main__                                           line:849  ERROR    No log database found. Load or create one from File menu
+2014-11-19 17:35:05,471 tmac_tools_lib.utils.qtclasses                     line:82   INFO     Saving file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/log.logdb
+2014-11-19 17:35:05,828 DatabaseFunctions                                  line:372  WARNING  Database already exists - Resetting to new
+2014-11-19 17:35:05,947 DatabaseFunctions                                  line:382  INFO     Run table created
+2014-11-19 17:35:05,951 DatabaseFunctions                                  line:385  INFO     Tgc table created
+2014-11-19 17:35:05,990 DatabaseFunctions                                  line:388  INFO     Tbc table created
+2014-11-19 17:35:06,030 DatabaseFunctions                                  line:391  INFO     Dat table created
+2014-11-19 17:35:06,036 DatabaseFunctions                                  line:394  INFO     Tgc Files table created
+2014-11-19 17:35:06,042 DatabaseFunctions                                  line:397  INFO     Tbc Files table created
+2014-11-19 17:35:06,046 DatabaseFunctions                                  line:400  INFO     BC Database Files table created
+2014-11-19 17:35:28,183 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.4.1.ief
+2014-11-19 17:35:28,183 LogBuilder                                         line:88   INFO     loading model at filepath: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.4.1.ief
+2014-11-19 17:35:28,184 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
+2014-11-19 17:35:28,184 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
+2014-11-19 17:35:28,184 tmac_tools_lib.utils.fileloaders.IefLoader         line:179  INFO     loading File: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.4.1.ief
+2014-11-19 17:35:28,184 tmac_tools_lib.modelfiles.Ief                      line:159  INFO     No 2DFile key found in ief
+2014-11-19 17:35:28,184 tmac_tools_lib.modelfiles.Ief                      line:159  INFO     No 2DFile key found in ief
+2014-11-19 17:36:58,171 __main__                                           line:725  INFO     Closing program
+2014-11-19 17:36:58,173 __main__                                           line:726  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-19 17:37:07,345 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:37:07,470 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:37:30,177 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:37:30,309 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:40:19,117 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:40:19,253 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:41:00,331 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:41:00,457 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:45:09,255 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:45:09,378 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:46:43,257 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:46:43,382 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:46:51,109 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-19 17:46:51,226 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:06:51,092 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:06:51,262 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:08:05,871 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:08:06,015 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:18:51,388 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:18:51,520 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:21:14,641 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:21:14,792 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:22:05,573 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:22:05,740 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:22:46,407 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:22:46,542 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:23:57,842 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:23:57,973 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:31:56,141 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:31:56,328 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:33:11,339 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:33:11,470 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:38:04,447 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 06:38:04,628 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 08:02:20,339 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 08:02:20,487 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 08:03:23,108 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 08:03:23,243 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 08:30:02,984 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 08:30:03,148 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:09:14,473 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:09:14,539 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:09:14,634 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:09:14,690 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:09:40,546 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:09:40,690 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:10:41,250 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:10:41,372 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:13:59,627 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:13:59,957 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:15:24,924 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:15:25,232 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:16:22,753 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:16:22,881 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:27:47,344 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:27:47,487 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:27:56,869 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 09:27:57,177 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:10:44,230 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:10:44,551 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:11:24,474 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:11:24,588 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:12:34,829 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:12:34,986 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:12:35,184 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:12:35,358 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:13:18,486 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:13:18,549 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:13:18,793 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:13:18,871 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:14:14,267 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:14:14,398 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:15:33,828 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:15:34,141 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:16:28,775 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:16:29,098 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:16:34,842 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:16:35,151 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:19:38,438 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:19:38,561 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:21:41,703 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-20 12:21:41,841 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:23:45,921 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:23:46,966 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:24:28,792 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:24:28,933 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:24:54,155 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:24:54,280 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:25:27,759 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:25:28,023 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:25:55,944 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:25:56,257 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:28:23,957 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:28:24,286 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:30:16,490 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:30:16,661 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:30:27,525 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:30:27,650 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:30:50,279 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:30:50,592 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:31:18,076 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:31:18,421 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:31:41,351 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:31:41,664 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:32:09,365 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:32:09,536 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:32:25,408 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:32:25,533 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:32:41,437 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:32:41,753 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:34:25,076 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:34:25,390 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:39:11,673 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:39:11,812 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:39:21,482 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:39:21,592 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:39:39,822 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:39:39,946 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:39:45,519 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:39:45,815 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:43:21,930 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:43:22,055 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:44:38,352 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:44:38,651 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:47:21,019 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:47:21,158 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:47:47,569 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:47:58,709 tmac_tools_lib.utils.qtclasses                     line:82   INFO     Saving file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:47:58,719 __main__                                           line:734  INFO     Closing program
+2014-11-24 14:47:58,719 __main__                                           line:735  INFO     Saving user settings to: C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:48:00,079 __main__                                           line:734  INFO     Closing program
+2014-11-24 14:48:00,079 __main__                                           line:735  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-24 14:48:02,094 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:48:06,680 __main__                                           line:734  INFO     Closing program
+2014-11-24 14:48:06,680 __main__                                           line:735  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-24 14:48:08,165 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:48:13,381 __main__                                           line:734  INFO     Closing program
+2014-11-24 14:48:13,381 __main__                                           line:735  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-24 14:48:15,289 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:48:19,694 __main__                                           line:734  INFO     Closing program
+2014-11-24 14:48:19,694 __main__                                           line:735  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-24 14:52:49,775 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:53:05,335 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:53:08,799 __main__                                           line:734  INFO     Closing program
+2014-11-24 14:53:08,799 __main__                                           line:735  INFO     Saving user settings to: C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:53:16,651 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:53:24,766 __main__                                           line:734  INFO     Closing program
+2014-11-24 14:53:24,766 __main__                                           line:735  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-24 14:54:12,482 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:54:33,372 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:54:36,540 __main__                                           line:735  INFO     Closing program
+2014-11-24 14:54:36,540 __main__                                           line:736  INFO     Saving user settings to: C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:54:41,721 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:54:56,048 __main__                                           line:735  INFO     Closing program
+2014-11-24 14:54:56,048 __main__                                           line:736  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-24 14:55:29,884 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:58:31,947 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:58:45,690 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:58:52,259 __main__                                           line:735  INFO     Closing program
+2014-11-24 14:58:52,259 __main__                                           line:736  INFO     Saving user settings to: C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:59:18,683 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:59:27,950 __main__                                           line:735  INFO     Closing program
+2014-11-24 14:59:27,950 __main__                                           line:736  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-24 14:59:29,917 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 14:59:37,436 __main__                                           line:735  INFO     Closing program
+2014-11-24 14:59:37,451 __main__                                           line:736  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-24 15:00:57,750 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 15:01:07,346 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 15:01:08,595 __main__                                           line:735  INFO     Closing program
+2014-11-24 15:01:08,611 __main__                                           line:736  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-24 15:01:10,671 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 15:01:12,232 __main__                                           line:735  INFO     Closing program
+2014-11-24 15:01:12,232 __main__                                           line:736  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
+2014-11-24 15:04:02,875 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
+2014-11-24 15:04:14,918 __main__                                           line:316  INFO     Row ID=3 updated successfully
+2014-11-24 15:04:26,295 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/arup_test/Tuflow/runs/2670_WS_EA_SPdef_0100yr_2-75hr.tcf
+2014-11-24 15:04:26,295 LogBuilder                                         line:92   INFO     loading model at filepath: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/arup_test/Tuflow/runs/2670_WS_EA_SPdef_0100yr_2-75hr.tcf
+2014-11-24 15:04:26,295 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
+2014-11-24 15:04:26,295 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
+2014-11-24 15:04:26,295 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:72   INFO     Loading Tuflow model
+2014-11-24 15:04:26,295 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
+2014-11-24 15:04:26,311 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tcf file
+2014-11-24 15:04:26,326 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: trd file
+2014-11-24 15:04:26,342 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tgc file
+2014-11-24 15:04:26,342 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tbc file
+2014-11-24 15:04:26,358 DatabaseFunctions                                  line:282  INFO     TGC file does not yet exist in database
+2014-11-24 15:04:26,358 DatabaseFunctions                                  line:282  INFO     TBC file does not yet exist in database
+2014-11-24 15:04:33,099 __main__                                           line:735  INFO     Closing program
+2014-11-24 15:04:33,099 __main__                                           line:736  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
