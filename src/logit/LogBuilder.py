@@ -61,8 +61,9 @@ try:
     from tmac_tools_lib.utils.fileloaders.TuflowLoader import TuflowLoader
     from tmac_tools_lib.utils.fileloaders.IefLoader import IefLoader
     from tmac_tools_lib.utils import UniversalUtilityFunctions as ufunc
-    from tmac_tools_lib.tuflow.MainTuflowModelFiles import Tcf, Tgc, Tbc
+    from tmac_tools_lib.tuflow.MainTuflowModelFiles import Tcf, Ecf, Tgc, Tbc
     from tmac_tools_lib.tuflow.tuflowfileparts.SomeFile import SomeFile
+    from tmac_tools_lib.tuflow.data_files import DataFileObject
     from tmac_tools_lib.utils import FileTools
 except:
     logger.error('Cannot load tmac_tools_lib: Is it installed?')
@@ -163,9 +164,10 @@ def loadModel(file_path, log_type):
         log_pages['TBC'] = None
         log_pages['BC_DBASE'] = None
     else:
+        log_pages['ECF'] = buildEcfRowFromModel(cur_date, tuflow_model)
         log_pages['TGC'] = buildTgcRowFromModel(cur_date, tuflow_model)
         log_pages['TBC'] = buildTbcRowFromModel(cur_date, tuflow_model)
-        log_pages['BC_DBASE'] = None
+        log_pages['BC_DBASE'] = buildBcRowFromModel(cur_date, tuflow_model)
 
     if log_type == TYPE_ESTRY:
         log_pages['DAT'] = None
@@ -297,6 +299,23 @@ def buildTuflowRun(has_ief_file, tuflow_model, run_cols):
     run_cols['TGC'] = "[" + ", ".join(tgc_paths) + "]"
     run_cols['TBC'] = "[" + ", ".join(tbc_paths) + "]"
     
+    # Get the Materials and BC Database file references
+    # Get the tcf and ecf references from the model
+    model_objs = tuflow_model.getModelObject(Tcf.TYPE)
+    model_objs = model_objs + tuflow_model.getModelObject(Ecf.TYPE)
+    model_objs.append(tuflow_model.getModelObject('main_tcf'))
+    
+    # Fetch any boundary condition database out of the the ecf and tcf files
+    bc_paths = []
+    for m in model_objs:
+        data = m.getModelValues(Tcf.DATA_FILES)
+        for d in data:
+            if d.command == 'BC Database':
+                bc_paths.append(d.getFileNameAndExtension())
+    
+    # Get them into a single string
+    run_cols['BC_DBASE'] = "[" + ", ".join(bc_paths) + "]"
+    
     # Go through the list of tcf's and associated trd files to get all
     # references to results file locations.
     tcf_list = tcf_trds
@@ -314,6 +333,40 @@ def buildTuflowRun(has_ief_file, tuflow_model, run_cols):
     
     return run_cols
                 
+
+def buildEcfRowFromModel(cur_date, tuflow_model):
+    '''Create a new row for the ECF file page
+    @var tulfow_model: The TuflowModel object loaded from file
+    @attention: See superclass for more details 
+    '''
+    ecf_cols = {'DATE': str(cur_date), 'ECF': 'None', 'FILES': 'None', 
+                'COMMENTS': 'None'}
+    ecf_list = []
+    cur_date = str(cur_date)
+    ecf_files = []
+    ecf_path = 'None'
+    
+    # If there are any .tgc files in the TuflowModel; grab them all and join up
+    # the filenames (as done in the run page) and append files to the list if
+    # they aren't already in it.
+    ecfs = tuflow_model.getModelObject(Ecf.TYPE)
+    if len(ecfs) > 0:
+
+        for e in ecfs:
+            ecf_path = e.somefileRef.getFileNameAndExtension()
+            paths = e.getFilePaths(SomeFile.NAME_AND_EXTENSION)
+            for p in paths:
+                if not p in ecf_files:
+                    ecf_files.append(p)
+
+            ecf_list.append({'DATE': cur_date, 'ECF': ecf_path, 
+                             'FILES': ecf_files, 'COMMENTS': 'None'})
+
+    else:
+        ecf_list.append(tgc_cols) 
+            
+    return ecf_list
+
                 
 def buildTgcRowFromModel(cur_date, tuflow_model):
     '''Create a new row for the TGC file page
@@ -385,7 +438,8 @@ def buildTbcRowFromModel(cur_date, tuflow_model):
     
 def buildDatRowFromModel(cur_date, run_page):
     '''Create a new row for the DAT file page
-    @var ief: The IEF model file
+    @var cur_date: todays date.
+    @var run_page: the run page details.
     @attention: See superclass for more details 
     '''
     dat_cols = {'DATE': str(cur_date), 'DAT': 'None', 'AMENDMENTS': 'None', 
@@ -396,5 +450,71 @@ def buildDatRowFromModel(cur_date, run_page):
     return dat_cols
         
         
-def buildBcRowFromModel(cur_date):
-    raise NotImplementedError("Boundary conditions page has not been implemented yet")
+def buildBcRowFromModel(cur_date, tuflow_model):
+    '''Create a new row for the BC Databas file page
+    @var cur_date: todays date.
+    @var tuflow_model: the TuflowModel object loaded from file.
+    @attention: See superclass for more details.
+    @return: Dictionary containing the data needed for the page.
+    '''
+    bc_cols = {'DATE': str(cur_date), 'BC_DBASE': 'None', 'FILES': 'None', 
+                'COMMENTS': 'None'}
+    bc_list = []
+    cur_date = str(cur_date)
+    bc_files = []
+    bc_path = 'None'
+    
+    # Get the tcf and ecf references from the model
+    model_objs = tuflow_model.getModelObject(Tcf.TYPE)
+    model_objs = model_objs + tuflow_model.getModelObject(Ecf.TYPE)
+    model_objs.append(tuflow_model.getModelObject('main_tcf'))
+    
+    # Fetch any boundary condition database out of the the ecf and tcf files
+    datafiles = []
+    for m in model_objs:
+        data = m.getModelValues(Tcf.DATA_FILES)
+        for d in data:
+            if d.command == 'BC Database':
+                datafiles.append(d)
+    
+    # If we didn't find any bc database files then we can leave.
+    if len(datafiles) > 0:
+
+        # For each data file found we need to:
+        # - Load the data.
+        # - Fetch the 'main' file and collect it's filename
+        # - Loop through the 'SOURCE' collection and collect the filenames it contains.
+        # - Add any files that we don't already have to the list.
+        bc_files = {}
+        for d in datafiles:
+            bc_obj = DataFileObject.createDataFileObject(d)
+            bc_obj.loadFiles()
+            
+            bc_collection = bc_obj.getDataEntryRowData('main')
+            bc_path = bc_obj.getDataEntryPathData('main').getFileNameAndExtension()
+            
+            if not bc_path in bc_files.keys():
+                bc_files[bc_path] = []
+                
+            sources = bc_collection.getDataObject(bc_obj.SOURCE)
+            for s in sources.data_collection:
+                if not s in bc_files[bc_path]:
+                    bc_files[bc_path].append(s)    
+        
+        # Loop through what we found and create entries for each file.
+        for bc in bc_files.keys():
+            bc_list.append({'DATE': cur_date, 'BC_DBASE': bc, 
+                             'FILES': bc_files[bc], 'COMMENTS': 'None'})
+
+    else:
+        bc_list.append(bc_cols) 
+            
+    return bc_list
+    
+    
+    
+    
+    
+    
+    
+    

@@ -1,3 +1,4 @@
+
 import logging.config
 
 LOG_SETTINGS_CONSOLE_ONLY = {
@@ -11,12 +12,12 @@ LOG_SETTINGS_CONSOLE_ONLY = {
         'console': {
             'class': 'logging.StreamHandler',
             'level': 'INFO',
-            'formatter': 'detailed',
+            'formatter': 'simple',
             'stream': 'ext://sys.stdout',
         },
     },
     'formatters': {
-        'console': {
+        'simple': {
             'format': '%(asctime)s %(module)-30s line:%(lineno)-4d ' \
             '%(levelname)-8s %(message)s',
         },
@@ -68,7 +69,7 @@ LOG_SETTINGS_DEBUG = {
             'class': 'logging.StreamHandler',
             'level': 'DEBUG',
             'formatter': 'simple',
-            'stream': 'ext://sys.stdout',
+            'stream': 'sys.stderr',
         },
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',

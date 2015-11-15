@@ -67,6 +67,8 @@ try:
       
     from LogSettings import LOG_SETTINGS
     logging.config.dictConfig(LOG_SETTINGS)
+    #from LogSettings import LOG_SETTINGS_DEBUG
+    #logging.config.dictConfig(LOG_SETTINGS_DEBUG)
     logger = logging.getLogger(__name__)
     logger.info('Logs will be written to file at: %s' % (log_path))
 except:
