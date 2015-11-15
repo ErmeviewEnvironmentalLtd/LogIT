@@ -217,9 +217,13 @@ def buildIsisRun(ief_file, run_cols):
     run_cols['IEF'] = ief_file.path_holder.getFileNameAndExtension()
     run_cols['DAT'] = FileTools.getFileName(ief_paths['datafile'], True)
     run_cols['RESULTS_LOCATION_1D'] = ief_paths['results']
-    start = ief_file.event_details['Start']
-    end = ief_file.event_details['Finish']
-    run_cols['EVENT_DURATION'] = str(float(end) - float(start))
+    
+    if ief_file.event_details.has_key('Finish'):    
+        start = ief_file.event_details['Start']
+        end = ief_file.event_details['Finish']
+        run_cols['EVENT_DURATION'] = str(float(end) - float(start))
+    else:
+        run_cols['EVENT_DURATION'] = 'None'
     
     return run_cols
 
