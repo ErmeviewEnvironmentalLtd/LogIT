@@ -11,7 +11,7 @@ LOG_SETTINGS_CONSOLE_ONLY = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'level': 'INFO',
+            'level': 'DEBUG',
             'formatter': 'simple',
             'stream': 'ext://sys.stdout',
         },
@@ -33,13 +33,13 @@ LOG_SETTINGS = {
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
-            'level': 'INFO',
+            'level': 'DEBUG',
             'formatter': 'simple',
             'stream': 'ext://sys.stdout',
         },
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',
-            'level': 'INFO',
+            'level': 'DEBUG',
             'formatter': 'detailed',
             'filename': 'logs/LogIT.log',
             'mode': 'a',
@@ -57,6 +57,7 @@ LOG_SETTINGS = {
         }
     },
 }
+
 LOG_SETTINGS_DEBUG = {
     'version': 1,
     'root': {
@@ -69,7 +70,7 @@ LOG_SETTINGS_DEBUG = {
             'class': 'logging.StreamHandler',
             'level': 'DEBUG',
             'formatter': 'simple',
-            'stream': 'sys.stderr',
+            'stream': 'ext://sys.stdout',
         },
         'file': {
             'class': 'logging.handlers.RotatingFileHandler',

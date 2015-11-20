@@ -40,6 +40,8 @@
 ###############################################################################
 '''
 import os
+import traceback
+import itertools
 
 # Local modules
 import DatabaseFunctions
@@ -47,94 +49,181 @@ import DatabaseFunctions
 import logging
 logger = logging.getLogger(__name__)
 
-def logEntryUpdates(conn, log_pages):
+def logEntryUpdates(conn, log_pages, check_new_entries=False):
     '''Update the database with the current status of the log_pages dictionary.
+    
+    If there's an issue inserting any of the data into any of the tables it
+    will attempt to roll back the changes to all of the tables to 'hopefully'
+    avoid any corruption. This will be logged so the user is aware.
     
     @param conn: an open database connection.
     @param log_pages: dictionary containing the the data to enter into the 
            database under the database table names.
+    @param check_new_entries=False: new entry status may be checked before 
+           getting to this stage and we don't want to do it twice.
+    @raise IOError: If there's any issue connecting to the database.
+    @raise Exception: if anything else goes wrong. 
+    
+    TODO:
+        This is getting a bit of a mess and needs a lot of refactoring. Some
+        of which may involve changing the way that LogIT.py uses it.
     '''
+    def reverse_enumerate(iterable):
+        '''Enumerate over an iterable in reverse order while retaining proper indexes
+        '''
+        return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
+    
     update_check = {'TGC': log_pages['RUN']['TGC'], 
                     'TBC': log_pages['RUN']['TBC'], 
                     'DAT': log_pages['RUN']['DAT'], 
-                    'BC_DBASE': log_pages['RUN']['BC_DBASE']} 
+                    'BC_DBASE': log_pages['RUN']['BC_DBASE'],
+                    'ECF': log_pages['RUN']['ECF'],
+                    'TCF': log_pages['RUN']['TCF']
+                    } 
     
-    for u in update_check:
-            
-        # We can have a log page set to None so skip it if we find one.
-        if log_pages[u] == None: 
-            update_check[u] = False
-            continue
-        
-        # We need to maximum id so that we can increment by 1 and put it into
-        # the output table in the GUI.
-        max_id = DatabaseFunctions.getMaxIDFromTable(conn, u) + 1
-        
-        # Need to deal with these separately because they have quite
-        # specific behaviour with files etc
-        if u == 'TGC' or u == 'TBC':
-            update_check[u] = True
-            
-            # These hold a list of different model files so cycle through them
-            for i, f in enumerate(log_pages[u], 0):
-                table_name = u + '_FILES'
-
-                # The FILES entry is a dictionary that uses the file
-                # name as a key. We need to get the new files from the files
-                # entry to enter into the database.
-                # Files lists then get converted to a single string.
-                new_files = insertIntoModelFileTable(conn, table_name, 'FILES',
-                                                            f[u], f['FILES']) 
-                if not new_files == False:
-                    log_pages[u][i]['NEW_FILES'] =\
-                                        "[" + ", ".join(new_files) + "]"
-                
-                log_pages[u][i]['FILES'] = "[" + ", ".join(
-                                        log_pages[u][i]['FILES']) + "]"
-                log_pages[u][i]['ID'] = max_id
-                try:
-                    DatabaseFunctions.insertValuesIntoTable(conn, u, 
-                                                log_pages[u][i])
-                except:
-                    raise Exception
-        
-        else:
-            # Check if the file already exists in the RUN table or not.
-            found_it = False
-            try:
-                # Get the first entry from tuple which contains a boolean of
-                # whether the file exists or not.
-                found_it = DatabaseFunctions.findInDatabase('RUN', conn=conn,
-                                        col_name=u, db_entry=update_check[u])[0]
-            except:
-                raise Exception
-            
-            if not found_it:
-                update_check[u] = True
-                logger.debug('%s file does not yet exist in database' % (u))
-                                            
-                # join up the columns and place holders for creating the query.
-                log_pages[u]['ID'] = max_id
-                try:
-                    DatabaseFunctions.insertValuesIntoTable(conn, u, 
-                                                    log_pages[u])
-                except:
-                    raise Exception
-            else:
-                update_check[u] = False
-                logger.debug('%s file already exists in database' % (u))
-                
-    # Always put an entry in the Run entry table
-    max_id = DatabaseFunctions.getMaxIDFromTable(conn, 'RUN') + 1
-    log_pages['RUN']['ID'] = max_id
+    added_rows = {}
+    
     try:
-        DatabaseFunctions.insertValuesIntoTable(conn, 'RUN', 
-                                                log_pages['RUN'])
-    except:
-        raise Exception
+        for u in update_check:
+                
+            # We can have a log page set to None so skip it if we find one.
+            if  update_check[u] == 'None' or log_pages[u] == None: 
+                update_check[u] = False
+                continue
+            
+            # We need the maximum id so that we can increment by 1 and put it into
+            # the output table in the GUI.
+            #max_id = DatabaseFunctions.getMaxIDFromTable(conn, u) + 1
+            
+            # Need to deal with these separately because they have quite
+            # specific behaviour with files etc
+            if u == 'TGC' or u == 'TBC' or u == 'ECF' or u == 'BC_DBASE' or u == 'TCF':
+                #update_check[u] = True
+                
+                # These hold a list of different model files so cycle through them
+                #for i, f in enumerate(log_pages[u], 0):
+                for i, f in reverse_enumerate(log_pages[u]):
+                    
+                    table_name = u + '_FILES'
+                    
+                    # We need the maximum id so that we can increment by 1 and put it into
+                    # the output table in the GUI.
+                    max_id = DatabaseFunctions.getMaxIDFromTable(conn, u) + 1
     
-    return log_pages, update_check
+                    # The FILES entry is a dictionary that uses the file
+                    # name as a key. We need to get the new files from the files
+                    # entry to enter into the database.
+                    # Files lists then get converted to a single string.
+                    
+                    new_files, ids = insertIntoModelFileTable(conn, table_name, 'FILES',
+                                                                f[u], f['FILES']) 
+                
+                    if not table_name in added_rows:
+                        added_rows[table_name] = []
+                    if not ids == False:
+                        added_rows[table_name] = added_rows[table_name] + ids
+                    
+                    if not new_files == False:
+                        log_pages[u][i]['NEW_FILES'] =\
+                                            "[" + ", ".join(new_files) + "]"
+                    
+                    log_pages[u][i]['FILES'] = "[" + ", ".join(
+                                            log_pages[u][i]['FILES']) + "]"
+                    log_pages[u][i]['ID'] = max_id
+                    try:
+                        is_new_entry = True
+                        if check_new_entries:
+                            is_new_entry = DatabaseFunctions.findNewEntries(
+                                                    conn, u, log_pages[u][i])
+                        if is_new_entry:
+                            DatabaseFunctions.insertValuesIntoTable(conn, u, 
+                                                            log_pages[u][i])
+                        
+                            if not u in added_rows:
+                                added_rows[u] = []
+                            added_rows[u].append(max_id)
+                        else:
+                            del log_pages[u][i] 
+                        
+                    except:
+                        logger.debug(traceback.format_exc())
+                        raise 
 
+            else:
+                # We need the maximum id so that we can increment by 1 and put it into
+                # the output table in the GUI.
+                max_id = DatabaseFunctions.getMaxIDFromTable(conn, u) + 1
+                
+                # Check if the file already exists in the RUN table or not.
+                found_it = False
+                try:
+                    # Get the first entry from tuple which contains a boolean of
+                    # whether the file exists or not.
+                    found_it = DatabaseFunctions.findInDatabase('RUN', conn=conn,
+                                            col_name=u, db_entry=update_check[u])[0]
+                except:
+                    logger.debug(traceback.format_exc())
+                    raise 
+
+                if not found_it:
+                    update_check[u] = True
+                    logger.debug('%s file does not yet exist in database' % (u))
+                                                
+                    # join up the columns and place holders for creating the query.
+                    log_pages[u]['ID'] = max_id
+                    try:
+                        DatabaseFunctions.insertValuesIntoTable(conn, u, 
+                                                        log_pages[u])
+                        
+                        if not u in added_rows:
+                            added_rows[u] = []
+                        added_rows[u].append(max_id)
+                        
+                    except:
+                        logger.debug(traceback.format_exc())
+                        raise 
+                else:
+                    update_check[u] = False
+                    logger.debug('%s file already exists in database' % (u))
+                    
+        # Always put an entry in the Run entry table
+        max_id = DatabaseFunctions.getMaxIDFromTable(conn, 'RUN') + 1
+        log_pages['RUN']['ID'] = max_id
+        try:
+            DatabaseFunctions.insertValuesIntoTable(conn, 'RUN', 
+                                                    log_pages['RUN'])
+            
+            if not 'RUN' in added_rows:
+                added_rows['RUN'] = []
+                added_rows['RUN'].append(max_id)
+            
+        except:
+            logger.debug(traceback.format_exc())
+            raise 
+        return log_pages, update_check
+    
+    # This acts as a failsafe incase we hit an error after some of the entries
+    # were already added to the database. It try's to roll back the entries by
+    # deleting them. The exception is still raised to be dealt with by the GUI.
+    # TODO:
+    #    This could probably be managed better with more constructive use of the
+    #    database calls and how the connection.rollback() in sqlite3 is implemented.
+    except:
+        logger.error('Problem updating database: attempting to roll back changes')
+        logger.debug(traceback.format_exc())
+
+        try:
+            for key in added_rows.keys():
+                for id in added_rows[key]:
+                    DatabaseFunctions.deleteRowFromTable(conn, key, id)
+            
+            logger.warning('Successfully rolled back database')
+            raise
+        except:
+            logger.error('Unable to roll back database: CHECK ENTRIES!')
+            logger.debug(traceback.format_exc())
+            raise 
+        
 
 def insertIntoModelFileTable(conn, table_name, col_name, model_file, files_list):
     '''Insert file references into the model file table if they are not
@@ -145,6 +234,8 @@ def insertIntoModelFileTable(conn, table_name, col_name, model_file, files_list)
     @param file_list: the list of files to check against the database.
     '''
     new_files = []
+    added_count = 1
+    ids = []
     for f in files_list:
         
         # Check if we have any matched to the file name.            
@@ -159,10 +250,11 @@ def insertIntoModelFileTable(conn, table_name, col_name, model_file, files_list)
             row_data = {col_name: model_file, 'FILES': f}
             DatabaseFunctions.insertValuesIntoTable(conn, table_name, row_data)
             new_files.append(f)
+            ids.append(added_count)
+            added_count += 1
     
     if len(new_files) < 1:
-        return False
+        return False, False
     else:
-        return new_files
-    
+        return new_files, ids
     

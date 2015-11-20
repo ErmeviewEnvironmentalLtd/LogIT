@@ -54,6 +54,7 @@ import sys
 import cPickle
 import sqlite3
 import logging
+import win32clipboard
  
 # Setup the logging protocols. Try and create a directory to put the logs into.
 # If that fails we call the console only logger, if not detailed logs will be
@@ -67,15 +68,17 @@ try:
       
     from LogSettings import LOG_SETTINGS
     logging.config.dictConfig(LOG_SETTINGS)
-    #from LogSettings import LOG_SETTINGS_DEBUG
-    #logging.config.dictConfig(LOG_SETTINGS_DEBUG)
+    #from LogSettings import LOG_SETTINGS_WARNING
+    #logging.config.dictConfig(LOG_SETTINGS_WARNING)
     logger = logging.getLogger(__name__)
     logger.info('Logs will be written to file at: %s' % (log_path))
+    CONSOLE_ONLY_LOG = False
 except:
     from LogSettings import LOG_SETTINGS_CONSOLE_ONLY
     logging.config.dictConfig(LOG_SETTINGS_CONSOLE_ONLY)
     logger = logging.getLogger(__name__)
     logger.warning('Unable to create log file directory')
+    CONSOLE_ONLY_LOG = True
 
 
 from _sqlite3 import Error
@@ -123,7 +126,7 @@ class MainGui(QtGui.QMainWindow):
                                 'TUFLOW_BUILD', 'AMENDMENTS']
         
         # Database tables that should be exported to Excel
-        self.export_tables = ['RUN', 'TGC', 'TBC', 'DAT', 'BC_DBASE']
+        self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 'BC_DBASE']
             
         # Start the application and initialise the GUI
         self.app = QtGui.QApplication(sys.argv)
@@ -138,7 +141,12 @@ class MainGui(QtGui.QMainWindow):
         
         # Connect the slots
         self.ui.loadModelButton.clicked.connect(self._loadFileActions)
-        self.ui.addlogEntryButton.clicked.connect(self._createLogEntry)
+        self.ui.addSingleLogEntryButton.clicked.connect(self._createLogEntry)
+        self.ui.addMultiLogEntryButton.clicked.connect(self._createMultipleLogEntry)
+        self.ui.addMultiModelButton.clicked.connect(self._updateMultipleLogSelection)
+        self.ui.removeMultiModelButton.clicked.connect(self._updateMultipleLogSelection)
+        self.ui.multiModelErrorClearButton.clicked.connect(self._clearMultiErrorText)
+        self.ui.multiModelErrorCopyButton.clicked.connect(self._copyToClipboard)
         self.ui.actionLoad.triggered.connect(self.fileMenuActions)
         self.ui.actionExportToExcel.triggered.connect(self.fileMenuActions)
         self.ui.actionNewModelLog.triggered.connect(self.fileMenuActions)
@@ -146,13 +154,17 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionUpdateDatabaseSchema.triggered.connect(self._updateDatabaseVersion)
         self.ui.actionSaveSetupAs.triggered.connect(self._saveSetup)
         self.ui.actionLoadSetup.triggered.connect(self._loadSetup)
+        self.ui.actionLogWarning.triggered.connect(self._updateLoggingLevel)
+        self.ui.actionLogDebug.triggered.connect(self._updateLoggingLevel)
+        self.ui.actionLogInfo.triggered.connect(self._updateLoggingLevel)
+        self.ui.actionReloadDatabase.triggered.connect(self.loadModelLog)
         
         # A couple of keyboard shortcuts...because I'm lazy!
         # Launch the browse for model dialog
         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+L"), self.ui.loadModelButton, 
                                 lambda: self._loadFileActions(shortcut='loadmodel'))
         # Add log entry
-        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+A"), self.ui.addlogEntryButton, 
+        QtGui.QShortcut(QtGui.QKeySequence("Ctrl+A"), self.ui.addSingleLogEntryButton, 
                                                         self._createLogEntry)
         # Quit
         self.ui.actionExit.setToolTip('Exit Application')
@@ -178,6 +190,10 @@ class MainGui(QtGui.QMainWindow):
         self.ui.datEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
         self.ui.bcEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.bcEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.ecfEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.ecfEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.tcfEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.tcfEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
         
         # Custom quit function
         #self.app.aboutToQuit.connect(self._customClose)
@@ -190,9 +206,135 @@ class MainGui(QtGui.QMainWindow):
         self.loadModelLog()
         self.log_pages = None
         
+        self.setWindowIcon(QtGui.QIcon(':Logit_Logo2_25x25.png'))
+        
         # Activate the GUI
         MainGui.show()
         sys.exit(self.app.exec_())
+        
+    
+    def _updateLoggingLevel(self):
+        '''Alters to logging level based on the name of the calling action
+        
+        This is set by an action on the menu.
+        '''
+        caller = self.sender()
+        call_name = caller.objectName()
+        #logger.debug('Caller = ' + call_name)
+        
+        if call_name == 'actionLogWarning':
+            
+            self.ui.actionLogInfo.setChecked(False)
+            self.ui.actionLogDebug.setChecked(False)
+            self.ui.actionLogWarning.setChecked(True)
+
+            logging.getLogger().setLevel(logging.WARNING)
+            self.settings.logging_level = logging.WARNING
+            logger.warning('Logging level set to: WARNING')
+            logger.info('warning set check')
+         
+        elif call_name == 'actionLogInfo':
+            logging.getLogger(__name__)
+            self.ui.actionLogWarning.setChecked(False)
+            self.ui.actionLogDebug.setChecked(False)
+            self.ui.actionLogInfo.setChecked(True)
+
+            logging.getLogger().setLevel(logging.INFO)
+            self.settings.logging_level = logging.INFO
+            logger.info('Logging level set to: INFO')
+            logger.debug('info set check')
+
+        elif call_name == 'actionLogDebug':
+            self.ui.actionLogWarning.setChecked(False)
+            self.ui.actionLogInfo.setChecked(False)
+            self.ui.actionLogDebug.setChecked(True)
+        
+            logging.getLogger().setLevel(logging.DEBUG)
+            self.settings.logging_level = logging.DEBUG
+            logger.info('Logging level set to: DEBUG')
+            logger.debug('Debug set test')
+            
+        
+    def _clearMultiErrorText(self):
+        '''
+        '''
+        self.ui.multiModelLoadErrorTextEdit.clear()
+    
+    def _copyToClipboard(self):
+        '''
+        '''
+        caller = self.sender()
+        call_name = caller.objectName()
+        
+        if call_name == 'multiModelErrorCopyButton':
+            text = self.ui.multiModelLoadErrorTextEdit.toPlainText()
+        
+#         try:
+#             win32clipboard.OpenClipboard()
+#             win32clipboard.EmptyClipboard()
+#             win32clipboard.SetClipboardText(s)
+#             win32clipboard.CloseClipboard()
+#         except:
+#             logger.warning('Could not copy clipboard data.')
+            
+            clipboard = QtGui.QApplication.clipboard()
+            clipboard.setText(text)
+            event = QtCore.QEvent(QtCore.QEvent.Clipboard)
+            self.app.sendEvent(clipboard, event)
+        
+    
+    def _updateMultipleLogSelection(self):
+        '''Updates the contents of the loadMultiModelListView.
+        Called by both the add and remove buttons. It will open a multiple
+        choice file dialog by the former or remove the selected items by the
+        latter.
+        '''
+        caller = self.sender()
+        call_name = caller.objectName()
+        logger.debug('Caller = ' + call_name)
+        
+        # Add a new file
+        if call_name == 'addMultiModelButton':
+            open_paths = self._getModelFileDialog(multi_paths=True)
+            if open_paths == False:
+                return
+
+            
+            row_count = self.ui.loadMultiModelTable.rowCount()
+            for p in open_paths:
+                
+                # Insert a new row first if needed
+                self.ui.loadMultiModelTable.insertRow(row_count)
+                
+                # Get the filename
+                d, fname = os.path.split(str(p))
+                self.settings.last_model_directory = d
+                
+                # Create a couple of items and add to the table
+                itemf = QtGui.QTableWidgetItem(str(fname))
+                itemf.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+                itemp = QtGui.QTableWidgetItem(str(p))
+                itemp.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+                self.ui.loadMultiModelTable.setItem(row_count, 0, itemf)
+                self.ui.loadMultiModelTable.setItem(row_count, 1, itemp)
+                
+                # Set the sumbit button to enabled
+                self.ui.submitMultiModelGroup.setEnabled(True)
+            
+        elif call_name == 'removeMultiModelButton':
+
+            # Get the selected rows, reverse them and remove them
+            rows = self.ui.loadMultiModelTable.selectionModel().selectedRows()
+            rows = sorted(rows, reverse=True)
+            for r in rows:
+                self.ui.loadMultiModelTable.removeRow(r.row())
+            
+            # Deactivate the log button if there's no rows left
+            if self.ui.loadMultiModelTable.rowCount() < 1:
+                self.ui.submitMultiModelGroup.setEnabled(False)
+        
+        else:
+            logger.info('Caller %s not recongnised' % call_name)
        
     
     def _tablePopup(self, pos):
@@ -236,6 +378,12 @@ class MainGui(QtGui.QMainWindow):
         elif sender == 'bcEntryViewTable':
             table_obj = self.ui.bcEntryViewTable
             table_name = 'BC_DBASE'
+        elif sender == 'ecfEntryViewTable':
+            table_obj = self.ui.ecfEntryViewTable
+            table_name = 'ECF'
+        elif sender == 'tcfEntryViewTable':
+            table_obj = self.ui.tcfEntryViewTable
+            table_name = 'TCF'
         else:
             return
         
@@ -378,6 +526,12 @@ class MainGui(QtGui.QMainWindow):
             self._fetchAndShowTable(conn, tbc_table, 'TBC')
             dat_table = self.ui.datEntryViewTable
             self._fetchAndShowTable(conn, dat_table, 'DAT')
+            bc_table = self.ui.bcEntryViewTable
+            self._fetchAndShowTable(conn, bc_table, 'BC_DBASE') 
+            ecf_table = self.ui.ecfEntryViewTable
+            self._fetchAndShowTable(conn, ecf_table, 'ECF')
+            tcf_table = self.ui.tcfEntryViewTable
+            self._fetchAndShowTable(conn, tcf_table, 'TCF')
                 
             conn.close()
             
@@ -400,6 +554,59 @@ class MainGui(QtGui.QMainWindow):
                 count += 1        
         
 
+    def _findNewLogEntries(self, conn, log_pages, log_name, entry_table=None, 
+                                                        multiple_files=True):
+        '''Checks the log entries to see if they already exist, adds them to
+        their respective tables and highlights the cells.
+        '''
+        
+        logger.debug('Find Entry: log_name=%s, entry_table=%s' % (log_name, entry_table))
+        
+        # Most files are multiple but the DAT file entry isn't so has to be 
+        # dealt with seperately as it doesn't need looping through
+        if multiple_files:
+            if not log_pages[log_name] == None:
+                mod_length = len(log_pages[log_name])
+                
+                # We have to loop backwards here because we might delete entries
+                for i in range(mod_length-1, -1, -1):
+                    
+                    if log_pages[log_name][i][log_name] == 'None':
+                        log_pages[log_name][i] = None
+                    else:
+                    
+                        is_new_entry = DatabaseFunctions.findNewEntries(
+                                            conn, log_name, log_pages[log_name][i])
+        
+                        # If we're adding them to the editable tables we do it
+                        # Otherwise just get rid of those we don't want
+                        if not entry_table == None:
+                            self._putInTableValues(log_pages[log_name][i], entry_table, i)
+                            
+                            # If it'a already in the database then we remove it from the log
+                            # dictionary to avoid entering it again.
+                            if not is_new_entry:
+                                self._setRowIsEditable(entry_table, i, False)
+                                del log_pages[log_name][i]
+                            else:
+                                self._setRowIsEditable(entry_table, i)
+                        else:
+                            if not is_new_entry:
+                                del log_pages[log_name][i]
+        else:
+            if not entry_table == None:
+                self._putInTableValues(log_pages[log_name], entry_table)
+                if not DatabaseFunctions.findNewEntries(conn, log_name, log_pages[log_name]):
+                    self._setRowIsEditable(entry_table, 0, False)
+                    log_pages[log_name] = None
+                else:
+                    self._setRowIsEditable(entry_table, 0)
+            else:
+                log_pages[log_name] = None
+        
+        return log_pages
+
+
     def _fillEntryTables(self, log_pages):
         '''Add the log pages data to the log entry tables that will be
         displayed to the user for amending prior to updating the database.
@@ -410,7 +617,7 @@ class MainGui(QtGui.QMainWindow):
         self._clearTableWidget('entry')
         
         self.log_pages = log_pages
-        self._getInputLogVariables()
+        log_pages = self._getInputLogVariables(log_pages)
         
         # Update RUN
         self._putInTableValues(log_pages['RUN'], self.ui.runEntryTable)
@@ -423,46 +630,24 @@ class MainGui(QtGui.QMainWindow):
         try:
             conn = DatabaseFunctions.loadLogDatabase(self.settings.cur_log_path)
             
-            # Add all tgc's referenced
-            if not log_pages['TGC'] == None:
-                mod_length = len(log_pages['TGC'])
-                for i in range(0, mod_length):
-                    is_new_entry = DatabaseFunctions.findNewEntries(
-                                        conn, 'TGC', log_pages['TGC'][i])
-    
-                    self._putInTableValues(log_pages['TGC'][i], self.ui.tgcEntryTable, i)
-                    
-                    # If it'a already in the database then we remove it from the log
-                    # dictionary to avoid entering it again.
-                    if not is_new_entry:
-                        self._setRowIsEditable(self.ui.tgcEntryTable, i, False)
-                        del log_pages['TGC'][i]
-                    else:
-                        self._setRowIsEditable(self.ui.tgcEntryTable, i)
-                
-            if not log_pages['TBC'] == None:
-                # And the tbc's
-                mod_length = len(log_pages['TBC'])
-                for i in range(0, mod_length):
-                    is_new_entry = DatabaseFunctions.findNewEntries(
-                                        conn, 'TBC', log_pages['TBC'][i])
-    
-                    self._putInTableValues(log_pages['TBC'][i], self.ui.tbcEntryTable, i)
-                    if not is_new_entry:
-                        self._setRowIsEditable(self.ui.tbcEntryTable, i, False)
-                        del log_pages['TBC'][i]
-                    else:
-                        self._setRowIsEditable(self.ui.tbcEntryTable, i)
-                    
+            # Find log entries and populate tables for the model files
+            log_pages = self._findNewLogEntries(conn, log_pages, 'TGC', 
+                                                    self.ui.tgcEntryTable)
+            log_pages = self._findNewLogEntries(conn, log_pages, 'TBC', 
+                                                    self.ui.tbcEntryTable)
+            log_pages = self._findNewLogEntries(conn, log_pages, 'ECF', 
+                                                    self.ui.ecfEntryTable)
+            log_pages = self._findNewLogEntries(conn, log_pages, 'TCF', 
+                                                    self.ui.tcfEntryTable)
+            log_pages = self._findNewLogEntries(conn, log_pages, 'BC_DBASE', 
+                                                    self.ui.bcEntryTable)
+            
+            # DAT files get dealt with separately as there can only be one.
             if log_pages['DAT']['DAT'] == 'None': 
                 log_pages['DAT'] = None
             else:
-                self._putInTableValues(log_pages['DAT'], self.ui.datEntryTable)
-                if not DatabaseFunctions.findNewEntries(conn, 'DAT', log_pages['DAT']):
-                    self._setRowIsEditable(self.ui.datEntryTable, 0, False)
-                    log_pages['DAT'] = None
-                else:
-                    self._setRowIsEditable(self.ui.datEntryTable, 0)
+                log_pages = self._findNewLogEntries(conn, log_pages, 'DAT', 
+                                        self.ui.datEntryTable, False)
                 
         except IOError:
             logger.error('IOError - Unable to access database')
@@ -502,15 +687,22 @@ class MainGui(QtGui.QMainWindow):
                 table_widget.item(row_no, c).setBackground(my_color)
         
         
-    def _getInputLogVariables(self):
+    def _getInputLogVariables(self, log_pages):
         '''Put the variables entered by the user in the Input log variables
         group into the log_pages dictionary.
         '''
-        self.log_pages['RUN']['MODELLER'] = str(self.ui.modellerTextbox.text())
-        self.log_pages['RUN']['TUFLOW_BUILD'] = str(self.ui.tuflowVersionTextbox.text())
-        self.log_pages['RUN']['ISIS_BUILD'] = str(self.ui.isisVersionTextbox.text())
-        self.log_pages['RUN']['EVENT_NAME'] = str(self.ui.eventNameTextbox.text())
+        log_pages['RUN']['MODELLER'] = str(self.ui.modellerTextbox.text())
+        log_pages['RUN']['TUFLOW_BUILD'] = str(self.ui.tuflowVersionTextbox.text())
+        log_pages['RUN']['ISIS_BUILD'] = str(self.ui.isisVersionTextbox.text())
+        log_pages['RUN']['EVENT_NAME'] = str(self.ui.eventNameTextbox.text())
         
+        return log_pages
+        
+#         return str(self.ui.modellerTextbox.text()), \
+#                 str(self.ui.tuflowVersionTextbox.text()), \
+#                 str(self.ui.isisVersionTextbox.text()), \
+#                 str(self.ui.eventNameTextbox.text())
+
                 
     def _putInTableValues(self, col_dict, table_obj, row_no=0):
         '''Put values in the given dictionary into the given table where the
@@ -519,6 +711,11 @@ class MainGui(QtGui.QMainWindow):
         @param col_dict: dictionary containing the values to put in the table.
         @param table_obj: the QTableWidget object to put the values in.
         '''
+        # Insert a new row first if needed
+        row_count = table_obj.rowCount()
+        if not row_count > row_no:
+            table_obj.insertRow(row_count)
+        
         row = table_obj.rowAt(row_no)
         headercount = table_obj.columnCount()
         for x in range(0,headercount,1):
@@ -601,6 +798,7 @@ class MainGui(QtGui.QMainWindow):
                 error_found = True
             except Error:
                 logger.error('Error updating database -  See log for details')
+                error_found = True
             finally:
                 if not conn == False:
                     conn.close()
@@ -613,14 +811,164 @@ class MainGui(QtGui.QMainWindow):
             # Add the new entries to the view table as well
             self.updateLogTable(update_check)
             
-            # Clear the entry rows
+            # Clear the entry rows and deactivate add new log button
             self._clearTableWidget('entry')
+            self.ui.submitSingleModelGroup.setEnabled(False)
             
+            
+            # Update the status bar message
+            self.ui.statusbar.showMessage("Log Database successfully updated")
+            logger.info('Log Database successfully updated')
+            
+    
+    def _createMultipleLogEntry(self):
+        '''Takes all the files in the multiple model list, load them and add
+        them to the database.        
+        TODO:
+            Currently a copy of the method above. Need to implement properly.
+        '''
+        
+        def _updateProgressBar(prog_val, label_text=None):
+            '''Updates the progress bar on the multiple model load tab.
+            '''
+            self.ui.multiLoadProgressBar.setValue(prog_val)
+            if not label_text == None:
+                self.ui.multiLoadProgressLabel.setText(label_text)
+            QtGui.QApplication.processEvents()
+            return prog_val + 1
+
+        
+        # Check that we have a database
+        if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
+            QtGui.QMessageBox.warning(self, "No Database Loaded",
+                    "No log database active. Please load or create one from the file menu.")
+            logger.error('No log database found. Load or create one from File menu')
+            return
+        
+        # Get all of the file paths from the list
+        model_paths = []
+        allRows = self.ui.loadMultiModelTable.rowCount()
+        for row in xrange(0,allRows):
+            #rows.append(index.row()) 
+            model_paths.append(str(self.ui.loadMultiModelTable.item(row,1).text()))
+        
+        # Get the type of log to build
+        log_type = self.ui.loadMultiModelComboBox.currentIndex()
+        
+        # Load all of the models into a list
+        model_logs = []
+        load_errors = []
+        total = len(model_paths)
+        current = 1
+        load_progress = 0
+        total_progress = total*2
+        self.ui.multiLoadProgressBar.setRange(0, total_progress)
+        
+        # Loop through all of the file paths given
+        for path in model_paths:
+            error_found = False
+            
+            try:
+                load_progress = _updateProgressBar(load_progress, 
+                                   'Loading Model %d of %d' % (current, total))
+                
+                log_pages, result = self._fetchAndCheckModel(path, log_type, launch_error=False)
+                
+                if result['Success'] == False:
+                    load_errors.append(result)
+                    error_found = True
+                    continue
+                
+            except IOError:
+                load_errors.append({'Success': False, 
+                    'Status_bar': "Unable to update Database with model: %s" % path,
+                     'Error': 'IO Error', 
+                    'Message': "Unable to load model from file at: %s" % path})
+                error_found = True
+            except:
+                load_errors.append({'Success': False, 
+                    'Status_bar': "Unable to update Database with model: %s" % path,
+                     'Error': 'IO Error', 
+                    'Message': "Unable to load model from file at: %s" % path})
+                error_found = True
+            
+            if not error_found:
+                # Setup progress bar stuff
+                load_progress = _updateProgressBar(load_progress)
+                
+                # Get the global user supplied log variables
+                log_pages = self._getInputLogVariables(log_pages)
+    
+                # Connect to the database and then update the log entries
+                conn = False
+                error_found = False
+                try:
+                    conn = DatabaseFunctions.loadLogDatabase(
+                                                self.settings.cur_log_path)
+                    
+    #                 # Find log entries and populate tables for the model files
+    #                 log_pages = self._findNewLogEntries(conn, log_pages, 'TGC')
+    #                 log_pages = self._findNewLogEntries(conn, log_pages, 'TBC')
+    #                 log_pages = self._findNewLogEntries(conn, log_pages, 'ECF')
+    #                 log_pages = self._findNewLogEntries(conn, log_pages, 'TCF')
+    #                 log_pages = self._findNewLogEntries(conn, log_pages, 'BC_DBASE')
+    #                 # DAT files get dealt with separately as there can only be one.
+    #                 if log_pages['DAT']['DAT'] == 'None': 
+    #                     log_pages['DAT'] = None
+    #                 else:
+    #                     log_pages = self._findNewLogEntries(conn, log_pages, 'DAT', 
+    #                                                         multiple_files=False)
+                    
+                    self.log_pages, update_check = Controller.logEntryUpdates(
+                                        conn, log_pages, check_new_entries=True)
+                except IOError:
+                    logger.error('Unable to access database')
+                    error_found = True
+                except Error:
+                    logger.error('Error updating database -  See log for details')
+                finally:
+                    if not conn == False:
+                        conn.close()
+            
+            # Log any errors to show later
+            if error_found:
+                load_errors.append({'Success': False, 
+                    'Status_bar': "Unable to update Database with model: %s" % path,
+                     'Error': 'Database Error', 
+                    'Message': "Unable to update Database with model: %s" % path})
+                continue
+            
+            # Add the new entries to the view table as well
+            self.updateLogTable(update_check)
+            current += 1
+        
+        load_progress = _updateProgressBar(0, 'Complete')
+            
+        # Clear the list entries
+        self.ui.loadMultiModelTable.setRowCount(0)
+        
+        if len(load_errors) < 1: 
             # Let the user know that all is good
             logger.info('Log Database updated successfully')
-            QtGui.QMessageBox.information(self, 'Log Database Updated',
-                    'See "View Log" Tab for new model entry: %s'\
-                        % self.ui.loadModelTextbox.text())
+            self.ui.statusbar.showMessage("Log Database successfully updated")
+        
+        else:
+            # Collect all of the errors and show to user
+            logger.warning('One or more models could not be loaded')
+            error_files = []
+            for e in load_errors:
+                error_files.append(e['Message'])
+            error_files.insert(0, 
+                    'Models not logged:\n')
+            errors = '\n\n'.join(error_files)
+            
+            self.ui.multiModelLoadErrorTextEdit.setText(errors)
+            
+            # Reset the progress stuff
+            _updateProgressBar(0, 'Complete')
+                
+            QtGui.QMessageBox.warning(self, 'Logging Error:',
+                        'See Error Logs window for details')
             
     
     def _updateWithUserInputs(self):
@@ -630,7 +978,7 @@ class MainGui(QtGui.QMainWindow):
         updates = {}
         updates['RUN'] = self._getFromTableValues(self.ui.runEntryTable)
         
-        # For tgc and tbc this most be done for multiple files
+        # For tgc, tbc, ecf and bc_dbase this most be done for multiple files
         updates['TGC'] = []
         if not self.log_pages['TGC'] == None:
             for i, entry in enumerate(self.log_pages['TGC'], 0):
@@ -640,17 +988,33 @@ class MainGui(QtGui.QMainWindow):
             updates['TBC'] = []
             for i, entry in enumerate(self.log_pages['TBC'], 0):
                 updates['TBC'].append(self._getFromTableValues(self.ui.tbcEntryTable, row_no=i))
+        
+        if not self.log_pages['ECF'] == None:
+            updates['ECF'] = []
+            for i, entry in enumerate(self.log_pages['ECF'], 0):
+                updates['ECF'].append(self._getFromTableValues(self.ui.ecfEntryTable, row_no=i))
+        
+        if not self.log_pages['TCF'] == None:
+            updates['TCF'] = []
+            for i, entry in enumerate(self.log_pages['TCF'], 0):
+                updates['TCF'].append(self._getFromTableValues(self.ui.tcfEntryTable, row_no=i))
+                
+        if not self.log_pages['BC_DBASE'] == None:
+            updates['BC_DBASE'] = []
+            for i, entry in enumerate(self.log_pages['BC_DBASE'], 0):
+                updates['BC_DBASE'].append(self._getFromTableValues(self.ui.bcEntryTable, row_no=i))
             
         updates['DAT'] = self._getFromTableValues(self.ui.datEntryTable)
         
         # Loop through the updates entries and amend any corresponding log_pages
         for key, val in updates.iteritems():
-            if key == 'TGC' or key == 'TBC':
+            if key == 'TGC' or key == 'TBC' or key == 'ECF' or \
+                                    key == 'BC_DBASE' or key == 'TCF':
                 
                 # In this case val is a list
                 for i, input_dict in enumerate(val, 0):
                     for item in input_dict:
-                        if not self.log_pages[key] == None and item in self.log_pages[key][i]:
+                        if not self.log_pages[key] == None and not self.log_pages[key][i] == None and item in self.log_pages[key][i]:
                             self.log_pages[key][i][item] = val[i][item]
             else:
                 for v in val:
@@ -664,6 +1028,7 @@ class MainGui(QtGui.QMainWindow):
         update_check['RUN'] = True
         table_dict = {'RUN': self.ui.runEntryViewTable, 'TGC': self.ui.tgcEntryViewTable,
                       'TBC': self.ui.tbcEntryViewTable, 'DAT': self.ui.datEntryViewTable,
+                      'ECF': self.ui.ecfEntryViewTable, 'TCF': self.ui.tcfEntryViewTable,
                       'BC_DBASE': self.ui.bcEntryViewTable}
         
         for t in table_dict:
@@ -672,8 +1037,8 @@ class MainGui(QtGui.QMainWindow):
             if not update_check[t] == False:
                 last_row = table_dict[t].rowCount()
                 
-                # Need to loop through possible multiple rows in these two
-                if t == 'TGC' or t == 'TBC':
+                # Need to loop through possible multiple rows in these
+                if t == 'TGC' or t == 'TBC' or t == 'ECF' or t == 'BC_DBASE' or t == 'TCF':
                     tab_length = len(self.log_pages[t])
                     for i in range(0, tab_length):
                         table_dict[t].setRowCount((last_row + 1))
@@ -695,7 +1060,9 @@ class MainGui(QtGui.QMainWindow):
                    'TGC': [self.ui.tgcEntryTable, self.ui.tgcEntryViewTable],
                    'TBC': [self.ui.tbcEntryTable, self.ui.tbcEntryViewTable], 
                    'DAT': [self.ui.datEntryTable, self.ui.datEntryViewTable],
-                   'BC_DBASE': [self.ui.bcEntryTable, self.ui.bcEntryViewTable]}
+                   'BC_DBASE': [self.ui.bcEntryTable, self.ui.bcEntryViewTable],
+                   'ECF': [self.ui.ecfEntryTable, self.ui.ecfEntryViewTable],
+                   'TCF': [self.ui.tcfEntryTable, self.ui.tcfEntryViewTable]}
         
         if table_type == 'entry' or table_type == 'all':
                         
@@ -718,6 +1085,15 @@ class MainGui(QtGui.QMainWindow):
             self.ui.isisVersionTextbox.setText(self.settings.isis_version)
             self.ui.eventNameTextbox.setText(self.settings.event_name)
             self.ui.loadModelComboBox.setCurrentIndex(int(self.settings.cur_model_type))
+            
+            if self.settings.logging_level == logging.WARNING:
+                self.ui.actionLogWarning.setChecked(True)
+            elif self.settings.logging_level == logging.INFO:
+                self.ui.actionLogInfo.setChecked(True)
+            elif self.settings.logging_level == logging.DEBUG:
+                self.ui.actionLogDebug.setChecked(True)                
+            
+            logging.getLogger().setLevel(self.settings.logging_level)
             
             if self.settings.last_model_directory == '' or self.settings.last_model_directory == False:
                 if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
@@ -812,7 +1188,29 @@ class MainGui(QtGui.QMainWindow):
             open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, file_types='LogIT database(*.logdb)'))
          
         if not open_path == False:
-            DatabaseFunctions.updateDatabaseVersion(open_path)
+            try:
+                DatabaseFunctions.updateDatabaseVersion(open_path)
+                
+            except:
+                logger.error('Failed to update database scheme: See log for details')
+                QtGui.QMessageBox.warning(self, "Database Update Failed",
+                        "Failed to update database scheme: See log for details") 
+                return
+            
+            msg = "Update Successfull\nWould you like to load updated database?"
+            reply = QtGui.QMessageBox.question(self, 'Update Successfull', 
+                        msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+            if reply == QtGui.QMessageBox.Yes:
+                self.settings.cur_log_path = open_path
+                try:
+                    self.loadModelLog()
+                    self.ui.statusbar.showMessage("Current log: " + open_path)
+                except:
+                    logger.error('Cannot load database: see log for details')
+                    QtGui.QMessageBox.warning(self, "Database Open Failed",
+                        "Failed to open database: See log for details") 
+                    
+            
         
 
     def fileMenuActions(self):
@@ -832,17 +1230,22 @@ class MainGui(QtGui.QMainWindow):
                 
                 # Check if we are about to write over an existing database
                 create_db = True
-                if os.path.exists(save_path):
-                    button = QtGui.QMessageBox.question(self, "Confirm Remove",
-                        "Existing database will be reset to new. Continue?\nDatabase = %s" % save_path,
-                        QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-                    if button == QtGui.QMessageBox.No:
-                        create_db = False
+                
+                # Removed because the system already checks this.
+#                 if os.path.exists(save_path):
+#                     button = QtGui.QMessageBox.question(self, "Confirm Remove",
+#                         "Existing database will be reset to new. Continue?\nDatabase = %s" % save_path,
+#                         QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+#                     if button == QtGui.QMessageBox.No:
+#                         create_db = False
                 
                 if create_db:
                     self.settings.cur_log_path = str(save_path)
                     self._clearTableWidget('all')
+                    self.ui.statusbar.showMessage('Building new log database...')
+                    self.ui.centralwidget.setEnabled(False)
                     DatabaseFunctions.createNewLogDatabase(str(save_path))
+                    self.ui.centralwidget.setEnabled(True)
                     self.ui.statusbar.showMessage("Current log: " + save_path)
         
         elif call_name == 'actionLoad':
@@ -856,9 +1259,13 @@ class MainGui(QtGui.QMainWindow):
             
             if not open_path == False:
                 self.settings.cur_log_path = open_path
-                self.loadModelLog()
-                self.ui.statusbar.showMessage("Current log: " + open_path)
                 
+                try:
+                    self.loadModelLog()
+                    self.ui.statusbar.showMessage("Current log: " + open_path)
+                except:
+                    logger.error('Cannot load database: see log for details')
+                                    
         elif call_name == 'actionExportToExcel':
             if not self.settings.cur_log_path == '' and not self.settings.cur_log_path == False:
                 d = MyFileDialogs()
@@ -885,6 +1292,44 @@ class MainGui(QtGui.QMainWindow):
                 QtGui.QMessageBox.warning(self, "Cannot Export Log",
                                           "There is no log database loaded")
             
+            
+    def _getModelFileDialog(self, multi_paths=False):
+        '''Launches an open file dialog to get .ief or .tcf files.
+        
+        @param multi_paths=False: if set to True it will return a list of all
+               the user selected paths, otherwise a single string path.
+        @return: The chosen file path, a list of paths or false if the user 
+                 cancelled.
+        '''
+
+        # Check that we have a database
+        if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
+            QtGui.QMessageBox.warning(self, "No Database Loaded",
+                "No log database active. Please load or create one from" +
+                                                    " the file menu.")
+            logger.error('No log database found. Load or create one from File menu')
+            return            
+
+        # Create a file dialog with an initial path based on the availability
+        # of path variables.
+        d = MyFileDialogs()
+        if not self.settings.last_model_directory == '' and not self.settings.last_model_directory == False:
+            chosen_path = self.settings.last_model_directory
+        elif not self.settings.cur_log_path == ''  and not self.settings.cur_log_path == False:
+            chosen_path = self.settings.cur_log_path
+        else:
+            chosen_path = self.settings.cur_settings_path
+            
+        if multi_paths:
+            open_path = d.openFileDialog(path=chosen_path, 
+                    file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)',
+                    multi_file=True)
+        else:
+            open_path = d.openFileDialog(path=chosen_path, 
+                    file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)')
+            
+        return open_path
+    
           
     def _loadFileActions(self, shortcut=None):
         '''Respond to the user clicking a button that loads a file.
@@ -893,30 +1338,11 @@ class MainGui(QtGui.QMainWindow):
         call_name = caller.objectName()
         logger.debug('Caller = ' + call_name)
         
-        #setLoggingLevel('DEBUG')
-        
         # Trying to load a model to add to the log
         if call_name == 'loadModelButton' or shortcut == 'loadmodel':
-            # Check that we have a database
-            if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
-                QtGui.QMessageBox.warning(self, "No Database Loaded",
-                    "No log database active. Please load or create one from" +
-                                                        " the file menu.")
-                logger.error('No log database found. Load or create one from File menu')
-                return            
-
-            # Create a file dialog with an initial path based on the availability
-            # of path variables.
-            d = MyFileDialogs()
-            if not self.settings.last_model_directory == '' and not self.settings.last_model_directory == False:
-                open_path = d.openFileDialog(path=self.settings.last_model_directory, 
-                        file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF *.ecf *.ECF)')
-            elif not self.settings.cur_log_path == ''  and not self.settings.cur_log_path == False:
-                open_path = d.openFileDialog(path=self.settings.cur_log_path, 
-                        file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF *.ecf *.ECF)')
-            else:
-                open_path = d.openFileDialog(path=self.settings.cur_settings_path, 
-                        file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF *.ecf *.ECF)')
+                
+            # Launch dialog and get a file
+            open_path = self._getModelFileDialog()
             
             # If the user doesn't cancel
             if not open_path == False:
@@ -927,87 +1353,105 @@ class MainGui(QtGui.QMainWindow):
                 # Get the log type index
                 log_type = self.ui.loadModelComboBox.currentIndex()
                 
-                # Load the model at the chosen path.
-                log_pages = LogBuilder.loadModel(open_path, log_type)
-                if log_pages == False:
-                    QtGui.QMessageBox.warning(self, "Load Error",
-                    "Unable to load model from file at: %s." % open_path)
-                    self.ui.statusbar.showMessage("Unable to load model at: " + open_path)
+                log_pages, result = self._fetchAndCheckModel(open_path, log_type)
+    
+                if result['Success'] == False:
+                    QtGui.QMessageBox.warning(self, result['Error'],
+                    result['Message'])
+                    self.ui.statusbar.showMessage(result['Status_bar'])
                 else:
-                    # Make sure that this ief or tcf do not already exist in the
-                    # database. You need new ones for each run so this isn't
-                    # allowed.
-                    main_ief = log_pages['RUN']['IEF']
-                    main_tcf = log_pages['RUN']['TCF']
-                    tcf_results = log_pages['RUN']['RESULTS_LOCATION_2D']
-                    indb = (False,)
-                    found_path = ''
-                    
-                    # If we have an ief get the ief name to see if we already
-                    # recorded a run using that model
-                    if not main_ief == 'None':
-                        indb = DatabaseFunctions.findInDatabase(
-                                 'RUN', db_path=self.settings.cur_log_path, 
-                                 db_entry=main_ief, col_name='IEF', 
-                                 only_col_name=True)
-                        
-                        # Then check if we've already used the results locations
-                        # location for a previous run and see if the user wants
-                        # to continue if we have.
-                        if indb[0]:
-                            exists = DatabaseFunctions.findInDatabase(
-                                     'RUN', db_path=self.settings.cur_log_path, 
-                                     db_entry=tcf_results, col_name='RESULTS_LOCATION_1D', 
-                                     only_col_name=True)
-                            
-                            if exists[0]:
-                                button = QtGui.QMessageBox.question(self, 
-                                        "Results Folder Already Exists",
-                                        "Results folder location found in previous " +
-                                        "entry\nDo you want to Continue?",
-                                        QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-                                
-                                if button == QtGui.QMessageBox.No:
-                                    return
-                            
-                        found_path = main_ief
-                    
-                    # Do the whole lot again for the tuflow run
-                    if not main_tcf == 'None':
-                        if not indb[0]:
-                            indb = DatabaseFunctions.findInDatabase(
-                                     'RUN', db_path=self.settings.cur_log_path, 
-                                     db_entry=main_tcf, col_name='TCF', 
-                                     only_col_name=True)
-                            found_path = main_tcf
-                        
-                        if not indb[0]:
-                            if not tcf_results == 'None':
-                                exists = DatabaseFunctions.findInDatabase(
-                                         'RUN', db_path=self.settings.cur_log_path, 
-                                         db_entry=tcf_results, col_name='RESULTS_LOCATION_2D', 
-                                         only_col_name=True)
-                            
-                                if exists[0]:
-                                    button = QtGui.QMessageBox.question(self, 
-                                            "Results Folder Already Exists",
-                                            "Results folder location found in previous " +
-                                            "entry\nDo you want to Continue?",
-                                            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-                                    
-                                    if button == QtGui.QMessageBox.No:
-                                        return
-                    
-                    if indb[0]:
-                        QtGui.QMessageBox.warning(self, "Load Error",
-                        "Selected file already exists in database - file: %s." % found_path)
-                        self.ui.statusbar.showMessage("Unable to load model at: " + open_path)
-                    
-                    else:
-                        self.ui.statusbar.showMessage("loaded model at: " + open_path)
-                        self._fillEntryTables(log_pages)
+                    self.ui.statusbar.showMessage(result['Status_bar'])
+                    self._fillEntryTables(log_pages)
+                    self.ui.submitSingleModelGroup.setEnabled(True) 
+
+
+    def _fetchAndCheckModel(self, open_path, log_type, launch_error=True):
+        '''Loads a model and makes a few conditional checks on it.
+        Loads model from the given .tcf/.ief file and checks that the .ief, 
+        .tcf and ISIS results don't already exist in the DB and then returns
+        a success or fail status.
         
-        
+        @param open_path: the .ief or .tcf file path.
+        @param log_type: the model type to load (tuflow or ISIS only).
+        @param lauch_error=True: whether to launch message boxes if an error is
+               found or not. We don't want to if we're loading multiple files.
+        @return: tuple containing log_pages (which could be the loaded log
+                 pages or False if the load failed and a dictionary containing
+                 the load status and messages for status bars and errors.
+        '''
+                
+        # Load the model at the chosen path.
+        log_pages = LogBuilder.loadModel(open_path, log_type)
+        if log_pages == False:
+            if launch_error:
+                QtGui.QMessageBox.warning(self, "Load Error",
+                "Unable to load model from file at: %s." % open_path)
+                self.ui.statusbar.showMessage("Unable to load model at: " + open_path)
+            else:
+                return log_pages, {'Success': False, 
+                        'Status_bar': "Unable to load model at: %s" % open_path,
+                         'Error': 'LoadError', 
+                        'Message': 'Selected file could not be loaded - file: %s.' % found_path}
+        else:
+            # Make sure that this ief or tcf do not already exist in the
+            # database. You need new ones for each run so this isn't
+            # allowed.
+            main_ief = log_pages['RUN']['IEF']
+            main_tcf = log_pages['RUN']['TCF']
+            tcf_results = log_pages['RUN']['RESULTS_LOCATION_2D']
+            indb = (False,)
+            found_path = ''
+            
+            # If we have an ief get the ief name to see if we already
+            # recorded a run using that model
+            if not main_ief == 'None':
+                indb = DatabaseFunctions.findInDatabase(
+                         'RUN', db_path=self.settings.cur_log_path, 
+                         db_entry=main_ief, col_name='IEF', 
+                         only_col_name=True)
+                
+                # Then check if we've already used the results locations
+                # location for a previous run and see if the user wants
+                # to continue if we have.
+                if indb[0]:
+                    exists = DatabaseFunctions.findInDatabase(
+                             'RUN', db_path=self.settings.cur_log_path, 
+                             db_entry=tcf_results, col_name='RESULTS_LOCATION_1D', 
+                             only_col_name=True)
+                    
+                    if exists[0]:
+                        button = QtGui.QMessageBox.question(self, 
+                                "ISIS/FMP Results Folder Already Exists",
+                                "Results folder location found in previous " +
+                                "entry\nDo you want to Continue?",
+                                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+                        
+                        if button == QtGui.QMessageBox.No:
+                            return
+                    
+                found_path = main_ief
+            
+            # Do the whole lot again for the tuflow run
+            if not main_tcf == 'None':
+                if not indb[0]:
+                    indb = DatabaseFunctions.findInDatabase(
+                             'RUN', db_path=self.settings.cur_log_path, 
+                             db_entry=main_tcf, col_name='TCF', 
+                             only_col_name=True)
+                    found_path = main_tcf
+                        
+            if indb[0]:
+                return log_pages, {'Success': False, 
+                        'Status_bar': "Unable to load model at: %s" % open_path,
+                         'Error': 'LoadError', 
+                        'Message': 'Selected file already exists in database - file: %s.' % found_path}
+            else:
+                return log_pages, {'Success': True, 
+                        'Status_bar': "Loaded model at: %s" % open_path,
+                         'Error': None, 
+                        'Message': None}
+
+
 
 class LogitSettings(object):
     '''Storage class for holding all of the settings that the current user has
@@ -1027,6 +1471,7 @@ class LogitSettings(object):
         self.log_path = ''
         self.log_export_path = ''
         self.cur_model_type = 0
+        self.logging_level = 0
         
         
 def main():
@@ -1035,10 +1480,10 @@ def main():
     #import logging
      
     # Need to do this so that the icons show up properly
-    #import ctypes
-    #myappid = 'logit.0-1-Beta'
-    #ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
-    #QPlugin = QtCore.QPluginLoader("qico4.dll")
+    import ctypes
+    myappid = 'logit.0-3-Beta'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    QPlugin = QtCore.QPluginLoader("qico4.dll")
      
     cur_location = os.getcwd()
     settings_path = os.path.join(cur_location, 'settings.logset')

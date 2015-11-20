@@ -6,9 +6,9 @@
 
 
 Name: LogIT (Logger for Isis and Tuflow) 
-Version: 0.1-Beta
+Version: 0.3-Beta
 Author: Duncan Runnacles
-Copyright: (C) 2014 Duncan Runnacles
+Copyright: (C) 2015 Duncan Runnacles
 email: duncan.runnacles@thomasmackay.co.uk
 License: GPL v2 - See below under section LICENSE
 
@@ -77,6 +77,20 @@ v0.2-Beta:
 	- Built database update functionality.
 	- Changed Excel exporter to use DatabaseFunction.cur_table list orders for
 	  fetching columns rather than writing by column order.
+v0.3-Beta:
+	- Added ESTRY and BC Database file reading capability.
+	- Added Tcf and Ecf tabs to the log tables.
+	- Added multiple model load functionality.
+	- Added quick reference guide on main page.
+	- Added automatically load update log question box when updating database.
+	- Added ability to choose logging level in settings menu.
+	- Added reload database option to settings menu.
+	- Fixed bugs in loading multiple tgc, tbc, etc files at once.
+	- Added additional error catching where it was needed.
+	- Added role back of database when log update fails at any point.
+	- Removed some of the more annoying message boxes. Now writes to statusbar.
+	- Updated LogFormatter.bas (version 2) to deal with updated Excel outputs.
+	- Updated tab contents.
 
 
 LICENSE

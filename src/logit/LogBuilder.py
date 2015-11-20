@@ -68,6 +68,7 @@ try:
 except:
     logger.error('Cannot load tmac_tools_lib: Is it installed?')
 
+# Constants for identifying log type
 TYPE_TUFLOW = 0
 TYPE_ISIS = 1
 TYPE_ESTRY = 2
@@ -162,9 +163,12 @@ def loadModel(file_path, log_type):
     if log_type == TYPE_ISIS:
         log_pages['TGC'] = None
         log_pages['TBC'] = None
+        log_pages['ECF'] = None
+        log_pages['TCF'] = None
         log_pages['BC_DBASE'] = None
     else:
         log_pages['ECF'] = buildEcfRowFromModel(cur_date, tuflow_model)
+        log_pages['TCF'] = buildTcfRowFromModel(cur_date, tuflow_model)
         log_pages['TGC'] = buildTgcRowFromModel(cur_date, tuflow_model)
         log_pages['TBC'] = buildTbcRowFromModel(cur_date, tuflow_model)
         log_pages['BC_DBASE'] = buildBcRowFromModel(cur_date, tuflow_model)
@@ -197,7 +201,7 @@ def buildRunRowFromModel(cur_date, ief_file, tuflow_model, log_type):
                 'COMMENTS': 'None', 'SETUP': 'None', 'ISIS_BUILD': 'None', 
                 'IEF': 'None', 'DAT': 'None', 'TUFLOW_BUILD': 'None', 
                 'TCF': 'None', 'TGC': 'None', 'TBC': 'None', 'BC_DBASE': 'None', 
-                'EVENT_NAME': 'None'}
+                'ECF': 'None', 'EVENT_NAME': 'None'}
     
     if not log_type == TYPE_ESTRY and not ief_file == None:
         run_cols = buildIsisRun(ief_file, run_cols)
@@ -282,13 +286,19 @@ def buildTuflowRun(has_ief_file, tuflow_model, run_cols):
                     pass
         
     # The rest is in the tuflow model
-    run_cols['TCF'] = tcf.somefileRef.getFileNameAndExtension()
+    tcf_paths = []
+    for t in tcf_trds:
+        if not t in tcf_paths:
+            tcf_paths.append(t.somefileRef.getFileNameAndExtension())
+    run_cols['TCF'] = "[" + ", ".join(tcf_paths) + "]"
     
     # Get the tgc and tbc file details.
     tgc_paths = []
     tbc_paths = []
+    ecf_paths = []
     tgcs = tuflow_model.getModelObject(Tgc.TYPE)
     tbcs = tuflow_model.getModelObject(Tbc.TYPE)
+    ecfs = tuflow_model.getModelObject(Ecf.TYPE)
     
     # Add all .tgc file and .tbc file paths to a list and join them up into a
     # single string
@@ -296,14 +306,21 @@ def buildTuflowRun(has_ief_file, tuflow_model, run_cols):
         tgc_paths.append(g.somefileRef.getFileNameAndExtension())
     for b in tbcs:
         tbc_paths.append(b.somefileRef.getFileNameAndExtension())
-    run_cols['TGC'] = "[" + ", ".join(tgc_paths) + "]"
-    run_cols['TBC'] = "[" + ", ".join(tbc_paths) + "]"
+    for e in ecfs:
+        ecf_paths.append(e.somefileRef.getFileNameAndExtension())
+        
+    if not len(tgc_paths) < 1:
+        run_cols['TGC'] = "[" + ", ".join(tgc_paths) + "]"
+    if not len(tbc_paths) < 1:
+        run_cols['TBC'] = "[" + ", ".join(tbc_paths) + "]"
+    if not len(ecf_paths) < 1:
+        run_cols['ECF'] = "[" + ", ".join(ecf_paths) + "]"
     
     # Get the Materials and BC Database file references
     # Get the tcf and ecf references from the model
     model_objs = tuflow_model.getModelObject(Tcf.TYPE)
     model_objs = model_objs + tuflow_model.getModelObject(Ecf.TYPE)
-    model_objs.append(tuflow_model.getModelObject('main_tcf'))
+    #model_objs.append(tuflow_model.getModelObject('main_tcf'))
     
     # Fetch any boundary condition database out of the the ecf and tcf files
     bc_paths = []
@@ -314,7 +331,8 @@ def buildTuflowRun(has_ief_file, tuflow_model, run_cols):
                 bc_paths.append(d.getFileNameAndExtension())
     
     # Get them into a single string
-    run_cols['BC_DBASE'] = "[" + ", ".join(bc_paths) + "]"
+    if not len(bc_paths) < 1:
+        run_cols['BC_DBASE'] = "[" + ", ".join(bc_paths) + "]"
     
     # Go through the list of tcf's and associated trd files to get all
     # references to results file locations.
@@ -346,7 +364,7 @@ def buildEcfRowFromModel(cur_date, tuflow_model):
     ecf_files = []
     ecf_path = 'None'
     
-    # If there are any .tgc files in the TuflowModel; grab them all and join up
+     # Need to find all the .ecf files in the TuflowModel; grab them and join up
     # the filenames (as done in the run page) and append files to the list if
     # they aren't already in it.
     ecfs = tuflow_model.getModelObject(Ecf.TYPE)
@@ -356,16 +374,61 @@ def buildEcfRowFromModel(cur_date, tuflow_model):
             ecf_path = e.somefileRef.getFileNameAndExtension()
             paths = e.getFilePaths(SomeFile.NAME_AND_EXTENSION)
             for p in paths:
-                if not p in ecf_files:
+                # Need to catch the "" files because of the results file references
+                if not p in ecf_files and not p.strip() == "":
                     ecf_files.append(p)
 
             ecf_list.append({'DATE': cur_date, 'ECF': ecf_path, 
                              'FILES': ecf_files, 'COMMENTS': 'None'})
 
     else:
-        ecf_list.append(tgc_cols) 
+        ecf_list.append(ecf_cols) 
             
     return ecf_list
+
+
+def buildTcfRowFromModel(cur_date, tuflow_model):
+    '''Create a new row for the TCF file page
+    @var tulfow_model: The TuflowModel object loaded from file
+    @attention: See superclass for more details 
+    '''
+    tcf_cols = {'DATE': str(cur_date), 'TCF': 'None', 'FILES': 'None', 
+                'COMMENTS': 'None'}
+    tcf_list = []
+    cur_date = str(cur_date)
+    tcf_files = []
+    tcf_path = 'None'
+    
+    temp_tcf_catch = []
+    
+    # Need to find all the .tcf files in the TuflowModel; grab them and join up
+    # the filenames (as done in the run page) and append files to the list if
+    # they aren't already in it.
+    tcfs = tuflow_model.getModelObject(Tcf.TYPE)
+    #tcfs.append(tuflow_model.getModelObject('main_tcf'))
+    if len(tcfs) > 0:
+
+        for t in tcfs:
+            # Hacky way of bypassing loading two version of the same tcf
+            # TODO: fix this properly!
+            tcf_path = t.somefileRef.getFileNameAndExtension()
+            if tcf_path in temp_tcf_catch:
+                continue
+            temp_tcf_catch.append(tcf_path)
+            
+            paths = t.getFilePaths(SomeFile.NAME_AND_EXTENSION)
+            for p in paths:
+                # Need to catch the "" files because of the results file references
+                if not p in tcf_files and not p.strip() == "":
+                    tcf_files.append(p)
+
+            tcf_list.append({'DATE': cur_date, 'TCF': tcf_path, 
+                             'FILES': tcf_files, 'COMMENTS': 'None'})
+
+    else:
+        tcf_list.append(tcf_cols) 
+            
+    return tcf_list
 
                 
 def buildTgcRowFromModel(cur_date, tuflow_model):

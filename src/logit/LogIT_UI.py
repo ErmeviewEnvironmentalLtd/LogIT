@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'LogIT_UI.ui'
+# Form implementation generated from reading ui file '..\..\Gui\LogIT_UI.ui'
 #
-# Created: Thu Nov 20 13:29:39 2014
-#      by: PyQt4 UI code generator 4.10.4
+# Created by: PyQt4 UI code generator 4.11.4
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -26,7 +25,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(680, 605)
+        MainWindow.resize(905, 836)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -41,7 +40,7 @@ class Ui_MainWindow(object):
         font.setWeight(75)
         MainWindow.setFont(font)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/images/Logit_Logo.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/images/Logit_Logo2_25x25.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet(_fromUtf8("QGroupBox {\n"
 "    font: 75 9pt \"Arial\" bold;\n"
@@ -54,6 +53,7 @@ class Ui_MainWindow(object):
 "    left: 10px;\n"
 "    padding: 0 3px 0 3px;\n"
 " } "))
+        MainWindow.setIconSize(QtCore.QSize(25, 25))
         self.centralwidget = QtGui.QWidget(MainWindow)
         self.centralwidget.setObjectName(_fromUtf8("centralwidget"))
         self.verticalLayout_2 = QtGui.QVBoxLayout(self.centralwidget)
@@ -74,88 +74,28 @@ class Ui_MainWindow(object):
         self.verticalLayout.setObjectName(_fromUtf8("verticalLayout"))
         self.scrollArea = QtGui.QScrollArea(self.newEntryTab)
         self.scrollArea.setMinimumSize(QtCore.QSize(400, 400))
+        self.scrollArea.setStyleSheet(_fromUtf8("border-color: rgb(124, 163, 255);"))
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
         self.scrollAreaWidgetContents = QtGui.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 619, 754))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 860, 1272))
         self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
-        self.verticalLayout_3 = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
-        self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
-        self.loadModelGroup = QtGui.QGroupBox(self.scrollAreaWidgetContents)
-        self.loadModelGroup.setMinimumSize(QtCore.QSize(0, 100))
-        self.loadModelGroup.setMaximumSize(QtCore.QSize(600, 120))
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("Arial 12"))
-        font.setPointSize(9)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(9)
-        self.loadModelGroup.setFont(font)
-        self.loadModelGroup.setStyleSheet(_fromUtf8(""))
-        self.loadModelGroup.setObjectName(_fromUtf8("loadModelGroup"))
-        self.gridLayout = QtGui.QGridLayout(self.loadModelGroup)
-        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
-        self.loadModelComboFrame = QtGui.QFrame(self.loadModelGroup)
-        self.loadModelComboFrame.setMinimumSize(QtCore.QSize(575, 0))
-        self.loadModelComboFrame.setMaximumSize(QtCore.QSize(16777215, 35))
-        self.loadModelComboFrame.setFrameShape(QtGui.QFrame.NoFrame)
-        self.loadModelComboFrame.setFrameShadow(QtGui.QFrame.Raised)
-        self.loadModelComboFrame.setObjectName(_fromUtf8("loadModelComboFrame"))
-        self.horizontalLayout = QtGui.QHBoxLayout(self.loadModelComboFrame)
-        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
-        self.loadModelComboLabel = QtGui.QLabel(self.loadModelComboFrame)
-        font = QtGui.QFont()
-        font.setPointSize(9)
-        self.loadModelComboLabel.setFont(font)
-        self.loadModelComboLabel.setObjectName(_fromUtf8("loadModelComboLabel"))
-        self.horizontalLayout.addWidget(self.loadModelComboLabel)
-        self.loadModelComboBox = QtGui.QComboBox(self.loadModelComboFrame)
+        self.verticalLayout_19 = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout_19.setObjectName(_fromUtf8("verticalLayout_19"))
+        self.instructionsTextBrowser = QtGui.QTextBrowser(self.scrollAreaWidgetContents)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.loadModelComboBox.sizePolicy().hasHeightForWidth())
-        self.loadModelComboBox.setSizePolicy(sizePolicy)
-        self.loadModelComboBox.setMinimumSize(QtCore.QSize(210, 20))
-        self.loadModelComboBox.setMaximumSize(QtCore.QSize(60, 16777215))
-        self.loadModelComboBox.setAutoFillBackground(False)
-        self.loadModelComboBox.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);"))
-        self.loadModelComboBox.setObjectName(_fromUtf8("loadModelComboBox"))
-        self.loadModelComboBox.addItem(_fromUtf8(""))
-        self.loadModelComboBox.addItem(_fromUtf8(""))
-        self.loadModelComboBox.addItem(_fromUtf8(""))
-        self.horizontalLayout.addWidget(self.loadModelComboBox)
-        spacerItem = QtGui.QSpacerItem(40, 10, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.horizontalLayout.addItem(spacerItem)
-        self.gridLayout.addWidget(self.loadModelComboFrame, 0, 0, 1, 1)
-        self.frame_2 = QtGui.QFrame(self.loadModelGroup)
-        self.frame_2.setMinimumSize(QtCore.QSize(0, 0))
-        self.frame_2.setMaximumSize(QtCore.QSize(16777215, 35))
-        self.frame_2.setFrameShape(QtGui.QFrame.NoFrame)
-        self.frame_2.setFrameShadow(QtGui.QFrame.Raised)
-        self.frame_2.setObjectName(_fromUtf8("frame_2"))
-        self.horizontalLayout_2 = QtGui.QHBoxLayout(self.frame_2)
-        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
-        self.loadModelTextbox = QtGui.QLineEdit(self.frame_2)
-        self.loadModelTextbox.setMinimumSize(QtCore.QSize(390, 20))
-        self.loadModelTextbox.setMaximumSize(QtCore.QSize(470, 16777215))
-        self.loadModelTextbox.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);"))
-        self.loadModelTextbox.setObjectName(_fromUtf8("loadModelTextbox"))
-        self.horizontalLayout_2.addWidget(self.loadModelTextbox)
-        self.loadModelButton = QtGui.QPushButton(self.frame_2)
-        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
-        sizePolicy.setHorizontalStretch(55)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.loadModelButton.sizePolicy().hasHeightForWidth())
-        self.loadModelButton.setSizePolicy(sizePolicy)
-        self.loadModelButton.setMinimumSize(QtCore.QSize(90, 20))
+        sizePolicy.setHeightForWidth(self.instructionsTextBrowser.sizePolicy().hasHeightForWidth())
+        self.instructionsTextBrowser.setSizePolicy(sizePolicy)
+        self.instructionsTextBrowser.setMinimumSize(QtCore.QSize(600, 250))
         font = QtGui.QFont()
-        font.setBold(False)
-        font.setWeight(50)
-        self.loadModelButton.setFont(font)
-        self.loadModelButton.setObjectName(_fromUtf8("loadModelButton"))
-        self.horizontalLayout_2.addWidget(self.loadModelButton)
-        self.gridLayout.addWidget(self.frame_2, 1, 0, 1, 1)
-        self.verticalLayout_3.addWidget(self.loadModelGroup)
+        font.setFamily(_fromUtf8("Arial"))
+        font.setPointSize(10)
+        self.instructionsTextBrowser.setFont(font)
+        self.instructionsTextBrowser.setStyleSheet(_fromUtf8("QTextEdit { background-color: rgb(255, 255, 255); }"))
+        self.instructionsTextBrowser.setObjectName(_fromUtf8("instructionsTextBrowser"))
+        self.verticalLayout_19.addWidget(self.instructionsTextBrowser)
         self.inputVarGroup = QtGui.QGroupBox(self.scrollAreaWidgetContents)
         self.inputVarGroup.setMinimumSize(QtCore.QSize(600, 100))
         self.inputVarGroup.setMaximumSize(QtCore.QSize(600, 130))
@@ -200,8 +140,115 @@ class Ui_MainWindow(object):
         self.tuflowVersionTextbox.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);\n"
 "border-color: rgb(180, 180, 180);"))
         self.tuflowVersionTextbox.setObjectName(_fromUtf8("tuflowVersionTextbox"))
-        self.verticalLayout_3.addWidget(self.inputVarGroup)
-        self.RunGroup = QtGui.QGroupBox(self.scrollAreaWidgetContents)
+        self.verticalLayout_19.addWidget(self.inputVarGroup)
+        self.loadModelTab = QtGui.QTabWidget(self.scrollAreaWidgetContents)
+        self.loadModelTab.setStyleSheet(_fromUtf8("QTabWidget {\n"
+"font: 75 10pt \"Arial\"; \n"
+"\n"
+"}"))
+        self.loadModelTab.setObjectName(_fromUtf8("loadModelTab"))
+        self.loadSingleModelTab = QtGui.QWidget()
+        self.loadSingleModelTab.setObjectName(_fromUtf8("loadSingleModelTab"))
+        self.verticalLayout_3 = QtGui.QVBoxLayout(self.loadSingleModelTab)
+        self.verticalLayout_3.setObjectName(_fromUtf8("verticalLayout_3"))
+        self.horizontalLayout_3 = QtGui.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName(_fromUtf8("horizontalLayout_3"))
+        self.loadModelGroup = QtGui.QGroupBox(self.loadSingleModelTab)
+        self.loadModelGroup.setMinimumSize(QtCore.QSize(0, 100))
+        self.loadModelGroup.setMaximumSize(QtCore.QSize(600, 120))
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("Arial 12"))
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(9)
+        self.loadModelGroup.setFont(font)
+        self.loadModelGroup.setStyleSheet(_fromUtf8(""))
+        self.loadModelGroup.setObjectName(_fromUtf8("loadModelGroup"))
+        self.gridLayout = QtGui.QGridLayout(self.loadModelGroup)
+        self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        self.loadModelComboFrame = QtGui.QFrame(self.loadModelGroup)
+        self.loadModelComboFrame.setMinimumSize(QtCore.QSize(575, 0))
+        self.loadModelComboFrame.setMaximumSize(QtCore.QSize(16777215, 35))
+        self.loadModelComboFrame.setFrameShape(QtGui.QFrame.NoFrame)
+        self.loadModelComboFrame.setFrameShadow(QtGui.QFrame.Raised)
+        self.loadModelComboFrame.setObjectName(_fromUtf8("loadModelComboFrame"))
+        self.horizontalLayout = QtGui.QHBoxLayout(self.loadModelComboFrame)
+        self.horizontalLayout.setObjectName(_fromUtf8("horizontalLayout"))
+        self.loadModelComboLabel = QtGui.QLabel(self.loadModelComboFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.loadModelComboLabel.setFont(font)
+        self.loadModelComboLabel.setObjectName(_fromUtf8("loadModelComboLabel"))
+        self.horizontalLayout.addWidget(self.loadModelComboLabel)
+        self.loadModelComboBox = QtGui.QComboBox(self.loadModelComboFrame)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.loadModelComboBox.sizePolicy().hasHeightForWidth())
+        self.loadModelComboBox.setSizePolicy(sizePolicy)
+        self.loadModelComboBox.setMinimumSize(QtCore.QSize(210, 20))
+        self.loadModelComboBox.setMaximumSize(QtCore.QSize(60, 16777215))
+        self.loadModelComboBox.setAutoFillBackground(False)
+        self.loadModelComboBox.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);"))
+        self.loadModelComboBox.setObjectName(_fromUtf8("loadModelComboBox"))
+        self.loadModelComboBox.addItem(_fromUtf8(""))
+        self.loadModelComboBox.addItem(_fromUtf8(""))
+        self.horizontalLayout.addWidget(self.loadModelComboBox)
+        spacerItem = QtGui.QSpacerItem(40, 10, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem)
+        self.gridLayout.addWidget(self.loadModelComboFrame, 0, 0, 1, 1)
+        self.frame_2 = QtGui.QFrame(self.loadModelGroup)
+        self.frame_2.setMinimumSize(QtCore.QSize(0, 0))
+        self.frame_2.setMaximumSize(QtCore.QSize(16777215, 35))
+        self.frame_2.setFrameShape(QtGui.QFrame.NoFrame)
+        self.frame_2.setFrameShadow(QtGui.QFrame.Raised)
+        self.frame_2.setObjectName(_fromUtf8("frame_2"))
+        self.horizontalLayout_2 = QtGui.QHBoxLayout(self.frame_2)
+        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
+        self.loadModelTextbox = QtGui.QLineEdit(self.frame_2)
+        self.loadModelTextbox.setMinimumSize(QtCore.QSize(390, 20))
+        self.loadModelTextbox.setMaximumSize(QtCore.QSize(470, 16777215))
+        self.loadModelTextbox.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);"))
+        self.loadModelTextbox.setObjectName(_fromUtf8("loadModelTextbox"))
+        self.horizontalLayout_2.addWidget(self.loadModelTextbox)
+        self.loadModelButton = QtGui.QPushButton(self.frame_2)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(55)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.loadModelButton.sizePolicy().hasHeightForWidth())
+        self.loadModelButton.setSizePolicy(sizePolicy)
+        self.loadModelButton.setMinimumSize(QtCore.QSize(90, 20))
+        font = QtGui.QFont()
+        font.setBold(False)
+        font.setWeight(50)
+        self.loadModelButton.setFont(font)
+        self.loadModelButton.setObjectName(_fromUtf8("loadModelButton"))
+        self.horizontalLayout_2.addWidget(self.loadModelButton)
+        self.gridLayout.addWidget(self.frame_2, 1, 0, 1, 1)
+        self.horizontalLayout_3.addWidget(self.loadModelGroup)
+        spacerItem1 = QtGui.QSpacerItem(13, 20, QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_3.addItem(spacerItem1)
+        self.submitSingleModelGroup = QtGui.QGroupBox(self.loadSingleModelTab)
+        self.submitSingleModelGroup.setEnabled(False)
+        self.submitSingleModelGroup.setMinimumSize(QtCore.QSize(190, 0))
+        self.submitSingleModelGroup.setObjectName(_fromUtf8("submitSingleModelGroup"))
+        self.verticalLayout_23 = QtGui.QVBoxLayout(self.submitSingleModelGroup)
+        self.verticalLayout_23.setObjectName(_fromUtf8("verticalLayout_23"))
+        self.submitSingleModelLabel = QtGui.QLabel(self.submitSingleModelGroup)
+        self.submitSingleModelLabel.setObjectName(_fromUtf8("submitSingleModelLabel"))
+        self.verticalLayout_23.addWidget(self.submitSingleModelLabel)
+        self.addSingleLogEntryButton = QtGui.QPushButton(self.submitSingleModelGroup)
+        self.addSingleLogEntryButton.setMinimumSize(QtCore.QSize(0, 25))
+        self.addSingleLogEntryButton.setMaximumSize(QtCore.QSize(150, 25))
+        self.addSingleLogEntryButton.setSizeIncrement(QtCore.QSize(50, 30))
+        self.addSingleLogEntryButton.setObjectName(_fromUtf8("addSingleLogEntryButton"))
+        self.verticalLayout_23.addWidget(self.addSingleLogEntryButton)
+        self.horizontalLayout_3.addWidget(self.submitSingleModelGroup)
+        spacerItem2 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_3.addItem(spacerItem2)
+        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
+        self.RunGroup = QtGui.QGroupBox(self.loadSingleModelTab)
         self.RunGroup.setMinimumSize(QtCore.QSize(400, 100))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
@@ -226,7 +273,7 @@ class Ui_MainWindow(object):
         self.runEntryTable.setStyleSheet(_fromUtf8("font: 7pt \"MS Shell Dlg 2\";"))
         self.runEntryTable.setFrameShape(QtGui.QFrame.WinPanel)
         self.runEntryTable.setObjectName(_fromUtf8("runEntryTable"))
-        self.runEntryTable.setColumnCount(17)
+        self.runEntryTable.setColumnCount(18)
         self.runEntryTable.setRowCount(1)
         item = QtGui.QTableWidgetItem()
         font = QtGui.QFont()
@@ -322,6 +369,11 @@ class Ui_MainWindow(object):
         self.runEntryTable.setHorizontalHeaderItem(16, item)
         item = QtGui.QTableWidgetItem()
         font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.runEntryTable.setHorizontalHeaderItem(17, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
         font.setFamily(_fromUtf8("MS Shell Dlg 2"))
         font.setPointSize(7)
         item.setFont(font)
@@ -386,10 +438,85 @@ class Ui_MainWindow(object):
         font = QtGui.QFont()
         font.setPointSize(7)
         item.setFont(font)
-        self.runEntryTable.setItem(0, 16, item)
+        self.runEntryTable.setItem(0, 17, item)
         self.verticalLayout_4.addWidget(self.runEntryTable)
         self.verticalLayout_3.addWidget(self.RunGroup)
-        self.tgcGroup = QtGui.QGroupBox(self.scrollAreaWidgetContents)
+        self.tcfGroup = QtGui.QGroupBox(self.loadSingleModelTab)
+        self.tcfGroup.setMinimumSize(QtCore.QSize(0, 100))
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("Arial"))
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(9)
+        self.tcfGroup.setFont(font)
+        self.tcfGroup.setStyleSheet(_fromUtf8("font: 75 9pt \"Arial\";"))
+        self.tcfGroup.setObjectName(_fromUtf8("tcfGroup"))
+        self.verticalLayout_14 = QtGui.QVBoxLayout(self.tcfGroup)
+        self.verticalLayout_14.setObjectName(_fromUtf8("verticalLayout_14"))
+        self.tcfEntryTable = QtGui.QTableWidget(self.tcfGroup)
+        self.tcfEntryTable.setMaximumSize(QtCore.QSize(16777215, 71))
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.tcfEntryTable.setFont(font)
+        self.tcfEntryTable.setStyleSheet(_fromUtf8("font: 7pt \"MS Shell Dlg 2\";"))
+        self.tcfEntryTable.setFrameShape(QtGui.QFrame.WinPanel)
+        self.tcfEntryTable.setObjectName(_fromUtf8("tcfEntryTable"))
+        self.tcfEntryTable.setColumnCount(4)
+        self.tcfEntryTable.setRowCount(1)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryTable.setVerticalHeaderItem(0, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryTable.setHorizontalHeaderItem(0, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryTable.setHorizontalHeaderItem(1, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryTable.setHorizontalHeaderItem(2, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryTable.setHorizontalHeaderItem(3, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryTable.setItem(0, 0, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryTable.setItem(0, 1, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryTable.setItem(0, 2, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryTable.setItem(0, 3, item)
+        self.verticalLayout_14.addWidget(self.tcfEntryTable)
+        self.verticalLayout_3.addWidget(self.tcfGroup)
+        self.tgcGroup = QtGui.QGroupBox(self.loadSingleModelTab)
         self.tgcGroup.setMinimumSize(QtCore.QSize(0, 100))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
@@ -464,7 +591,7 @@ class Ui_MainWindow(object):
         self.tgcEntryTable.setItem(0, 3, item)
         self.verticalLayout_5.addWidget(self.tgcEntryTable)
         self.verticalLayout_3.addWidget(self.tgcGroup)
-        self.tbcGroup = QtGui.QGroupBox(self.scrollAreaWidgetContents)
+        self.tbcGroup = QtGui.QGroupBox(self.loadSingleModelTab)
         self.tbcGroup.setMinimumSize(QtCore.QSize(0, 100))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
@@ -539,7 +666,7 @@ class Ui_MainWindow(object):
         self.tbcEntryTable.setItem(0, 3, item)
         self.verticalLayout_6.addWidget(self.tbcEntryTable)
         self.verticalLayout_3.addWidget(self.tbcGroup)
-        self.datGroup = QtGui.QGroupBox(self.scrollAreaWidgetContents)
+        self.datGroup = QtGui.QGroupBox(self.loadSingleModelTab)
         self.datGroup.setMinimumSize(QtCore.QSize(0, 100))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
@@ -609,7 +736,7 @@ class Ui_MainWindow(object):
         self.datEntryTable.setItem(0, 3, item)
         self.verticalLayout_7.addWidget(self.datEntryTable)
         self.verticalLayout_3.addWidget(self.datGroup)
-        self.bcGroup = QtGui.QGroupBox(self.scrollAreaWidgetContents)
+        self.bcGroup = QtGui.QGroupBox(self.loadSingleModelTab)
         self.bcGroup.setMinimumSize(QtCore.QSize(0, 100))
         font = QtGui.QFont()
         font.setFamily(_fromUtf8("Arial"))
@@ -685,23 +812,224 @@ class Ui_MainWindow(object):
         self.bcEntryTable.setItem(0, 3, item)
         self.verticalLayout_8.addWidget(self.bcEntryTable)
         self.verticalLayout_3.addWidget(self.bcGroup)
+        self.ecfGroup = QtGui.QGroupBox(self.loadSingleModelTab)
+        self.ecfGroup.setMinimumSize(QtCore.QSize(0, 100))
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("Arial"))
+        font.setPointSize(9)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(9)
+        self.ecfGroup.setFont(font)
+        self.ecfGroup.setStyleSheet(_fromUtf8("font: 75 9pt \"Arial\";"))
+        self.ecfGroup.setObjectName(_fromUtf8("ecfGroup"))
+        self.verticalLayout_18 = QtGui.QVBoxLayout(self.ecfGroup)
+        self.verticalLayout_18.setObjectName(_fromUtf8("verticalLayout_18"))
+        self.ecfEntryTable = QtGui.QTableWidget(self.ecfGroup)
+        self.ecfEntryTable.setMaximumSize(QtCore.QSize(16777215, 71))
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.ecfEntryTable.setFont(font)
+        self.ecfEntryTable.setStyleSheet(_fromUtf8("font: 7pt \"MS Shell Dlg 2\";"))
+        self.ecfEntryTable.setFrameShape(QtGui.QFrame.WinPanel)
+        self.ecfEntryTable.setFrameShadow(QtGui.QFrame.Sunken)
+        self.ecfEntryTable.setObjectName(_fromUtf8("ecfEntryTable"))
+        self.ecfEntryTable.setColumnCount(4)
+        self.ecfEntryTable.setRowCount(1)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryTable.setVerticalHeaderItem(0, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryTable.setHorizontalHeaderItem(0, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryTable.setHorizontalHeaderItem(1, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryTable.setHorizontalHeaderItem(2, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryTable.setHorizontalHeaderItem(3, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryTable.setItem(0, 0, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryTable.setItem(0, 1, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryTable.setItem(0, 2, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryTable.setItem(0, 3, item)
+        self.verticalLayout_18.addWidget(self.ecfEntryTable)
+        self.verticalLayout_3.addWidget(self.ecfGroup)
+        self.loadModelTab.addTab(self.loadSingleModelTab, _fromUtf8(""))
+        self.multiModelLoadTab = QtGui.QWidget()
+        self.multiModelLoadTab.setObjectName(_fromUtf8("multiModelLoadTab"))
+        self.loadMultiModelGroupBox = QtGui.QGroupBox(self.multiModelLoadTab)
+        self.loadMultiModelGroupBox.setGeometry(QtCore.QRect(10, 10, 591, 71))
+        self.loadMultiModelGroupBox.setObjectName(_fromUtf8("loadMultiModelGroupBox"))
+        self.loadMultiModelComboFrame = QtGui.QFrame(self.loadMultiModelGroupBox)
+        self.loadMultiModelComboFrame.setGeometry(QtCore.QRect(10, 20, 575, 34))
+        self.loadMultiModelComboFrame.setMinimumSize(QtCore.QSize(575, 0))
+        self.loadMultiModelComboFrame.setMaximumSize(QtCore.QSize(16777215, 35))
+        self.loadMultiModelComboFrame.setFrameShape(QtGui.QFrame.NoFrame)
+        self.loadMultiModelComboFrame.setFrameShadow(QtGui.QFrame.Raised)
+        self.loadMultiModelComboFrame.setObjectName(_fromUtf8("loadMultiModelComboFrame"))
+        self.horizontalLayout_4 = QtGui.QHBoxLayout(self.loadMultiModelComboFrame)
+        self.horizontalLayout_4.setObjectName(_fromUtf8("horizontalLayout_4"))
+        self.loadMultiModelComboLabel = QtGui.QLabel(self.loadMultiModelComboFrame)
+        font = QtGui.QFont()
+        font.setPointSize(9)
+        self.loadMultiModelComboLabel.setFont(font)
+        self.loadMultiModelComboLabel.setObjectName(_fromUtf8("loadMultiModelComboLabel"))
+        self.horizontalLayout_4.addWidget(self.loadMultiModelComboLabel)
+        self.loadMultiModelComboBox = QtGui.QComboBox(self.loadMultiModelComboFrame)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.loadMultiModelComboBox.sizePolicy().hasHeightForWidth())
+        self.loadMultiModelComboBox.setSizePolicy(sizePolicy)
+        self.loadMultiModelComboBox.setMinimumSize(QtCore.QSize(210, 20))
+        self.loadMultiModelComboBox.setMaximumSize(QtCore.QSize(60, 16777215))
+        self.loadMultiModelComboBox.setAutoFillBackground(False)
+        self.loadMultiModelComboBox.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);"))
+        self.loadMultiModelComboBox.setObjectName(_fromUtf8("loadMultiModelComboBox"))
+        self.loadMultiModelComboBox.addItem(_fromUtf8(""))
+        self.loadMultiModelComboBox.addItem(_fromUtf8(""))
+        self.horizontalLayout_4.addWidget(self.loadMultiModelComboBox)
+        spacerItem3 = QtGui.QSpacerItem(40, 10, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        self.horizontalLayout_4.addItem(spacerItem3)
+        self.chooseMultipleModelsGroupBox = QtGui.QGroupBox(self.multiModelLoadTab)
+        self.chooseMultipleModelsGroupBox.setGeometry(QtCore.QRect(10, 90, 591, 621))
+        self.chooseMultipleModelsGroupBox.setAutoFillBackground(False)
+        self.chooseMultipleModelsGroupBox.setObjectName(_fromUtf8("chooseMultipleModelsGroupBox"))
+        self.addMultiModelButton = QtGui.QPushButton(self.chooseMultipleModelsGroupBox)
+        self.addMultiModelButton.setGeometry(QtCore.QRect(520, 120, 31, 23))
+        self.addMultiModelButton.setText(_fromUtf8(""))
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/images/add_icon_25x25.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.addMultiModelButton.setIcon(icon1)
+        self.addMultiModelButton.setObjectName(_fromUtf8("addMultiModelButton"))
+        self.removeMultiModelButton = QtGui.QPushButton(self.chooseMultipleModelsGroupBox)
+        self.removeMultiModelButton.setGeometry(QtCore.QRect(520, 150, 31, 23))
+        self.removeMultiModelButton.setText(_fromUtf8(""))
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/images/delete_icon_25x25.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.removeMultiModelButton.setIcon(icon2)
+        self.removeMultiModelButton.setObjectName(_fromUtf8("removeMultiModelButton"))
+        self.label = QtGui.QLabel(self.chooseMultipleModelsGroupBox)
+        self.label.setGeometry(QtCore.QRect(20, 30, 481, 81))
+        self.label.setTextFormat(QtCore.Qt.PlainText)
+        self.label.setObjectName(_fromUtf8("label"))
+        self.loadMultiModelTable = QtGui.QTableWidget(self.chooseMultipleModelsGroupBox)
+        self.loadMultiModelTable.setGeometry(QtCore.QRect(20, 120, 480, 490))
+        self.loadMultiModelTable.setMinimumSize(QtCore.QSize(480, 490))
+        self.loadMultiModelTable.setMaximumSize(QtCore.QSize(480, 490))
+        self.loadMultiModelTable.setStyleSheet(_fromUtf8("QTableWidget {background-color: rgb(255, 255, 255);}"))
+        self.loadMultiModelTable.setDragDropMode(QtGui.QAbstractItemView.DragDrop)
+        self.loadMultiModelTable.setDefaultDropAction(QtCore.Qt.CopyAction)
+        self.loadMultiModelTable.setAlternatingRowColors(True)
+        self.loadMultiModelTable.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.loadMultiModelTable.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
+        self.loadMultiModelTable.setGridStyle(QtCore.Qt.SolidLine)
+        self.loadMultiModelTable.setObjectName(_fromUtf8("loadMultiModelTable"))
+        self.loadMultiModelTable.setColumnCount(2)
+        self.loadMultiModelTable.setRowCount(0)
+        item = QtGui.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.loadMultiModelTable.setHorizontalHeaderItem(0, item)
+        item = QtGui.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.loadMultiModelTable.setHorizontalHeaderItem(1, item)
+        self.loadMultiModelTable.horizontalHeader().setDefaultSectionSize(350)
+        self.loadMultiModelTable.horizontalHeader().setMinimumSectionSize(350)
+        self.loadMultiModelTable.horizontalHeader().setStretchLastSection(True)
+        self.submitMultiModelGroup = QtGui.QGroupBox(self.multiModelLoadTab)
+        self.submitMultiModelGroup.setEnabled(False)
+        self.submitMultiModelGroup.setGeometry(QtCore.QRect(610, 90, 211, 101))
+        self.submitMultiModelGroup.setMinimumSize(QtCore.QSize(160, 0))
+        self.submitMultiModelGroup.setObjectName(_fromUtf8("submitMultiModelGroup"))
+        self.verticalLayout_24 = QtGui.QVBoxLayout(self.submitMultiModelGroup)
+        self.verticalLayout_24.setObjectName(_fromUtf8("verticalLayout_24"))
+        self.submitMultiModelLabel = QtGui.QLabel(self.submitMultiModelGroup)
+        self.submitMultiModelLabel.setObjectName(_fromUtf8("submitMultiModelLabel"))
+        self.verticalLayout_24.addWidget(self.submitMultiModelLabel)
+        self.addMultiLogEntryButton = QtGui.QPushButton(self.submitMultiModelGroup)
+        self.addMultiLogEntryButton.setMinimumSize(QtCore.QSize(0, 25))
+        self.addMultiLogEntryButton.setMaximumSize(QtCore.QSize(150, 25))
+        self.addMultiLogEntryButton.setSizeIncrement(QtCore.QSize(50, 30))
+        self.addMultiLogEntryButton.setObjectName(_fromUtf8("addMultiLogEntryButton"))
+        self.verticalLayout_24.addWidget(self.addMultiLogEntryButton)
+        self.multiLoadProgressBox = QtGui.QGroupBox(self.multiModelLoadTab)
+        self.multiLoadProgressBox.setGeometry(QtCore.QRect(610, 200, 211, 91))
+        self.multiLoadProgressBox.setFlat(False)
+        self.multiLoadProgressBox.setObjectName(_fromUtf8("multiLoadProgressBox"))
+        self.verticalLayoutWidget = QtGui.QWidget(self.multiLoadProgressBox)
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(9, 20, 191, 64))
+        self.verticalLayoutWidget.setObjectName(_fromUtf8("verticalLayoutWidget"))
+        self.verticalLayout_22 = QtGui.QVBoxLayout(self.verticalLayoutWidget)
+        self.verticalLayout_22.setObjectName(_fromUtf8("verticalLayout_22"))
+        self.multiLoadProgressLabel = QtGui.QLabel(self.verticalLayoutWidget)
+        self.multiLoadProgressLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.multiLoadProgressLabel.setObjectName(_fromUtf8("multiLoadProgressLabel"))
+        self.verticalLayout_22.addWidget(self.multiLoadProgressLabel)
+        self.multiLoadProgressBar = QtGui.QProgressBar(self.verticalLayoutWidget)
+        sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.multiLoadProgressBar.sizePolicy().hasHeightForWidth())
+        self.multiLoadProgressBar.setSizePolicy(sizePolicy)
+        self.multiLoadProgressBar.setMinimumSize(QtCore.QSize(0, 10))
+        self.multiLoadProgressBar.setStyleSheet(_fromUtf8("border-color: rgb(99, 99, 99);\n"
+"background-color: rgb(203, 203, 203);"))
+        self.multiLoadProgressBar.setProperty("value", 0)
+        self.multiLoadProgressBar.setAlignment(QtCore.Qt.AlignCenter)
+        self.multiLoadProgressBar.setTextDirection(QtGui.QProgressBar.TopToBottom)
+        self.multiLoadProgressBar.setObjectName(_fromUtf8("multiLoadProgressBar"))
+        self.verticalLayout_22.addWidget(self.multiLoadProgressBar)
+        self.multiModelLoadErrorGroup = QtGui.QGroupBox(self.multiModelLoadTab)
+        self.multiModelLoadErrorGroup.setGeometry(QtCore.QRect(610, 300, 211, 411))
+        self.multiModelLoadErrorGroup.setObjectName(_fromUtf8("multiModelLoadErrorGroup"))
+        self.multiModelErrorClearButton = QtGui.QPushButton(self.multiModelLoadErrorGroup)
+        self.multiModelErrorClearButton.setGeometry(QtCore.QRect(140, 20, 51, 23))
+        self.multiModelErrorClearButton.setObjectName(_fromUtf8("multiModelErrorClearButton"))
+        self.multiModelErrorCopyButton = QtGui.QPushButton(self.multiModelLoadErrorGroup)
+        self.multiModelErrorCopyButton.setGeometry(QtCore.QRect(20, 20, 101, 23))
+        self.multiModelErrorCopyButton.setObjectName(_fromUtf8("multiModelErrorCopyButton"))
+        self.multiModelLoadErrorTextEdit = QtGui.QTextEdit(self.multiModelLoadErrorGroup)
+        self.multiModelLoadErrorTextEdit.setGeometry(QtCore.QRect(10, 50, 191, 351))
+        self.multiModelLoadErrorTextEdit.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);"))
+        self.multiModelLoadErrorTextEdit.setObjectName(_fromUtf8("multiModelLoadErrorTextEdit"))
+        self.loadModelTab.addTab(self.multiModelLoadTab, _fromUtf8(""))
+        self.verticalLayout_19.addWidget(self.loadModelTab)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.verticalLayout.addWidget(self.scrollArea)
-        self.addLogButtonFrame = QtGui.QFrame(self.newEntryTab)
-        self.addLogButtonFrame.setMinimumSize(QtCore.QSize(0, 40))
-        self.addLogButtonFrame.setMaximumSize(QtCore.QSize(16777215, 40))
-        self.addLogButtonFrame.setFrameShape(QtGui.QFrame.NoFrame)
-        self.addLogButtonFrame.setFrameShadow(QtGui.QFrame.Raised)
-        self.addLogButtonFrame.setObjectName(_fromUtf8("addLogButtonFrame"))
-        self.verticalLayout_14 = QtGui.QVBoxLayout(self.addLogButtonFrame)
-        self.verticalLayout_14.setObjectName(_fromUtf8("verticalLayout_14"))
-        self.addlogEntryButton = QtGui.QPushButton(self.addLogButtonFrame)
-        self.addlogEntryButton.setMinimumSize(QtCore.QSize(0, 25))
-        self.addlogEntryButton.setMaximumSize(QtCore.QSize(150, 25))
-        self.addlogEntryButton.setSizeIncrement(QtCore.QSize(50, 30))
-        self.addlogEntryButton.setObjectName(_fromUtf8("addlogEntryButton"))
-        self.verticalLayout_14.addWidget(self.addlogEntryButton)
-        self.verticalLayout.addWidget(self.addLogButtonFrame)
         self.tabWidget.addTab(self.newEntryTab, _fromUtf8(""))
         self.viewLogTab = QtGui.QWidget()
         self.viewLogTab.setObjectName(_fromUtf8("viewLogTab"))
@@ -715,8 +1043,8 @@ class Ui_MainWindow(object):
         self.logViewTab.setObjectName(_fromUtf8("logViewTab"))
         self.runViewTab = QtGui.QWidget()
         self.runViewTab.setObjectName(_fromUtf8("runViewTab"))
-        self.gridLayout_2 = QtGui.QGridLayout(self.runViewTab)
-        self.gridLayout_2.setObjectName(_fromUtf8("gridLayout_2"))
+        self.verticalLayout_20 = QtGui.QVBoxLayout(self.runViewTab)
+        self.verticalLayout_20.setObjectName(_fromUtf8("verticalLayout_20"))
         self.runEntryViewTable = QtGui.QTableWidget(self.runViewTab)
         self.runEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.runEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
@@ -729,8 +1057,9 @@ class Ui_MainWindow(object):
         self.runEntryViewTable.setFont(font)
         self.runEntryViewTable.setStyleSheet(_fromUtf8("font: 7pt \"MS Shell Dlg 2\";"))
         self.runEntryViewTable.setFrameShape(QtGui.QFrame.WinPanel)
+        self.runEntryViewTable.setAlternatingRowColors(True)
         self.runEntryViewTable.setObjectName(_fromUtf8("runEntryViewTable"))
-        self.runEntryViewTable.setColumnCount(18)
+        self.runEntryViewTable.setColumnCount(19)
         self.runEntryViewTable.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         font = QtGui.QFont()
@@ -823,8 +1152,117 @@ class Ui_MainWindow(object):
         font.setPointSize(7)
         item.setFont(font)
         self.runEntryViewTable.setHorizontalHeaderItem(17, item)
-        self.gridLayout_2.addWidget(self.runEntryViewTable, 0, 0, 1, 1)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.runEntryViewTable.setHorizontalHeaderItem(18, item)
+        self.verticalLayout_20.addWidget(self.runEntryViewTable)
         self.logViewTab.addTab(self.runViewTab, _fromUtf8(""))
+        self.tcfViewTab = QtGui.QWidget()
+        self.tcfViewTab.setObjectName(_fromUtf8("tcfViewTab"))
+        self.verticalLayout_16 = QtGui.QVBoxLayout(self.tcfViewTab)
+        self.verticalLayout_16.setObjectName(_fromUtf8("verticalLayout_16"))
+        self.tcfEntryViewTable = QtGui.QTableWidget(self.tcfViewTab)
+        self.tcfEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
+        self.tcfEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.tcfEntryViewTable.setFont(font)
+        self.tcfEntryViewTable.setStyleSheet(_fromUtf8("font: 7pt \"MS Shell Dlg 2\";"))
+        self.tcfEntryViewTable.setFrameShape(QtGui.QFrame.WinPanel)
+        self.tcfEntryViewTable.setAlternatingRowColors(True)
+        self.tcfEntryViewTable.setObjectName(_fromUtf8("tcfEntryViewTable"))
+        self.tcfEntryViewTable.setColumnCount(6)
+        self.tcfEntryViewTable.setRowCount(0)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryViewTable.setHorizontalHeaderItem(0, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryViewTable.setHorizontalHeaderItem(1, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryViewTable.setHorizontalHeaderItem(2, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryViewTable.setHorizontalHeaderItem(3, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryViewTable.setHorizontalHeaderItem(4, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.tcfEntryViewTable.setHorizontalHeaderItem(5, item)
+        self.verticalLayout_16.addWidget(self.tcfEntryViewTable)
+        self.logViewTab.addTab(self.tcfViewTab, _fromUtf8(""))
+        self.ecfViewTab = QtGui.QWidget()
+        self.ecfViewTab.setObjectName(_fromUtf8("ecfViewTab"))
+        self.verticalLayout_17 = QtGui.QVBoxLayout(self.ecfViewTab)
+        self.verticalLayout_17.setObjectName(_fromUtf8("verticalLayout_17"))
+        self.ecfEntryViewTable = QtGui.QTableWidget(self.ecfViewTab)
+        self.ecfEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
+        self.ecfEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.ecfEntryViewTable.setFont(font)
+        self.ecfEntryViewTable.setStyleSheet(_fromUtf8("font: 7pt \"MS Shell Dlg 2\";"))
+        self.ecfEntryViewTable.setFrameShape(QtGui.QFrame.WinPanel)
+        self.ecfEntryViewTable.setAlternatingRowColors(True)
+        self.ecfEntryViewTable.setObjectName(_fromUtf8("ecfEntryViewTable"))
+        self.ecfEntryViewTable.setColumnCount(6)
+        self.ecfEntryViewTable.setRowCount(0)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryViewTable.setHorizontalHeaderItem(0, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryViewTable.setHorizontalHeaderItem(1, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryViewTable.setHorizontalHeaderItem(2, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryViewTable.setHorizontalHeaderItem(3, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryViewTable.setHorizontalHeaderItem(4, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.ecfEntryViewTable.setHorizontalHeaderItem(5, item)
+        self.verticalLayout_17.addWidget(self.ecfEntryViewTable)
+        self.logViewTab.addTab(self.ecfViewTab, _fromUtf8(""))
         self.TgcViewTab = QtGui.QWidget()
         self.TgcViewTab.setObjectName(_fromUtf8("TgcViewTab"))
         self.verticalLayout_9 = QtGui.QVBoxLayout(self.TgcViewTab)
@@ -841,6 +1279,7 @@ class Ui_MainWindow(object):
         self.tgcEntryViewTable.setFont(font)
         self.tgcEntryViewTable.setStyleSheet(_fromUtf8("font: 7pt \"MS Shell Dlg 2\";"))
         self.tgcEntryViewTable.setFrameShape(QtGui.QFrame.WinPanel)
+        self.tgcEntryViewTable.setAlternatingRowColors(True)
         self.tgcEntryViewTable.setObjectName(_fromUtf8("tgcEntryViewTable"))
         self.tgcEntryViewTable.setColumnCount(6)
         self.tgcEntryViewTable.setRowCount(0)
@@ -892,6 +1331,7 @@ class Ui_MainWindow(object):
         self.tbcEntryViewTable.setFont(font)
         self.tbcEntryViewTable.setStyleSheet(_fromUtf8("font: 7pt \"MS Shell Dlg 2\";"))
         self.tbcEntryViewTable.setFrameShape(QtGui.QFrame.WinPanel)
+        self.tbcEntryViewTable.setAlternatingRowColors(True)
         self.tbcEntryViewTable.setObjectName(_fromUtf8("tbcEntryViewTable"))
         self.tbcEntryViewTable.setColumnCount(6)
         self.tbcEntryViewTable.setRowCount(0)
@@ -943,6 +1383,7 @@ class Ui_MainWindow(object):
         self.datEntryViewTable.setFont(font)
         self.datEntryViewTable.setStyleSheet(_fromUtf8("font: 7pt \"MS Shell Dlg 2\";"))
         self.datEntryViewTable.setFrameShape(QtGui.QFrame.WinPanel)
+        self.datEntryViewTable.setAlternatingRowColors(True)
         self.datEntryViewTable.setObjectName(_fromUtf8("datEntryViewTable"))
         self.datEntryViewTable.setColumnCount(5)
         self.datEntryViewTable.setRowCount(0)
@@ -989,8 +1430,9 @@ class Ui_MainWindow(object):
         self.bcEntryViewTable.setFont(font)
         self.bcEntryViewTable.setStyleSheet(_fromUtf8("font: 7pt \"MS Shell Dlg 2\";"))
         self.bcEntryViewTable.setFrameShape(QtGui.QFrame.WinPanel)
+        self.bcEntryViewTable.setAlternatingRowColors(True)
         self.bcEntryViewTable.setObjectName(_fromUtf8("bcEntryViewTable"))
-        self.bcEntryViewTable.setColumnCount(5)
+        self.bcEntryViewTable.setColumnCount(6)
         self.bcEntryViewTable.setRowCount(0)
         item = QtGui.QTableWidgetItem()
         font = QtGui.QFont()
@@ -1017,6 +1459,11 @@ class Ui_MainWindow(object):
         font.setPointSize(7)
         item.setFont(font)
         self.bcEntryViewTable.setHorizontalHeaderItem(4, item)
+        item = QtGui.QTableWidgetItem()
+        font = QtGui.QFont()
+        font.setPointSize(7)
+        item.setFont(font)
+        self.bcEntryViewTable.setHorizontalHeaderItem(5, item)
         self.verticalLayout_13.addWidget(self.bcEntryViewTable)
         self.logViewTab.addTab(self.bcViewTab, _fromUtf8(""))
         self.verticalLayout_10.addWidget(self.logViewTab)
@@ -1026,6 +1473,11 @@ class Ui_MainWindow(object):
         self.verticalLayout_15 = QtGui.QVBoxLayout(self.helpTab)
         self.verticalLayout_15.setObjectName(_fromUtf8("verticalLayout_15"))
         self.textEdit = QtGui.QTextEdit(self.helpTab)
+        font = QtGui.QFont()
+        font.setFamily(_fromUtf8("Arial"))
+        font.setPointSize(10)
+        self.textEdit.setFont(font)
+        self.textEdit.setStyleSheet(_fromUtf8("QTextEdit{ background-color: rgb(255, 255, 255);}"))
         self.textEdit.setReadOnly(True)
         self.textEdit.setObjectName(_fromUtf8("textEdit"))
         self.verticalLayout_15.addWidget(self.textEdit)
@@ -1033,7 +1485,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 680, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 905, 21))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
@@ -1046,6 +1498,8 @@ class Ui_MainWindow(object):
         self.menuSettings.setObjectName(_fromUtf8("menuSettings"))
         self.menuTools = QtGui.QMenu(self.menuSettings)
         self.menuTools.setObjectName(_fromUtf8("menuTools"))
+        self.menuLoggingLevel = QtGui.QMenu(self.menuSettings)
+        self.menuLoggingLevel.setObjectName(_fromUtf8("menuLoggingLevel"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         font = QtGui.QFont()
@@ -1068,6 +1522,18 @@ class Ui_MainWindow(object):
         self.actionSaveSetupAs.setObjectName(_fromUtf8("actionSaveSetupAs"))
         self.actionLoadSetup = QtGui.QAction(MainWindow)
         self.actionLoadSetup.setObjectName(_fromUtf8("actionLoadSetup"))
+        self.actionLogWarning = QtGui.QAction(MainWindow)
+        self.actionLogWarning.setCheckable(True)
+        self.actionLogWarning.setChecked(False)
+        self.actionLogWarning.setObjectName(_fromUtf8("actionLogWarning"))
+        self.actionLogInfo = QtGui.QAction(MainWindow)
+        self.actionLogInfo.setCheckable(True)
+        self.actionLogInfo.setObjectName(_fromUtf8("actionLogInfo"))
+        self.actionLogDebug = QtGui.QAction(MainWindow)
+        self.actionLogDebug.setCheckable(True)
+        self.actionLogDebug.setObjectName(_fromUtf8("actionLogDebug"))
+        self.actionReloadDatabase = QtGui.QAction(MainWindow)
+        self.actionReloadDatabase.setObjectName(_fromUtf8("actionReloadDatabase"))
         self.menuExport.addAction(self.actionExportToExcel)
         self.menuFile.addAction(self.actionNewModelLog)
         self.menuFile.addAction(self.actionLoad)
@@ -1079,35 +1545,78 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
         self.menuTools.addAction(self.actionUpdateDatabaseSchema)
+        self.menuLoggingLevel.addAction(self.actionLogWarning)
+        self.menuLoggingLevel.addAction(self.actionLogInfo)
+        self.menuLoggingLevel.addAction(self.actionLogDebug)
         self.menuSettings.addAction(self.menuTools.menuAction())
+        self.menuSettings.addAction(self.menuLoggingLevel.menuAction())
+        self.menuSettings.addAction(self.actionReloadDatabase)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuSettings.menuAction())
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
+        self.loadModelTab.setCurrentIndex(0)
         self.loadModelComboBox.setCurrentIndex(0)
+        self.loadMultiModelComboBox.setCurrentIndex(0)
         self.logViewTab.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(_translate("MainWindow", "LogIT", None))
-        self.loadModelGroup.setTitle(_translate("MainWindow", "Load Model ", None))
-        self.loadModelComboLabel.setText(_translate("MainWindow", "Model Type ", None))
-        self.loadModelComboBox.setToolTip(_translate("MainWindow", "Type of model to log (default: Tuflow)", None))
-        self.loadModelComboBox.setItemText(0, _translate("MainWindow", "TUFLOW (With ISIS/ESTRY If Found)", None))
-        self.loadModelComboBox.setItemText(1, _translate("MainWindow", "ISIS Only", None))
-        self.loadModelComboBox.setItemText(2, _translate("MainWindow", "ESTRY Only", None))
-        self.loadModelButton.setToolTip(_translate("MainWindow", "Load an IEF or TCF file (Ctrl-L)", None))
-        self.loadModelButton.setText(_translate("MainWindow", "Load Model...", None))
+        self.instructionsTextBrowser.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Arial\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><img src=\":/icons/images/Logit_Logo2_75x75.png\" /><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  </span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">LogIT is an automatic logging tool for ISIS/Flood Modeller Pro and TUFLOW.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">Duncan R. 2015.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:6pt; font-weight:600; color:#ffffff;\">l</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt; font-weight:600; color:#0055ff;\">Using LogIT</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600; color:#0055ff;\"> </span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-weight:600;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">1) Create new log database:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> File &gt; Create New Model Log.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">2) Input Log Variables box:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> Insert global log details.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">3) Single / Multiple model load</span><span style=\" font-family:\'MS Shell Dlg 2\';\">: Choose tab and follow the choices below.</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\';\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">Single Model Load:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">1) Model Type:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> Choose either TUFLOW or ISIS from Load Model dropdown.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">2) Load Model:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> Click Load Model button in Load Model box; browse models.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">3) Edit variables:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> if you want (green are editable).</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">4) Add to log:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> Click Add New Log Entry.</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\';\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">Multiple Model Load:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">1) Model Type:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> Choose either TUFLOW or ISIS from Load Model dropdown.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">2) Select models:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> Click &quot;+&quot; button to add files.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">         -&gt; Click &quot;X&quot; to remove files.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">3) Add models:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> Click Add All Log Entries.</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\';\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">View Log:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> Click View Log tab</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600;\">Edit Log:</span><span style=\" font-family:\'MS Shell Dlg 2\';\"> Right-click rows in log.</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:12pt; font-weight:600; color:#aa0000;\">For more information see the Help tab.</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-size:8pt;\"><br /></p></body></html>", None))
         self.inputVarGroup.setTitle(_translate("MainWindow", "Input Log Variables", None))
         self.modellerLabel.setText(_translate("MainWindow", "Modeller", None))
         self.eventNameLabel.setText(_translate("MainWindow", "Event Name", None))
         self.isisVersionLabel.setText(_translate("MainWindow", "Isis Version", None))
         self.tuflowVersionLabel.setText(_translate("MainWindow", "Tuflow Version", None))
+        self.loadModelGroup.setTitle(_translate("MainWindow", "Load Model ", None))
+        self.loadModelComboLabel.setText(_translate("MainWindow", "Model Type ", None))
+        self.loadModelComboBox.setToolTip(_translate("MainWindow", "Type of model to log (default: Tuflow)", None))
+        self.loadModelComboBox.setItemText(0, _translate("MainWindow", "TUFLOW (With ISIS/ESTRY If Found)", None))
+        self.loadModelComboBox.setItemText(1, _translate("MainWindow", "ISIS Only", None))
+        self.loadModelButton.setToolTip(_translate("MainWindow", "Load an IEF or TCF file (Ctrl-L)", None))
+        self.loadModelButton.setText(_translate("MainWindow", "Load Model...", None))
+        self.submitSingleModelGroup.setTitle(_translate("MainWindow", "Submit Model", None))
+        self.submitSingleModelLabel.setToolTip(_translate("MainWindow", "<html><head/><body><p>Button will be activated when a model has been loaded.</p></body></html>", None))
+        self.submitSingleModelLabel.setText(_translate("MainWindow", "Click Button to submit the currently \n"
+"loaded model to the log database.", None))
+        self.addSingleLogEntryButton.setToolTip(_translate("MainWindow", "Add loaded model data to database (Ctrl-A)", None))
+        self.addSingleLogEntryButton.setText(_translate("MainWindow", "Add New Log Entry", None))
         self.RunGroup.setTitle(_translate("MainWindow", "Run Variables", None))
         self.runEntryTable.setSortingEnabled(False)
         item = self.runEntryTable.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Vars", None))
+        item.setText(_translate("MainWindow", "1", None))
         item = self.runEntryTable.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "DATE", None))
         item = self.runEntryTable.horizontalHeaderItem(1)
@@ -1141,13 +1650,29 @@ class Ui_MainWindow(object):
         item = self.runEntryTable.horizontalHeaderItem(15)
         item.setText(_translate("MainWindow", "BC_DBASE", None))
         item = self.runEntryTable.horizontalHeaderItem(16)
+        item.setText(_translate("MainWindow", "ECF", None))
+        item = self.runEntryTable.horizontalHeaderItem(17)
         item.setText(_translate("MainWindow", "EVENT_NAME", None))
         __sortingEnabled = self.runEntryTable.isSortingEnabled()
         self.runEntryTable.setSortingEnabled(False)
         self.runEntryTable.setSortingEnabled(__sortingEnabled)
+        self.tcfGroup.setTitle(_translate("MainWindow", "Tcf Variables", None))
+        item = self.tcfEntryTable.verticalHeaderItem(0)
+        item.setText(_translate("MainWindow", "1", None))
+        item = self.tcfEntryTable.horizontalHeaderItem(0)
+        item.setText(_translate("MainWindow", "DATE", None))
+        item = self.tcfEntryTable.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "TCF", None))
+        item = self.tcfEntryTable.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "FILES", None))
+        item = self.tcfEntryTable.horizontalHeaderItem(3)
+        item.setText(_translate("MainWindow", "COMMENTS", None))
+        __sortingEnabled = self.tcfEntryTable.isSortingEnabled()
+        self.tcfEntryTable.setSortingEnabled(False)
+        self.tcfEntryTable.setSortingEnabled(__sortingEnabled)
         self.tgcGroup.setTitle(_translate("MainWindow", "Tgc Variables", None))
         item = self.tgcEntryTable.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Vars", None))
+        item.setText(_translate("MainWindow", "1", None))
         item = self.tgcEntryTable.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "DATE", None))
         item = self.tgcEntryTable.horizontalHeaderItem(1)
@@ -1161,7 +1686,7 @@ class Ui_MainWindow(object):
         self.tgcEntryTable.setSortingEnabled(__sortingEnabled)
         self.tbcGroup.setTitle(_translate("MainWindow", "Tbc Variables", None))
         item = self.tbcEntryTable.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Vars", None))
+        item.setText(_translate("MainWindow", "1", None))
         item = self.tbcEntryTable.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "DATE", None))
         item = self.tbcEntryTable.horizontalHeaderItem(1)
@@ -1175,7 +1700,7 @@ class Ui_MainWindow(object):
         self.tbcEntryTable.setSortingEnabled(__sortingEnabled)
         self.datGroup.setTitle(_translate("MainWindow", "Dat Variables", None))
         item = self.datEntryTable.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Vars", None))
+        item.setText(_translate("MainWindow", "1", None))
         item = self.datEntryTable.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "DATE", None))
         item = self.datEntryTable.horizontalHeaderItem(1)
@@ -1189,20 +1714,61 @@ class Ui_MainWindow(object):
         self.datEntryTable.setSortingEnabled(__sortingEnabled)
         self.bcGroup.setTitle(_translate("MainWindow", "BC DBase Variables", None))
         item = self.bcEntryTable.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Vars", None))
+        item.setText(_translate("MainWindow", "1", None))
         item = self.bcEntryTable.horizontalHeaderItem(0)
         item.setText(_translate("MainWindow", "DATE", None))
         item = self.bcEntryTable.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "BC_DBASE", None))
         item = self.bcEntryTable.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "AMENDMENTS", None))
+        item.setText(_translate("MainWindow", "FILES", None))
         item = self.bcEntryTable.horizontalHeaderItem(3)
         item.setText(_translate("MainWindow", "COMMENTS", None))
         __sortingEnabled = self.bcEntryTable.isSortingEnabled()
         self.bcEntryTable.setSortingEnabled(False)
         self.bcEntryTable.setSortingEnabled(__sortingEnabled)
-        self.addlogEntryButton.setToolTip(_translate("MainWindow", "Add loaded model data to database (Ctrl-A)", None))
-        self.addlogEntryButton.setText(_translate("MainWindow", "Add New Log Entry", None))
+        self.ecfGroup.setTitle(_translate("MainWindow", "Ecf Variables", None))
+        item = self.ecfEntryTable.verticalHeaderItem(0)
+        item.setText(_translate("MainWindow", "1", None))
+        item = self.ecfEntryTable.horizontalHeaderItem(0)
+        item.setText(_translate("MainWindow", "DATE", None))
+        item = self.ecfEntryTable.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "ECF", None))
+        item = self.ecfEntryTable.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "FILES", None))
+        item = self.ecfEntryTable.horizontalHeaderItem(3)
+        item.setText(_translate("MainWindow", "COMMENTS", None))
+        __sortingEnabled = self.ecfEntryTable.isSortingEnabled()
+        self.ecfEntryTable.setSortingEnabled(False)
+        self.ecfEntryTable.setSortingEnabled(__sortingEnabled)
+        self.loadModelTab.setTabText(self.loadModelTab.indexOf(self.loadSingleModelTab), _translate("MainWindow", "Single Model Load", None))
+        self.loadMultiModelGroupBox.setTitle(_translate("MainWindow", "Set Model Type", None))
+        self.loadMultiModelComboLabel.setText(_translate("MainWindow", "Model Type ", None))
+        self.loadMultiModelComboBox.setToolTip(_translate("MainWindow", "Type of model to log (default: Tuflow)", None))
+        self.loadMultiModelComboBox.setItemText(0, _translate("MainWindow", "TUFLOW (With ISIS/ESTRY If Found)", None))
+        self.loadMultiModelComboBox.setItemText(1, _translate("MainWindow", "ISIS Only", None))
+        self.chooseMultipleModelsGroupBox.setTitle(_translate("MainWindow", "Select Multiple Models", None))
+        self.label.setText(_translate("MainWindow", "Choose the model type from the drop down box above.\n"
+"Select the models that you would like to load into the log database using the list below. \n"
+"Add additional models using the add button (+) and remove models using the delete button (x).\n"
+"You can add and remove multiple models at once by holding Ctrl or Shift while clicking with the mouse.\n"
+"When done click the Add All Log Entries button.\n"
+"Any errors will be written to the Error Logs window to the right.", None))
+        item = self.loadMultiModelTable.horizontalHeaderItem(0)
+        item.setText(_translate("MainWindow", "TCF / IEF File Name", None))
+        item = self.loadMultiModelTable.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "Absolute Path", None))
+        self.submitMultiModelGroup.setToolTip(_translate("MainWindow", "<html><head/><body><p>Button will be activated when a model has been added to the list.</p></body></html>", None))
+        self.submitMultiModelGroup.setTitle(_translate("MainWindow", "Submit Model", None))
+        self.submitMultiModelLabel.setText(_translate("MainWindow", "Click Button to submit all of the models \n"
+"in the list to the database.", None))
+        self.addMultiLogEntryButton.setToolTip(_translate("MainWindow", "Add loaded model data to database (Ctrl-A)", None))
+        self.addMultiLogEntryButton.setText(_translate("MainWindow", "Add All Log Entries", None))
+        self.multiLoadProgressBox.setTitle(_translate("MainWindow", "Load Progress", None))
+        self.multiLoadProgressLabel.setText(_translate("MainWindow", "Complete", None))
+        self.multiModelLoadErrorGroup.setTitle(_translate("MainWindow", "Error logs", None))
+        self.multiModelErrorClearButton.setText(_translate("MainWindow", "Clear", None))
+        self.multiModelErrorCopyButton.setText(_translate("MainWindow", "Copy to Clipboard", None))
+        self.loadModelTab.setTabText(self.loadModelTab.indexOf(self.multiModelLoadTab), _translate("MainWindow", "Multiple Model Load", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.newEntryTab), _translate("MainWindow", "New Log Entry", None))
         self.runEntryViewTable.setToolTip(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:9pt;\">Right-click row entry to delete or update</span></p></body></html>", None))
         self.runEntryViewTable.setAccessibleName(_translate("MainWindow", "runViewEntryTable", None))
@@ -1242,8 +1808,40 @@ class Ui_MainWindow(object):
         item = self.runEntryViewTable.horizontalHeaderItem(16)
         item.setText(_translate("MainWindow", "BC_DBASE", None))
         item = self.runEntryViewTable.horizontalHeaderItem(17)
+        item.setText(_translate("MainWindow", "ECF", None))
+        item = self.runEntryViewTable.horizontalHeaderItem(18)
         item.setText(_translate("MainWindow", "EVENT_NAME", None))
         self.logViewTab.setTabText(self.logViewTab.indexOf(self.runViewTab), _translate("MainWindow", " Run Log", None))
+        self.tcfEntryViewTable.setToolTip(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:9pt;\">Right-click row entry to delete or update</span></p></body></html>", None))
+        self.tcfEntryViewTable.setSortingEnabled(True)
+        item = self.tcfEntryViewTable.horizontalHeaderItem(0)
+        item.setText(_translate("MainWindow", "ID", None))
+        item = self.tcfEntryViewTable.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "DATE", None))
+        item = self.tcfEntryViewTable.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "TCF", None))
+        item = self.tcfEntryViewTable.horizontalHeaderItem(3)
+        item.setText(_translate("MainWindow", "FILES", None))
+        item = self.tcfEntryViewTable.horizontalHeaderItem(4)
+        item.setText(_translate("MainWindow", "NEW_FILES", None))
+        item = self.tcfEntryViewTable.horizontalHeaderItem(5)
+        item.setText(_translate("MainWindow", "COMMENTS", None))
+        self.logViewTab.setTabText(self.logViewTab.indexOf(self.tcfViewTab), _translate("MainWindow", "Tcf Log", None))
+        self.ecfEntryViewTable.setToolTip(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:9pt;\">Right-click row entry to delete or update</span></p></body></html>", None))
+        self.ecfEntryViewTable.setSortingEnabled(True)
+        item = self.ecfEntryViewTable.horizontalHeaderItem(0)
+        item.setText(_translate("MainWindow", "ID", None))
+        item = self.ecfEntryViewTable.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "DATE", None))
+        item = self.ecfEntryViewTable.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "ECF", None))
+        item = self.ecfEntryViewTable.horizontalHeaderItem(3)
+        item.setText(_translate("MainWindow", "FILES", None))
+        item = self.ecfEntryViewTable.horizontalHeaderItem(4)
+        item.setText(_translate("MainWindow", "NEW_FILES", None))
+        item = self.ecfEntryViewTable.horizontalHeaderItem(5)
+        item.setText(_translate("MainWindow", "COMMENTS", None))
+        self.logViewTab.setTabText(self.logViewTab.indexOf(self.ecfViewTab), _translate("MainWindow", "Ecf Log", None))
         self.tgcEntryViewTable.setToolTip(_translate("MainWindow", "<html><head/><body><p><span style=\" font-size:9pt;\">Right-click row entry to delete or update</span></p></body></html>", None))
         self.tgcEntryViewTable.setSortingEnabled(True)
         item = self.tgcEntryViewTable.horizontalHeaderItem(0)
@@ -1296,113 +1894,130 @@ class Ui_MainWindow(object):
         item = self.bcEntryViewTable.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "BC_DBASE", None))
         item = self.bcEntryViewTable.horizontalHeaderItem(3)
-        item.setText(_translate("MainWindow", "AMENDMENTS", None))
+        item.setText(_translate("MainWindow", "FILES", None))
         item = self.bcEntryViewTable.horizontalHeaderItem(4)
+        item.setText(_translate("MainWindow", "NEW_FILES", None))
+        item = self.bcEntryViewTable.horizontalHeaderItem(5)
         item.setText(_translate("MainWindow", "COMMENTS", None))
         self.logViewTab.setTabText(self.logViewTab.indexOf(self.bcViewTab), _translate("MainWindow", "BC Log", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.viewLogTab), _translate("MainWindow", "View Log", None))
         self.textEdit.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600; text-decoration: underline;\">LogIT v0.1</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600; text-decoration: underline;\"><br /></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600; text-decoration: underline;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline;\">Info</span></p>\n"
+"</style></head><body style=\" font-family:\'Arial\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><img src=\":/icons/images/Logit_Logo2_75x75.png\" /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600; color:#0055ff;\">LogIT v0.3</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Info</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600; text-decoration: underline;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Name: LogIT (Logger for Isis and Tuflow) </span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Version: 0.1-Beta</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Author: Duncan Runnacles</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Copyright: (C) 2014 Duncan Runnacles</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">email: duncan.runnacles@thomasmackay.co.uk</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Name: LogIT (Logger for Isis and Tuflow) </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Version: 0.3-Beta</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Author: Duncan Runnacles</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Copyright: (C) 2015 Duncan Runnacles</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">email: duncan.runnacles@thomasmackay.co.uk</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:7pt;\">This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the license, or (at your option) any later version.</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:7pt;\">This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRENTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:7pt;\">You should have received a copy of the GNU General Public License along with this program; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline;\">Summary</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600; text-decoration: underline;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">LogIT provides an interface for logging run specific information from ISIS and TUFLOW models. It supports loading of ISIS Event Files (*.ief) and TUFLOW run files (*.tcf). There is currently no support for ESTRY run files (*.ecf), although there are plans to implement this.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Once a model has been loaded it will read key model information into tables that can be amended and added to the database. The database can be exported to Excel format at any time.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline;\">Instructions</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600; text-decoration: underline;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Create a database:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Before a model log can be loaded you need to create a log database. This can be done through the File &gt; Create New Model Log menu (Ctrl+N).</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">A different database can be loaded at any time using the File &gt; Load Model Log menu (Ctrl-O).</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">LogIT will attempt to load the last used database when you open the software.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Load Model:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Prior to loading the model you can enter the Input Log Variables. These will then be included in the Variable tables once the model is loaded. They will also be remembered when LogIT is restarted.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">To load a model for logging click the Load Model button (Ctrl-L).</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">The key variables from the model will be entered into the Variables tables on the New Log Entry tab. </span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Some of the cells in the table are editable prior to adding to the database. These cells will be coloured green. If certain files already exist in the database they cannot be re-entered, so any changes to comment cells etc will not be stored, these rows will be coloured red.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Add Log Entry:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">When you have finished editing the log entry you can enter it in the database by clicking the Add New Log Entry button (Ctrl-A).</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">This will store the log entry exactly as shown in the Variables tables into the log database and show the updated log in the View Log tab tables.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Editing Existing Log Entries:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">It is possible to edit log entries that have already been added to the log database in the View Log tab. However only certain cells are editable.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">To edit a cell: double click the required cell and edit the entry. Once you have completed all required edits for that row you can update the database by right clicking anywhere in the row and selecting Update Row. Changes to the database can only be done on a row-by-row basis.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Delete Log Entry:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Deleting entries from the log database can be done in the View Log tab tables. It is not possible to remove an entire entry at once because multiple run log entries may refer to a single tgc/tbc/dat/bc dbase entry. Thus entries in the different tables must be deleted seperately.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">To delete an entry right click the row to delete from the table and select Delete Row.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Exporting to Excel:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Exporting the log databse to Excel format can be done through the File &gt; Export &gt; Excel Menu (Ctrl+E).</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">This will export all of the existing database tables to an Excel Workbook. A Worksheet will be created for each of the exported database tables.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">There is an Excel VBA Module called LogFormatter.bas available in the distribution folder for &quot;pretifying&quot; the exported Workbook. To use it:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">1) Open the exported Excel Workbook.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">2) Open the Visual Basic window.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">3) Right-Click on your log book project.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">4) Click &quot;Import File...&quot;.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">5) Find the LogFormatter.bas file in the LogIT folder and open it.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">6) Go back to the Excel Workbook and under developer click &quot;Macros&quot;).</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">7) Depending on whether you have any other Workbooks open or not the Macro </span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">   will either be caller &quot;formatLogbook&quot; or &quot;LogFormatter.formatLogbook&quot;.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">   Select it and click &quot;Run&quot;.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">The jumbled output from the software should now be nicely formatted :)</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Update Database Schema:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">When a new version of LogIT is released there may be changes to the way that the log database is setup. If this happens the database must be updated in order to use the new version. Settings &gt; Tools &gt; Update Database Schema will make a backup of the existing database and attempt to update it.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; font-weight:600;\">Load/Save Setup:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">When you start LogIT it will attempt to load the settings that you last used from a local file. These include Input variables, log database, etc.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">If you have particular setups for certain logs, such as different Isis or Tuflow versions, you can save a settings file and load it at any time using File &gt; Load Setup and File &gt; Save Setup As...</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Summary</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LogIT provides an interface for logging run specific information from ISIS / Flood Modeller Pro and TUFLOW models. It supports loading of ISIS Event Files (*.ief) and TUFLOW run files (*.tcf). Once one of these files has been provided LogIT will read all .ecf, .tgc, etc files and any GIS or data files that they contain.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Once a model has been loaded it will read key model information into tables that can be amended and added to the database. The database can be exported to Excel format at any time.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Instructions</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline; color:#0055ff;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Create a database:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Before a model log can be loaded you need to create a log database. This can be done through the File &gt; Create New Model Log menu (Ctrl+N).</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">A different database can be loaded at any time using the File &gt; Load Model Log menu (Ctrl-O).</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LogIT will attempt to load the last used database when you open the software.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Load Model:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Prior to loading the model you can enter the Input Log Variables. These will then be included in the Variable tables once the model is loaded. They will also be remembered when LogIT is restarted.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">To load a model file click the Load Model button (Ctrl-L).</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The key variables from the model will be entered into the Variables tables on the Single Model Load tab. </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Some of the cells in the table are editable. These cells will be coloured green. If a file already exists in the database it cannot be re-entered, so any changes will be coloured red.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Add Log Entry:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">When you have finished editing the log entry you can enter it in the database by clicking the Add New Log Entry button (Ctrl-A).</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This will store the log entry exactly as shown in the Variables tables into the log database and show the updated log in the View Log tab tables.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Adding Multiple Models at once:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">You can add multiple models on the Multiple Model Load Tab.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Select the Model Type (either TUFLOW or ISIS only) and click the &quot;+&quot; button to browse for model files. It is not possible to mix model type\'s at this time. Remove files with the &quot;X&quot; button.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Click the Add All Log Entries button to load listed files to the log.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">If there are any errors they will be output to the Error Logs box and can be copied to the clipboard by pressing the button.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Editing Existing Log Entries:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">It is possible to edit log entries that have already been added to the log database in the View Log tab. However only certain cells are editable.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">To edit a cell: double click the required cell and edit the entry. Once you have completed all required edits for that row you can update the database by right clicking anywhere in the row and selecting Update Row. Changes to the database can only be done on a row-by-row basis.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Delete Log Entry:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Deleting entries from the log database can be done in the View Log tab tables. It is not possible to remove an entire entry at once because multiple run log entries may refer to a single tgc/tbc/dat/bc dbase entry. Thus entries in the different tables must be deleted seperately.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">To delete an entry right click the row to delete from the table and select Delete Row.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Exporting to Excel:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Exporting the log databse to Excel format can be done through the File &gt; Export &gt; Excel Menu (Ctrl+E).</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This will export all of the existing database tables to an Excel Workbook. A Worksheet will be created for each of the exported database tables.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">There is an Excel VBA Module called LogFormatter.bas available in the distribution folder for &quot;pretifying&quot; the exported Workbook. To use it:</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">1) Open the exported Excel Workbook.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">2) Open the Visual Basic window.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">3) Right-Click on your log book project.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">4) Click &quot;Import File...&quot;.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">5) Find the LogFormatter_v2.bas file in the LogIT folder and open it.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">6) Go back to the Excel Workbook and under developer click &quot;Macros&quot;).</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">7) Depending on whether you have any other Workbooks open or not the Macro </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">   will either be caller &quot;formatLogbook&quot; or &quot;LogFormatter.formatLogbook&quot;.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">   Select it and click &quot;Run&quot;.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The jumbled output from the software should now be nicely formatted :)</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Update Database Schema:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">When a new version of LogIT is released there may be changes to the way that the log database is setup. If this happens the database must be updated in order to use the new version. Settings &gt; Tools &gt; Update Database Schema will make a backup of the existing database and attempt to update it.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Load/Save Setup:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">When you start LogIT it will attempt to load the settings that you last used from a local file. These include Input variables, log database, etc.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">If you have particular setups for certain logs, such as different Isis or Tuflow versions, you can save a settings file and load it at any time using File &gt; Load Setup and File &gt; Save Setup As...</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Change the logging level</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The logging output to the console can be changed with:</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Settings &gt; Set Logging Level &gt; Warning\\Info\\Debug.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Warning will issue all errors.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Info will output anything helpful that\'s going on.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Debug will output obscure errors and lots of rubbish.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline;\">Current Limitations</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600; text-decoration: underline;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">LogIT does not currently know how to read Estry Control Files (*.ecf). Any files that are referenced through an ecf will not be found. </span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Although there are tables for Boundary Condition Database\'s (BC_DBASE) there is not currently any implementation for these files. This is due to the lack of .ecf file support.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">These capabilities will be implemented once they are supported by the tmac_tools_lib package used to load the models into LogIT.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline;\">Common Errors</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt; font-weight:600; text-decoration: underline;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Some common errors can occur when loading files. These are outlined here.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Load Error - Unable to load model from file at: filename:</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">This can be caused by several issues that may be bugs. A common cause is trying to load a model from an IEF file which has unfindable paths. Check the log for the error; if it says &quot;Tcf file referenced by ief does not exist at: filename&quot; make sure that filename exists and is findable. This error can also be caused by having the Model Type combo box set incorrectly for the type of model you are trying to load - check the error log for further details.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:10pt;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline;\">Reporting Bugs</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Current Limitations</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LogIT does not currently know how to read MapInfo or Shapefile data so it will not find any files referenced within them - like cross section csv data. </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This will be implemented in a future release.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Common Errors</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Some common errors can occur when loading files. These are outlined here.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Load Error - Unable to load model from file at: filename:</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This can be caused by several issues that may be bugs. A common cause is trying to load a model from an IEF file which has unfindable paths. Check the log for the error; if it says &quot;Tcf file referenced by ief does not exist at: filename&quot; make sure that filename exists and is findable. This error can also be caused by having the Model Type combo box set incorrectly for the type of model you are trying to load - check the error log for further details.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Reporting Bugs</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600; text-decoration: underline;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">If you find an error that is not included in the Common Errors list above please report it as a bug to duncan.runnacles@thomasmackay.co.uk.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">There should be a folder called /logs/ in the same folder as the executable. This should be zipped up and sent along with any bug report. If this folder is empty there has been a problem wth setting up the logging on your computer (probably due to access rights or a virus checker not allowing LogIT to write to disc - If this is the case a warning will be sent to the console saying &quot;Unable to create log file directory&quot;). To get the log entry you can try and reproduce the error and copy the text from the console window. </span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt;\">Any other details about the contents and setup of the model that you are trying to log should also be included in the bug report. It may be easier to just send the ief/tcf/tgc/tbc/trd files if you are happy to do it. </span></p></body></html>", None))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">If you find an error that is not included in the Common Errors list above please report it as a bug to duncan.runnacles@thomasmackay.co.uk.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">There should be a folder called /logs/ in the same folder as the executable. This should be zipped up and sent along with any bug report. If this folder is empty there has been a problem wth setting up the logging on your computer (probably due to access rights or a virus checker not allowing LogIT to write to disc - If this is the case a warning will be sent to the console saying &quot;Unable to create log file directory&quot;). To get the log entry you can try and reproduce the error and copy the text from the console window. </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Any other details about the contents and setup of the model that you are trying to log should also be included in the bug report. It may be easier to just send the ief/tcf/tgc/tbc/trd files if you are happy to do it. </p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.helpTab), _translate("MainWindow", "Help", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.menuExport.setTitle(_translate("MainWindow", "Export", None))
         self.menuSettings.setTitle(_translate("MainWindow", "Settings", None))
         self.menuTools.setTitle(_translate("MainWindow", "Tools", None))
+        self.menuLoggingLevel.setToolTip(_translate("MainWindow", "<html><head/><body><p>Set the logging output level for the console.</p></body></html>", None))
+        self.menuLoggingLevel.setTitle(_translate("MainWindow", "Set Logging Level", None))
         self.actionExportToExcel.setText(_translate("MainWindow", "Excel", None))
         self.actionExportToExcel.setToolTip(_translate("MainWindow", "Export model log database to Excel (*.xls) Workbook", None))
         self.actionExportToExcel.setStatusTip(_translate("MainWindow", "Export model log database to Excel (*.xls) Workbook", None))
@@ -1431,4 +2046,9 @@ class Ui_MainWindow(object):
         self.actionLoadSetup.setToolTip(_translate("MainWindow", "Load setup of LogIT (Input Variables, connected database, etc) from file.", None))
         self.actionLoadSetup.setStatusTip(_translate("MainWindow", "Load setup of LogIT (Input Variables, connected database, etc) from file.", None))
         self.actionLoadSetup.setWhatsThis(_translate("MainWindow", "Load setup of LogIT (Input Variables, connected database, etc) from file.", None))
+        self.actionLogWarning.setText(_translate("MainWindow", "Warning", None))
+        self.actionLogInfo.setText(_translate("MainWindow", "Info", None))
+        self.actionLogDebug.setText(_translate("MainWindow", "Debug", None))
+        self.actionReloadDatabase.setText(_translate("MainWindow", "Reload Database", None))
 
+import LogIT_RC_rc

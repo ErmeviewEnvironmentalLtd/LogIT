@@ -54,11 +54,12 @@ import os
 import sqlite3
 from _sqlite3 import OperationalError, Error
 import shutil
+import traceback
 
 import logging
 logger = logging.getLogger(__name__)
 
-DATABASE_VERSION_NO = 1
+DATABASE_VERSION_NO = 3
 DATABASE_VERSION_SAME = 0
 DATABASE_VERSION_LOW = 1
 DATABASE_VERSION_HIGH = 2
@@ -82,9 +83,11 @@ def getMaxIDFromTable(conn, table_name):
     
     except conn.Error:
         logger.error('Problem querying database')
+        logger.debug(traceback.format_exc())
         raise Exception
     except Exception:
         logger.error('Problem querying database')
+        logger.debug(traceback.format_exc())
         raise Exception
     
     
@@ -104,11 +107,13 @@ def deleteRowFromTable(conn, table_name, row_id):
         
     except conn.Error:
         conn.rollback()
+        logger.debug(traceback.format_exc())
         logger.error('SQL error when trying to delete\n' +
                       'row: %s\n' +
                       'table: %s' % (row_id, table_name))
     except Exception:
         conn.rollback()
+        logger.debug(traceback.format_exc())
         logger.error('Unknown exception when trying to delete\n' +
                       'row: %s\n' +
                       'table: %s' % (row_id, table_name))
@@ -124,7 +129,7 @@ def insertValuesIntoTable(conn, table_name, row_data):
     table or an error will be thrown.
     
     @param conn: the database connection.
-    #####@param cursor: cursor for the database connection.
+    @param cursor: cursor for the database connection.
     @param table_name: the name of the table to update.
     @param row_data=None: Dictionary containing the values to be put into 
            the columns.
@@ -141,6 +146,7 @@ def insertValuesIntoTable(conn, table_name, row_data):
     
     except conn.Error:
         conn.rollback()
+        logger.debug(traceback.format_exc())
         logger.error('Failed to insert row_data into %s table' % (table_name))
         raise Error
     
@@ -170,10 +176,12 @@ def saveViewChangesToDatabase(table_name, save_dict, id_key, db_path):
             #cur.execute('commit')
         except conn.Error:
             conn.rollback()
+            logger.debug(traceback.format_exc())
             logger.error('Unable to update database') 
             error_text = 'SQLError'
      
     except IOError:
+        logger.debug(traceback.format_exc())
         logger.error('Cannot connect to database at: %s' % db_path)
         error_text = 'IOError'
     finally:
@@ -253,10 +261,16 @@ def findInDatabase(table_name, db_path=False, conn=False, col_name=False,
             
         except conn.Error():
             conn.rollback()
+            logger.debug(traceback.format_exc())
             logger.error('Failed to query database')
             raise Error
     
     except IOError:
+        logger.debug(traceback.format_exc())
+        logger.error('Cannot load the database')
+        raise Error
+    except:
+        logger.debug(traceback.format_exc())
         logger.error('Cannot load the database')
         raise Error
     finally:
@@ -285,6 +299,7 @@ def findNewEntries(conn, t_name, model_entry):
     except conn.Error:
         conn.rollback()
         logger.error('SQLError - Unable to complete query')
+        logger.debug(traceback.format_exc())
         raise Error
     
     return is_new
@@ -316,6 +331,7 @@ def loadLogDatabase(db_path):
         logger.debug('Loaded log database at: ' + db_path)
     except:
         logger.error('Could not load log database at: ' + db_path)
+        logger.debug(traceback.format_exc())
     
     return con
 
@@ -355,11 +371,14 @@ def checkDatabaseVersion(db_path):
             
         except conn.error:
             logger.error('Sql query error')
+            logger.debug(traceback.format_exc())
         
     except IOError:
         logger.error('Unable to access database')
+        logger.debug(traceback.format_exc())
     except Exception:
         logger.error('Unable to access database')
+        logger.debug(traceback.format_exc())
     finally:
         if not conn == None:
             conn.close()
@@ -397,6 +416,15 @@ def createNewLogDatabase(db_path):
         createDatTable(cur) 
         logger.info('Dat table created')
         
+        createEcfTable(cur)
+        logger.info('Ecf table created')
+        
+        createTcfTable(cur)
+        logger.info('Tcf table created')
+
+        createBcTable(cur)
+        logger.info('BC Database table created')
+        
         createTgcFilesTable(cur)
         logger.info('Tgc Files table created')
     
@@ -406,6 +434,12 @@ def createNewLogDatabase(db_path):
         createBcFilesTable(cur)
         logger.info('BC Database Files table created')
         
+        createEcfFilesTable(cur)
+        logger.info('Ecf Files table created')
+        
+        createTcfFilesTable(cur)
+        logger.info('Tcf Files table created')
+        
         cur.execute("pragma user_version = %s" % DATABASE_VERSION_NO)
         
         conn.commit()
@@ -413,8 +447,10 @@ def createNewLogDatabase(db_path):
     except OperationalError:
         conn.rollback()
         logger.error('Error creating log database - OperationalError')
+        logger.debug(traceback.format_exc())
     except IOError:
-        logger.error('Error creating log database - IOError') 
+        logger.error('Error creating log database - IOError')
+        logger.debug(traceback.format_exc())
     finally:
         if not conn == None:
             conn.close()
@@ -443,6 +479,7 @@ def createRunTable(cur):
                   TGC                     TEXT,
                   TBC                     TEXT,
                   BC_DBASE                TEXT,
+                  ECF                     TEXT,
                   EVENT_NAME              TEXT);
                  ''')
     
@@ -496,6 +533,44 @@ def createBcTable(cur):
     
     @param cur: a cursor to an open database connection
     '''
+    cur.execute('''CREATE TABLE BC_DBASE
+                    (ID            INTEGER     PRIMARY KEY    NOT NULL,
+                    DATE           TEXT                       NOT NULL,
+                    BC_DBASE       TEXT,
+                    FILES          TEXT,
+                    NEW_FILES      TEXT,
+                    COMMENTS       TEXT);
+                    ''')
+    
+
+def createEcfTable(cur):
+    '''Create the ecf table
+    
+    @param cur: a cursor to an open database connection
+    '''
+    cur.execute('''CREATE TABLE ECF
+                    (ID            INTEGER     PRIMARY KEY    NOT NULL,
+                    DATE           TEXT                       NOT NULL,
+                    ECF            TEXT,
+                    FILES          TEXT,
+                    NEW_FILES      TEXT,
+                    COMMENTS       TEXT);
+                    ''')
+    
+
+def createTcfTable(cur):
+    '''Create the tcf table
+    
+    @param cur: a cursor to an open database connection
+    '''
+    cur.execute('''CREATE TABLE TCF
+                    (ID            INTEGER     PRIMARY KEY    NOT NULL,
+                    DATE           TEXT                       NOT NULL,
+                    TCF            TEXT,
+                    FILES          TEXT,
+                    NEW_FILES      TEXT,
+                    COMMENTS       TEXT);
+                    ''')
     
 
 def createTgcFilesTable(cur):
@@ -518,7 +593,7 @@ def createTbcFilesTable(cur):
     cur.execute('''CREATE TABLE TBC_FILES
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     TBC                TEXT,
-                    FILES          TEXT);
+                    FILES              TEXT);
                     ''')
     
     
@@ -530,7 +605,31 @@ def createBcFilesTable(cur):
     cur.execute('''CREATE TABLE BC_DBASE_FILES 
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     BC_DBASE           TEXT,
-                    FILES     TEXT);
+                    FILES              TEXT);
+                    ''')
+    
+
+def createEcfFilesTable(cur):
+    '''Create the ecf_files table
+    
+    @param cur: a cursor to an open database connection
+    '''
+    cur.execute('''CREATE TABLE ECF_FILES 
+                    (ID                INTEGER     PRIMARY KEY    NOT NULL,
+                    ECF                TEXT,
+                    FILES              TEXT);
+                    ''')
+
+
+def createTcfFilesTable(cur):
+    '''Create the tcf_files table
+    
+    @param cur: a cursor to an open database connection
+    '''
+    cur.execute('''CREATE TABLE TCF_FILES 
+                    (ID                INTEGER     PRIMARY KEY    NOT NULL,
+                    TCF                TEXT,
+                    FILES              TEXT);
                     ''')
 
         
@@ -550,15 +649,21 @@ def dropAllTables(db_path):
             cur.execute('''DROP TABLE IF EXISTS TBC''')
             cur.execute('''DROP TABLE IF EXISTS DAT''')
             cur.execute('''DROP TABLE IF EXISTS BC_DBASE''')
+            cur.execute('''DROP TABLE IF EXISTS ECF''')
+            cur.execute('''DROP TABLE IF EXISTS TCF''')
             cur.execute('''DROP TABLE IF EXISTS TGC_FILES''')
             cur.execute('''DROP TABLE IF EXISTS TBC_FILES''')
             cur.execute('''DROP TABLE IF EXISTS BC_DBASE_FILES''')
+            cur.execute('''DROP TABLE IF EXISTS ECF_FILES''')
+            cur.execute('''DROP TABLE IF EXISTS TCF_FILES''')
             con.commit()
         except con.Error:
             con.rollback()
             logger.warning('Cannot drop tables - Sql Error')
+            logger.debug(traceback.format_exc())
     except IOError:
         logger.error('Could not connect to database')
+        logger.debug(traceback.format_exc())
         if not con == None:
             con.close()
             
@@ -566,19 +671,24 @@ def dropAllTables(db_path):
 # Setup for this version of the database
 run = ['ID', 'DATE', 'MODELLER', 'RESULTS_LOCATION_2D', 'RESULTS_LOCATION_1D', 
        'EVENT_DURATION', 'DESCRIPTION', 'COMMENTS', 'SETUP', 'ISIS_BUILD', 
-       'IEF', 'DAT', 'TUFLOW_BUILD', 'TCF', 'TGC', 'TBC', 'BC_DBASE', 
+       'IEF', 'DAT', 'TUFLOW_BUILD', 'TCF', 'TGC', 'TBC', 'BC_DBASE', 'ECF',
        'EVENT_NAME'] 
 tgc = ['ID', 'DATE', 'TGC', 'FILES', 'NEW_FILES', 'COMMENTS']
 tbc = ['ID', 'DATE', 'TBC', 'FILES', 'NEW_FILES', 'COMMENTS']
 dat = ['ID', 'DATE', 'DAT', 'AMENDMENTS', 'COMMENTS']
-#bc_dbase = ['ID', 'BC_DBASE', 'FILES', 'NEW_FILES', 'COMMENTS']
+bc_dbase = ['ID', 'BC_DBASE', 'FILES', 'NEW_FILES', 'COMMENTS']
+ecf = ['ID', 'ECF', 'FILES', 'NEW_FILES', 'COMMENTS']
+tcf = ['ID', 'TCF', 'FILES', 'NEW_FILES', 'COMMENTS']
 tgc_files = ['ID', 'TGC', 'FILES']
 tbc_files = ['ID', 'TBC', 'FILES']
 bc_dbase_files = ['ID', 'BC_DBASE', 'FILES']
+ecf_files = ['ID', 'ECF', 'FILES']
+tcf_files = ['ID', 'TCF', 'FILES']
 
-cur_tables = {'RUN': run, 'TGC': tgc, 'TBC': tbc, 'DAT': dat, 
-              'TGC_FILES': tgc_files, 
-              'TBC_FILES': tbc_files, 'BC_DBASE_FILES': bc_dbase_files
+cur_tables = {'RUN': run, 'TGC': tgc, 'TBC': tbc, 'DAT': dat, 'ECF': ecf, 'TCF': tcf,
+              'BC_DBASE': bc_dbase, 'TGC_FILES': tgc_files, 
+              'TBC_FILES': tbc_files, 'BC_DBASE_FILES': bc_dbase_files,
+              'ECF_FILES': ecf_files, 'TCF_FILES': tcf_files
              }
 
 def buildTableFromName(table_type, cur):
@@ -586,14 +696,22 @@ def buildTableFromName(table_type, cur):
     
     @param table_type: the type of table to build.
     '''
-    table_types = {'RUN': createRunTable(cur), 'TGC': createTgcTable(cur), 
-                    'TBC': createTbcTable(cur), 'DAT': createDatTable(cur), 
-                    'TGC_FILES': createTgcFilesTable(cur), 
-                    'TBC_FILES': createTbcFilesTable(cur), 
-                    'BC_DBASE_FILES': createBcFilesTable(cur)
-                   }
-    
-    table_types[table_type]
+    try:
+        table_types = {'RUN': createRunTable, 'TGC': createTgcTable, 
+                        'TBC': createTbcTable, 'DAT': createDatTable, 
+                        'BC_DBASE': createBcTable, 'ECF': createEcfTable,
+                        'TCF': createTcfTable,
+                        'TGC_FILES': createTgcFilesTable, 
+                        'TBC_FILES': createTbcFilesTable, 
+                        'BC_DBASE_FILES': createBcFilesTable,
+                        'ECF_FILES': createEcfFilesTable,
+                        'TCF_FILES': createTcfFilesTable
+                       }
+        
+        table_types[table_type](cur)
+    except:
+        logger.debug(traceback.format_exc())
+        raise Exception
     
 
 def updateDatabaseVersion(db_path):
@@ -630,10 +748,12 @@ def updateDatabaseVersion(db_path):
     except sqlite3.Error:
             conn.rollback()
             logger.warning('Cannot query database - Sql Error')
+            logger.debug(traceback.format_exc())
             return False
     except IOError:
         conn.rollback()
         logger.error('Could not connect to database')
+        logger.debug(traceback.format_exc())
         return False
     finally:
         if not conn == None:
@@ -696,6 +816,7 @@ def testDatabaseCompatibility(conn, add_update=False):
     except conn.Error:
         conn.rollback()
         logger.warning('Cannot query database - Sql Error')
+        logger.debug(traceback.format_exc())
         return False
 
     
