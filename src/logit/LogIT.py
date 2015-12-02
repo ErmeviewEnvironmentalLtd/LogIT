@@ -906,19 +906,6 @@ class MainGui(QtGui.QMainWindow):
                     conn = DatabaseFunctions.loadLogDatabase(
                                                 self.settings.cur_log_path)
                     
-    #                 # Find log entries and populate tables for the model files
-    #                 log_pages = self._findNewLogEntries(conn, log_pages, 'TGC')
-    #                 log_pages = self._findNewLogEntries(conn, log_pages, 'TBC')
-    #                 log_pages = self._findNewLogEntries(conn, log_pages, 'ECF')
-    #                 log_pages = self._findNewLogEntries(conn, log_pages, 'TCF')
-    #                 log_pages = self._findNewLogEntries(conn, log_pages, 'BC_DBASE')
-    #                 # DAT files get dealt with separately as there can only be one.
-    #                 if log_pages['DAT']['DAT'] == 'None': 
-    #                     log_pages['DAT'] = None
-    #                 else:
-    #                     log_pages = self._findNewLogEntries(conn, log_pages, 'DAT', 
-    #                                                         multiple_files=False)
-                    
                     self.log_pages, update_check = Controller.logEntryUpdates(
                                         conn, log_pages, check_new_entries=True)
                 except IOError:
