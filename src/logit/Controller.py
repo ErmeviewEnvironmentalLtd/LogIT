@@ -42,6 +42,7 @@
 import os
 import traceback
 import itertools
+import sqlite3
 
 from PyQt4 import QtCore, QtGui
 
@@ -302,6 +303,66 @@ def deleteDatabaseRow(db_path, table_name, id):
     return True
     
     
+def checkDatabaseVersion(db_path):
+    '''
+    '''
+    conn = False
+    if not db_path == '' and not db_path == False:
+
+        try:
+            title = 'Load Error'
+            # Need to check that the database is aligned with the current version
+            version_check = DatabaseFunctions.checkDatabaseVersion(db_path)
+            if version_check == DatabaseFunctions.DATABASE_VERSION_LOW:
+                logger.error('Database version is old - please update database')
+                msg = ("Unable to load model log from file at: %s\nDatabase" 
+                       " needs updating to latest version.\nUse Settings >"
+                       " Tools > Update Database Schema. See Help for details." 
+                       % (db_path))
+                return title, msg
+                
+            elif version_check == DatabaseFunctions.DATABASE_VERSION_HIGH:
+                logger.error('Database version in new - please update LogIT')
+                msg = ("Unable to load model log from file at: %s" 
+                    "\nDatabase was produced with newer version of LogIT.\n"
+                    "Update to latest version of LogIT to use database."
+                    % (db_path))
+                return title, msg
+            
+            conn = DatabaseFunctions.loadLogDatabase(db_path)
+            cur = conn.cursor()
+            cur.execute("select * from RUN")
+            return None, None
+        except:
+            msg = "Unable to load model log from file at: %s." % (db_path)
+            logger.error('Unable to load model log from file at: \n' % (db_path))
+            return title, message
+        finally:
+            conn.close()
+    
+
+def fetchTableValues(db_path, table_name):
+    '''Fetches all rows from the given table name.
+    @param db_path: path to a database on file.
+    @param table_name: name of the table to fetch rows from.
+    @return: tuple (boolean success flag, row count, row data) or an error
+             with (False, error title, message)
+    '''
+    conn = False
+    title = 'Load Error'
+    try:
+        conn = DatabaseFunctions.loadLogDatabase(db_path)
+        conn.row_factory = sqlite3.Row
+        results = DatabaseFunctions.findInDatabase(table_name, db_path=False, 
+                                                conn=conn, return_rows=True)
+        return results[0], results[1], results[2]
+    except:
+        msg = "Unable to load model log from file at: %s." % (db_path)
+        logger.error('Unable to load model log from file at: \n%s' % (db_path))
+        return False, title, msg
+    finally:
+        conn.close()
+ 
 
     
     

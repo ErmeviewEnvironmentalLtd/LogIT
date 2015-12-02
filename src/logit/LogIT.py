@@ -201,13 +201,13 @@ class MainGui(QtGui.QMainWindow):
         # Load the user settings from the last time the software was used 
         self._loadSettings()
         
+        self.ui_container = {}
+        self._setupUiContainer()
+        
         # Use those settings to get the file path and try and load the last log
         # database that the user had open
         self.loadModelLog()
         self.log_pages = None
-        
-        self.ui_container = {}
-        self._setupUiContainer()
         
         self.setWindowIcon(QtGui.QIcon(':Logit_Logo2_25x25.png'))
         
@@ -457,7 +457,6 @@ class MainGui(QtGui.QMainWindow):
     def loadModelLog(self):
         '''If there is a model log to load we do it.
         '''
-        conn = False
         if not self.settings.cur_log_path == '' and not self.settings.cur_log_path == False:
 
             # Check that the database actually exists. If not get out of here.
@@ -465,79 +464,29 @@ class MainGui(QtGui.QMainWindow):
                 logger.info('No existing log database to load')
                 self.settings.cur_log_path = ''
                 return
-            try:
-                # Need to check that the database is aligned with the current version
-                version_check = DatabaseFunctions.checkDatabaseVersion(self.settings.cur_log_path)
-                if version_check == DatabaseFunctions.DATABASE_VERSION_LOW:
-                    logger.error('Database version is old - please update database')
-                    QtGui.QMessageBox.warning(self, "Load Error",
-                        "Unable to load model log from file at: " + self.settings.cur_log_path +
-                        "\nDatabase needs updating to latest" +
-                        " version.\nUse Settings > Tools > Update Database Schema." +
-                        " See Help for details." )
-                    return
-                    
-                elif version_check == DatabaseFunctions.DATABASE_VERSION_HIGH:
-                    logger.error('Database version in new - please update LogIT')
-                    QtGui.QMessageBox.warning(self, "Load Error",
-                        "Unable to load model log from file at: " + self.settings.cur_log_path +
-                        "\nDatabase was produced with newer version of LogIT.\n" +
-                        "Update to latest version of LogIT to use database.") 
-                    return
-                
-                conn = DatabaseFunctions.loadLogDatabase(self.settings.cur_log_path)
-                cur = conn.cursor()
-                cur.execute("select * from RUN")
-            except:
-                conn = False
-                QtGui.QMessageBox.warning(self, "Load Error",
-                    "Unable to load model log from file at: %s." % self.settings.cur_log_path)
-                logger.error('Unable to load model log from file at: \n' + self.settings.cur_log_path)
+            
+            title, error = Controller.checkDatabaseVersion(self.settings.cur_log_path)
+            if not title == None:
+                self.launchQMsgBox(title, error, 'warning')
                 return
-        
-        if not conn == False:
             
             self._clearTableWidget('view')
              
-            # Fetch data from the RUN table
-            conn.row_factory = sqlite3.Row
+            # load each of the tables from the database
+            for key, table in self.ui_container['View_log'].iteritems():
+                t = table[0]
+                name = table[1]
+                has_vals, count, rows = Controller.fetchTableValues(
+                                            self.settings.cur_log_path, name)
             
-            # Get the tables and update
-            run_table = self.ui.runEntryViewTable
-            self._fetchAndShowTable(conn, run_table, 'RUN')
-            tgc_table = self.ui.tgcEntryViewTable
-            self._fetchAndShowTable(conn, tgc_table, 'TGC')
-            tbc_table = self.ui.tbcEntryViewTable
-            self._fetchAndShowTable(conn, tbc_table, 'TBC')
-            dat_table = self.ui.datEntryViewTable
-            self._fetchAndShowTable(conn, dat_table, 'DAT')
-            bc_table = self.ui.bcEntryViewTable
-            self._fetchAndShowTable(conn, bc_table, 'BC_DBASE') 
-            ecf_table = self.ui.ecfEntryViewTable
-            self._fetchAndShowTable(conn, ecf_table, 'ECF')
-            tcf_table = self.ui.tcfEntryViewTable
-            self._fetchAndShowTable(conn, tcf_table, 'TCF')
-                
-            conn.close()
+                # and display in the gui tables all those that loaded
+                if has_vals:
+                    t.setRowCount(count)
+                    count = 0
+                    for row in rows:
+                        self._putInTableValues(row, t, count)
+                        count += 1  
             
-    
-    def _fetchAndShowTable(self, conn, table_widget, table_name):
-        '''Get the table from the database and show it on the gui.
-        
-        @param cursor: the cursor from the open database connection.
-        @param table_widget: the TableWidget on the form to display the data in.
-        @param db_table_name: the name of the database table to load data from.
-        '''
-        results = DatabaseFunctions.findInDatabase(table_name, db_path=False, conn=conn, 
-                                                            return_rows=True)
-        if not results[0] == False:
-            count = results[1]
-            table_widget.setRowCount(count)
-            count = 0
-            for row in results[2]:
-                self._putInTableValues(row, table_widget, count)
-                count += 1        
-        
 
     def _findNewLogEntries(self, conn, log_pages, log_name, entry_table=None, 
                                                         multiple_files=True):
@@ -1433,7 +1382,17 @@ class MainGui(QtGui.QMainWindow):
             return False
         else:
             return answer
-
+    
+    
+    def launchQMsgBox(self, title, message, type='warning'):
+        '''
+        '''
+        if type == 'warning':
+            QtGui.QMessageBox.warning(self, title, message)
+        
+        elif type == 'info':
+            QtGui.QMessageBox.Information(self, title, message)
+        
 
 class LogitSettings(object):
     '''Storage class for holding all of the settings that the current user has
