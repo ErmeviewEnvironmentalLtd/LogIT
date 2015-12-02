@@ -274,6 +274,32 @@ def createQtTableItem(name, is_editable=False):
         item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
     return item
+
+
+def deleteDatabaseRow(db_path, table_name, id):
+    '''Deletes the database row with the given id
+    @param db_path: the path to the database on file.
+    @param table_name: the name of the table.
+    @param id: the unique id of the row to delete.
+    @return: True if successful, false otherwise.
+    '''
+    conn = None
+    try:
+        # Delete the row from the database
+        conn = DatabaseFunctions.loadLogDatabase(db_path)
+        DatabaseFunctions.deleteRowFromTable(conn, table_name, id)
+        
+    except IOError:
+        logger.error('Unable to access database - see log for details')
+        return False
+    except Exception:
+        logger.error('Unable to access database - see log for details')
+        return False
+    finally:
+        if not conn == None:
+            conn.close()
+    
+    return True
     
     
 

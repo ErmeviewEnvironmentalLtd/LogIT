@@ -377,6 +377,7 @@ class MainGui(QtGui.QMainWindow):
         sender = self.sender()
         sender = str(sender.objectName())
         
+        # lookup the table and database table name
         try:
             table_obj = self.ui_container['View_log'][sender][0]
             table_name = self.ui_container['View_log'][sender][1]
@@ -407,30 +408,18 @@ class MainGui(QtGui.QMainWindow):
         row_dict = self._getFromTableValues(table_widget, row=row, names=['ID'])
         
         # Just make sure we meant to do this
-        answer = QtGui.QMessageBox.question(self, "Confirm Delete",
-            "Are you sure you want to delete this row?\n" +
-            "Table = %s, Row ID = %s" % (table_name, row_dict['ID']),
-            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-        if answer == QtGui.QMessageBox.No:
+        message = "Are you sure you want to delete this row?\nTable = %s, Row ID = %s" % (table_name, row_dict['ID'])
+        answer = self.launchQtQBox('Confirm Delete?', message)            
+        if answer == False:
             return
         
-        conn = None
-        try:
-            # Delete the row from the database
-            conn = DatabaseFunctions.loadLogDatabase(self.settings.cur_log_path)
-            DatabaseFunctions.deleteRowFromTable(conn, table_name, row_dict['ID'])
-            
+        # Delete from database
+        success = Controller.deleteDatabaseRow(self.settings.cur_log_path,
+                                               table_name, row_dict['ID'])
+        if success:
             # and then from the table
             table_widget.removeRow(row)
             logger.info('Row ID=%s deleted successfully' % (row_dict['ID']))
-            
-        except IOError:
-            logger.error('Unable to access database - see log for details')
-        except Exception:
-            logger.error('Unable to access database - see log for details')
-        finally:
-            if not conn == None:
-                conn.close()
     
     
     def _saveViewChangesToDatabase(self, table_widget, table_name):
@@ -1434,6 +1423,16 @@ class MainGui(QtGui.QMainWindow):
                          'Error': None, 
                         'Message': None}
 
+
+    def launchQtQBox(self, title, message):
+        '''
+        '''
+        answer = QtGui.QMessageBox.question(self, title, message,
+                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+        if answer == QtGui.QMessageBox.No:
+            return False
+        else:
+            return answer
 
 
 class LogitSettings(object):
