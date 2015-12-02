@@ -43,6 +43,8 @@ import os
 import traceback
 import itertools
 
+from PyQt4 import QtCore, QtGui
+
 # Local modules
 import DatabaseFunctions
 
@@ -257,4 +259,24 @@ def insertIntoModelFileTable(conn, table_name, col_name, model_file, files_list)
         return False, False
     else:
         return new_files, ids
+    
+    
+def createQtTableItem(name, is_editable=False):
+    '''Create a QTableWidgetItem and return
+    @param is_editable=False: Set editable flag.
+    @return: QTableWidgetItem
+    '''
+    item = QtGui.QTableWidgetItem(str(name))
+    
+    if is_editable:
+        item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QTCore.QT.ItemIsEditable)
+    else:
+        item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+        
+    return item
+    
+    
+
+    
+    
     

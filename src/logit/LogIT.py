@@ -206,12 +206,38 @@ class MainGui(QtGui.QMainWindow):
         self.loadModelLog()
         self.log_pages = None
         
+        self.ui_container = {}
+        self._setupUiContainer()
+        
         self.setWindowIcon(QtGui.QIcon(':Logit_Logo2_25x25.png'))
         
         # Activate the GUI
         MainGui.show()
         sys.exit(self.app.exec_())
         
+    
+    def _setupUiContainer(self):
+        '''
+        '''
+        self.ui_container['New_log_entry'] = {}
+        self.ui_container['New_log_entry']['Run_table'] = self.ui.runEntryTable
+        self.ui_container['New_log_entry']['Tcf_table'] = self.ui.tcfEntryTable
+        self.ui_container['New_log_entry']['Ecf_table'] = self.ui.ecfEntryTable
+        self.ui_container['New_log_entry']['Tgc_table'] = self.ui.tgcEntryTable
+        self.ui_container['New_log_entry']['Tbc_table'] = self.ui.tbcEntryTable
+        self.ui_container['New_log_entry']['Bc_table'] = self.ui.bcEntryTable
+        self.ui_container['New_log_entry']['Dat_table'] = self.ui.datEntryTable
+        self.ui_container['New_log_entry']['Input_log_vars'] = self.ui.inputVarGroup
+        
+        self.ui_container['View_log'] = {}
+        self.ui_container['View_log']['Run_table'] = self.ui.runEntryViewTable
+        self.ui_container['View_log']['Tcf_table'] = self.ui.tcfEntryViewTable
+        self.ui_container['View_log']['Ecf_table'] = self.ui.ecfEntryViewTable
+        self.ui_container['View_log']['Tgc_table'] = self.ui.tgcEntryViewTable
+        self.ui_container['View_log']['Tbc_table'] = self.ui.tbcEntryViewTable
+        self.ui_container['View_log']['Bc_table'] = self.ui.bcEntryViewTable
+        self.ui_container['View_log']['Dat_table'] = self.ui.datEntryViewTable 
+    
     
     def _updateLoggingLevel(self):
         '''Alters to logging level based on the name of the calling action
@@ -269,14 +295,6 @@ class MainGui(QtGui.QMainWindow):
         if call_name == 'multiModelErrorCopyButton':
             text = self.ui.multiModelLoadErrorTextEdit.toPlainText()
         
-#         try:
-#             win32clipboard.OpenClipboard()
-#             win32clipboard.EmptyClipboard()
-#             win32clipboard.SetClipboardText(s)
-#             win32clipboard.CloseClipboard()
-#         except:
-#             logger.warning('Could not copy clipboard data.')
-            
             clipboard = QtGui.QApplication.clipboard()
             clipboard.setText(text)
             event = QtCore.QEvent(QtCore.QEvent.Clipboard)
@@ -298,7 +316,6 @@ class MainGui(QtGui.QMainWindow):
             open_paths = self._getModelFileDialog(multi_paths=True)
             if open_paths == False:
                 return
-
             
             row_count = self.ui.loadMultiModelTable.rowCount()
             for p in open_paths:
@@ -311,12 +328,10 @@ class MainGui(QtGui.QMainWindow):
                 self.settings.last_model_directory = d
                 
                 # Create a couple of items and add to the table
-                itemf = QtGui.QTableWidgetItem(str(fname))
-                itemf.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-                itemp = QtGui.QTableWidgetItem(str(p))
-                itemp.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
-                self.ui.loadMultiModelTable.setItem(row_count, 0, itemf)
-                self.ui.loadMultiModelTable.setItem(row_count, 1, itemp)
+                self.ui.loadMultiModelTable.setItem(row_count, 0, 
+                                        Controller.createQtTableItem(fname))
+                self.ui.loadMultiModelTable.setItem(row_count, 1, 
+                                        Controller.createQtTableItem(p))
                 
                 # Set the sumbit button to enabled
                 self.ui.submitMultiModelGroup.setEnabled(True)
