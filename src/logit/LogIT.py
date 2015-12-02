@@ -220,23 +220,23 @@ class MainGui(QtGui.QMainWindow):
         '''
         '''
         self.ui_container['New_log_entry'] = {}
-        self.ui_container['New_log_entry']['Run_table'] = self.ui.runEntryTable
-        self.ui_container['New_log_entry']['Tcf_table'] = self.ui.tcfEntryTable
-        self.ui_container['New_log_entry']['Ecf_table'] = self.ui.ecfEntryTable
-        self.ui_container['New_log_entry']['Tgc_table'] = self.ui.tgcEntryTable
-        self.ui_container['New_log_entry']['Tbc_table'] = self.ui.tbcEntryTable
-        self.ui_container['New_log_entry']['Bc_table'] = self.ui.bcEntryTable
-        self.ui_container['New_log_entry']['Dat_table'] = self.ui.datEntryTable
-        self.ui_container['New_log_entry']['Input_log_vars'] = self.ui.inputVarGroup
+        self.ui_container['New_log_entry']['runEntryTable'] = self.ui.runEntryTable
+        self.ui_container['New_log_entry']['tcfEntryTable'] = self.ui.tcfEntryTable
+        self.ui_container['New_log_entry']['ecfEntryTable'] = self.ui.ecfEntryTable
+        self.ui_container['New_log_entry']['tgcEntryTable'] = self.ui.tgcEntryTable
+        self.ui_container['New_log_entry']['tbcEntryTable'] = self.ui.tbcEntryTable
+        self.ui_container['New_log_entry']['bcEntryTable'] = self.ui.bcEntryTable
+        self.ui_container['New_log_entry']['datEntryTable'] = self.ui.datEntryTable
+        self.ui_container['New_log_entry']['inputVarGroup'] = self.ui.inputVarGroup
         
         self.ui_container['View_log'] = {}
-        self.ui_container['View_log']['Run_table'] = self.ui.runEntryViewTable
-        self.ui_container['View_log']['Tcf_table'] = self.ui.tcfEntryViewTable
-        self.ui_container['View_log']['Ecf_table'] = self.ui.ecfEntryViewTable
-        self.ui_container['View_log']['Tgc_table'] = self.ui.tgcEntryViewTable
-        self.ui_container['View_log']['Tbc_table'] = self.ui.tbcEntryViewTable
-        self.ui_container['View_log']['Bc_table'] = self.ui.bcEntryViewTable
-        self.ui_container['View_log']['Dat_table'] = self.ui.datEntryViewTable 
+        self.ui_container['View_log']['runEntryViewTable'] = [self.ui.runEntryViewTable, 'RUN']
+        self.ui_container['View_log']['tcfEntryViewTable'] = [self.ui.tcfEntryViewTable, 'TCF']
+        self.ui_container['View_log']['ecfEntryViewTable'] = [self.ui.ecfEntryViewTable, 'ECF']
+        self.ui_container['View_log']['tgcEntryViewTable'] = [self.ui.tgcEntryViewTable, 'TGC']
+        self.ui_container['View_log']['tbcEntryViewTable'] = [self.ui.tbcEntryViewTable, 'TBC']
+        self.ui_container['View_log']['bcEntryViewTable'] = [self.ui.bcEntryViewTable, 'BC_DBASE']
+        self.ui_container['View_log']['datEntryViewTable'] = [self.ui.datEntryViewTable, 'DAT'] 
     
     
     def _updateLoggingLevel(self):
@@ -375,31 +375,12 @@ class MainGui(QtGui.QMainWindow):
     
         # Find who called us and get the object that the name refers to.
         sender = self.sender()
-        sender = sender.objectName()
+        sender = str(sender.objectName())
         
-        # Table objects
-        if sender == 'runEntryViewTable':
-            table_obj = self.ui.runEntryViewTable
-            table_name = 'RUN'
-        elif sender == 'tgcEntryViewTable':
-            table_obj = self.ui.tgcEntryViewTable
-            table_name= 'TGC'
-        elif sender == 'tbcEntryViewTable':
-            table_obj = self.ui.tbcEntryViewTable
-            table_name = 'TBC'
-        elif sender == 'datEntryViewTable':
-            table_obj = self.ui.datEntryViewTable
-            table_name = 'DAT'
-        elif sender == 'bcEntryViewTable':
-            table_obj = self.ui.bcEntryViewTable
-            table_name = 'BC_DBASE'
-        elif sender == 'ecfEntryViewTable':
-            table_obj = self.ui.ecfEntryViewTable
-            table_name = 'ECF'
-        elif sender == 'tcfEntryViewTable':
-            table_obj = self.ui.tcfEntryViewTable
-            table_name = 'TCF'
-        else:
+        try:
+            table_obj = self.ui_container['View_log'][sender][0]
+            table_name = self.ui_container['View_log'][sender][1]
+        except KeyError:
             return
         
         # Get the action and do whatever it says
