@@ -918,28 +918,17 @@ class MainGui(QtGui.QMainWindow):
     def _loadSetup(self):
         '''Load LogIT setup from file.
         '''
-        d = MyFileDialogs()
-        open_path = d.openFileDialog(path=os.path.split(
-                            self.settings.cur_log_path)[0], 
-                            file_types='Log Settings (*.logset)')
-        
-        if open_path == False:
+        settings, err_title, err_msg = Controller.loadSetup(
+                self.settings.cur_settings_path, self.settings.cur_log_path)
+         
+        if settings == False:
+            if not err_title == None:
+                QtGui.QMessageBox.warning(self, err_title, err_msg)
             return
-        try:
-            # Load the settings dictionary
-            open_path = str(open_path)
-            cur_settings = cPickle.load(open(open_path, "rb"))
-            cur_settings.cur_settings_path = self.settings.cur_settings_path
-            self.settings = cur_settings 
-        except:
-            logging.info("Unable to load user settings from: %s" % (open_path))
-            logger.error('Could not load settings file')
-            QtGui.QMessageBox.warning(self, "Load Failed",
-                    "Unable to load user settings from: %s" % (open_path))
-            return
+        else:
+            self.settings = settings
+            self._loadSettings()
         
-        self._loadSettings()
-    
     
     def _customClose(self):
         '''Do the things that need doing before closing window.

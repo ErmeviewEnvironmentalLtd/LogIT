@@ -43,8 +43,11 @@ import os
 import traceback
 import itertools
 import sqlite3
+import cPickle
 
 from PyQt4 import QtCore, QtGui
+
+from tmac_tools_lib.utils.qtclasses import MyFileDialogs
 
 # Local modules
 import DatabaseFunctions
@@ -612,5 +615,28 @@ def fetchAndCheckModel(db_path, open_path, log_type, launch_error=True):
             return error_details, log_pages
                         
         
+def loadSetup(cur_settings_path, cur_log_path):
+    '''Load LogIT setup from file.
+    '''
+    d = MyFileDialogs()
+    open_path = d.openFileDialog(path=os.path.split(cur_log_path)[0], 
+                        file_types='Log Settings (*.logset)')
+    
+    if open_path == False:
+        return False, None, None
+    try:
+        # Load the settings dictionary
+        open_path = str(open_path)
+        cur_settings = cPickle.load(open(open_path, "rb"))
+        cur_settings.cur_settings_path = cur_settings_path
+        return cur_settings, None, None
+    except:
+        msg = "Unable to load user settings from: %s" % (open_path)
+        logging.info(msg)
+        logger.error('Could not load settings file')
+        title = "Load Failed"
+        return False, title, msg
+    
+    
     
     
