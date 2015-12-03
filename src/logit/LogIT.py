@@ -1057,31 +1057,17 @@ class MainGui(QtGui.QMainWindow):
         '''
 
         # Check that we have a database
-        if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
+        if not self.checkDbLoaded():
             QtGui.QMessageBox.warning(self, "No Database Loaded",
                 "No log database active. Please load or create one from" +
                                                     " the file menu.")
             logger.error('No log database found. Load or create one from File menu')
             return            
 
-        # Create a file dialog with an initial path based on the availability
-        # of path variables.
-        d = MyFileDialogs()
-        if not self.settings.last_model_directory == '' and not self.settings.last_model_directory == False:
-            chosen_path = self.settings.last_model_directory
-        elif not self.settings.cur_log_path == ''  and not self.settings.cur_log_path == False:
-            chosen_path = self.settings.cur_log_path
-        else:
-            chosen_path = self.settings.cur_settings_path
-            
-        if multi_paths:
-            open_path = d.openFileDialog(path=chosen_path, 
-                    file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)',
-                    multi_file=True)
-        else:
-            open_path = d.openFileDialog(path=chosen_path, 
-                    file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)')
-            
+        open_path = Controller.getModelFileLocation(multi_paths,
+            self.settings.last_model_directory, self.settings.cur_log_path,
+                self.settings.cur_settings_path)
+        
         return open_path
     
           
@@ -1107,7 +1093,9 @@ class MainGui(QtGui.QMainWindow):
                 # Get the log type index
                 log_type = self.ui.loadModelComboBox.currentIndex()
                 
-                log_pages, result = self._fetchAndCheckModel(open_path, log_type)
+                #log_pages, result = self._fetchAndCheckModel(open_path, log_type)
+                result, log_pages = Controller.fetchAndCheckModel(
+                    self.settings.cur_log_path, open_path, log_type)
     
                 if result['Success'] == False:
                     QtGui.QMessageBox.warning(self, result['Error'],
@@ -1117,93 +1105,6 @@ class MainGui(QtGui.QMainWindow):
                     self.ui.statusbar.showMessage(result['Status_bar'])
                     self._fillEntryTables(log_pages)
                     self.ui.submitSingleModelGroup.setEnabled(True) 
-
-
-    def _fetchAndCheckModel(self, open_path, log_type, launch_error=True):
-        '''Loads a model and makes a few conditional checks on it.
-        Loads model from the given .tcf/.ief file and checks that the .ief, 
-        .tcf and ISIS results don't already exist in the DB and then returns
-        a success or fail status.
-        
-        @param open_path: the .ief or .tcf file path.
-        @param log_type: the model type to load (tuflow or ISIS only).
-        @param lauch_error=True: whether to launch message boxes if an error is
-               found or not. We don't want to if we're loading multiple files.
-        @return: tuple containing log_pages (which could be the loaded log
-                 pages or False if the load failed and a dictionary containing
-                 the load status and messages for status bars and errors.
-        '''
-                
-        # Load the model at the chosen path.
-        log_pages = LogBuilder.loadModel(open_path, log_type)
-        if log_pages == False:
-            if launch_error:
-                QtGui.QMessageBox.warning(self, "Load Error",
-                "Unable to load model from file at: %s." % open_path)
-                self.ui.statusbar.showMessage("Unable to load model at: " + open_path)
-            else:
-                return log_pages, {'Success': False, 
-                        'Status_bar': "Unable to load model at: %s" % open_path,
-                         'Error': 'LoadError', 
-                        'Message': 'Selected file could not be loaded - file: %s.' % found_path}
-        else:
-            # Make sure that this ief or tcf do not already exist in the
-            # database. You need new ones for each run so this isn't
-            # allowed.
-            main_ief = log_pages['RUN']['IEF']
-            main_tcf = log_pages['RUN']['TCF']
-            tcf_results = log_pages['RUN']['RESULTS_LOCATION_2D']
-            indb = (False,)
-            found_path = ''
-            
-            # If we have an ief get the ief name to see if we already
-            # recorded a run using that model
-            if not main_ief == 'None':
-                indb = DatabaseFunctions.findInDatabase(
-                         'RUN', db_path=self.settings.cur_log_path, 
-                         db_entry=main_ief, col_name='IEF', 
-                         only_col_name=True)
-                
-                # Then check if we've already used the results locations
-                # location for a previous run and see if the user wants
-                # to continue if we have.
-                if indb[0]:
-                    exists = DatabaseFunctions.findInDatabase(
-                             'RUN', db_path=self.settings.cur_log_path, 
-                             db_entry=tcf_results, col_name='RESULTS_LOCATION_1D', 
-                             only_col_name=True)
-                    
-                    if exists[0]:
-                        button = QtGui.QMessageBox.question(self, 
-                                "ISIS/FMP Results Folder Already Exists",
-                                "Results folder location found in previous " +
-                                "entry\nDo you want to Continue?",
-                                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-                        
-                        if button == QtGui.QMessageBox.No:
-                            return
-                    
-                found_path = main_ief
-            
-            # Do the whole lot again for the tuflow run
-            if not main_tcf == 'None':
-                if not indb[0]:
-                    indb = DatabaseFunctions.findInDatabase(
-                             'RUN', db_path=self.settings.cur_log_path, 
-                             db_entry=main_tcf, col_name='TCF', 
-                             only_col_name=True)
-                    found_path = main_tcf
-                        
-            if indb[0]:
-                return log_pages, {'Success': False, 
-                        'Status_bar': "Unable to load model at: %s" % open_path,
-                         'Error': 'LoadError', 
-                        'Message': 'Selected file already exists in database - file: %s.' % found_path}
-            else:
-                return log_pages, {'Success': True, 
-                        'Status_bar': "Loaded model at: %s" % open_path,
-                         'Error': None, 
-                        'Message': None}
 
 
     def launchQtQBox(self, title, message):
