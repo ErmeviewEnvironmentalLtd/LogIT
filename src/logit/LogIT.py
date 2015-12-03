@@ -455,7 +455,7 @@ class MainGui(QtGui.QMainWindow):
     def loadModelLog(self):
         '''If there is a model log to load we do it.
         '''
-        if not self.settings.cur_log_path == '' and not self.settings.cur_log_path == False:
+        if self.checkDbLoaded():
 
             # Check that the database actually exists. If not get out of here.
             if not os.path.exists(self.settings.cur_log_path):
@@ -471,19 +471,28 @@ class MainGui(QtGui.QMainWindow):
             self._clearTableWidget('view')
              
             # load each of the tables from the database
+            table_list = []
             for key, table in self.ui_container['View_log'].iteritems():
                 t = table[0]
                 name = table[1]
-                has_vals, count, rows = Controller.fetchTableValues(
-                                            self.settings.cur_log_path, name)
-            
-                # and display in the gui tables all those that loaded
-                if has_vals:
-                    t.setRowCount(count)
+                table_list.append([name, key])
+             
+            entries = Controller.fetchTableValues(
+                                    self.settings.cur_log_path, table_list)
+            if entries[0] == False:
+                self.launchQMsgBox('Log Load Error', 
+                'Unable to load model log at %s' % (self.settings.cur_log_path))
+                return
+             
+            # Add the results to the database tables
+            for e in entries:
+                if e[2]:
+                    t = self.ui_container['View_log'][e[1]][0]
+                    t.setRowCount(e[3])
                     count = 0
-                    for row in rows:
-                        self._putInTableValues(row, t, count)
-                        count += 1  
+                    for row in e[4]:
+                        self._putInTableValues(row, t, count)                    
+                        count += 1
             
 
     def _fillEntryTables(self, log_pages):

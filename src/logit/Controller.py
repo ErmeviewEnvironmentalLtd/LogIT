@@ -385,7 +385,7 @@ def checkDatabaseVersion(db_path):
             conn.close()
     
 
-def fetchTableValues(db_path, table_name):
+def fetchTableValues(db_path, table_list):
     '''Fetches all rows from the given table name.
     @param db_path: path to a database on file.
     @param table_name: name of the table to fetch rows from.
@@ -394,12 +394,27 @@ def fetchTableValues(db_path, table_name):
     '''
     conn = False
     title = 'Load Error'
+    entries = []
     try:
         conn = DatabaseFunctions.loadLogDatabase(db_path)
         conn.row_factory = sqlite3.Row
-        results = DatabaseFunctions.findInDatabase(table_name, db_path=False, 
-                                                conn=conn, return_rows=True)
-        return results[0], results[1], results[2]
+                
+        for table in table_list:
+            # If there's nothing in the table it will fail, but we don't care
+            # so just pass the error.
+            try:
+                results = DatabaseFunctions.findInDatabase(table[0], 
+                                    db_path=False, conn=conn, return_rows=True)
+                 
+                entries.append([table[0], table[1], results[0], results[1], results[2]])
+            except:
+                pass           
+         
+        return entries
+        
+#         results = DatabaseFunctions.findInDatabase(table_name, db_path=False, 
+#                                                 conn=conn, return_rows=True)
+#         return results[0], results[1], results[2]
     except:
         msg = "Unable to load model log from file at: %s." % (db_path)
         logger.error('Unable to load model log from file at: \n%s' % (db_path))
