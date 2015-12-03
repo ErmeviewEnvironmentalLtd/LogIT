@@ -613,6 +613,38 @@ def fetchAndCheckModel(db_path, open_path, log_type, launch_error=True):
                 'Error': 'IO Error', 
                 'Message': "Unable to load model from file at: %s" % open_path}
             return error_details, log_pages
+        
+
+def updateDatabaseVersion(db_path):
+    '''Try to update database to latest version.
+    @param db_path: path to the database to update.
+    @return: None if user cancels or error_details otherwise. These can be:
+             error_details['Success'] = True if all good or False otherwise.
+             If False then other dict items contain details.
+    '''
+    error_details = {'Success': True}
+    d = MyFileDialogs()
+    if not self.checkDbLoaded():
+        open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
+                                    file_types='LogIT database(*.logdb)'))
+    else:
+        open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, 
+                                    file_types='LogIT database(*.logdb)'))
+    
+    # User cancel return
+    if open_path == False:
+        return None
+    
+    try:
+        DatabaseFunctions.updateDatabaseVersion(open_path)
+        return error_details
+    except:
+        logger.error('Failed to update database scheme: See log for details')
+        error_details = {'Success': False, 
+                'Status_bar': "Database Update Failed",
+                'Error': 'Database Error', 
+                'Message': "Failed to update database scheme: See log for details"}
+        return error_details
                         
         
 def loadSetup(cur_settings_path, cur_log_path):

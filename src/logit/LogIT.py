@@ -943,37 +943,27 @@ class MainGui(QtGui.QMainWindow):
     def _updateDatabaseVersion(self): 
         '''Checks if the databse at the given path is compatible with the
         latest version of LogIT.
-         
-        @param db_path: path to the database to check.
         '''
-        d = MyFileDialogs()
-        if not self.settings.cur_log_path == '' and not self.settings.cur_log_path == False:
-            open_path = str(d.openFileDialog(path=self.settings.cur_log_path, file_types='LogIT database(*.logdb)'))
+        errors = Controller.updateDatabaseVersion()
+        if errors == None:
+            return
+        elif errors['Success'] == False:
+            msg = "Failed to update database scheme: See log for details"
+            self.launchQMsgBox('Database Update Failed', message)
         else:
-            open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, file_types='LogIT database(*.logdb)'))
-         
-        if not open_path == False:
-            try:
-                DatabaseFunctions.updateDatabaseVersion(open_path)
-                
-            except:
-                logger.error('Failed to update database scheme: See log for details')
-                QtGui.QMessageBox.warning(self, "Database Update Failed",
-                        "Failed to update database scheme: See log for details") 
-                return
-            
+        
             msg = "Update Successfull\nWould you like to load updated database?"
-            reply = QtGui.QMessageBox.question(self, 'Update Successfull', 
-                        msg, QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
-            if reply == QtGui.QMessageBox.Yes:
-                self.settings.cur_log_path = open_path
+            reply = self.launchQtQBox('Update Successful', msg)
+            if not reply == False:
+                temp = self.settings.cur_log_path = open_path
                 try:
                     self.loadModelLog()
                     self.ui.statusbar.showMessage("Current log: " + open_path)
                 except:
                     logger.error('Cannot load database: see log for details')
-                    QtGui.QMessageBox.warning(self, "Database Open Failed",
-                        "Failed to open database: See log for details") 
+                    msg = "Failed to open database: See log for details"
+                    self.launchQMsgBox('Database Update Failed', message)
+                    self.settings.cur_log_path = temp
         
 
     def fileMenuActions(self):
