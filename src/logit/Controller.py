@@ -409,8 +409,8 @@ def fetchTableValues(db_path, table_list):
                 entries.append([table[0], table[1], results[0], results[1], results[2]])
             except:
                 pass           
-         
-        return entries
+        
+        return entries, True
         
 #         results = DatabaseFunctions.findInDatabase(table_name, db_path=False, 
 #                                                 conn=conn, return_rows=True)
@@ -418,7 +418,7 @@ def fetchTableValues(db_path, table_list):
     except:
         msg = "Unable to load model log from file at: %s." % (db_path)
         logger.error('Unable to load model log from file at: \n%s' % (db_path))
-        return False, title, msg
+        return entries, False, title, msg
     finally:
         conn.close()
  
@@ -450,19 +450,21 @@ def loadEntrysWithStatus(db_path, log_pages, table_list):
         for item in table_list:
             name = item[0]
             key = item[1]
-            if name == 'RUN' or name == 'DAT':
+            if name == 'RUN':
                 continue
             
-            log_pages, new_entries = findNewLogEntries(
+            if name == 'DAT':
+                if log_pages['DAT']['DAT'] == 'None':   
+                    log_pages['DAT'] = None
+                else:
+                    log_pages, new_entries = findNewLogEntries(
+                                        conn, log_pages, 'DAT', key, False)
+            else:
+                log_pages, new_entries = findNewLogEntries(
                                             conn, log_pages, name, key)
             entries = entries + new_entries
         
-        if log_pages['DAT']['DAT'] == 'None':   
-            log_pages['DAT'] = None
-        else:
-            log_pages, new_entries = findNewLogEntries(
-                conn, log_pages, 'DAT', self.ui.datEntryTable, False)
-            entries = entries + new_entries
+        
             
         return entries
             

@@ -477,9 +477,10 @@ class MainGui(QtGui.QMainWindow):
                 name = table[1]
                 table_list.append([name, key])
              
-            entries = Controller.fetchTableValues(
+            entries, success = Controller.fetchTableValues(
                                     self.settings.cur_log_path, table_list)
-            if entries[0] == False:
+            
+            if success == False:
                 self.launchQMsgBox('Log Load Error', 
                 'Unable to load model log at %s' % (self.settings.cur_log_path))
                 return

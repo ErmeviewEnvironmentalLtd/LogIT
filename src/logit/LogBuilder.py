@@ -250,6 +250,7 @@ def buildTuflowRun(has_ief_file, tuflow_model, run_cols):
     # Fetch the main tcf file and the list of .trd files referenced by it.
     tcf = tuflow_model.getModelObject('main_tcf')
     tcf_trds = tuflow_model.getModelObject(Tcf.TYPE)
+    tcf_trds.append(tcf)
 
     if not has_ief_file:
         # If we don't have an ief we should try and get the run duration 
@@ -288,7 +289,7 @@ def buildTuflowRun(has_ief_file, tuflow_model, run_cols):
     # The rest is in the tuflow model
     tcf_paths = []
     for t in tcf_trds:
-        if not t in tcf_paths:
+        if not t.somefileRef.getFileNameAndExtension() in tcf_paths:
             tcf_paths.append(t.somefileRef.getFileNameAndExtension())
     run_cols['TCF'] = "[" + ", ".join(tcf_paths) + "]"
     
