@@ -52,6 +52,7 @@ from tmac_tools_lib.utils.qtclasses import MyFileDialogs
 # Local modules
 import DatabaseFunctions
 import LogBuilder
+import Exporters
 
 import logging
 logger = logging.getLogger(__name__)
@@ -670,5 +671,37 @@ def loadSetup(cur_settings_path, cur_log_path):
         return False, title, msg
     
     
+def exportToExcel(cur_log_path, export_tables):
+    '''Export database to Excel (.xls) format at user chosen location.
+    @param cur_log_path: the current log database file path.
+    @param export_tables: list with order to create worksheet.
+    @return dictionary containing error_details (or success details if
+            error_details['Success'] is True.
+    @note: launches file dialog.
+    '''
+    error_details = {'Success': True}
+    d = MyFileDialogs()
+    save_path = d.saveFileDialog(path=os.path.split(cur_log_path)[0], 
+                                 file_types='Excel File (*.xls)')
+    save_path = str(save_path)
     
+    if not save_path == False:
+        try:
+            Exporters.exportToExcel(cur_log_path, export_tables, save_path)
+        except:
+            logger.error('Could not export log to Excel')
+            error_details = {'Success': False, 
+                'Status_bar': "Export to Excel Failed",
+                'Error': "Export Failed", 
+                'Message': "Unable to export database to Excel - Is the file open?"}
+            return error_details
+       
+        logger.info('Database exported to Excel at:\n%s' % (save_path))
+        error_details = {'Success': True, 
+                'Status_bar': "Database exported to Excel at: %s." % save_path,
+                'Error': "Export Failed", 
+                'Message': "Database exported to Excel at: %s." % save_path}
+        return error_details
+
+
     

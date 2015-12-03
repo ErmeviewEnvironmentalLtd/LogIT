@@ -964,6 +964,70 @@ class MainGui(QtGui.QMainWindow):
                     msg = "Failed to open database: See log for details"
                     self.launchQMsgBox('Database Update Failed', message)
                     self.settings.cur_log_path = temp
+    
+    
+    def _createNewLogDatabase(self):
+        '''Create a new model log database.
+        '''
+        d = MyFileDialogs()
+        save_path = d.saveFileDialog(path=os.path.split(
+                                    self.settings.cur_settings_path)[0], 
+                                     file_types='LogIT database(*.logdb)')
+        
+        if not save_path == False:
+            self.settings.cur_log_path = str(save_path)
+            self._clearTableWidget('all')
+            self.ui.statusbar.showMessage('Building new log database...')
+            self.ui.centralwidget.setEnabled(False)
+            DatabaseFunctions.createNewLogDatabase(str(save_path))
+            self.ui.centralwidget.setEnabled(True)
+            self.ui.statusbar.showMessage("Current log: " + save_path)
+    
+    
+    def _loadDatabaseFromUser(self):
+        '''Load database chosen by user in dialog.
+        '''
+        d = MyFileDialogs()
+        if not self.checkDbLoaded():
+            open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
+                                        file_types='LogIT database(*.logdb)'))
+        else:
+            open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, 
+                                        file_types='LogIT database(*.logdb)'))
+        
+        if open_path == False:
+            return
+        
+        if self.settings == False:
+            self.settings = LogitSettings()
+        
+        self.settings.cur_log_path = open_path
+        
+        try:
+            self.loadModelLog()
+            self.ui.statusbar.showMessage("Current log: " + open_path)
+        except:
+            logger.error('Cannot load database: see log for details')
+    
+    
+    def _exportDatabase(self, call_name):
+        '''Exports the database based on calling action.
+        '''
+        if self.checkDbLoaded():
+            err_details = Controller.exportToExcel(
+                        self.settings.cur_log_path, self.export_tables)
+            
+            if err_details['Success'] == False:
+                self.launchQMsgBox(err_details['Error'], err_details['Message'])
+                self.ui.statusbar.showMessage(err_details['Status_bar'])
+            else:
+                self.launchQMsgBox(err_details['Error'], 
+                                   err_details['Message'], 'info')
+                self.ui.statusbar.showMessage(err_details['Status_bar'])
+        else:
+            logger.warning('Cannot export log - no database loaded')
+            QtGui.QMessageBox.warning(self, "Cannot Export Log",
+                                      "There is no log database loaded")
         
 
     def fileMenuActions(self):
@@ -974,76 +1038,13 @@ class MainGui(QtGui.QMainWindow):
         logger.debug('Caller = ' + call_name)
         
         if call_name == 'actionNewModelLog':
-            d = MyFileDialogs()
-            save_path = d.saveFileDialog(path=os.path.split(
-                                        self.settings.cur_settings_path)[0], 
-                                         file_types='LogIT database(*.logdb)')
-            
-            if not save_path == False:
-                
-                # Check if we are about to write over an existing database
-                create_db = True
-                
-                # Removed because the system already checks this.
-#                 if os.path.exists(save_path):
-#                     button = QtGui.QMessageBox.question(self, "Confirm Remove",
-#                         "Existing database will be reset to new. Continue?\nDatabase = %s" % save_path,
-#                         QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-#                     if button == QtGui.QMessageBox.No:
-#                         create_db = False
-                
-                if create_db:
-                    self.settings.cur_log_path = str(save_path)
-                    self._clearTableWidget('all')
-                    self.ui.statusbar.showMessage('Building new log database...')
-                    self.ui.centralwidget.setEnabled(False)
-                    DatabaseFunctions.createNewLogDatabase(str(save_path))
-                    self.ui.centralwidget.setEnabled(True)
-                    self.ui.statusbar.showMessage("Current log: " + save_path)
+            self._createNewLogDatabase()
         
         elif call_name == 'actionLoad':
-            d = MyFileDialogs()
-            if not self.settings.cur_log_path == '' and not self.settings.cur_log_path == False:
-                open_path = str(d.openFileDialog(path=self.settings.cur_log_path, file_types='LogIT database(*.logdb)'))
-            else:
-                open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, file_types='LogIT database(*.logdb)'))
-            if self.settings == False:
-                self.settings = LogitSettings()
-            
-            if not open_path == False:
-                self.settings.cur_log_path = open_path
-                
-                try:
-                    self.loadModelLog()
-                    self.ui.statusbar.showMessage("Current log: " + open_path)
-                except:
-                    logger.error('Cannot load database: see log for details')
+            self._loadDatabaseFromUser()
                                     
         elif call_name == 'actionExportToExcel':
-            if not self.settings.cur_log_path == '' and not self.settings.cur_log_path == False:
-                d = MyFileDialogs()
-                save_path = d.saveFileDialog(path=os.path.split(
-                                            self.settings.cur_log_path)[0], 
-                                             file_types='Excel File (*.xls)')
-                save_path = str(save_path)
-                
-                if not save_path == False:
-                    try:
-                        Exporters.exportToExcel(self.settings.cur_log_path, 
-                                                self.export_tables, save_path)
-                    except:
-                        logger.error('Could not export log to Excel')
-                        QtGui.QMessageBox.warning(self, "Export Failed",
-                                            "Unable to export database to Excel - Is the file open?")
-                        return
-                   
-                    logger.info('Database exported to Excel at:\n%s' % (save_path))
-                    QtGui.QMessageBox.information(self, "Export Complete",
-                    "Database exported to Excel at: %s." % save_path)
-            else:
-                logger.warning('Cannot export log - no database loaded')
-                QtGui.QMessageBox.warning(self, "Cannot Export Log",
-                                          "There is no log database loaded")
+            self._exportDatabase(call_name)
             
             
     def _getModelFileDialog(self, multi_paths=False):
@@ -1223,7 +1224,7 @@ class MainGui(QtGui.QMainWindow):
             QtGui.QMessageBox.warning(self, title, message)
         
         elif type == 'info':
-            QtGui.QMessageBox.Information(self, title, message)
+            QtGui.QMessageBox.information(self, title, message)
     
     
     def checkDbLoaded(self):
