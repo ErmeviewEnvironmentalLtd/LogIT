@@ -270,7 +270,7 @@ def createQtTableItem(name, is_editable=False):
     item = QtGui.QTableWidgetItem(str(name))
     
     if is_editable:
-        item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QTCore.QT.ItemIsEditable)
+        item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
     else:
         item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         

@@ -582,18 +582,15 @@ class MainGui(QtGui.QMainWindow):
         for x in range(0,headercount,1):
             headertext = str(table_obj.horizontalHeaderItem(x).text())
             if headertext in col_dict:
-                item = QtGui.QTableWidgetItem(str(col_dict[headertext]))
                 
-                # If it is the ID column we have to ensure that no one can mess
-                # with it, otherwise we could accidentally corrupt the underlying
-                # database. With the other
+                # If it's a loaded variable or db ID then we need to stop 
+                # user for corrupting the data and/or database
                 if not headertext in self.editing_allowed:
-                    item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsEnabled)
-                
-                table_obj.setItem(row_no, x, item)
-                
-                if not headertext in self.editing_allowed:
-                    item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+                    table_obj.setItem(row_no, x, Controller.createQtTableItem(
+                                        str(col_dict[headertext]), False))
+                else:
+                    table_obj.setItem(row_no, x, Controller.createQtTableItem(
+                                        str(col_dict[headertext]), True))
                 
     
     def _getFromTableValues(self, table_obj, row_no=0, row=None, names=None):
@@ -675,7 +672,6 @@ class MainGui(QtGui.QMainWindow):
             # Clear the entry rows and deactivate add new log button
             self._clearTableWidget('entry')
             self.ui.submitSingleModelGroup.setEnabled(False)
-            
             
             # Update the status bar message
             self.ui.statusbar.showMessage("Log Database successfully updated")
