@@ -5,3 +5,4 @@
 /.metadata
 /.settings
 /src/logit/logs
+*.logdb

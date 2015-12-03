@@ -26,7 +26,7 @@
 # Module:  logit.py
 # Date:  16/11/2014
 # Author:  Duncan Runnacles
-# Version:  1.1
+# Version:  1.2
 # 
 # Summary:
 #    Main file and GUI for the LogIT software. Deals with all interactions with
@@ -35,15 +35,14 @@
 # UPDATES:
 #    DR - 19/11/2014:
 #        Changed logging procedure so that it is now possible to log an ISIS
-#        onlymodel without a Tuflow component.
+#        only model without a Tuflow component.
+#    DR - 03/12/2015:
+#        Cleaned out a lot of non GUI related code from here and refeactored
+#        a lot of the methods. It's still quite big, but a lot neater and
+#        more focused on dealing with the UI.
 #
 # TODO:
-#    It feels like there is a lot more code in this module than there should
-#    be. Maybe look at how it could be thinned out a bit by making better use
-#    of the controller.py module.
-#    There is also an issue with how PyInstaller is dealing with icons at the
-#    moment so they have been completely removed. Need to look into this and
-#    fix at some point. At the moment only the Python/windows icon is used.
+#    
 #
 ###############################################################################
 '''

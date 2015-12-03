@@ -26,7 +26,7 @@
 # Module:  Controller.py 
 # Date:  16/11/2014
 # Author:  Duncan Runnacles
-# Version:  1.0
+# Version: 1.1
 # 
 # Summary:
 #    Controller functions for the GUI. Code that is not directly responsible 
@@ -34,8 +34,11 @@
 #    order to separate it from the application library.
 #
 # UPDATES:
+#    DR (03/12/15) - Moved lots of the MainGui code into functions in here
+#                    during extensive refactoring in that class.
 #
 # TODO:
+#    Some heavy refactoring needed in some funtions.
 #
 ###############################################################################
 '''
@@ -115,6 +118,7 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
         '''Enumerate over an iterable in reverse order while retaining proper indexes
         '''
         return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
+    
     
     update_check = {'TGC': log_pages['RUN']['TGC'], 
                     'TBC': log_pages['RUN']['TBC'], 
