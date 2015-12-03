@@ -54,7 +54,6 @@ import sys
 import cPickle
 import sqlite3
 import logging
-import win32clipboard
  
 # Setup the logging protocols. Try and create a directory to put the logs into.
 # If that fails we call the console only logger, if not detailed logs will be
@@ -68,8 +67,6 @@ try:
       
     from LogSettings import LOG_SETTINGS
     logging.config.dictConfig(LOG_SETTINGS)
-    #from LogSettings import LOG_SETTINGS_WARNING
-    #logging.config.dictConfig(LOG_SETTINGS_WARNING)
     logger = logging.getLogger(__name__)
     logger.info('Logs will be written to file at: %s' % (log_path))
     CONSOLE_ONLY_LOG = False
@@ -282,12 +279,14 @@ class MainGui(QtGui.QMainWindow):
             
         
     def _clearMultiErrorText(self):
-        '''
+        '''Clears the error outputs in multi model load error textbox.
         '''
         self.ui.multiModelLoadErrorTextEdit.clear()
     
+    
     def _copyToClipboard(self):
-        '''
+        '''Copies the contents of a textbox to clipboard.
+        Textbox to copy is based on the calling action name.
         '''
         caller = self.sender()
         call_name = caller.objectName()
@@ -662,10 +661,45 @@ class MainGui(QtGui.QMainWindow):
     def _createMultipleLogEntry(self):
         '''Takes all the files in the multiple model list, load them and add
         them to the database.        
-        TODO:
-            Currently a copy of the method above. Need to implement properly.
         '''
+        def checkErrorStatus(error_details, error_list):
+            '''Look at outputs for errors and let caller know.
+            '''
+            error_found = False
+            if error_details['Success'] == False:
+                error_list.append(error_details)
+                error_found = True
+             
+            return error_found, error_list
         
+
+        def writeErrorLogs(load_errors):
+            '''Write logs to GUI if any errors found
+            '''
+            if len(load_errors) < 1: 
+                # Let the user know that all is good
+                logger.info('Log Database updated successfully')
+                self.ui.statusbar.showMessage("Log Database successfully updated")
+            
+            else:
+                # Collect all of the errors and show to user
+                logger.warning('One or more models could not be loaded')
+                error_files = []
+                for e in load_errors:
+                    error_files.append(e['Message'])
+                error_files.insert(0, 
+                        'Models not logged:\n')
+                errors = '\n\n'.join(error_files)
+                
+                self.ui.multiModelLoadErrorTextEdit.setText(errors)
+                
+                # Reset the progress stuff
+                prog_mon.reset('Complete')
+                    
+                QtGui.QMessageBox.warning(self, 'Logging Error:',
+                            'See Error Logs window for details')
+            
+            
         # Check that we have a database
         if not self.checkDbLoaded(): return
         
@@ -697,68 +731,31 @@ class MainGui(QtGui.QMainWindow):
             error_details, log_pages = Controller.fetchAndCheckModel(
                 self.settings.cur_log_path, path, log_type, launch_error=False)
             
-            if error_details['Success'] == False:
-                load_errors.append(error_details)
-                error_found = True
-                continue
+            # Go to next if we find an error
+            error_found, load_errors = checkErrorStatus(error_details, load_errors)
+            if error_found: continue
             
-            if not error_found:
-                prog_mon.update(bar_only=True)
-                
-                # Get the global user supplied log variables
-                log_pages = self._getInputLogVariables(log_pages)
-    
-                # Connect to the database and then update the log entries
-                error_details, self.log_pages, update_check = Controller.updateLog(
-                                    self.settings.cur_log_path, log_pages, 
-                                    check_new_entries=True)
-                
-                if error_details['Success'] == False:
-                    load_errors.append(error_details)
-                    error_found = True
-                    continue
-                
-                # Add the new entries to the view table as well
-                self.updateLogTable(update_check)
+            prog_mon.update(bar_only=True)
             
-            # Log any errors to show later
-            # TODO - Should be 'else'
-            if error_found:
-                load_errors.append({'Success': False, 
-                    'Status_bar': "Unable to update Database with model: %s" % path,
-                     'Error': 'Database Error', 
-                    'Message': "Unable to update Database with model: %s" % path})
-                continue
+            # Get the global user supplied log variables
+            log_pages = self._getInputLogVariables(log_pages)
+
+            # Update the log entries
+            error_details, self.log_pages, update_check = Controller.updateLog(
+                                self.settings.cur_log_path, log_pages, 
+                                check_new_entries=True)
             
-        prog_mon.reset('Complete')
+            error_found, load_errors = checkErrorStatus(error_details, load_errors)
+            if error_found: continue
+            
+            # Add the new entries to the view table as well
+            self.updateLogTable(update_check)
             
         # Clear the list entries
         self.ui.loadMultiModelTable.setRowCount(0)
+        writeErrorLogs(load_errors)
+        prog_mon.reset('Complete')
         
-        if len(load_errors) < 1: 
-            # Let the user know that all is good
-            logger.info('Log Database updated successfully')
-            self.ui.statusbar.showMessage("Log Database successfully updated")
-        
-        else:
-            # Collect all of the errors and show to user
-            logger.warning('One or more models could not be loaded')
-            error_files = []
-            for e in load_errors:
-                error_files.append(e['Message'])
-            error_files.insert(0, 
-                    'Models not logged:\n')
-            errors = '\n\n'.join(error_files)
-            
-            self.ui.multiModelLoadErrorTextEdit.setText(errors)
-            
-            # Reset the progress stuff
-            #_updateProgressBar(0, 'Complete')
-            prog_mon.reset('Complete')
-                
-            QtGui.QMessageBox.warning(self, 'Logging Error:',
-                        'See Error Logs window for details')
-            
     
     def _updateWithUserInputs(self):
         '''Get the variables that we want to allow the user to be able to update.
@@ -1093,7 +1090,6 @@ class MainGui(QtGui.QMainWindow):
                 # Get the log type index
                 log_type = self.ui.loadModelComboBox.currentIndex()
                 
-                #log_pages, result = self._fetchAndCheckModel(open_path, log_type)
                 result, log_pages = Controller.fetchAndCheckModel(
                     self.settings.cur_log_path, open_path, log_type)
     
