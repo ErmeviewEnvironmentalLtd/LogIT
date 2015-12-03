@@ -764,36 +764,21 @@ class MainGui(QtGui.QMainWindow):
         '''Get the variables that we want to allow the user to be able to update.
         '''
         # Fetch the values that have editing allowed from the form tables
+        # These only have single entries
         updates = {}
         updates['RUN'] = self._getFromTableValues(self.ui.runEntryTable)
-        
-        # For tgc, tbc, ecf and bc_dbase this most be done for multiple files
-        updates['TGC'] = []
-        if not self.log_pages['TGC'] == None:
-            for i, entry in enumerate(self.log_pages['TGC'], 0):
-                updates['TGC'].append(self._getFromTableValues(self.ui.tgcEntryTable, row_no=i))
-        
-        if not self.log_pages['TBC'] == None:
-            updates['TBC'] = []
-            for i, entry in enumerate(self.log_pages['TBC'], 0):
-                updates['TBC'].append(self._getFromTableValues(self.ui.tbcEntryTable, row_no=i))
-        
-        if not self.log_pages['ECF'] == None:
-            updates['ECF'] = []
-            for i, entry in enumerate(self.log_pages['ECF'], 0):
-                updates['ECF'].append(self._getFromTableValues(self.ui.ecfEntryTable, row_no=i))
-        
-        if not self.log_pages['TCF'] == None:
-            updates['TCF'] = []
-            for i, entry in enumerate(self.log_pages['TCF'], 0):
-                updates['TCF'].append(self._getFromTableValues(self.ui.tcfEntryTable, row_no=i))
-                
-        if not self.log_pages['BC_DBASE'] == None:
-            updates['BC_DBASE'] = []
-            for i, entry in enumerate(self.log_pages['BC_DBASE'], 0):
-                updates['BC_DBASE'].append(self._getFromTableValues(self.ui.bcEntryTable, row_no=i))
-            
         updates['DAT'] = self._getFromTableValues(self.ui.datEntryTable)
+        
+        # The others can have multiple entries
+        for key, table in self.ui_container['New_log_entry'].iteritems():
+            t = table[0]
+            name = table[1]
+            if name == 'RUN' or name == 'DAT': continue
+            
+            updates[name] = []
+            if not self.log_pages[name] == None:
+                for i, entry in enumerate(self.log_pages[name], 0):
+                    updates[name].append(self._getFromTableValues(t, row_no=i))
         
         # Loop through the updates entries and amend any corresponding log_pages
         for key, val in updates.iteritems():
@@ -803,7 +788,9 @@ class MainGui(QtGui.QMainWindow):
                 # In this case val is a list
                 for i, input_dict in enumerate(val, 0):
                     for item in input_dict:
-                        if not self.log_pages[key] == None and not self.log_pages[key][i] == None and item in self.log_pages[key][i]:
+                        if not self.log_pages[key] == None and \
+                            not self.log_pages[key][i] == None and \
+                                item in self.log_pages[key][i]:
                             self.log_pages[key][i][item] = val[i][item]
             else:
                 for v in val:
@@ -998,8 +985,6 @@ class MainGui(QtGui.QMainWindow):
                     logger.error('Cannot load database: see log for details')
                     QtGui.QMessageBox.warning(self, "Database Open Failed",
                         "Failed to open database: See log for details") 
-                    
-            
         
 
     def fileMenuActions(self):
