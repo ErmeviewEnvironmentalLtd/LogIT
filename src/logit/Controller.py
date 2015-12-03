@@ -364,6 +364,111 @@ def fetchTableValues(db_path, table_name):
         conn.close()
  
 
+def loadEntrysWithStatus(db_path, log_pages, table_list):
+    '''Loads the database and checks if the new entries exist.
+    
+    Builds a new list that stores the log_pages entry for each row as well as
+    some info on the key to that table in the gui, whether the entry already
+    exists or not adn the row count.
+    Uses the findNewLogEntries function to fo the hard work.
+    
+    @param db_path: path to a database on file.
+    @param log_pages: the log_pages dictionary with loaded model variables.
+    @param table_list: a list of all of the keys for accessing thetables in the 
+           'New log Entry' page of the GUI and the associated db tables.
+    @return: list containing sub-lists of all of the rows to be displayed on
+             the New log entry page tables.
+    '''
+     # We need to find if the TGC and TBC files have been registered with the
+    # database before. If they have then we don't need to register them 
+    # again.
+    conn = False
+    try:
+        conn = DatabaseFunctions.loadLogDatabase(db_path)
+        entries = []
+        
+        # Find log entries and populate tables for the model files
+        for item in table_list:
+            name = item[0]
+            key = item[1]
+            if name == 'RUN' or name == 'DAT':
+                continue
+            
+            log_pages, new_entries = findNewLogEntries(
+                                            conn, log_pages, name, key)
+            entries = entries + new_entries
+        
+        if log_pages['DAT']['DAT'] == 'None':   
+            log_pages['DAT'] = None
+        else:
+            log_pages, new_entries = findNewLogEntries(
+                conn, log_pages, 'DAT', self.ui.datEntryTable, False)
+            entries = entries + new_entries
+            
+        return entries
+            
+    except IOError:
+        logger.error('IOError - Unable to access database')
+    except Error:
+        logger.error('SQLError - Could not query database')
+    finally:
+        if not conn == False:
+            conn.close()
+
+
+def findNewLogEntries(conn, log_pages, log_name, table_key=None, 
+                                                    multiple_files=True):
+    '''Checks entries against database to see if they're new of already exist.
+    
+    TODO:
+        This is still a bit messy at the moment. Need to clean it up and make
+        it a bit easier to read and less nested.
+    '''
+    logger.debug('Find Entry: log_name=%s, table_key=%s' % (log_name, table_key))
+        
+    data_to_display = []
+    
+    # Most files are multiple but the DAT file entry isn't so has to be 
+    # dealt with seperately as it doesn't need looping through
+    if multiple_files:
+        if not log_pages[log_name] == None:
+            mod_length = len(log_pages[log_name])
+            
+            # We have to loop backwards here because we might delete entries
+            for i in range(mod_length-1, -1, -1):
+                
+                if log_pages[log_name][i][log_name] == 'None':
+                    log_pages[log_name][i] = None
+                else:
+                
+                    is_new_entry = DatabaseFunctions.findNewEntries(
+                                        conn, log_name, log_pages[log_name][i])
+    
+                    # If we're adding them to the editable tables we do it
+                    # Otherwise just get rid of those we don't want
+                    if not table_key == None:
+                        
+                        # If it'a already in the database then we remove it from the log
+                        # dictionary to avoid entering it again.
+                        if not is_new_entry:
+                            data_to_display = [[log_pages[log_name][i], table_key, i, False]]
+                            del log_pages[log_name][i]
+                        else:
+                            data_to_display = [[log_pages[log_name][i], table_key, i, True]]
+                    else:
+                        if not is_new_entry:
+                            del log_pages[log_name][i]
+    else:
+        if not table_key == None:
+            if not DatabaseFunctions.findNewEntries(conn, log_name, log_pages[log_name]):
+                data_to_display = [[log_pages[log_name], table_key, 0, False]]
+                log_pages[log_name] = None
+            else:
+                data_to_display = [[log_pages[log_name], table_key, 0, True]]
+        else:
+            log_pages[log_name] = None
+    
+    return log_pages, data_to_display
     
     
     

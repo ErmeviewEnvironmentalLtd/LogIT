@@ -217,17 +217,17 @@ class MainGui(QtGui.QMainWindow):
         
     
     def _setupUiContainer(self):
-        '''
+        '''Create a convenient holding object for the gui inputs.
         '''
         self.ui_container['New_log_entry'] = {}
-        self.ui_container['New_log_entry']['runEntryTable'] = self.ui.runEntryTable
-        self.ui_container['New_log_entry']['tcfEntryTable'] = self.ui.tcfEntryTable
-        self.ui_container['New_log_entry']['ecfEntryTable'] = self.ui.ecfEntryTable
-        self.ui_container['New_log_entry']['tgcEntryTable'] = self.ui.tgcEntryTable
-        self.ui_container['New_log_entry']['tbcEntryTable'] = self.ui.tbcEntryTable
-        self.ui_container['New_log_entry']['bcEntryTable'] = self.ui.bcEntryTable
-        self.ui_container['New_log_entry']['datEntryTable'] = self.ui.datEntryTable
-        self.ui_container['New_log_entry']['inputVarGroup'] = self.ui.inputVarGroup
+        self.ui_container['New_log_entry']['runEntryTable'] = [self.ui.runEntryTable, 'RUN']
+        self.ui_container['New_log_entry']['tcfEntryTable'] = [self.ui.tcfEntryTable, 'TCF']
+        self.ui_container['New_log_entry']['ecfEntryTable'] = [self.ui.ecfEntryTable, 'ECF']
+        self.ui_container['New_log_entry']['tgcEntryTable'] = [self.ui.tgcEntryTable, 'TGC']
+        self.ui_container['New_log_entry']['tbcEntryTable'] = [self.ui.tbcEntryTable, 'TBC']
+        self.ui_container['New_log_entry']['bcEntryTable'] = [self.ui.bcEntryTable, 'BC_DBASE']
+        self.ui_container['New_log_entry']['datEntryTable'] = [self.ui.datEntryTable, 'DAT']
+        #self.ui_container['New_log_entry']['inputVarGroup'] = [self.ui.inputVarGroup, 'inputs']
         
         self.ui_container['View_log'] = {}
         self.ui_container['View_log']['runEntryViewTable'] = [self.ui.runEntryViewTable, 'RUN']
@@ -488,59 +488,6 @@ class MainGui(QtGui.QMainWindow):
                         count += 1  
             
 
-    def _findNewLogEntries(self, conn, log_pages, log_name, entry_table=None, 
-                                                        multiple_files=True):
-        '''Checks the log entries to see if they already exist, adds them to
-        their respective tables and highlights the cells.
-        '''
-        
-        logger.debug('Find Entry: log_name=%s, entry_table=%s' % (log_name, entry_table))
-        
-        # Most files are multiple but the DAT file entry isn't so has to be 
-        # dealt with seperately as it doesn't need looping through
-        if multiple_files:
-            if not log_pages[log_name] == None:
-                mod_length = len(log_pages[log_name])
-                
-                # We have to loop backwards here because we might delete entries
-                for i in range(mod_length-1, -1, -1):
-                    
-                    if log_pages[log_name][i][log_name] == 'None':
-                        log_pages[log_name][i] = None
-                    else:
-                    
-                        is_new_entry = DatabaseFunctions.findNewEntries(
-                                            conn, log_name, log_pages[log_name][i])
-        
-                        # If we're adding them to the editable tables we do it
-                        # Otherwise just get rid of those we don't want
-                        if not entry_table == None:
-                            self._putInTableValues(log_pages[log_name][i], entry_table, i)
-                            
-                            # If it'a already in the database then we remove it from the log
-                            # dictionary to avoid entering it again.
-                            if not is_new_entry:
-                                self._setRowIsEditable(entry_table, i, False)
-                                del log_pages[log_name][i]
-                            else:
-                                self._setRowIsEditable(entry_table, i)
-                        else:
-                            if not is_new_entry:
-                                del log_pages[log_name][i]
-        else:
-            if not entry_table == None:
-                self._putInTableValues(log_pages[log_name], entry_table)
-                if not DatabaseFunctions.findNewEntries(conn, log_name, log_pages[log_name]):
-                    self._setRowIsEditable(entry_table, 0, False)
-                    log_pages[log_name] = None
-                else:
-                    self._setRowIsEditable(entry_table, 0)
-            else:
-                log_pages[log_name] = None
-        
-        return log_pages
-
-
     def _fillEntryTables(self, log_pages):
         '''Add the log pages data to the log entry tables that will be
         displayed to the user for amending prior to updating the database.
@@ -553,43 +500,28 @@ class MainGui(QtGui.QMainWindow):
         self.log_pages = log_pages
         log_pages = self._getInputLogVariables(log_pages)
         
-        # Update RUN
+        # Create a list of all of the available tables and their names
+        table_list = []
+        for key, table in self.ui_container['New_log_entry'].iteritems():
+            name = table[1]
+            if name == 'RUN': continue
+            table_list.append([name, key])
+        
+        # Update RUN seperately as it's treated in a different way to others
         self._putInTableValues(log_pages['RUN'], self.ui.runEntryTable)
         self._setRowIsEditable(self.ui.runEntryTable, 0)
         
-        # We need to find if the TGC and TBC files have been registered with the
-        # database before. If they have then we don't need to register them 
-        # again.
-        conn = False
-        try:
-            conn = DatabaseFunctions.loadLogDatabase(self.settings.cur_log_path)
-            
-            # Find log entries and populate tables for the model files
-            log_pages = self._findNewLogEntries(conn, log_pages, 'TGC', 
-                                                    self.ui.tgcEntryTable)
-            log_pages = self._findNewLogEntries(conn, log_pages, 'TBC', 
-                                                    self.ui.tbcEntryTable)
-            log_pages = self._findNewLogEntries(conn, log_pages, 'ECF', 
-                                                    self.ui.ecfEntryTable)
-            log_pages = self._findNewLogEntries(conn, log_pages, 'TCF', 
-                                                    self.ui.tcfEntryTable)
-            log_pages = self._findNewLogEntries(conn, log_pages, 'BC_DBASE', 
-                                                    self.ui.bcEntryTable)
-            
-            # DAT files get dealt with separately as there can only be one.
-            if log_pages['DAT']['DAT'] == 'None': 
-                log_pages['DAT'] = None
-            else:
-                log_pages = self._findNewLogEntries(conn, log_pages, 'DAT', 
-                                        self.ui.datEntryTable, False)
-                
-        except IOError:
-            logger.error('IOError - Unable to access database')
-        except Error:
-            logger.error('SQLError - Could not query database')
-        finally:
-            if not conn == False:
-                conn.close()
+        # check the new entries against the database and return them with
+        # flags set for whether they are new entries or already exist
+        entries = Controller.loadEntrysWithStatus(
+                            self.settings.cur_log_path, log_pages, table_list)
+        
+        # Add the entries to the gui tables with editable status set
+        for e in entries:
+            self._putInTableValues(e[0], 
+                    self.ui_container['New_log_entry'][e[1]][0], e[2])
+            self._setRowIsEditable(
+                self.ui_container['New_log_entry'][e[1]][0], e[2], e[3])
         
     
     def _setRowIsEditable(self, table_widget, row_no, is_editable=True):
@@ -632,11 +564,6 @@ class MainGui(QtGui.QMainWindow):
         
         return log_pages
         
-#         return str(self.ui.modellerTextbox.text()), \
-#                 str(self.ui.tuflowVersionTextbox.text()), \
-#                 str(self.ui.isisVersionTextbox.text()), \
-#                 str(self.ui.eventNameTextbox.text())
-
                 
     def _putInTableValues(self, col_dict, table_obj, row_no=0):
         '''Put values in the given dictionary into the given table where the
