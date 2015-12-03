@@ -633,37 +633,18 @@ class MainGui(QtGui.QMainWindow):
         model log.
         '''
         # Check that we have a database
-        if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
-            QtGui.QMessageBox.warning(self, "No Database Loaded",
-                    "No log database active. Please load or create one from the file menu.")
-            logger.error('No log database found. Load or create one from File menu')
-            return
+        if not self.checkDbLoaded(): return
 
         if not self.log_pages == None:
             
             self._updateWithUserInputs()
             
-            # Connect to the database and then update the log entries
-            conn = False
-            error_found = False
-            try:
-                conn = DatabaseFunctions.loadLogDatabase(
-                                            self.settings.cur_log_path)
-                self.log_pages, update_check = Controller.logEntryUpdates(
-                                                        conn, self.log_pages)
-            except IOError:
-                logger.error('Unable to access database')
-                error_found = True
-            except Error:
-                logger.error('Error updating database -  See log for details')
-                error_found = True
-            finally:
-                if not conn == False:
-                    conn.close()
+            error_details, self.log_pages, update_check = Controller.updateLog(
+                                    self.settings.cur_log_path, self.log_pages)
             
-            if error_found:
-                QtGui.QMessageBox.warning(self, 'Unable to Update Database',
-                    'Problem updating database: see log for details')
+            if error_details['Success'] == False:
+                self.launchQMsgBox(error_details['Error'], 
+                                            error_details['Message']) 
                 return
             
             # Add the new entries to the view table as well
@@ -685,28 +666,13 @@ class MainGui(QtGui.QMainWindow):
             Currently a copy of the method above. Need to implement properly.
         '''
         
-        def _updateProgressBar(prog_val, label_text=None):
-            '''Updates the progress bar on the multiple model load tab.
-            '''
-            self.ui.multiLoadProgressBar.setValue(prog_val)
-            if not label_text == None:
-                self.ui.multiLoadProgressLabel.setText(label_text)
-            QtGui.QApplication.processEvents()
-            return prog_val + 1
-
-        
         # Check that we have a database
-        if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
-            QtGui.QMessageBox.warning(self, "No Database Loaded",
-                    "No log database active. Please load or create one from the file menu.")
-            logger.error('No log database found. Load or create one from File menu')
-            return
+        if not self.checkDbLoaded(): return
         
         # Get all of the file paths from the list
         model_paths = []
         allRows = self.ui.loadMultiModelTable.rowCount()
         for row in xrange(0,allRows):
-            #rows.append(index.row()) 
             model_paths.append(str(self.ui.loadMultiModelTable.item(row,1).text()))
         
         # Get the type of log to build
@@ -715,66 +681,48 @@ class MainGui(QtGui.QMainWindow):
         # Load all of the models into a list
         model_logs = []
         load_errors = []
+        
+        # Setup the progress monitor. It updates prgress bars etc
         total = len(model_paths)
-        current = 1
-        load_progress = 0
-        total_progress = total*2
-        self.ui.multiLoadProgressBar.setRange(0, total_progress)
+        prog_mon = ProgressMonitor(self.ui.multiLoadProgressBar, 
+                                   self.ui.multiLoadProgressLabel)
+        prog_mon.setRanges(total*2, 1, total, 'Loading Model %d or %d')
         
         # Loop through all of the file paths given
         for path in model_paths:
             error_found = False
             
-            try:
-                load_progress = _updateProgressBar(load_progress, 
-                                   'Loading Model %d of %d' % (current, total))
-                
-                log_pages, result = self._fetchAndCheckModel(path, log_type, launch_error=False)
-                
-                if result['Success'] == False:
-                    load_errors.append(result)
-                    error_found = True
-                    continue
-                
-            except IOError:
-                load_errors.append({'Success': False, 
-                    'Status_bar': "Unable to update Database with model: %s" % path,
-                     'Error': 'IO Error', 
-                    'Message': "Unable to load model from file at: %s" % path})
+            prog_mon.update()
+            
+            error_details, log_pages = Controller.fetchAndCheckModel(
+                self.settings.cur_log_path, path, log_type, launch_error=False)
+            
+            if error_details['Success'] == False:
+                load_errors.append(error_details)
                 error_found = True
-            except:
-                load_errors.append({'Success': False, 
-                    'Status_bar': "Unable to update Database with model: %s" % path,
-                     'Error': 'IO Error', 
-                    'Message': "Unable to load model from file at: %s" % path})
-                error_found = True
+                continue
             
             if not error_found:
-                # Setup progress bar stuff
-                load_progress = _updateProgressBar(load_progress)
+                prog_mon.update(bar_only=True)
                 
                 # Get the global user supplied log variables
                 log_pages = self._getInputLogVariables(log_pages)
     
                 # Connect to the database and then update the log entries
-                conn = False
-                error_found = False
-                try:
-                    conn = DatabaseFunctions.loadLogDatabase(
-                                                self.settings.cur_log_path)
-                    
-                    self.log_pages, update_check = Controller.logEntryUpdates(
-                                        conn, log_pages, check_new_entries=True)
-                except IOError:
-                    logger.error('Unable to access database')
+                error_details, self.log_pages, update_check = Controller.updateLog(
+                                    self.settings.cur_log_path, log_pages, 
+                                    check_new_entries=True)
+                
+                if error_details['Success'] == False:
+                    load_errors.append(error_details)
                     error_found = True
-                except Error:
-                    logger.error('Error updating database -  See log for details')
-                finally:
-                    if not conn == False:
-                        conn.close()
+                    continue
+                
+                # Add the new entries to the view table as well
+                self.updateLogTable(update_check)
             
             # Log any errors to show later
+            # TODO - Should be 'else'
             if error_found:
                 load_errors.append({'Success': False, 
                     'Status_bar': "Unable to update Database with model: %s" % path,
@@ -782,11 +730,7 @@ class MainGui(QtGui.QMainWindow):
                     'Message': "Unable to update Database with model: %s" % path})
                 continue
             
-            # Add the new entries to the view table as well
-            self.updateLogTable(update_check)
-            current += 1
-        
-        load_progress = _updateProgressBar(0, 'Complete')
+        prog_mon.reset('Complete')
             
         # Clear the list entries
         self.ui.loadMultiModelTable.setRowCount(0)
@@ -809,7 +753,8 @@ class MainGui(QtGui.QMainWindow):
             self.ui.multiModelLoadErrorTextEdit.setText(errors)
             
             # Reset the progress stuff
-            _updateProgressBar(0, 'Complete')
+            #_updateProgressBar(0, 'Complete')
+            prog_mon.reset('Complete')
                 
             QtGui.QMessageBox.warning(self, 'Logging Error:',
                         'See Error Logs window for details')
@@ -1297,7 +1242,7 @@ class MainGui(QtGui.QMainWindow):
 
 
     def launchQtQBox(self, title, message):
-        '''
+        '''Launch QtQMessageBox.
         '''
         answer = QtGui.QMessageBox.question(self, title, message,
                 QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
@@ -1308,14 +1253,97 @@ class MainGui(QtGui.QMainWindow):
     
     
     def launchQMsgBox(self, title, message, type='warning'):
-        '''
+        '''Launch a QMessageBox
         '''
         if type == 'warning':
             QtGui.QMessageBox.warning(self, title, message)
         
         elif type == 'info':
             QtGui.QMessageBox.Information(self, title, message)
+    
+    
+    def checkDbLoaded(self):
+        '''Check if there's a database filepath set.
+        '''
+        if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
+            QtGui.QMessageBox.warning(self, "No Database Loaded",
+                    "No log database active. Please load or create one from the file menu.")
+            logger.error('No log database found. Load or create one from File menu')
+            return False
+        return True
         
+
+class ProgressMonitor(object):
+    '''Convenience class for updating progress bars and text.
+    
+    This stays in this module becuase it sort of breaks the encapsulation of
+    the MainGui class by updating its progress bar and text label. It's better
+    than having to little progress update code all over the place though.
+    '''
+     
+    def __init__(self, progbar_ui, text_ui=None):
+        self.progbar_ui = progbar_ui
+        self.text_ui = text_ui
+        self.prog_cur = 0
+        self.text_cur = 0
+    
+    def setRanges(self, prog_up, text_down=None, text_up=None, textform='%d of %d'): 
+        '''Set the range to operate on.
+        @param prog_up: max progress bar value.
+        @param text_down=None: lowest text counter value.
+        @param text_up=None: max text counter value.
+        @param textform=None: format to dislplay text counter in.
+        '''
+        self.prog_up = prog_up
+        self.text_up = text_up
+        self.text_current = self.text_down = text_down
+        self.textform = textform
+        self.progbar_ui.setRange(0, prog_up)
+        self.setToStart()
+    
+    def setToStart(self):
+        '''Set progress counters to start point.
+        '''
+        self.progbar_ui.setValue(0)
+        if not self.text_ui == None:
+            text_out = self.textform % (self.text_cur, self.text_up)
+            self.text_ui.setText(text_out)
+    
+    def reset(self, text=None):
+        '''Reset the progress bar to normal state.
+        @param text=None: text to display in text label.
+        '''
+        self.setToStart()
+        if text == None: text = ''
+        self.text_ui.setText(text)
+    
+    def update(self, bar_only=False, text_only=False):
+        '''Update progress.
+        @param bar_only=False: don't update the progress bar.
+        @param text_only=False: don't update the text counter.
+        '''
+        if not text_only:
+            self.updateBarProgress()
+        if not bar_only:
+            self.updateTextProgress()
+        QtGui.QApplication.processEvents()
+    
+    def updateBarProgress(self):
+        '''Iterate and update progress bar
+        '''
+        self.prog_cur += 1
+        self.progbar_ui.setValue(self.prog_cur)
+    
+    def updateTextProgress(self):
+        '''Iterate and update text counter label.
+        '''
+        if self.text_ui == None:
+            return
+        else:
+            self.text_cur += 1
+            text_out = self.textform % (self.text_cur, self.text_up)
+            self.text_ui.setText(text_out)
+
 
 class LogitSettings(object):
     '''Storage class for holding all of the settings that the current user has

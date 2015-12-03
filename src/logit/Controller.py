@@ -48,9 +48,45 @@ from PyQt4 import QtCore, QtGui
 
 # Local modules
 import DatabaseFunctions
+import LogBuilder
 
 import logging
 logger = logging.getLogger(__name__)
+
+
+def updateLog(db_path, log_pages, check_new_entries=False):
+    '''
+    '''
+    # Connect to the database and then update the log entries
+    conn = False
+    error_found = False
+    error_details = {'Success': True}
+    update_check = None
+    try:
+        conn = DatabaseFunctions.loadLogDatabase(db_path)
+        log_pages, update_check = logEntryUpdates(conn, log_pages,
+                                                  check_new_entries)
+    except IOError:
+        logger.error('Unable to access database')
+        error_found = False
+        error_details = {'Success': False, 
+            'Status_bar': "Unable to update Database with model: %s" % db_path,
+            'Error': 'Database Error', 
+            'Message': "Unable to update Database with model: %s" % db_path}
+        #error_found = True
+    except:
+        logger.error('Error updating database -  See log for details')
+        error_found = False
+        error_details = {'Success': False, 
+            'Status_bar': "Unable to update Database with model: %s" % db_path,
+            'Error': 'Database Error', 
+            'Message': "Unable to update Database with model: %s" % db_path}
+        #error_found = True
+    finally:
+        if not conn == False:
+            conn.close()
+        return error_details, log_pages, update_check
+    
 
 def logEntryUpdates(conn, log_pages, check_new_entries=False):
     '''Update the database with the current status of the log_pages dictionary.
@@ -469,6 +505,112 @@ def findNewLogEntries(conn, log_pages, log_name, table_key=None,
             log_pages[log_name] = None
     
     return log_pages, data_to_display
+
+
+def fetchAndCheckModel(db_path, open_path, log_type, launch_error=True):
+    '''Loads a model and makes a few conditional checks on it.
+    Loads model from the given .tcf/.ief file and checks that the .ief, 
+    .tcf and ISIS results don't already exist in the DB and then returns
+    a success or fail status.
     
+    @param db_path: path to the database on file.
+    @param open_path: the .ief or .tcf file path.
+    @param log_type: the model type to load (tuflow or ISIS only).
+    @param lauch_error=True: whether to launch message boxes if an error is
+           found or not. We don't want to if we're loading multiple files.
+    @return: tuple containing log_pages (which could be the loaded log
+             pages or False if the load failed and a dictionary containing
+             the load status and messages for status bars and errors.
+    '''
+    
+    error_details = {'Success': True}
+    # Load the model at the chosen path.
+    log_pages = LogBuilder.loadModel(open_path, log_type)
+    if log_pages == False:
+        error_details = {'Success': False, 
+                    'Status_bar': "Unable to load model at: %s" % open_path,
+                     'Error': 'LoadError', 
+                    'Message': 'Selected file could not be loaded - file: %s.' % open_path}
+        return error_details, log_pages
+    else:
+        # Make sure that this ief or tcf do not already exist in the
+        # database. You need new ones for each run so this isn't
+        # allowed.
+        main_ief = log_pages['RUN']['IEF']
+        main_tcf = log_pages['RUN']['TCF']
+        tcf_results = log_pages['RUN']['RESULTS_LOCATION_2D']
+        indb = (False,)
+        found_path = ''
+        
+        try:
+            # If we have an ief get the ief name to see if we already
+            # recorded a run using that model
+            if not main_ief == 'None':
+                indb = DatabaseFunctions.findInDatabase(
+                         'RUN', db_path=db_path, 
+                         db_entry=main_ief, col_name='IEF', 
+                         only_col_name=True)
+                
+                # Then check if we've already used the results locations
+                # location for a previous run and return error if it has.
+                if indb[0]:
+                    exists = DatabaseFunctions.findInDatabase(
+                             'RUN', db_path=db_path, 
+                             db_entry=tcf_results, col_name='RESULTS_LOCATION_1D', 
+                             only_col_name=True)
+                    
+                    if exists[0]:
+                        error_details = {'Success': False, 
+                        'Status_bar': "ISIS/FMP results file already exists in %s" % (main_ief),
+                         'Error': 'Results Location Exists', 
+                        'Message': 'ISIS/FMP results file already exists in %s' % (main_ief)}
+                        return error_details, log_pages
+    #                     button = QtGui.QMessageBox.question(self, 
+    #                             "ISIS/FMP Results Folder Already Exists",
+    #                             "Results folder location found in previous " +
+    #                             "entry\nDo you want to Continue?",
+    #                             QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+    #                     
+    #                     if button == QtGui.QMessageBox.No:
+    #                         return
+                    
+                found_path = main_ief
+            
+            # Do the whole lot again for the tuflow run
+            if not main_tcf == 'None':
+                if not indb[0]:
+                    indb = DatabaseFunctions.findInDatabase(
+                             'RUN', db_path=db_path, 
+                             db_entry=main_tcf, col_name='TCF', 
+                             only_col_name=True)
+                    found_path = main_tcf
+            
+            if indb[0]:
+                error_details =  {'Success': False, 
+                    'Status_bar': "Unable to load model at: %s" % open_path,
+                     'Error': 'LoadError', 
+                    'Message': 'Selected file already exists in database - file: %s.' % found_path}
+                return error_details, log_pages
+            else:
+                error_details = {'Success': True, 
+                    'Status_bar': "Loaded model at: %s" % open_path,
+                     'Error': None, 
+                    'Message': None}
+                return error_details, log_pages
+                    
+        except IOError:
+            error_details = {'Success': False, 
+                    'Status_bar': "Unable to update Database with model: %s" % open_path,
+                     'Error': 'IO Error', 
+                    'Message': "Unable to load model from file at: %s" % open_path}
+            return error_details, log_pages
+        except:
+            error_details = {'Success': False, 
+                'Status_bar': "Unable to update Database with model: %s" % open_path,
+                'Error': 'IO Error', 
+                'Message': "Unable to load model from file at: %s" % open_path}
+            return error_details, log_pages
+                        
+        
     
     
