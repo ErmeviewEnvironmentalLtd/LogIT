@@ -61,38 +61,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def updateLog(db_path, log_pages, check_new_entries=False):
-    '''
-    '''
-    # Connect to the database and then update the log entries
-    conn = False
-    error_found = False
-    error_details = {'Success': True}
-    update_check = None
-    try:
-        conn = DatabaseFunctions.loadLogDatabase(db_path)
-        log_pages, update_check = logEntryUpdates(conn, log_pages,
-                                                  check_new_entries)
-    except IOError:
-        logger.error('Unable to access database')
-        error_found = False
-        error_details = {'Success': False, 
-            'Status_bar': "Unable to update Database with model: %s" % db_path,
-            'Error': 'Database Error', 
-            'Message': "Unable to update Database with model: %s" % db_path}
-        #error_found = True
-    except:
-        logger.error('Error updating database -  See log for details')
-        error_found = False
-        error_details = {'Success': False, 
-            'Status_bar': "Unable to update Database with model: %s" % db_path,
-            'Error': 'Database Error', 
-            'Message': "Unable to update Database with model: %s" % db_path}
-        #error_found = True
-    finally:
-        if not conn == False:
-            conn.close()
-        return error_details, log_pages, update_check
     
 class AddedRows(object):
     '''Keeps track of any new rows added to the database.
@@ -218,12 +186,17 @@ class SubLog(object):
         This should also be possible to clean up by ensuring only a single
         default value is used throughout the codebase.
         '''
-        if self.multi_file:
-            if contents[0] == 'None' or contents[0] == False or contents[0] == None:
-                return False
-        else:
-            if contents == 'None' or contents == False or contents == None:
-                return False
+        if not self.name == 'RUN':
+            if self.multi_file:
+                if contents[0] == 'None' or contents[0] == False or contents[0] == None:
+                    return False
+                elif contents[0][self.name] == 'None':
+                    return False
+            else:
+                if contents == 'None' or contents == False or contents == None:
+                    return False
+                elif contents[self.name] == 'None':
+                    return False
 
         return True
     
@@ -239,11 +212,57 @@ class SubLog(object):
         '''Deletes an item (i.e. a row) from the contents.
         '''
         del self.contents[index]
+
+
+def updateLog(db_path, log_pages, check_new_entries=False):
+    '''Updates the log database with the current value of log_pages.
     
+    This is just an entry function that connects to the database and and then
+    call logEntryUpdates to do all of the hard work. It deals with handling
+    any errors that might pop up and notifying the caller.
+    @param dp_path: the path to the log database on file.
+    @param log_pages: log pages dictionary.
+    @param check_new_entries=False: Flag identifying whether the values in the
+           log_pages entries should be checked against the database before they
+           are entered. i.e. make sure they don't alreay exist first. This is
+           needed because the check may have already been carries out before
+           and it will cost unnecessary processing effort.
+    '''
+    # Connect to the database and then update the log entries
+    conn = False
+    error_found = False
+    error_details = {'Success': True}
+    update_check = None
+    try:
+        conn = DatabaseFunctions.loadLogDatabase(db_path)
+        log_pages, update_check = logEntryUpdates(conn, log_pages,
+                                                  check_new_entries)
+    except IOError:
+        logger.error('Unable to access database')
+        error_found = False
+        error_details = {'Success': False, 
+            'Status_bar': "Unable to update Database with model: %s" % db_path,
+            'Error': 'Database Error', 
+            'Message': "Unable to update Database with model: %s" % db_path}
+    except:
+        logger.error('Error updating database -  See log for details')
+        error_found = False
+        error_details = {'Success': False, 
+            'Status_bar': "Unable to update Database with model: %s" % db_path,
+            'Error': 'Database Error', 
+            'Message': "Unable to update Database with model: %s" % db_path}
+    finally:
+        if not conn == False:
+            conn.close()
+        return error_details, log_pages, update_check
+ 
 
 def logEntryUpdates(conn, log_pages, check_new_entries=False):
     '''Update the database with the current status of the log_pages dictionary.
-    TODO: Re-Write these comments.
+    
+    This creates a callback function and hands it to loopLogPages method,
+    which loops through the log pages applying the call back each time.
+    
     If there's an issue inserting any of the data into any of the tables it
     will attempt to roll back the changes to all of the tables to 'hopefully'
     avoid any corruption. This will be logged so the user is aware.
@@ -339,9 +358,9 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
         
         return page, callback_args
             
-    
     # Class to hold all the log page objects
     all_logs = AllLogs(log_pages)  
+
     # Collects all files added to database for resetting
     added_rows = AddedRows()
     check_new_entries = True
@@ -357,7 +376,7 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
         return log_pages, update_check
     
     # This acts as a failsafe incase we hit an error after some of the entries
-    # were already added to the database. It try's to roll back the entries by
+    # were already added to the database. It tries to roll back the entries by
     # deleting them. The exception is still raised to be dealt with by the GUI.
     except:
         logger.error('Problem updating database: attempting to roll back changes')
@@ -374,13 +393,24 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
 
 def loopLogPages(conn, all_logs, callback, callback_args):
     '''Loop all the pages in the log applying the given callback function.
+    
+    The callback function expects to get back a copy of the all_logs object
+    and the call_back_args as (all_logs, callback_args). If it doesn't it will
+    raise an exeption when trying to return at the end.
+    @note: list is iterated in reverse so any deletions will be sane.
+    
+    @param conn: an open database connection.
+    @param all_logs: an instance of the AllLogs class.
+    @param callback: a callback function to execute in the loop.
+    @param callback_args: a dictionary of arguments for the callback function.
+    @return: all_logs, callback_args (tuple). Updated by whatever happens in
+             the callback function.
     '''
     
     def reverse_enumerate(iterable):
         '''Enumerate over an iterable in reverse order while retaining proper indexes
         '''
         return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
-    
     
     for page in all_logs.log_pages.values():
             
@@ -395,60 +425,90 @@ def loopLogPages(conn, all_logs, callback, callback_args):
     return all_logs, callback_args
     
 
-def findNewLogEntries(conn, log_pages, log_name, table_key=None, 
-                                                    multiple_files=True):
-    '''Checks entries against database to see if they're new of already exist.
+def loadEntrysWithStatus(db_path, log_pages, table_list):
+    '''Loads the database and checks if the new entries exist.
     
-    TODO:
-        This is still a bit messy at the moment. Need to clean it up and make
-        it a bit easier to read and less nested.
+    Builds a new list that stores the log_pages entry for each row as well as
+    some info on the key to that table in the gui, whether the entry already
+    exists or not adn the row count.
+    Uses the findNewLogEntries function to fo the hard work.
+    
+    @param db_path: path to a database on file.
+    @param log_pages: the log_pages dictionary with loaded model variables.
+    @param table_list: a list of all of the keys for accessing thetables in the 
+           'New log Entry' page of the GUI and the associated db tables.
+    @return: list containing sub-lists of all of the rows to be displayed on
+             the New log entry page tables.
     '''
-    logger.debug('Find Entry: log_name=%s, table_key=%s' % (log_name, table_key))
+     # We need to find if the TGC and TBC files have been registered with the
+    # database before. If they have then we don't need to register them 
+    # again.
+    conn = False
+    try:
+        conn = DatabaseFunctions.loadLogDatabase(db_path)
+        entries = []
+        log_pages, entries = findNewLogEntries(conn, log_pages, table_list)
         
-    data_to_display = []
-    
-    # Most files are multiple but the DAT file entry isn't so has to be 
-    # dealt with seperately as it doesn't need looping through
-    if multiple_files:
-        if not log_pages[log_name] == None:
-            mod_length = len(log_pages[log_name])
+        return entries
             
-            # We have to loop backwards here because we might delete entries
-            for i in range(mod_length-1, -1, -1):
-                
-                if log_pages[log_name][i][log_name] == 'None':
-                    log_pages[log_name][i] = None
-                else:
-                
-                    is_new_entry = DatabaseFunctions.findNewEntries(
-                                        conn, log_name, log_pages[log_name][i])
-    
-                    # If we're adding them to the editable tables we do it
-                    # Otherwise just get rid of those we don't want
-                    if not table_key == None:
-                        
-                        # If it'a already in the database then we remove it from the log
-                        # dictionary to avoid entering it again.
-                        if not is_new_entry:
-                            data_to_display = [[log_pages[log_name][i], table_key, i, False]]
-                            del log_pages[log_name][i]
-                        else:
-                            data_to_display = [[log_pages[log_name][i], table_key, i, True]]
-                    else:
-                        if not is_new_entry:
-                            del log_pages[log_name][i]
-    else:
-        if not table_key == None:
-            if not DatabaseFunctions.findNewEntries(conn, log_name, log_pages[log_name]):
-                data_to_display = [[log_pages[log_name], table_key, 0, False]]
-                log_pages[log_name] = None
-            else:
-                data_to_display = [[log_pages[log_name], table_key, 0, True]]
-        else:
-            log_pages[log_name] = None
-    
-    return log_pages, data_to_display
+    except IOError:
+        logger.error('IOError - Unable to access database')
+    except:
+        logger.error('SQLError - Could not query database')
+    finally:
+        if not conn == False:
+            conn.close()
 
+
+def findNewLogEntries(conn, log_pages, table_list):
+    '''Checks entries against database to see if they're new or already exist.
+    '''
+    def callbackFunc(conn, i, values, page, callback_args):
+        '''
+        This function is a callback used by the looping function.
+        '''
+        if page.name == 'RUN':
+            return page, callback_args
+         
+        is_new_entry = DatabaseFunctions.findNewEntries(
+                                        conn, page.name, page.contents[i])
+    
+        table_dict = callback_args['table_dict']
+           
+        # Append the contents row, ui table name, row no., and whether it 
+        # should be added to the table or not to the display_data list.
+        # If it'a already in the database then we remove it from the log
+        # dictionary to avoid entering it again. (see debug comment below)
+        if not is_new_entry:
+            callback_args['display_data'].append([page.contents[i], 
+                                            table_dict[page.name], i, False])
+            #DEBUG - I don't think this is necessary as it's dealt with by the
+            #        False flag in the 'display_data'.
+            #del log_pages[log_name][i]
+        else:
+            callback_args['display_data'].append([page.contents[i], 
+                                            table_dict[page.name], i, True])
+        
+        return page, callback_args
+    
+    display_data = []
+    
+    # DEBUG - Deal with this earlier as it should be unnecessary here.
+    table_keys, table_names = zip(*table_list)
+    combo = zip(table_keys,table_names)
+    table_dict = dict(combo)
+    
+    # Get the logs in object format
+    all_logs = AllLogs(log_pages)
+    callback_args = {'table_dict': table_dict, 'display_data': []}
+    
+    # Call the looping function, handing it our callback
+    all_logs, callback_args = loopLogPages(conn, all_logs, callbackFunc, 
+                                                            callback_args)
+    log_pages = all_logs.getLogDictionary()
+    display_data = callback_args['display_data']
+    return log_pages, display_data
+    
 
 def insertIntoModelFileTable(conn, table_name, col_name, model_file, files_list):
     '''Insert file references into the model file table if they are not
@@ -597,60 +657,6 @@ def fetchTableValues(db_path, table_list):
     finally:
         conn.close()
  
-
-def loadEntrysWithStatus(db_path, log_pages, table_list):
-    '''Loads the database and checks if the new entries exist.
-    
-    Builds a new list that stores the log_pages entry for each row as well as
-    some info on the key to that table in the gui, whether the entry already
-    exists or not adn the row count.
-    Uses the findNewLogEntries function to fo the hard work.
-    
-    @param db_path: path to a database on file.
-    @param log_pages: the log_pages dictionary with loaded model variables.
-    @param table_list: a list of all of the keys for accessing thetables in the 
-           'New log Entry' page of the GUI and the associated db tables.
-    @return: list containing sub-lists of all of the rows to be displayed on
-             the New log entry page tables.
-    '''
-     # We need to find if the TGC and TBC files have been registered with the
-    # database before. If they have then we don't need to register them 
-    # again.
-    conn = False
-    try:
-        conn = DatabaseFunctions.loadLogDatabase(db_path)
-        entries = []
-        
-        # Find log entries and populate tables for the model files
-        for item in table_list:
-            name = item[0]
-            key = item[1]
-            if name == 'RUN':
-                continue
-            
-            if name == 'DAT':
-                if log_pages['DAT']['DAT'] == 'None':   
-                    log_pages['DAT'] = None
-                else:
-                    log_pages, new_entries = findNewLogEntries(
-                                        conn, log_pages, 'DAT', key, False)
-            else:
-                log_pages, new_entries = findNewLogEntries(
-                                            conn, log_pages, name, key)
-            entries = entries + new_entries
-        
-        
-            
-        return entries
-            
-    except IOError:
-        logger.error('IOError - Unable to access database')
-    except Error:
-        logger.error('SQLError - Could not query database')
-    finally:
-        if not conn == False:
-            conn.close()
-
 
 def fetchAndCheckModel(db_path, open_path, log_type, launch_error=True):
     '''Loads a model and makes a few conditional checks on it.
