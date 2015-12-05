@@ -95,20 +95,26 @@ def updateLog(db_path, log_pages, check_new_entries=False):
         return error_details, log_pages, update_check
     
 class AddedRows(object):
+    '''Keeps track of any new rows added to the database.
+    
+    It stores the primary key ID of any rows that are added. This can be used
+    for many things I suppose, but at the moment it is used to deal with a
+    problem in data entry. If an issue is found and some entries have already
+    been made to the database it will re-wind all of the entries stored by
+    deleting them from the database.
+    '''
     
     def __init__(self):
-        '''
-        '''
         self.tables = {}
     
     def _createHolder(self, key):
-        '''
+        '''Creates a new key in the dict if it doesn't exist.
         '''
         if not key in self.tables:
             self.tables[key] = []
             
     def addRows(self, key, new_rows):
-        '''
+        '''Adds a new row to the list under key
         '''
         self._createHolder(key)
         if self._checkIsList(new_rows):
@@ -117,7 +123,9 @@ class AddedRows(object):
             self.tables[key].append(new_rows)        
     
     def _checkIsList(self, row_item):
-        '''
+        '''Returns True if a list or False if not.
+        Essentially this is testing whether a single value or a list of values
+        is being passed.
         '''
         if isinstance(row_item, list):
             return True
@@ -125,7 +133,9 @@ class AddedRows(object):
             return False
         
     def deleteEntries(self, conn):
-        '''
+        '''Deletes all of the entries in this object from the database.
+        @note: This may raise an error that should be dealt with by the 
+               calling code.
         '''
         for name, table in self.tables.iteritems():
             for id in table:
@@ -133,11 +143,13 @@ class AddedRows(object):
         
 
 class AllLogs(object):
+    '''Container class for all of the SubLog objects.
+    '''
     
     SINGLE_FILE = ['RUN', 'DAT']
     
     def __init__(self, log_pages):
-        '''
+        '''Create new SubLog and set multi_file.
         '''
         self.log_pages = {}        
         for key, page in log_pages.iteritems():
@@ -147,7 +159,7 @@ class AllLogs(object):
                 self.log_pages[key] = SubLog(key, page, True)
     
     def getLogDictionary(self):
-        '''
+        '''Return all logs in class as a dictionary.
         '''
         out_log = {}
         for page in self.log_pages.values():
@@ -159,7 +171,9 @@ class AllLogs(object):
         return out_log
     
     def getUpdateCheck(self):
-        '''
+        '''Return dictionary containing update status.
+        Update status is a boolean flag indicating whether a log page should
+        be updated or not.
         '''
         out_check = {}
         for page in self.log_pages.values():
@@ -169,9 +183,12 @@ class AllLogs(object):
         
 
 class SubLog(object):
+    '''Log page objects.
+    E.g. RUN, TGC, etc.
+    '''
     
     def __init__(self, name, sub_page, multi_file):
-        '''
+        '''Set vars and make sure everything is in the format needed.
         '''
         self.name = name
         self.multi_file = multi_file
@@ -183,16 +200,23 @@ class SubLog(object):
         if multi_file: self.subfile_name = name + '_FILES'
     
     def _checkIsList(self, sub_page):
+        '''Checks if given page is in a list and puts it in one if not.
+        
+        Some pages like RUN and DAT can only have one entry, while the others
+        may have many. Originally the others were put in a list and RUN & DAT
+        weren't. This is a design fault and this method can be removed once 
+        it is dealt with throughout the codebase.
         '''
-        '''
-        #if self.name == 'RUN':
-        #    return sub_page
         if not isinstance(sub_page, list):
             sub_page = [sub_page]
         return sub_page
     
     def _checkHasContents(self, contents):
-        '''
+        '''Checks the status of the page contents.
+        
+        If the contents are set to a default value this will return False.
+        This should also be possible to clean up by ensuring only a single
+        default value is used throughout the codebase.
         '''
         if self.multi_file:
             if contents[0] == 'None' or contents[0] == False or contents[0] == None:
@@ -204,13 +228,15 @@ class SubLog(object):
         return True
     
     def bracketFiles(self, index, key, files=None):
-        '''
+        '''Encloses all of the files, under a certain key, in brackets.
+        If not files==None a new key will be created and those files will be
+        enclosed in brackets.
         '''
         if not files == None: self.contents[index][key] = files
         self.contents[index][key] = "[" + ", ".join(self.contents[index][key]) + "]"
     
     def deleteItem(self, index):
-        '''
+        '''Deletes an item (i.e. a row) from the contents.
         '''
         del self.contents[index]
     
