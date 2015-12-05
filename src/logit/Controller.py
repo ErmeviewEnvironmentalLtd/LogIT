@@ -321,7 +321,7 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
     all_logs = AllLogs(log_pages)  
     # Collects all files added to database for resetting
     added_rows = AddedRows()
-    
+    check_new_entries = True
     try:
         for page in all_logs.log_pages.values():
             
@@ -329,23 +329,20 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
                 page.update_check = False
                 continue
             
-            if not page.name == 'RUN':
-                for i, values in reverse_enumerate(page.contents):
-                      
-                    # We need the maximum id so that we can increment by 1 and put it into
-                    # the output table in the GUI.
-                    max_id = DatabaseFunctions.getMaxIDFromTable(conn, page.name) + 1
+            #if not page.name == 'RUN':
+            for i, values in reverse_enumerate(page.contents):
+                  
+                # We need the maximum id so that we can increment by 1 and put it into
+                # the output table in the GUI.
+                max_id = DatabaseFunctions.getMaxIDFromTable(conn, page.name) + 1
+                
+                if page.multi_file:
+                    page = insertSubFiles(conn, i, page, max_id)
                     
-                    if page.multi_file:
-                        page = insertSubFiles(conn, i, page, max_id)
-                        
+                if page.name == 'RUN':
+                    page = insertMainFile(conn, 0, page, max_id, False)
+                else:
                     page = insertMainFile(conn, i, page, max_id, check_new_entries)
- 
-        # Always put an entry in the Run entry table
-        page = all_logs.log_pages['RUN']
-        max_id = DatabaseFunctions.getMaxIDFromTable(conn, page.name) + 1
-        page.contents[0]['ID'] = max_id
-        page = insertMainFile(conn, 0, page, max_id, False)
         
         # Get the data from the classes in dictionary format
         log_pages = all_logs.getLogDictionary()
@@ -367,6 +364,28 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
             logger.debug(traceback.format_exc())
             raise 
 
+
+def loopLogPages(conn, all_pages, callback_sub, callback_main):
+    '''
+    '''
+    for page in all_logs.log_pages.values():
+            
+            if not page.has_contents: 
+                page.update_check = False
+                continue
+            
+            if not page.name == 'RUN':
+                for i, values in reverse_enumerate(page.contents):
+                      
+                    # We need the maximum id so that we can increment by 1 and put it into
+                    # the output table in the GUI.
+                    max_id = DatabaseFunctions.getMaxIDFromTable(conn, page.name) + 1
+                    
+                    if page.multi_file:
+                        page = insertSubFiles(conn, i, page, max_id)
+                        
+                    page = insertMainFile(conn, i, page, max_id, check_new_entries)
+    
 
 def findNewLogEntries(conn, log_pages, log_name, table_key=None, 
                                                     multiple_files=True):
