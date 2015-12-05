@@ -260,13 +260,16 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
         This is getting a bit of a mess and needs a lot of refactoring. Some
         of which may involve changing the way that LogIT.py uses it.
     '''
+    
+    added_rows = None
+    
     def reverse_enumerate(iterable):
         '''Enumerate over an iterable in reverse order while retaining proper indexes
         '''
         return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
     
     
-    def insertSubFiles(conn, index, page, max_id):
+    def insertSubFiles(conn, index, values, page, max_id):
         '''Insert files referenced by one of the log pages into its table.
         
         Looks to see if any of the files it contains aren't already entered. 
@@ -287,7 +290,7 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
         page.contents[index]['ID'] = max_id
         
         return page
-    
+     
     def insertMainFile(conn, index, page, max_id, check_entry):
         '''Adds the log page data in 'page' to the log page table.
         
@@ -315,6 +318,26 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
             raise 
         
         return page
+    
+    def callbackFunc(conn, i, values, page, callback_args):
+        '''Insert entries into database and update page values.
+        This function is a callback used by the looping function.
+        '''
+        check_new_entries = callback_args['check_new_entries']
+        
+        # We need the maximum id so that we can increment by 1 and put it into
+        # the output table in the GUI.
+        max_id = DatabaseFunctions.getMaxIDFromTable(conn, page.name) + 1
+        
+        if page.multi_file:
+            page = insertSubFiles(conn, i, values, page, max_id)
+            
+        if page.name == 'RUN':
+            page = insertMainFile(conn, 0, page, max_id, False)
+        else:
+            page = insertMainFile(conn, i, page, max_id, check_new_entries)
+        
+        return page, callback_args
             
     
     # Class to hold all the log page objects
@@ -323,26 +346,10 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
     added_rows = AddedRows()
     check_new_entries = True
     try:
-        for page in all_logs.log_pages.values():
-            
-            if not page.has_contents: 
-                page.update_check = False
-                continue
-            
-            #if not page.name == 'RUN':
-            for i, values in reverse_enumerate(page.contents):
-                  
-                # We need the maximum id so that we can increment by 1 and put it into
-                # the output table in the GUI.
-                max_id = DatabaseFunctions.getMaxIDFromTable(conn, page.name) + 1
-                
-                if page.multi_file:
-                    page = insertSubFiles(conn, i, page, max_id)
-                    
-                if page.name == 'RUN':
-                    page = insertMainFile(conn, 0, page, max_id, False)
-                else:
-                    page = insertMainFile(conn, i, page, max_id, check_new_entries)
+        # Send function as a callback to the log page looping function.
+        all_logs, callback_args = loopLogPages(conn, all_logs, callbackFunc, 
+                                    {'check_new_entries': check_new_entries})
+        
         
         # Get the data from the classes in dictionary format
         log_pages = all_logs.getLogDictionary()
@@ -365,26 +372,27 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
             raise 
 
 
-def loopLogPages(conn, all_pages, callback_sub, callback_main):
+def loopLogPages(conn, all_logs, callback, callback_args):
+    '''Loop all the pages in the log applying the given callback function.
     '''
-    '''
+    
+    def reverse_enumerate(iterable):
+        '''Enumerate over an iterable in reverse order while retaining proper indexes
+        '''
+        return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
+    
+    
     for page in all_logs.log_pages.values():
             
-            if not page.has_contents: 
-                page.update_check = False
-                continue
-            
-            if not page.name == 'RUN':
-                for i, values in reverse_enumerate(page.contents):
-                      
-                    # We need the maximum id so that we can increment by 1 and put it into
-                    # the output table in the GUI.
-                    max_id = DatabaseFunctions.getMaxIDFromTable(conn, page.name) + 1
-                    
-                    if page.multi_file:
-                        page = insertSubFiles(conn, i, page, max_id)
-                        
-                    page = insertMainFile(conn, i, page, max_id, check_new_entries)
+        if not page.has_contents: 
+            page.update_check = False
+            continue
+        
+        for i, values in reverse_enumerate(page.contents):
+        
+            page, callback_args = callback(conn, i, values, page, callback_args)
+    
+    return all_logs, callback_args
     
 
 def findNewLogEntries(conn, log_pages, log_name, table_key=None, 
