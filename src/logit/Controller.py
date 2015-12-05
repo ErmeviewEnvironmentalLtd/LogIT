@@ -61,6 +61,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def reverse_enumerate(iterable):
+    '''Enumerate over an iterable in reverse order while retaining proper indexes
+    '''
+    return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
+
     
 class AddedRows(object):
     '''Keeps track of any new rows added to the database.
@@ -88,7 +93,7 @@ class AddedRows(object):
         if self._checkIsList(new_rows):
             self.tables[key] = self.tables[key] + new_rows
         else:
-            self.tables[key].append(new_rows)        
+            self.tables[key] = self.tables[key] + [new_rows]     
     
     def _checkIsList(self, row_item):
         '''Returns True if a list or False if not.
@@ -106,7 +111,7 @@ class AddedRows(object):
                calling code.
         '''
         for name, table in self.tables.iteritems():
-            for id in table:
+            for id in table: #reverse_enumerate(table):
                 DatabaseFunctions.deleteRowFromTable(conn, name, id)
         
 
@@ -163,9 +168,16 @@ class SubLog(object):
         self.has_contents = self._checkHasContents(sub_page)
         sub_page = self._checkIsList(sub_page)
         self.contents = sub_page
-        self.update_check = sub_page
+        self.update_check = False
+        #self.update_check = self._createUpdateCheck(sub_page)
         self.subfile_name = None
         if multi_file: self.subfile_name = name + '_FILES'
+    
+    
+#     def _createUpdateCheck(self, sub_page):
+#         '''
+#         '''
+#         return [False] * len(sub_page)
     
     def _checkIsList(self, sub_page):
         '''Checks if given page is in a list and puts it in one if not.
@@ -275,18 +287,9 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
     @raise IOError: If there's any issue connecting to the database.
     @raise Exception: if anything else goes wrong. 
     
-    TODO:
-        This is getting a bit of a mess and needs a lot of refactoring. Some
-        of which may involve changing the way that LogIT.py uses it.
     '''
     
-    added_rows = None
-    
-    def reverse_enumerate(iterable):
-        '''Enumerate over an iterable in reverse order while retaining proper indexes
-        '''
-        return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
-    
+    added_rows = None    
     
     def insertSubFiles(conn, index, values, page, max_id):
         '''Insert files referenced by one of the log pages into its table.
@@ -300,9 +303,10 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
                             page.subfile_name, 'FILES', 
                                 values[page.name], values['FILES']) 
     
-        added_rows.addRows(page.subfile_name, ids)
+        #added_rows.addRows(page.subfile_name, ids)
           
         if not new_files == False:
+            added_rows.addRows(page.subfile_name, ids)
             page.bracketFiles(index, 'NEW_FILES', new_files)
     
         page.bracketFiles(index, 'FILES')
@@ -327,11 +331,12 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
                             page.name, page.contents[index])
               
                 added_rows.addRows(page.name, max_id)
+                page.contents[index]['ID'] = max_id
                 page.update_check = True
 
             else:
                 page.deleteItem(index)
-                page.updateCheck[index] = False
+                #page.update_check[index] = False
         except:
             logger.debug(traceback.format_exc())
             raise 
@@ -415,7 +420,7 @@ def loopLogPages(conn, all_logs, callback, callback_args):
     for page in all_logs.log_pages.values():
             
         if not page.has_contents: 
-            page.update_check = False
+            #page.update_check[0] = False
             continue
         
         for i, values in reverse_enumerate(page.contents):
