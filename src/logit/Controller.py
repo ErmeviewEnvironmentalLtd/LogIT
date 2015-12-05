@@ -152,7 +152,7 @@ class AllLogs(object):
         out_log = {}
         for page in self.log_pages.values():
             # DEBUG - have to convert back from list at the moment
-            if page.name == 'DAT':
+            if page.name in AllLogs.SINGLE_FILE:
                 page.contents = page.contents[0]
             out_log[page.name] = page.contents
         
@@ -163,9 +163,6 @@ class AllLogs(object):
         '''
         out_check = {}
         for page in self.log_pages.values():
-            # DEBUG - have to convert back from list at the moment
-            #if page.name == 'DAT':
-            #    page.update_check = page.update_check[0]
             out_check[page.name] = page.update_check
         
         return out_check
@@ -188,8 +185,8 @@ class SubLog(object):
     def _checkIsList(self, sub_page):
         '''
         '''
-        if self.name == 'RUN':
-            return sub_page
+        #if self.name == 'RUN':
+        #    return sub_page
         if not isinstance(sub_page, list):
             sub_page = [sub_page]
         return sub_page
@@ -243,85 +240,88 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
         return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
     
     
-    added_rows = {}
+    def insertSubFiles(conn, index, page, max_id):
+        '''Insert files referenced by one of the log pages into its table.
+        
+        Looks to see if any of the files it contains aren't already entered. 
+        If they aren't it adds them to the files table (e.g. TGC_FILES).
+        Then converts to a bracket wrapped string for adding to main log table
+        (e.g. TGC).
+        '''
+        new_files, ids = insertIntoModelFileTable(conn, 
+                            page.subfile_name, 'FILES', 
+                                values[page.name], values['FILES']) 
     
+        added_rows.addRows(page.subfile_name, ids)
+          
+        if not new_files == False:
+            page.bracketFiles(index, 'NEW_FILES', new_files)
     
-    all_logs = AllLogs(log_pages)
+        page.bracketFiles(index, 'FILES')
+        page.contents[index]['ID'] = max_id
+        
+        return page
+    
+    def insertMainFile(conn, index, page, max_id, check_entry):
+        '''Adds the log page data in 'page' to the log page table.
+        
+        Will check if entry exists first if check_entry==True.
+        '''
+        try:
+            is_in_db = False
+            if check_entry:
+                is_in_db = DatabaseFunctions.findInDatabase(
+                        page.name, conn=conn, col_name=page.name, 
+                        db_entry=page.contents[index][page.name])[0]
+
+            if not is_in_db:
+                DatabaseFunctions.insertValuesIntoTable(conn, 
+                            page.name, page.contents[index])
+              
+                added_rows.addRows(page.name, max_id)
+                page.update_check = True
+
+            else:
+                page.deleteItem(index)
+                page.updateCheck[index] = False
+        except:
+            logger.debug(traceback.format_exc())
+            raise 
+        
+        return page
+            
+    
+    # Class to hold all the log page objects
+    all_logs = AllLogs(log_pages)  
+    # Collects all files added to database for resetting
     added_rows = AddedRows()
     
-    # DEBUG
-    check_new_entries = True
-    
     try:
-        
-        #for u in update_check:
         for page in all_logs.log_pages.values():
             
             if not page.has_contents: 
                 page.update_check = False
                 continue
             
-            #if page.multi_file:
             if not page.name == 'RUN':
-                
                 for i, values in reverse_enumerate(page.contents):
                       
                     # We need the maximum id so that we can increment by 1 and put it into
                     # the output table in the GUI.
                     max_id = DatabaseFunctions.getMaxIDFromTable(conn, page.name) + 1
-     
+                    
                     if page.multi_file:
-                        # The FILES entry is a dictionary that uses the file
-                        # name as a key. We need to get the new files from the files
-                        # entry to enter into the database.
-                        # Files lists then get converted to a single string.
-                        new_files, ids = insertIntoModelFileTable(conn, 
-                                            page.subfile_name, 'FILES', 
-                                                values[page.name], values['FILES']) 
-    
-                        added_rows.addRows(page.subfile_name, ids)
-                          
-                        if not new_files == False:
-                            page.bracketFiles(i, 'NEW_FILES', new_files)
-    
-                        page.bracketFiles(i, 'FILES')
-    
-                        page.contents[i]['ID'] = max_id
-                    try:
-                        is_in_db = False
-                        if check_new_entries:
-                            is_in_db = DatabaseFunctions.findInDatabase(
-                                    page.name, conn=conn, col_name=page.name, 
-                                    db_entry=page.contents[i][page.name])[0]
-
-                        if not is_in_db:
-                            DatabaseFunctions.insertValuesIntoTable(conn, 
-                                        page.name, page.contents[i])
-                          
-                            added_rows.addRows(page.name, max_id)
-                            page.update_check = True
-
-                        else:
-                            page.deleteItem(i)
-                            page.updateCheck[i] = False
-                    except:
-                        logger.debug(traceback.format_exc())
-                        raise 
+                        page = insertSubFiles(conn, i, page, max_id)
+                        
+                    page = insertMainFile(conn, i, page, max_id, check_new_entries)
  
         # Always put an entry in the Run entry table
         page = all_logs.log_pages['RUN']
         max_id = DatabaseFunctions.getMaxIDFromTable(conn, page.name) + 1
-        page.contents['ID'] = max_id
-        try:
-            DatabaseFunctions.insertValuesIntoTable(conn, page.name, 
-                                                    page.contents)
-             
-            added_rows.addRows(page.name, max_id)
-             
-        except:
-            logger.debug(traceback.format_exc())
-            raise 
+        page.contents[0]['ID'] = max_id
+        page = insertMainFile(conn, 0, page, max_id, False)
         
+        # Get the data from the classes in dictionary format
         log_pages = all_logs.getLogDictionary()
         update_check = all_logs.getUpdateCheck()
         return log_pages, update_check
@@ -329,9 +329,6 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
     # This acts as a failsafe incase we hit an error after some of the entries
     # were already added to the database. It try's to roll back the entries by
     # deleting them. The exception is still raised to be dealt with by the GUI.
-    # TODO:
-    #    This could probably be managed better with more constructive use of the
-    #    database calls and how the connection.rollback() in sqlite3 is implemented.
     except:
         logger.error('Problem updating database: attempting to roll back changes')
         logger.debug(traceback.format_exc())
@@ -339,11 +336,65 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
         try:
             added_rows.deleteEntries(conn)
             logger.warning('Successfully rolled back database')
-            #raise
         except:
             logger.error('Unable to roll back database: CHECK ENTRIES!')
             logger.debug(traceback.format_exc())
             raise 
+
+
+def findNewLogEntries(conn, log_pages, log_name, table_key=None, 
+                                                    multiple_files=True):
+    '''Checks entries against database to see if they're new of already exist.
+    
+    TODO:
+        This is still a bit messy at the moment. Need to clean it up and make
+        it a bit easier to read and less nested.
+    '''
+    logger.debug('Find Entry: log_name=%s, table_key=%s' % (log_name, table_key))
+        
+    data_to_display = []
+    
+    # Most files are multiple but the DAT file entry isn't so has to be 
+    # dealt with seperately as it doesn't need looping through
+    if multiple_files:
+        if not log_pages[log_name] == None:
+            mod_length = len(log_pages[log_name])
+            
+            # We have to loop backwards here because we might delete entries
+            for i in range(mod_length-1, -1, -1):
+                
+                if log_pages[log_name][i][log_name] == 'None':
+                    log_pages[log_name][i] = None
+                else:
+                
+                    is_new_entry = DatabaseFunctions.findNewEntries(
+                                        conn, log_name, log_pages[log_name][i])
+    
+                    # If we're adding them to the editable tables we do it
+                    # Otherwise just get rid of those we don't want
+                    if not table_key == None:
+                        
+                        # If it'a already in the database then we remove it from the log
+                        # dictionary to avoid entering it again.
+                        if not is_new_entry:
+                            data_to_display = [[log_pages[log_name][i], table_key, i, False]]
+                            del log_pages[log_name][i]
+                        else:
+                            data_to_display = [[log_pages[log_name][i], table_key, i, True]]
+                    else:
+                        if not is_new_entry:
+                            del log_pages[log_name][i]
+    else:
+        if not table_key == None:
+            if not DatabaseFunctions.findNewEntries(conn, log_name, log_pages[log_name]):
+                data_to_display = [[log_pages[log_name], table_key, 0, False]]
+                log_pages[log_name] = None
+            else:
+                data_to_display = [[log_pages[log_name], table_key, 0, True]]
+        else:
+            log_pages[log_name] = None
+    
+    return log_pages, data_to_display
 
 
 def insertIntoModelFileTable(conn, table_name, col_name, model_file, files_list):
@@ -422,7 +473,7 @@ def deleteDatabaseRow(db_path, table_name, id):
     
     
 def checkDatabaseVersion(db_path):
-    '''
+    '''Tests database to see if it's the right version.
     '''
     conn = False
     if not db_path == '' and not db_path == False:
@@ -486,9 +537,6 @@ def fetchTableValues(db_path, table_list):
         
         return entries, True
         
-#         results = DatabaseFunctions.findInDatabase(table_name, db_path=False, 
-#                                                 conn=conn, return_rows=True)
-#         return results[0], results[1], results[2]
     except:
         msg = "Unable to load model log from file at: %s." % (db_path)
         logger.error('Unable to load model log from file at: \n%s' % (db_path))
@@ -549,61 +597,6 @@ def loadEntrysWithStatus(db_path, log_pages, table_list):
     finally:
         if not conn == False:
             conn.close()
-
-
-def findNewLogEntries(conn, log_pages, log_name, table_key=None, 
-                                                    multiple_files=True):
-    '''Checks entries against database to see if they're new of already exist.
-    
-    TODO:
-        This is still a bit messy at the moment. Need to clean it up and make
-        it a bit easier to read and less nested.
-    '''
-    logger.debug('Find Entry: log_name=%s, table_key=%s' % (log_name, table_key))
-        
-    data_to_display = []
-    
-    # Most files are multiple but the DAT file entry isn't so has to be 
-    # dealt with seperately as it doesn't need looping through
-    if multiple_files:
-        if not log_pages[log_name] == None:
-            mod_length = len(log_pages[log_name])
-            
-            # We have to loop backwards here because we might delete entries
-            for i in range(mod_length-1, -1, -1):
-                
-                if log_pages[log_name][i][log_name] == 'None':
-                    log_pages[log_name][i] = None
-                else:
-                
-                    is_new_entry = DatabaseFunctions.findNewEntries(
-                                        conn, log_name, log_pages[log_name][i])
-    
-                    # If we're adding them to the editable tables we do it
-                    # Otherwise just get rid of those we don't want
-                    if not table_key == None:
-                        
-                        # If it'a already in the database then we remove it from the log
-                        # dictionary to avoid entering it again.
-                        if not is_new_entry:
-                            data_to_display = [[log_pages[log_name][i], table_key, i, False]]
-                            del log_pages[log_name][i]
-                        else:
-                            data_to_display = [[log_pages[log_name][i], table_key, i, True]]
-                    else:
-                        if not is_new_entry:
-                            del log_pages[log_name][i]
-    else:
-        if not table_key == None:
-            if not DatabaseFunctions.findNewEntries(conn, log_name, log_pages[log_name]):
-                data_to_display = [[log_pages[log_name], table_key, 0, False]]
-                log_pages[log_name] = None
-            else:
-                data_to_display = [[log_pages[log_name], table_key, 0, True]]
-        else:
-            log_pages[log_name] = None
-    
-    return log_pages, data_to_display
 
 
 def fetchAndCheckModel(db_path, open_path, log_type, launch_error=True):
