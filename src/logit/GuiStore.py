@@ -50,6 +50,132 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class ErrorHolder(object):
+    '''Container for errors logged for later use.
+    '''
+    
+    def __init__(self):
+        self.log = []
+        self.msgbox_error = None
+        self.types = self._initErrorTypes()
+        
+    
+    def _initErrorTypes(self):
+        '''Initialise all of the available error types.
+        '''
+        errors = {}
+        
+        #
+        title = 'Database Update Error'
+        status_bar = 'Unable to update Database with model'
+        message = status_bar
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        #
+        title = 'Database Old Error'
+        status_bar = 'Unable to load database'
+        message = ('Database needs updating to latest version.'
+                   '\nUse Settings > Tools > Update Database Schema. '
+                   'See Help for details.')
+        errors[error] = ErrorType(title, status_bar, message)
+        
+        #
+        title = 'Database New Error'
+        status_bar = 'Unable to load database'
+        message = ('Database was produced with newer version of LogIT.\n'
+                   'Update to latest version of LogIT to use database.')
+        errors[error] = ErrorType(title, status_bar, message)
+        
+        #
+        title = 'Database Access Error'
+        status_bar = 'Unable to access database'
+        message = status_bar
+        errors[error] = ErrorType(title, status_bar, message)
+        
+         #
+        title = 'Model Load Error'
+        status_bar = 'Unable to load model log from file'
+        message = status_bar
+        errors[error] = ErrorType(title, status_bar, message)
+        
+        #
+        title = 'Results Already Exist Error'
+        status_bar = 'ISIS/FMP results file already exist'
+        message = status_bar
+        errors[error] = ErrorType(title, status_bar, message)
+        
+        #
+        title = 'Log Entry Exists Error'
+        status_bar = 'Selected file already exists in database'
+        message = status_bar
+        errors[error] = ErrorType(title, status_bar, message)
+        
+        #
+        title = 'IO Error'
+        status_bar = 'Unable to update Database with model'
+        message = status_bar
+        errors[error] = ErrorType(title, status_bar, message)
+        
+        #
+        title = 'Database Schema Error'
+        status_bar = 'Failed to update database scheme: See log for details'
+        message = status_bar
+        errors[error] = ErrorType(title, status_bar, message)
+        
+        #
+        title = 'Load Settings Error'
+        status_bar = 'Unable to load user settings'
+        message = status_bar
+        errors[error] = ErrorType(title, status_bar, message)
+        
+        #
+        title = 'Export to Excel Error'
+        status_bar = 'Export to Excel Failed'
+        message = 'Unable to export database to Excel - Is the file open?'
+        errors[error] = ErrorType(title, status_bar, message)
+        
+    
+    def addError(self, key, message_additional='', change_status=False):
+        '''Adds a new error to the log list.
+        @param key: the key to the error. If this doesn't exist it will raise a 
+               KeyError. If you want to create a new type of error either add 
+               it to the _initErrorTypes function or call addErrorType with an 
+               ErrorType object if you only want it at run time.
+        @param message_additional='': Any additional text to add to the error.
+        @param change_status=False: If set to True the message_additional text
+               will be added to the status text as well.
+        '''
+        if not key in self.types:
+            raise KeyError
+        error = self.errors[key].copy()
+        error.message = error.message + message_additional
+        error.status_bar = error.status_bar + message_additional
+        error.error_found = True
+        self.log.append(error)
+        
+    
+    def addErrorType(self, error_type, key):
+        '''Adds a new ErrorType to the self.types dictionary.
+        @param error_type: The ErrorType object to add.
+        @param key: the key to use to access the error_type.
+        '''
+        self.types[key] = error_type
+
+
+class ErrorType(object):
+    '''Holds details of error types for use in ErrorHolder.
+    '''
+    
+    def __init__(self, title, status_bar, message=None):        
+        self.error_found = False
+        self.title = title
+        self.status_bar = status_bar
+        if message == None:
+            self.message = status_bar
+        else:
+            self.message = message
+
+
 class TableHolder(object):
     '''Container class for a collection of QTableWidget objects.
     '''
