@@ -564,71 +564,6 @@ class MainGui(QtGui.QMainWindow):
         
         return log_pages
         
-    
-    # REMOVE - When not called anywhere. 
-    def _putInTableValues(self, col_dict, table_obj, row_no=0):
-        '''Put values in the given dictionary into the given table where the
-        dictionary keys match the column headers of the table.
-        
-        @param col_dict: dictionary containing the values to put in the table.
-        @param table_obj: the QTableWidget object to put the values in.
-        '''
-        # Insert a new row first if needed
-        row_count = table_obj.rowCount()
-        if not row_count > row_no:
-            table_obj.insertRow(row_count)
-        
-        row = table_obj.rowAt(row_no)
-        headercount = table_obj.columnCount()
-        for x in range(0,headercount,1):
-            headertext = str(table_obj.horizontalHeaderItem(x).text())
-            if headertext in col_dict:
-                
-                # If it's a loaded variable or db ID then we need to stop 
-                # user for corrupting the data and/or database
-                if not headertext in self.editing_allowed:
-                    table_obj.setItem(row_no, x, Controller.createQtTableItem(
-                                        str(col_dict[headertext]), False))
-                else:
-                    table_obj.setItem(row_no, x, Controller.createQtTableItem(
-                                        str(col_dict[headertext]), True))
-                
-    
-    # REMOVE - This can be removed when other code updated
-    def _getFromTableValues(self, table_obj, row_no=0, row=None, names=None):
-        '''Get the item from the table where the header of the column in the
-        table matches the given name.
-        
-        @param table_obj: the QTableWidget object to retrieve the item from.
-        @param names: dictionary of names that are being looked for in the
-               the table.
-        @return: dictionary with the allowed items taken from the table.
-        '''
-        all_names = False
-        if names == None:
-            names = self.editing_allowed
-        elif names == '*':
-            all_names = True
-            
-        keep_cells = {}
-        if row == None:
-            row = table_obj.rowAt(row_no)
-
-        headercount = table_obj.columnCount()
-        for x in range(0,headercount,1):
-            
-            headertext = str(table_obj.horizontalHeaderItem(x).text())
-            if all_names:
-                keep_cells[headertext] = str(table_obj.item(row, x).text())
-            else:
-                if headertext in names:
-                    if not table_obj.item(row, x) == None:
-                        keep_cells[headertext] = str(table_obj.item(row, x).text())
-                    else:
-                        keep_cells[headertext] = 'None'
-                
-        return keep_cells
-        
         
     def _createLogEntry(self):
         '''Take the updated data in the provisional table and load it into the
@@ -653,7 +588,8 @@ class MainGui(QtGui.QMainWindow):
             self.updateLogTable(update_check)
             
             # Clear the entry rows and deactivate add new log button
-            self._clearTableWidget('entry')
+            #self._clearTableWidget('entry')
+            self.new_entry_tables.clearAll()
             self.ui.submitSingleModelGroup.setEnabled(False)
             
             # Update the status bar message
@@ -762,23 +698,25 @@ class MainGui(QtGui.QMainWindow):
     
     def _updateWithUserInputs(self):
         '''Get the variables that we want to allow the user to be able to update.
+        
+        TODO:
+            This function is a prime example of why the log_pages dictionary
+            needs converting to an object such as that used in Controller.
         '''
         # Fetch the values that have editing allowed from the form tables
         # These only have single entries
         updates = {}
-        updates['RUN'] = self._getFromTableValues(self.ui.runEntryTable)
-        updates['DAT'] = self._getFromTableValues(self.ui.datEntryTable)
+        updates['RUN'] = self.new_entry_tables.tables['RUN'].getValues()
+        updates['DAT'] = self.new_entry_tables.tables['DAT'].getValues()
         
         # The others can have multiple entries
-        for key, table in self.ui_container['New_log_entry'].iteritems():
-            t = table[0]
-            name = table[1]
-            if name == 'RUN' or name == 'DAT': continue
+        for table in self.new_entry_tables.tables.values():
+            if table.key == 'RUN' or table.key == 'DAT': continue
             
-            updates[name] = []
-            if not self.log_pages[name] == None:
-                for i, entry in enumerate(self.log_pages[name], 0):
-                    updates[name].append(self._getFromTableValues(t, row_no=i))
+            updates[table.key] = []
+            if not self.log_pages[table.key] == None:
+                for i, entry in enumerate(self.log_pages[table.key], 0):
+                    updates[table.key].append(table.getValues(row_no=1))
         
         # Loop through the updates entries and amend any corresponding log_pages
         for key, val in updates.iteritems():
@@ -798,32 +736,30 @@ class MainGui(QtGui.QMainWindow):
                         self.log_pages[key][v] = val[v]
             
     
+    # REMOVE - when no longer called.
     def updateLogTable(self, update_check):
         '''Updates the log tables on the log view tab.
         '''
         update_check['RUN'] = True
-        table_dict = {'RUN': self.ui.runEntryViewTable, 'TGC': self.ui.tgcEntryViewTable,
-                      'TBC': self.ui.tbcEntryViewTable, 'DAT': self.ui.datEntryViewTable,
-                      'ECF': self.ui.ecfEntryViewTable, 'TCF': self.ui.tcfEntryViewTable,
-                      'BC_DBASE': self.ui.bcEntryViewTable}
         
-        for t in table_dict:
+        for table in self.view_tables.tables.values():
             
             # Make sure that we have something to update
-            if not update_check[t] == False:
-                last_row = table_dict[t].rowCount()
+            if not update_check[table.key] == False:
+                last_row = table.ref.rowCount()
                 
                 # Need to loop through possible multiple rows in these
-                if t == 'TGC' or t == 'TBC' or t == 'ECF' or t == 'BC_DBASE' or t == 'TCF':
-                    tab_length = len(self.log_pages[t])
+                if not table.key == 'RUN' and not table.key == 'DAT':
+                    tab_length = len(self.log_pages[table.key])
                     for i in range(0, tab_length):
-                        table_dict[t].setRowCount((last_row + 1))
-                        self._putInTableValues(self.log_pages[t][i], table_dict[t], 
-                                                                        last_row)
+                        table.ref.setRowCount((last_row + 1))
+                        table.addRowValues(self.log_pages[table.key][i],
+                                                                    last_row)
                         last_row += 1
                 else:
-                    table_dict[t].setRowCount(last_row + 1)
-                    self._putInTableValues(self.log_pages[t], table_dict[t], last_row)
+                    table.ref.setRowCount(last_row + 1)
+                    table.addRowValues(self.log_pages[table.key], last_row)
+#                     self._putInTableValues(self.log_pages[t], table_dict[t], last_row)
                     
     
     def _clearTableWidget(self, table_type):

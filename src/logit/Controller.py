@@ -138,7 +138,8 @@ class AllLogs(object):
         for page in self.log_pages.values():
             # DEBUG - have to convert back from list at the moment
             if page.name in AllLogs.SINGLE_FILE:
-                page.contents = page.contents[0]
+                if not len(page.contents) < 1:
+                    page.contents = page.contents[0]
             out_log[page.name] = page.contents
         
         return out_log

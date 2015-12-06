@@ -136,7 +136,7 @@ class TableWidget(object):
         '''
         all_names = False
         if names == None:
-            names = EDITING_ALLOWED
+            names = TableWidget.EDITING_ALLOWED
         elif names == '*':
             all_names = True
             
