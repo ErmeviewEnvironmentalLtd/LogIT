@@ -777,17 +777,17 @@ def updateDatabaseVersion(db_path):
              If False then other dict items contain details.
     '''
     error_details = {'Success': True}
-    d = MyFileDialogs()
-    if not self.checkDbLoaded():
-        open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
-                                    file_types='LogIT database(*.logdb)'))
-    else:
-        open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, 
-                                    file_types='LogIT database(*.logdb)'))
-    
-    # User cancel return
-    if open_path == False:
-        return None
+#     d = MyFileDialogs()
+#     if not self.checkDbLoaded():
+#         open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
+#                                     file_types='LogIT database(*.logdb)'))
+#     else:
+#         open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, 
+#                                     file_types='LogIT database(*.logdb)'))
+#     
+#     # User cancel return
+#     if open_path == False:
+#         return None
     
     try:
         DatabaseFunctions.updateDatabaseVersion(open_path)
@@ -824,7 +824,7 @@ def loadSetup(cur_settings_path, cur_log_path):
         return False, title, msg
     
     
-def exportToExcel(cur_log_path, export_tables):
+def exportToExcel(save_path, export_tables):
     '''Export database to Excel (.xls) format at user chosen location.
     @param cur_log_path: the current log database file path.
     @param export_tables: list with order to create worksheet.
@@ -833,55 +833,28 @@ def exportToExcel(cur_log_path, export_tables):
     @note: launches file dialog.
     '''
     error_details = {'Success': True}
-    d = MyFileDialogs()
-    save_path = d.saveFileDialog(path=os.path.split(cur_log_path)[0], 
-                                 file_types='Excel File (*.xls)')
-    save_path = str(save_path)
-    
-    if not save_path == False:
-        try:
-            Exporters.exportToExcel(cur_log_path, export_tables, save_path)
-        except:
-            logger.error('Could not export log to Excel')
-            error_details = {'Success': False, 
-                'Status_bar': "Export to Excel Failed",
-                'Error': "Export Failed", 
-                'Message': "Unable to export database to Excel - Is the file open?"}
-            return error_details
-       
-        logger.info('Database exported to Excel at:\n%s' % (save_path))
-        error_details = {'Success': True, 
-                'Status_bar': "Database exported to Excel at: %s." % save_path,
-                'Error': "Export Failed", 
-                'Message': "Database exported to Excel at: %s." % save_path}
+#     d = MyFileDialogs()
+#     save_path = d.saveFileDialog(path=os.path.split(cur_log_path)[0], 
+#                                  file_types='Excel File (*.xls)')
+#     save_path = str(save_path)
+#     
+#     if not save_path == False:
+    try:
+        Exporters.exportToExcel(cur_log_path, export_tables, save_path)
+    except:
+        logger.error('Could not export log to Excel')
+        error_details = {'Success': False, 
+            'Status_bar': "Export to Excel Failed",
+            'Error': "Export Failed", 
+            'Message': "Unable to export database to Excel - Is the file open?"}
         return error_details
+   
+    logger.info('Database exported to Excel at:\n%s' % (save_path))
+    error_details = {'Success': True, 
+            'Status_bar': "Database exported to Excel at: %s." % save_path,
+            'Error': "Export Failed", 
+            'Message': "Database exported to Excel at: %s." % save_path}
+    return error_details
 
 
-def getModelFileLocation(multi_paths, last_model_directory,
-                                        cur_log_path, cur_settings_path):
-    '''Launch dialog for user to choose model to load.
-    @param param: 
-    '''
-    # Create a file dialog with an initial path based on the availability
-    # of path variables.
-    d = MyFileDialogs()
-    if not last_model_directory == '' and \
-                    not last_model_directory == False:
-        chosen_path = last_model_directory
-    elif not cur_log_path == ''  and not self.settings.cur_log_path == False:
-        chosen_path = cur_log_path
-    else:
-        chosen_path = cur_settings_path
-          
-    if multi_paths:
-        open_path = d.openFileDialog(path=chosen_path, 
-                file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)',
-                multi_file=True)
-    else:
-        open_path = d.openFileDialog(path=chosen_path, 
-                file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)')
-    
-    return open_path
-    
-    
     

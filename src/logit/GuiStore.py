@@ -242,6 +242,34 @@ def createQtTableItem(name, is_editable):
         
     return item
 
+
+def getModelFileLocation(multi_paths, last_model_directory,
+                                        cur_log_path, cur_settings_path):
+    '''Launch dialog for user to choose model to load.
+    @param param: 
+    '''
+    # Create a file dialog with an initial path based on the availability
+    # of path variables.
+    d = MyFileDialogs()
+    if not last_model_directory == '' and \
+                    not last_model_directory == False:
+        chosen_path = last_model_directory
+    elif not cur_log_path == ''  and not self.settings.cur_log_path == False:
+        chosen_path = cur_log_path
+    else:
+        chosen_path = cur_settings_path
+          
+    if multi_paths:
+        open_path = d.openFileDialog(path=chosen_path, 
+                file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)',
+                multi_file=True)
+    else:
+        open_path = d.openFileDialog(path=chosen_path, 
+                file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)')
+    
+    return open_path
+
+
 # class MessageBox(QtGui.QWidget):
 #      def __init__(self, parent=None):
 #          QtGui.QWidget.__init__(self, parent)

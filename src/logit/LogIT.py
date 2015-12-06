@@ -198,7 +198,6 @@ class MainGui(QtGui.QMainWindow):
         # Load the user settings from the last time the software was used 
         self._loadSettings()
         
-        self.ui_container = {}
         self._setupUiContainer()
         
         # Use those settings to get the file path and try and load the last log
@@ -249,25 +248,6 @@ class MainGui(QtGui.QMainWindow):
         self.view_tables.addTable(GuiStore.TableWidget('DAT', 
                             'datEntryViewTable', self.ui.datEntryViewTable))
         
-        self.ui_container['New_log_entry'] = {}
-        self.ui_container['New_log_entry']['runEntryTable'] = [self.ui.runEntryTable, 'RUN']
-        self.ui_container['New_log_entry']['tcfEntryTable'] = [self.ui.tcfEntryTable, 'TCF']
-        self.ui_container['New_log_entry']['ecfEntryTable'] = [self.ui.ecfEntryTable, 'ECF']
-        self.ui_container['New_log_entry']['tgcEntryTable'] = [self.ui.tgcEntryTable, 'TGC']
-        self.ui_container['New_log_entry']['tbcEntryTable'] = [self.ui.tbcEntryTable, 'TBC']
-        self.ui_container['New_log_entry']['bcEntryTable'] = [self.ui.bcEntryTable, 'BC_DBASE']
-        self.ui_container['New_log_entry']['datEntryTable'] = [self.ui.datEntryTable, 'DAT']
-        #self.ui_container['New_log_entry']['inputVarGroup'] = [self.ui.inputVarGroup, 'inputs']
-        
-        self.ui_container['View_log'] = {}
-        self.ui_container['View_log']['runEntryViewTable'] = [self.ui.runEntryViewTable, 'RUN']
-        self.ui_container['View_log']['tcfEntryViewTable'] = [self.ui.tcfEntryViewTable, 'TCF']
-        self.ui_container['View_log']['ecfEntryViewTable'] = [self.ui.ecfEntryViewTable, 'ECF']
-        self.ui_container['View_log']['tgcEntryViewTable'] = [self.ui.tgcEntryViewTable, 'TGC']
-        self.ui_container['View_log']['tbcEntryViewTable'] = [self.ui.tbcEntryViewTable, 'TBC']
-        self.ui_container['View_log']['bcEntryViewTable'] = [self.ui.bcEntryViewTable, 'BC_DBASE']
-        self.ui_container['View_log']['datEntryViewTable'] = [self.ui.datEntryViewTable, 'DAT'] 
-    
     
     def _updateLoggingLevel(self):
         '''Alters to logging level based on the name of the calling action
@@ -852,6 +832,17 @@ class MainGui(QtGui.QMainWindow):
         '''Checks if the databse at the given path is compatible with the
         latest version of LogIT.
         '''
+        d = MyFileDialogs()
+        if not self.checkDbLoaded():
+            open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
+                                        file_types='LogIT database(*.logdb)'))
+        else:
+            open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, 
+                                        file_types='LogIT database(*.logdb)'))
+        # User cancel return
+        if open_path == False:
+            return None
+        
         errors = Controller.updateDatabaseVersion()
         if errors == None:
             return
@@ -923,8 +914,15 @@ class MainGui(QtGui.QMainWindow):
         '''Exports the database based on calling action.
         '''
         if self.checkDbLoaded():
-            err_details = Controller.exportToExcel(
-                        self.settings.cur_log_path, self.export_tables)
+            d = MyFileDialogs()
+            save_path = d.saveFileDialog(path=os.path.split(cur_log_path)[0], 
+                                         file_types='Excel File (*.xls)')
+            if save_path == False:
+                return
+
+            save_path = str(save_path)
+            err_details = Controller.exportToExcel(save_path, 
+                                                   self.export_tables)
             
             if err_details['Success'] == False:
                 self.launchQMsgBox(err_details['Error'], err_details['Message'])
@@ -973,7 +971,7 @@ class MainGui(QtGui.QMainWindow):
             logger.error('No log database found. Load or create one from File menu')
             return            
 
-        open_path = Controller.getModelFileLocation(multi_paths,
+        open_path = GuiStore.getModelFileLocation(multi_paths,
             self.settings.last_model_directory, self.settings.cur_log_path,
                 self.settings.cur_settings_path)
         
