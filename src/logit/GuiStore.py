@@ -51,7 +51,10 @@ logger = logging.getLogger(__name__)
 
 
 class TableHolder(object):
+    '''Container class for a collection of QTableWidget objects.
+    '''
     
+    # Collection key
     VIEW_LOG = 0
     NEW_LOG = 1
 
@@ -61,11 +64,16 @@ class TableHolder(object):
     
     
     def addTable(self, table_info_obj):
+        '''Add a new table to the collection.
+        '''
         self.tables[table_info_obj.key] = table_info_obj
     
     
     def _findTable(self, key=None, name=None):
-        '''
+        '''Find table key based on given parameter.
+        Locates the correct table whether given the key to the table or the
+        name of the QTableWidget object.
+        @return key to table.
         '''
         if not key == None or (key == None and name == None):
             return key
@@ -75,14 +83,20 @@ class TableHolder(object):
     
     
     def getNameFromKey(self, key):
+        '''Return the table name when given the key.
+        '''
         return self.tables[key].name
     
     
-    def getKeyName(self, name):
+    def getKeyFromName(self, name):
+        '''Return the table key when given the name.
+        '''
         return self._findTable(name=name)
     
     
     def getTable(self, key=None, name=None):
+        '''Return table referenced by either the key or the name.
+        '''
         key = self._findTable(key, name)
         return self.tables[key]
     
@@ -101,6 +115,9 @@ class TableHolder(object):
 
 
 class TableWidget(object):
+    '''Conveniance class for accessing regularly used attributes of the 
+    QTableWidget object in the GUI.
+    '''
     
     # Columns that are editable by the user
     EDITING_ALLOWED = ['COMMENTS', 'MODELLER', 'SETUP', 'DESCRIPTION',
@@ -114,7 +131,12 @@ class TableWidget(object):
         
         
     def removeRow(self, row=None, row_no=0):
-        '''
+        '''Removes the row denoted by paramaters.
+        
+        If no arguments are given it will do nothing.
+        @param row=None: The row object to delete.
+        @param row_no=None: The index of the row to delete.
+        
         '''
         if not row == None:
             self.ref.removeRow(row)
@@ -123,6 +145,8 @@ class TableWidget(object):
     
     
     def currentRow(self):
+        '''Returns the currently selected row.
+        '''
         return self.ref.currentItem().row()
         
     
@@ -177,7 +201,7 @@ class TableWidget(object):
         dictionary keys match the column headers of the table.
         
         @param row_dict: dictionary containing the values to put in the table.
-        @param table_obj: the QTableWidget object to put the values in.
+        @param row_no=0: the row to add the values at.
         '''
         # Insert a new row first if needed
         row_count = self.ref.rowCount()
@@ -220,6 +244,7 @@ class TableWidget(object):
         cols = self.ref.columnCount()
         for c in range(0, cols):
             if is_editable:
+                # Only highlight it green if it's an editable entry
                 headertext = str(self.ref.horizontalHeaderItem(c).text())
                 if headertext in TableWidget.EDITING_ALLOWED:
                     self.ref.item(row_no, c).setBackground(my_color)
@@ -230,6 +255,7 @@ class TableWidget(object):
     
 def createQtTableItem(name, is_editable):
     '''Create a QTableWidgetItem and return
+    @param name: value to put into the item text.
     @param is_editable=False: Set editable flag.
     @return: QTableWidgetItem
     '''
@@ -270,23 +296,6 @@ def getModelFileLocation(multi_paths, last_model_directory,
     return open_path
 
 
-# class MessageBox(QtGui.QWidget):
-#      def __init__(self, parent=None):
-#          QtGui.QWidget.__init__(self, parent)
-# 
-#          self.setGeometry(300, 300, 250, 150)
-#          self.setWindowTitle('message box')
-# 
-# 
-#      def closeEvent(self, event):
-#          reply = QtGui.QMessageBox.question(self, 'Message',
-#              "Are you sure to quit?", QtGui.QMessageBox.Yes, 
-#              QtGui.QMessageBox.No)
-# 
-#          if reply == QtGui.QMessageBox.Yes:
-#              event.accept()
-#          else:
-#              event.ignore()
 
     
     
