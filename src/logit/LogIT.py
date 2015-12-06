@@ -588,7 +588,6 @@ class MainGui(QtGui.QMainWindow):
             self.updateLogTable(update_check)
             
             # Clear the entry rows and deactivate add new log button
-            #self._clearTableWidget('entry')
             self.new_entry_tables.clearAll()
             self.ui.submitSingleModelGroup.setEnabled(False)
             
@@ -736,7 +735,6 @@ class MainGui(QtGui.QMainWindow):
                         self.log_pages[key][v] = val[v]
             
     
-    # REMOVE - when no longer called.
     def updateLogTable(self, update_check):
         '''Updates the log tables on the log view tab.
         '''
@@ -759,34 +757,8 @@ class MainGui(QtGui.QMainWindow):
                 else:
                     table.ref.setRowCount(last_row + 1)
                     table.addRowValues(self.log_pages[table.key], last_row)
-#                     self._putInTableValues(self.log_pages[t], table_dict[t], last_row)
                     
-    
-    def _clearTableWidget(self, table_type):
-        '''Clears the row data and completely resets the table at the 
-        given type.
-        
-        @param table_type: the type of table to reset
-        '''
-        entries = {'RUN': [self.ui.runEntryTable, self.ui.runEntryViewTable], 
-                   'TGC': [self.ui.tgcEntryTable, self.ui.tgcEntryViewTable],
-                   'TBC': [self.ui.tbcEntryTable, self.ui.tbcEntryViewTable], 
-                   'DAT': [self.ui.datEntryTable, self.ui.datEntryViewTable],
-                   'BC_DBASE': [self.ui.bcEntryTable, self.ui.bcEntryViewTable],
-                   'ECF': [self.ui.ecfEntryTable, self.ui.ecfEntryViewTable],
-                   'TCF': [self.ui.tcfEntryTable, self.ui.tcfEntryViewTable]}
-        
-        if table_type == 'entry' or table_type == 'all':
-                        
-            for val in entries.itervalues():
-                val[0].clearContents()
-                val[0].setRowCount(1)
-            
-        if table_type == 'view' or table_type == 'all':
-            for val in entries.itervalues():
-                val[1].setRowCount(0)
-            
-            
+
     def _loadSettings(self):
         '''Get the settings loaded from file if they exist.
         '''
@@ -912,7 +884,8 @@ class MainGui(QtGui.QMainWindow):
         
         if not save_path == False:
             self.settings.cur_log_path = str(save_path)
-            self._clearTableWidget('all')
+            self.new_entry_tables.clearAll()
+            self.view_tables.clearAll()
             self.ui.statusbar.showMessage('Building new log database...')
             self.ui.centralwidget.setEnabled(False)
             DatabaseFunctions.createNewLogDatabase(str(save_path))
