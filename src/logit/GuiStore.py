@@ -68,7 +68,7 @@ class TableHolder(object):
         '''
         '''
         if not key == None or (key == None and name == None):
-            return self.tables[key]
+            return key
         else:
             for t in self.tables.values():
                 if t.name == name: return t.key
@@ -198,6 +198,33 @@ class TableWidget(object):
                 else:
                     self.ref.setItem(row_no, x, createQtTableItem(
                                         str(row_dict[headertext]), True))
+    
+    
+    def setEditColors(self, row_no, is_editable=True):
+        '''Sets the colour of the cells in a row according to whether the cell
+        is editable or not.
+        Cells that can be edited will be set to green.
+        Cells that can't be edited will be set to red.
+        If a model file has already been entered into the database the entire
+        row will be set to red.
+        
+        @param row_no: the index of the row to change editing settings on.
+        @param is_editable=True: Sets whether the entire row should be set to
+               non-editable or not.
+        '''
+        if is_editable:
+            my_color = QtGui.QColor(204, 255, 153) # Light green
+        else:
+            my_color = QtGui.QColor(255, 204, 204) # Light Red
+        
+        cols = self.ref.columnCount()
+        for c in range(0, cols):
+            if is_editable:
+                headertext = str(self.ref.horizontalHeaderItem(c).text())
+                if headertext in TableWidget.EDITING_ALLOWED:
+                    self.ref.item(row_no, c).setBackground(my_color)
+            else:
+                self.ref.item(row_no, c).setBackground(my_color)
 
         
     

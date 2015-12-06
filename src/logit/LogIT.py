@@ -526,21 +526,20 @@ class MainGui(QtGui.QMainWindow):
         @param log_pages: the log pages dictionary loaded from the model.
         '''
         # Reset the tables first
-        self._clearTableWidget('entry')
+        self.new_entry_tables.clearAll()
         
         self.log_pages = log_pages
         log_pages = self._getInputLogVariables(log_pages)
         
         # Create a list of all of the available tables and their names
         table_list = []
-        for key, table in self.ui_container['New_log_entry'].iteritems():
-            name = table[1]
-            if name == 'RUN': continue
-            table_list.append([name, key])
+        for table in self.new_entry_tables.tables.values():
+            if table.key == 'RUN': continue
+            table_list.append([table.key, table.name])
         
         # Update RUN seperately as it's treated in a different way to others
-        self._putInTableValues(log_pages['RUN'], self.ui.runEntryTable)
-        self._setRowIsEditable(self.ui.runEntryTable, 0)
+        self.new_entry_tables.tables['RUN'].addRowValues(log_pages['RUN'])
+        self.new_entry_tables.tables['RUN'].setEditColors(0)
         
         # check the new entries against the database and return them with
         # flags set for whether they are new entries or already exist
@@ -548,42 +547,12 @@ class MainGui(QtGui.QMainWindow):
                             self.settings.cur_log_path, log_pages, table_list)
         
         # Add the entries to the gui tables with editable status set
-        for e in entries:
-            self._putInTableValues(e[0], 
-                    self.ui_container['New_log_entry'][e[1]][0], e[2])
-            self._setRowIsEditable(
-                self.ui_container['New_log_entry'][e[1]][0], e[2], e[3])
-        
+        for entry in entries:
+            table = self.new_entry_tables.getTable(name=entry[1])
+            table.addRowValues(entry[0], entry[2])
+            table.setEditColors(entry[2], entry[3])
+
     
-    def _setRowIsEditable(self, table_widget, row_no, is_editable=True):
-        '''Sets the colour of the cells in a row according to whether the cell
-        is editable or not.
-        Cells that can be edited will be set to green.
-        Cells that can't be edited will be set to red.
-        If a model file has already been entered into the database the entire
-        row will be set to red.
-        
-        @param table_widget: the table that will have cell editing settings
-               changed.
-        @param row_no: the index of the row to change editing settings on.
-        @param is_editable=True: Sets whether the entire row should be set to
-               non-editable or not.
-        '''
-        if is_editable:
-            my_color = QtGui.QColor(204, 255, 153) # Light green
-        else:
-            my_color = QtGui.QColor(255, 204, 204) # Light Red
-        
-        cols = table_widget.columnCount()
-        for c in range(0, cols):
-            if is_editable:
-                headertext = str(table_widget.horizontalHeaderItem(c).text())
-                if headertext in self.editing_allowed:
-                    table_widget.item(row_no, c).setBackground(my_color)
-            else:
-                table_widget.item(row_no, c).setBackground(my_color)
-        
-        
     def _getInputLogVariables(self, log_pages):
         '''Put the variables entered by the user in the Input log variables
         group into the log_pages dictionary.
@@ -595,7 +564,8 @@ class MainGui(QtGui.QMainWindow):
         
         return log_pages
         
-                
+    
+    # REMOVE - When not called anywhere. 
     def _putInTableValues(self, col_dict, table_obj, row_no=0):
         '''Put values in the given dictionary into the given table where the
         dictionary keys match the column headers of the table.
