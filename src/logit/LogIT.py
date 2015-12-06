@@ -97,6 +97,7 @@ import LogBuilder
 import DatabaseFunctions
 import Exporters
 import Controller
+import GuiStore
 
 
 class MainGui(QtGui.QMainWindow):
@@ -215,6 +216,39 @@ class MainGui(QtGui.QMainWindow):
     def _setupUiContainer(self):
         '''Create a convenient holding object for the gui inputs.
         '''
+        
+        self.new_entry_tables = GuiStore.TableHolder()
+        self.new_entry_tables.addTable(GuiStore.TableWidget('RUN', 
+                                    'runEntryTable', self.ui.runEntryTable))
+        self.new_entry_tables.addTable(GuiStore.TableWidget('TCF', 
+                                    'tcfEntryTable', self.ui.tcfEntryTable))
+        self.new_entry_tables.addTable(GuiStore.TableWidget('ECF', 
+                                    'ecfEntryTable', self.ui.ecfEntryTable))
+        self.new_entry_tables.addTable(GuiStore.TableWidget('TGC', 
+                                    'tgcEntryTable', self.ui.tgcEntryTable))
+        self.new_entry_tables.addTable(GuiStore.TableWidget('TBC', 
+                                    'tbcEntryTable', self.ui.tbcEntryTable))
+        self.new_entry_tables.addTable(GuiStore.TableWidget('BC_DBASE', 
+                                    'bcEntryTable', self.ui.bcEntryTable))
+        self.new_entry_tables.addTable(GuiStore.TableWidget('DAT', 
+                                    'datEntryTable', self.ui.datEntryTable))
+        
+        self.view_tables = GuiStore.TableHolder()
+        self.view_tables.addTable(GuiStore.TableWidget('RUN', 
+                            'runEntryViewTable', self.ui.runEntryViewTable))
+        self.view_tables.addTable(GuiStore.TableWidget('TCF', 
+                            'tcfEntryViewTable', self.ui.tcfEntryViewTable))
+        self.view_tables.addTable(GuiStore.TableWidget('ECF', 
+                            'ecfEntryViewTable', self.ui.ecfEntryViewTable))
+        self.view_tables.addTable(GuiStore.TableWidget('TGC', 
+                            'tgcEntryViewTable', self.ui.tgcEntryViewTable))
+        self.view_tables.addTable(GuiStore.TableWidget('TBC', 
+                            'tbcEntryViewTable', self.ui.tbcEntryViewTable))
+        self.view_tables.addTable(GuiStore.TableWidget('BC_DBASE', 
+                            'bcEntryViewTable', self.ui.bcEntryViewTable))
+        self.view_tables.addTable(GuiStore.TableWidget('DAT', 
+                            'datEntryViewTable', self.ui.datEntryViewTable))
+        
         self.ui_container['New_log_entry'] = {}
         self.ui_container['New_log_entry']['runEntryTable'] = [self.ui.runEntryTable, 'RUN']
         self.ui_container['New_log_entry']['tcfEntryTable'] = [self.ui.tcfEntryTable, 'TCF']
@@ -376,67 +410,61 @@ class MainGui(QtGui.QMainWindow):
         sender = str(sender.objectName())
         
         # lookup the table and database table name
-        try:
-            table_obj = self.ui_container['View_log'][sender][0]
-            table_name = self.ui_container['View_log'][sender][1]
-        except KeyError:
-            return
+        table_obj = self.view_tables.getTable(name=sender)
         
         # Get the action and do whatever it says
-        action = menu.exec_(table_obj.viewport().mapToGlobal(pos))
+        action = menu.exec_(table_obj.ref.viewport().mapToGlobal(pos))
         if action == updateRowAction:
-            self._saveViewChangesToDatabase(table_obj, table_name)
+            self._saveViewChangesToDatabase(table_obj)
         
         elif action == deleteRowAction:
-            self._deleteRowFromDatabase(table_obj, table_name)
+            self._deleteRowFromDatabase(table_obj)
             
     
-    def _deleteRowFromDatabase(self, table_widget, table_name):
+    def _deleteRowFromDatabase(self, table):
         '''Deletes the row in the database based on the location that the mouse
         was last clicked.
         This is fine because this function is called from the context menu and
         therefore relies on the user right-clicking on the correct row.
         
-        @param table_widget: the TableWidget item to get the row data from.
-        @param table_name: the name of the database table to remove the row from.
+        @param table: the TableWidget item to get the row data from.
         '''
         
         # Get the currently active row in the table and find it's ID value
-        row = table_widget.currentItem().row()
-        row_dict = self._getFromTableValues(table_widget, row=row, names=['ID'])
+        row = table.currentRow()
+        row_dict = table.getValues(row=row, names=['ID'])
         
         # Just make sure we meant to do this
-        message = "Are you sure you want to delete this row?\nTable = %s, Row ID = %s" % (table_name, row_dict['ID'])
+        message = "Are you sure you want to delete this row?\nTable = %s, Row ID = %s" % (table.name, row_dict['ID'])
         answer = self.launchQtQBox('Confirm Delete?', message)            
         if answer == False:
             return
         
         # Delete from database
         success = Controller.deleteDatabaseRow(self.settings.cur_log_path,
-                                               table_name, row_dict['ID'])
+                                    table.key, row_dict['ID'])
+        # and then from the table
         if success:
-            # and then from the table
-            table_widget.removeRow(row)
+            table.removeRow(row)
             logger.info('Row ID=%s deleted successfully' % (row_dict['ID']))
     
     
-    def _saveViewChangesToDatabase(self, table_widget, table_name):
+    def _saveViewChangesToDatabase(self, table):
         '''Saves the edits made to the row in the View Log table to the database
         based on the id value in the row that was clicked to launch the context
         menu.
         
-        @param table_widget: the table in the user form to takes  updates from.
-        @param table_name: the name of the database table to update.
+        @param table: the table in the user form to takes  updates from.
         '''
-        row = table_widget.currentItem().row()
+        row = table.currentRow()
         
         # Search through the current row and get the values in the columns that
         # we are going to allow the user to update.
-        save_dict = self._getFromTableValues(table_widget, row=row, names='*')
+        save_dict = table.getValues(row=row, names='*')
         id_key = save_dict['ID']
         
         # Add the updates to the database
-        error = DatabaseFunctions.saveViewChangesToDatabase(table_name, 
+        error = DatabaseFunctions.saveViewChangesToDatabase(table.key, 
                                 save_dict, id_key, self.settings.cur_log_path)
         
         db_path = os.path.split(self.settings.cur_log_path)[0]
@@ -601,6 +629,7 @@ class MainGui(QtGui.QMainWindow):
                                         str(col_dict[headertext]), True))
                 
     
+    # REMOVE - This can be removed when other code updated
     def _getFromTableValues(self, table_obj, row_no=0, row=None, names=None):
         '''Get the item from the table where the header of the column in the
         table matches the given name.
