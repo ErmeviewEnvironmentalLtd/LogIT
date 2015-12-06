@@ -52,15 +52,17 @@ logger = logging.getLogger(__name__)
 
 class TableHolder(object):
     
-    #VIEW_LOG = 0
-    #NEW_LOG = 1
+    VIEW_LOG = 0
+    NEW_LOG = 1
 
-    def __init__(self, type=None):
+    def __init__(self, type):
         self.tables = {}
+        self.type = type
     
     
     def addTable(self, table_info_obj):
         self.tables[table_info_obj.key] = table_info_obj
+    
     
     def _findTable(self, key=None, name=None):
         '''
@@ -71,15 +73,31 @@ class TableHolder(object):
             for t in self.tables.values():
                 if t.name == name: return t.key
     
+    
     def getNameFromKey(self, key):
         return self.tables[key].name
+    
     
     def getKeyName(self, name):
         return self._findTable(name=name)
     
+    
     def getTable(self, key=None, name=None):
         key = self._findTable(key, name)
         return self.tables[key]
+    
+    
+    def clearAll(self):
+        '''Clears the row data and completely resets the table.
+        '''
+        if self.type == TableHolder.NEW_LOG:         
+            for table in self.tables.values():
+                table.ref.clearContents()
+                table.ref.setRowCount(1)
+                
+        elif self.type == TableHolder.VIEW_LOG:
+            for table in self.tables.values():
+                table.ref.setRowCount(0)
 
 
 class TableWidget(object):
@@ -94,6 +112,7 @@ class TableWidget(object):
         self.name = name
         self.ref = table_ref
         
+        
     def removeRow(self, row=None, row_no=0):
         '''
         '''
@@ -101,6 +120,7 @@ class TableWidget(object):
             self.ref.removeRow(row)
         else:
             self.ref.removeRow(self.ref.rowAt(row_no))
+    
     
     def currentRow(self):
         return self.ref.currentItem().row()
@@ -138,14 +158,50 @@ class TableWidget(object):
                         keep_cells[headertext] = 'None'
                 
         return keep_cells
-        
-
-
     
+    
+    def addRows(self, row_data, start_row):
+        '''Adds the given rows to the table.
+        
+        @param row_data: list of row dictionaries containing the data for the
+               table.
+        @param start_row: the first row in the table to start entering data.
+        '''
+        for row in row_data:
+            self.addRowValues(row, start_row)
+            start_row += 1
             
+    
+    def addRowValues(self, row_dict, row_no=0):
+        '''Put values in the given dictionary into the given table where the
+        dictionary keys match the column headers of the table.
+        
+        @param row_dict: dictionary containing the values to put in the table.
+        @param table_obj: the QTableWidget object to put the values in.
+        '''
+        # Insert a new row first if needed
+        row_count = self.ref.rowCount()
+        if not row_count > row_no:
+            self.ref.insertRow(row_count)
+        
+        row = self.ref.rowAt(row_no)
+        headercount = self.ref.columnCount()
+        for x in range(0,headercount,1):
+            headertext = str(self.ref.horizontalHeaderItem(x).text())
+            if headertext in row_dict:
+                
+                # If it's a loaded variable or db ID then we need to stop 
+                # user for corrupting the data and/or database
+                if not headertext in TableWidget.EDITING_ALLOWED:
+                    self.ref.setItem(row_no, x, createQtTableItem(
+                                        str(row_dict[headertext]), False))
+                else:
+                    self.ref.setItem(row_no, x, createQtTableItem(
+                                        str(row_dict[headertext]), True))
+
         
     
-def createQtTableItem(is_editable):
+def createQtTableItem(name, is_editable):
     '''Create a QTableWidgetItem and return
     @param is_editable=False: Set editable flag.
     @return: QTableWidgetItem

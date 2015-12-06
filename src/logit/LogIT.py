@@ -217,7 +217,7 @@ class MainGui(QtGui.QMainWindow):
         '''Create a convenient holding object for the gui inputs.
         '''
         
-        self.new_entry_tables = GuiStore.TableHolder()
+        self.new_entry_tables = GuiStore.TableHolder(GuiStore.TableHolder.NEW_LOG)
         self.new_entry_tables.addTable(GuiStore.TableWidget('RUN', 
                                     'runEntryTable', self.ui.runEntryTable))
         self.new_entry_tables.addTable(GuiStore.TableWidget('TCF', 
@@ -233,7 +233,7 @@ class MainGui(QtGui.QMainWindow):
         self.new_entry_tables.addTable(GuiStore.TableWidget('DAT', 
                                     'datEntryTable', self.ui.datEntryTable))
         
-        self.view_tables = GuiStore.TableHolder()
+        self.view_tables = GuiStore.TableHolder(GuiStore.TableHolder.VIEW_LOG)
         self.view_tables.addTable(GuiStore.TableWidget('RUN', 
                             'runEntryViewTable', self.ui.runEntryViewTable))
         self.view_tables.addTable(GuiStore.TableWidget('TCF', 
@@ -496,15 +496,13 @@ class MainGui(QtGui.QMainWindow):
                 self.launchQMsgBox(title, error, 'warning')
                 return
             
-            self._clearTableWidget('view')
+            self.view_tables.clearAll()
              
             # load each of the tables from the database
             table_list = []
-            for key, table in self.ui_container['View_log'].iteritems():
-                t = table[0]
-                name = table[1]
-                table_list.append([name, key])
-             
+            for table in self.view_tables.tables.values():
+                table_list.append([table.key, table.name])
+            
             entries, success = Controller.fetchTableValues(
                                     self.settings.cur_log_path, table_list)
             
@@ -514,14 +512,11 @@ class MainGui(QtGui.QMainWindow):
                 return
              
             # Add the results to the database tables
-            for e in entries:
-                if e[2]:
-                    t = self.ui_container['View_log'][e[1]][0]
-                    t.setRowCount(e[3])
-                    count = 0
-                    for row in e[4]:
-                        self._putInTableValues(row, t, count)                    
-                        count += 1
+            for entry in entries:
+                if entry[2]:
+                    table = self.view_tables.getTable(name=entry[1])
+                    table.ref.setRowCount(entry[3])
+                    table.addRows(entry[4], 0)
             
 
     def _fillEntryTables(self, log_pages):
