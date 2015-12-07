@@ -67,6 +67,8 @@ try:
     from tmac_tools_lib.utils import FileTools
 except:
     logger.error('Cannot load tmac_tools_lib: Is it installed?')
+    
+import LogClasses
 
 # Constants for identifying log type
 TYPE_TUFLOW = 0
@@ -178,7 +180,8 @@ def loadModel(file_path, log_type):
     else:
         log_pages['DAT'] = buildDatRowFromModel(cur_date, log_pages['RUN'])
     
-    return log_pages
+    all_logs = LogClasses.AllLogs(log_pages)
+    return all_logs
 
 
 def buildRunRowFromModel(cur_date, ief_file, tuflow_model, log_type):

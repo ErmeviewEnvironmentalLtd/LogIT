@@ -556,8 +556,6 @@ class MainGui(QtGui.QMainWindow):
             
             self._updateWithUserInputs()
             
-#             error_details, self.log_pages, update_check = Controller.updateLog(
-#                                     self.settings.cur_log_path, self.log_pages)
             errors = GuiStore.ErrorHolder()
             errors, self.log_pages, update_check = Controller.updateLog(
                         self.settings.cur_log_path, self.log_pages, errors)
