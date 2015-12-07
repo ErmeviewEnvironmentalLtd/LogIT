@@ -55,87 +55,11 @@ class ErrorHolder(object):
     '''
     
     def __init__(self):
-        self.log = []
-        self.msgbox_error = None
-        self.types = self._initErrorTypes()
+        self.reset()
         
     
-    def _initErrorTypes(self):
-        '''Initialise all of the available error types.
-        '''
-        errors = {}
-        
-        #
-        title = 'Database Update Error'
-        status_bar = 'Unable to update Database with model'
-        message = status_bar
-        errors[title] = ErrorType(title, status_bar, message)
-        
-        #
-        title = 'Database Old Error'
-        status_bar = 'Unable to load database'
-        message = ('Database needs updating to latest version.'
-                   '\nUse Settings > Tools > Update Database Schema. '
-                   'See Help for details.')
-        errors[error] = ErrorType(title, status_bar, message)
-        
-        #
-        title = 'Database New Error'
-        status_bar = 'Unable to load database'
-        message = ('Database was produced with newer version of LogIT.\n'
-                   'Update to latest version of LogIT to use database.')
-        errors[error] = ErrorType(title, status_bar, message)
-        
-        #
-        title = 'Database Access Error'
-        status_bar = 'Unable to access database'
-        message = status_bar
-        errors[error] = ErrorType(title, status_bar, message)
-        
-         #
-        title = 'Model Load Error'
-        status_bar = 'Unable to load model log from file'
-        message = status_bar
-        errors[error] = ErrorType(title, status_bar, message)
-        
-        #
-        title = 'Results Already Exist Error'
-        status_bar = 'ISIS/FMP results file already exist'
-        message = status_bar
-        errors[error] = ErrorType(title, status_bar, message)
-        
-        #
-        title = 'Log Entry Exists Error'
-        status_bar = 'Selected file already exists in database'
-        message = status_bar
-        errors[error] = ErrorType(title, status_bar, message)
-        
-        #
-        title = 'IO Error'
-        status_bar = 'Unable to update Database with model'
-        message = status_bar
-        errors[error] = ErrorType(title, status_bar, message)
-        
-        #
-        title = 'Database Schema Error'
-        status_bar = 'Failed to update database scheme: See log for details'
-        message = status_bar
-        errors[error] = ErrorType(title, status_bar, message)
-        
-        #
-        title = 'Load Settings Error'
-        status_bar = 'Unable to load user settings'
-        message = status_bar
-        errors[error] = ErrorType(title, status_bar, message)
-        
-        #
-        title = 'Export to Excel Error'
-        status_bar = 'Export to Excel Failed'
-        message = 'Unable to export database to Excel - Is the file open?'
-        errors[error] = ErrorType(title, status_bar, message)
-        
-    
-    def addError(self, key, message_additional='', change_status=False):
+    def addError(self, key, msg_add='', change_status=False,
+                                                msgbox_error=False):
         '''Adds a new error to the log list.
         @param key: the key to the error. If this doesn't exist it will raise a 
                KeyError. If you want to create a new type of error either add 
@@ -147,11 +71,36 @@ class ErrorHolder(object):
         '''
         if not key in self.types:
             raise KeyError
-        error = self.errors[key].copy()
-        error.message = error.message + message_additional
-        error.status_bar = error.status_bar + message_additional
+        title = self.types[key].title+''
+        msg = self.types[key].message + msg_add
+        status_bar = msg
+        if change_status:
+            status_bar = self.types[key].status_bar + msg_add
+        error = ErrorType(title, status_bar, msg)
         error.error_found = True
         self.log.append(error)
+        self.has_errors = True
+        self.has_local_errors = True
+        if msgbox_error:
+            self.msgbox_error = error
+    
+    
+    def formatErrors(self, prologue=''):
+        '''Return the message from the error logs formatted as text.
+        Takes the message from each of the ErrorType objects stored in the
+        self.log and combines them into a single formatted text string.
+        @param prologue: string containing any text that should be prepended
+               to the output text.
+        @return: string of formatted log messages.
+        '''
+        if len(self.log) < 1:
+            return ''
+        else:
+            out_err = []
+            for l in self.log:
+                out_err.append(l.message)
+            out_err = '\n\n'.join(out_err)
+            return out_err
         
     
     def addErrorType(self, error_type, key):
@@ -160,6 +109,102 @@ class ErrorHolder(object):
         @param key: the key to use to access the error_type.
         '''
         self.types[key] = error_type
+        
+    
+    def reset(self):
+        self.log = []
+        self.msgbox_error = None
+        self.types = self._initErrorTypes()
+        self.has_errors = False
+        self.has_local_errors = False
+    
+    
+    def _initErrorTypes(self):
+        '''Initialise all of the available error types.
+        '''
+        errors = {}
+        self.DB_UPDATE = 'Database Update Error'
+        self.DB_OLD = 'Database Old Error'
+        self.DB_NEW = 'Database New Error'
+        self.DB_ACCESS = 'Database Access Error'
+        self.DB_SCHEMA = 'Database Schema Error'
+        self.MODEL_LOAD = 'Model Load Error'
+        self.RESULTS_EXIST = 'Results Already Exist Error'
+        self.LOG_EXISTS = 'Log Entry Exists Error'
+        self.IO_ERROR = 'IO Error'
+        self.SETTINGS_LOAD = 'Load Settings Error' 
+        self.EXPORT_EXCEL = 'Export to Excel Error'
+            
+        #
+        title = self.DB_UPDATE
+        status_bar = 'Unable to update Database with model '
+        message = status_bar
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        #
+        title = self.DB_OLD
+        status_bar = 'Unable to load database '
+        message = ('Database needs updating to latest version.'
+                   '\nUse Settings > Tools > Update Database Schema. '
+                   'See Help for details.')
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        #
+        title = self.DB_NEW
+        status_bar = 'Unable to load database '
+        message = ('Database was produced with newer version of LogIT.\n'
+                   'Update to latest version of LogIT to use database.')
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        #
+        title = self.DB_ACCESS
+        status_bar = 'Unable to access database '
+        message = status_bar
+        errors[title] = ErrorType(title, status_bar, message)
+        
+         #
+        title = self.MODEL_LOAD
+        status_bar = 'Unable to load model log from file '
+        message = status_bar
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        #
+        title = self.RESULTS_EXIST
+        status_bar = 'ISIS/FMP results file already exist '
+        message = status_bar
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        #
+        title = self.LOG_EXISTS
+        status_bar = 'Selected file already exists in database '
+        message = status_bar
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        #
+        title = self.IO_ERROR
+        status_bar = 'Unable to access file '
+        message = status_bar
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        #
+        title = self.DB_SCHEMA
+        status_bar = 'Failed to update database scheme: See log for details '
+        message = status_bar
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        #
+        title = self.SETTINGS_LOAD
+        status_bar = 'Unable to load user settings '
+        message = status_bar
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        #
+        title = self.EXPORT_EXCEL
+        status_bar = 'Export to Excel Failed '
+        message = 'Unable to export database to Excel - Is the file open? '
+        errors[title] = ErrorType(title, status_bar, message)
+        
+        return errors
 
 
 class ErrorType(object):

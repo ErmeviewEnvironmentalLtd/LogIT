@@ -556,12 +556,16 @@ class MainGui(QtGui.QMainWindow):
             
             self._updateWithUserInputs()
             
-            error_details, self.log_pages, update_check = Controller.updateLog(
-                                    self.settings.cur_log_path, self.log_pages)
+#             error_details, self.log_pages, update_check = Controller.updateLog(
+#                                     self.settings.cur_log_path, self.log_pages)
+            errors = GuiStore.ErrorHolder()
+            errors, self.log_pages, update_check = Controller.updateLog(
+                        self.settings.cur_log_path, self.log_pages, errors)
             
-            if error_details['Success'] == False:
-                self.launchQMsgBox(error_details['Error'], 
-                                            error_details['Message']) 
+            if errors.has_errors:
+                self.launchQMsgBox(errors.msgbox_error.title, 
+                                        errors.msgbox_error.message)
+                del errors
                 return
             
             # Add the new entries to the view table as well
@@ -574,49 +578,13 @@ class MainGui(QtGui.QMainWindow):
             # Update the status bar message
             self.ui.statusbar.showMessage("Log Database successfully updated")
             logger.info('Log Database successfully updated')
+            del errors
             
     
     def _createMultipleLogEntry(self):
         '''Takes all the files in the multiple model list, load them and add
         them to the database.        
         '''
-        def checkErrorStatus(error_details, error_list):
-            '''Look at outputs for errors and let caller know.
-            '''
-            error_found = False
-            if error_details['Success'] == False:
-                error_list.append(error_details)
-                error_found = True
-             
-            return error_found, error_list
-        
-
-        def writeErrorLogs(load_errors):
-            '''Write logs to GUI if any errors found
-            '''
-            if len(load_errors) < 1: 
-                # Let the user know that all is good
-                logger.info('Log Database updated successfully')
-                self.ui.statusbar.showMessage("Log Database successfully updated")
-            
-            else:
-                # Collect all of the errors and show to user
-                logger.warning('One or more models could not be loaded')
-                error_files = []
-                for e in load_errors:
-                    error_files.append(e['Message'])
-                error_files.insert(0, 
-                        'Models not logged:\n')
-                errors = '\n\n'.join(error_files)
-                
-                self.ui.multiModelLoadErrorTextEdit.setText(errors)
-                
-                # Reset the progress stuff
-                prog_mon.reset('Complete')
-                    
-                QtGui.QMessageBox.warning(self, 'Logging Error:',
-                            'See Error Logs window for details')
-            
             
         # Check that we have a database
         if not self.checkDbLoaded(): return
@@ -632,7 +600,7 @@ class MainGui(QtGui.QMainWindow):
         
         # Load all of the models into a list
         model_logs = []
-        load_errors = []
+        errors = GuiStore.ErrorHolder()
         
         # Setup the progress monitor. It updates prgress bars etc
         total = len(model_paths)
@@ -646,12 +614,13 @@ class MainGui(QtGui.QMainWindow):
             
             prog_mon.update()
             
-            error_details, log_pages = Controller.fetchAndCheckModel(
-                self.settings.cur_log_path, path, log_type, launch_error=False)
+            errors, log_pages = Controller.fetchAndCheckModel(
+                       self.settings.cur_log_path, path, log_type, 
+                            errors, launch_error=False)
             
             # Go to next if we find an error
-            error_found, load_errors = checkErrorStatus(error_details, load_errors)
-            if error_found: continue
+            if errors.has_local_errors:
+                continue
             
             prog_mon.update(bar_only=True)
             
@@ -659,19 +628,28 @@ class MainGui(QtGui.QMainWindow):
             log_pages = self._getInputLogVariables(log_pages)
 
             # Update the log entries
-            error_details, self.log_pages, update_check = Controller.updateLog(
+            errors, self.log_pages, update_check = Controller.updateLog(
                                 self.settings.cur_log_path, log_pages, 
-                                check_new_entries=True)
+                                errors, check_new_entries=True)
             
-            error_found, load_errors = checkErrorStatus(error_details, load_errors)
-            if error_found: continue
+            if errors.has_local_errors:
+                errors.has_local_errors = False
+                continue
             
             # Add the new entries to the view table as well
             self.updateLogTable(update_check)
             
         # Clear the list entries
         self.ui.loadMultiModelTable.setRowCount(0)
-        writeErrorLogs(load_errors)
+        if errors.has_errors:
+            text = errors.formatErrors('Some models could not be logged:')
+            self.ui.multiModelLoadErrorTextEdit.setText(text)
+            QtGui.QMessageBox.warning(self, 'Logging Error:',
+                            'See Error Logs window for details')
+        else:
+            logger.info('Log Database updated successfully')
+            self.ui.statusbar.showMessage("Log Database successfully updated")
+                
         prog_mon.reset('Complete')
         
     
@@ -843,7 +821,7 @@ class MainGui(QtGui.QMainWindow):
         if open_path == False:
             return None
         
-        errors = Controller.updateDatabaseVersion()
+        errors = Controller.updateDatabaseVersion(open_path)
         if errors == None:
             return
         elif errors['Success'] == False:

@@ -227,7 +227,7 @@ class SubLog(object):
         del self.contents[index]
 
 
-def updateLog(db_path, log_pages, check_new_entries=False):
+def updateLog(db_path, log_pages, errors, check_new_entries=False):
     '''Updates the log database with the current value of log_pages.
     
     This is just an entry function that connects to the database and and then
@@ -243,8 +243,6 @@ def updateLog(db_path, log_pages, check_new_entries=False):
     '''
     # Connect to the database and then update the log entries
     conn = False
-    error_found = False
-    error_details = {'Success': True}
     update_check = None
     try:
         conn = DatabaseFunctions.loadLogDatabase(db_path)
@@ -252,22 +250,18 @@ def updateLog(db_path, log_pages, check_new_entries=False):
                                                   check_new_entries)
     except IOError:
         logger.error('Unable to access database')
-        error_found = False
-        error_details = {'Success': False, 
-            'Status_bar': "Unable to update Database with model: %s" % db_path,
-            'Error': 'Database Error', 
-            'Message': "Unable to update Database with model: %s" % db_path}
+        errors.addError(errors.DB_ACCESS, msgbox_error=True, 
+                                        msg_add=(':\n%s' % (db_path)))
+
     except:
         logger.error('Error updating database -  See log for details')
-        error_found = False
-        error_details = {'Success': False, 
-            'Status_bar': "Unable to update Database with model: %s" % db_path,
-            'Error': 'Database Error', 
-            'Message': "Unable to update Database with model: %s" % db_path}
+        errors.addError(errors.DB_UPDATE, msgbox_error=True, 
+                                        msg_add=':\n%s' % (db_path))
+
     finally:
         if not conn == False:
             conn.close()
-        return error_details, log_pages, update_check
+        return errors, log_pages, update_check
  
 
 def logEntryUpdates(conn, log_pages, check_new_entries=False):
@@ -602,6 +596,8 @@ def checkDatabaseVersion(db_path):
             # Need to check that the database is aligned with the current version
             version_check = DatabaseFunctions.checkDatabaseVersion(db_path)
             if version_check == DatabaseFunctions.DATABASE_VERSION_LOW:
+#                 errors.DB_ACCESS, msgbox_error=True, 
+#                                         msg_add=(':\n%s' % (db_path))
                 logger.error('Database version is old - please update database')
                 msg = ("Unable to load model log from file at: %s\nDatabase" 
                        " needs updating to latest version.\nUse Settings >"
@@ -664,7 +660,7 @@ def fetchTableValues(db_path, table_list):
         conn.close()
  
 
-def fetchAndCheckModel(db_path, open_path, log_type, launch_error=True):
+def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
     '''Loads a model and makes a few conditional checks on it.
     Loads model from the given .tcf/.ief file and checks that the .ief, 
     .tcf and ISIS results don't already exist in the DB and then returns
@@ -680,15 +676,11 @@ def fetchAndCheckModel(db_path, open_path, log_type, launch_error=True):
              the load status and messages for status bars and errors.
     '''
     
-    error_details = {'Success': True}
     # Load the model at the chosen path.
     log_pages = LogBuilder.loadModel(open_path, log_type)
     if log_pages == False:
-        error_details = {'Success': False, 
-                    'Status_bar': "Unable to load model at: %s" % open_path,
-                     'Error': 'LoadError', 
-                    'Message': 'Selected file could not be loaded - file: %s.' % open_path}
-        return error_details, log_pages
+        error.addError(errors.MODEL_LOAD, msg_add=('at:\n%s' % (open_path)))
+        return errors, log_pages
     else:
         # Make sure that this ief or tcf do not already exist in the
         # database. You need new ones for each run so this isn't
@@ -717,11 +709,9 @@ def fetchAndCheckModel(db_path, open_path, log_type, launch_error=True):
                              only_col_name=True)
                     
                     if exists[0]:
-                        error_details = {'Success': False, 
-                        'Status_bar': "ISIS/FMP results file already exists in %s" % (main_ief),
-                         'Error': 'Results Location Exists', 
-                        'Message': 'ISIS/FMP results file already exists in %s' % (main_ief)}
-                        return error_details, log_pages
+                        errors.addError(errors.RESULTS_EXIST, 
+                                        msg_add=('in:\n%s' % (main_ief)))
+                        return errors, log_pages
     #                     button = QtGui.QMessageBox.question(self, 
     #                             "ISIS/FMP Results Folder Already Exists",
     #                             "Results folder location found in previous " +
@@ -743,30 +733,20 @@ def fetchAndCheckModel(db_path, open_path, log_type, launch_error=True):
                     found_path = main_tcf
             
             if indb[0]:
-                error_details =  {'Success': False, 
-                    'Status_bar': "Unable to load model at: %s" % open_path,
-                     'Error': 'LoadError', 
-                    'Message': 'Selected file already exists in database - file: %s.' % found_path}
-                return error_details, log_pages
+                errors.addError(errors.LOG_EXISTS, 
+                                        msg_add=(':\nfile = %s' % (open_path)))
+                return errors, log_pages
             else:
-                error_details = {'Success': True, 
-                    'Status_bar': "Loaded model at: %s" % open_path,
-                     'Error': None, 
-                    'Message': None}
-                return error_details, log_pages
+                return errors, log_pages
                     
         except IOError:
-            error_details = {'Success': False, 
-                    'Status_bar': "Unable to update Database with model: %s" % open_path,
-                     'Error': 'IO Error', 
-                    'Message': "Unable to load model from file at: %s" % open_path}
-            return error_details, log_pages
+            errors.addError(errors.IO_ERROR, 
+                                        msg_add=('at:\n%s' % (open_path)))
+            return errors, log_pages
         except:
-            error_details = {'Success': False, 
-                'Status_bar': "Unable to update Database with model: %s" % open_path,
-                'Error': 'IO Error', 
-                'Message': "Unable to load model from file at: %s" % open_path}
-            return error_details, log_pages
+            errors.addError(errors.IO_ERROR, 
+                                        msg_add=('at:\n%s' % (open_path)))
+            return errors, log_pages
         
 
 def updateDatabaseVersion(db_path):
@@ -790,7 +770,7 @@ def updateDatabaseVersion(db_path):
 #         return None
     
     try:
-        DatabaseFunctions.updateDatabaseVersion(open_path)
+        DatabaseFunctions.updateDatabaseVersion(db_path)
         return error_details
     except:
         logger.error('Failed to update database scheme: See log for details')
