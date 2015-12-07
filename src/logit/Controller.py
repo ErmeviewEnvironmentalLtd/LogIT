@@ -794,7 +794,7 @@ def loadSetup(cur_settings_path, cur_log_path, errors):
         return cur_settings, errors
     
     
-def exportToExcel(save_path, export_tables):
+def exportToExcel(db_path, export_tables, save_path, errors):
     '''Export database to Excel (.xls) format at user chosen location.
     @param cur_log_path: the current log database file path.
     @param export_tables: list with order to create worksheet.
@@ -802,9 +802,8 @@ def exportToExcel(save_path, export_tables):
             error_details['Success'] is True.
     @note: launches file dialog.
     '''
-    error_details = {'Success': True}
     try:
-        Exporters.exportToExcel(cur_log_path, export_tables, save_path)
+        Exporters.exportToExcel(db_path, export_tables, save_path)
     except:
         logger.error('Could not export log to Excel')
         errors.addError(errors.EXPORT_EXCEL, msgbox_error=True)

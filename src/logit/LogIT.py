@@ -892,25 +892,27 @@ class MainGui(QtGui.QMainWindow):
         '''
         if self.checkDbLoaded():
             d = MyFileDialogs()
-            save_path = d.saveFileDialog(path=os.path.split(cur_log_path)[0], 
-                                         file_types='Excel File (*.xls)')
+            save_path = d.saveFileDialog(path=os.path.split(
+                                        self.settings.cur_log_path)[0], 
+                                        file_types='Excel File (*.xls)')
             if save_path == False:
                 return
 
             save_path = str(save_path)
             errors = GuiStore.ErrorHolder()
-            errors = Controller.exportToExcel(save_path, self.export_tables,
+            errors = Controller.exportToExcel(self.settings.cur_log_path, 
+                                              self.export_tables, save_path,
                                                                     errors)
             
             if errors.has_errors:
                 self.launchQMsgBox(errors.msgbox_error.title, 
                                    errors.msgbox_error.message)
-                self.ui.statusbar.showMessage(error.msgbox_errors.status_bar)
+                self.ui.statusbar.showMessage(errors.msgbox_error.status_bar)
             else:
                 self.launchQMsgBox('Export Complete', 
                     'Database exported to Excel (.xls) at:\n%s' % (save_path), 
                                                                     'info')
-                self.ui.status_bar.showMessage('Database exported to Excel')
+                self.ui.statusbar.showMessage('Database exported to Excel')
                 
         else:
             logger.warning('Cannot export log - no database loaded')
@@ -986,9 +988,9 @@ class MainGui(QtGui.QMainWindow):
                     self.settings.cur_log_path, open_path, log_type, errors)
     
                 if errors.has_errors:
-                    self.launchQMsgBox(errors.msgbox_errors.title, 
-                                       errors.msgbox_errors.message)
-                    self.ui.statusbar.showMessage(errors.msgbox_errors.status_bar)
+                    self.launchQMsgBox(errors.msgbox_error.title, 
+                                       errors.msgbox_error.message)
+                    self.ui.statusbar.showMessage(errors.msgbox_error.status_bar)
                 else:
                     self.ui.statusbar.showMessage('Loaded model at: %s' % open_path)
                     self._fillEntryTables(log_pages)
