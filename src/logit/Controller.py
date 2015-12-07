@@ -762,18 +762,6 @@ def updateDatabaseVersion(db_path, errors):
              error_details['Success'] = True if all good or False otherwise.
              If False then other dict items contain details.
     '''
-#     d = MyFileDialogs()
-#     if not self.checkDbLoaded():
-#         open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
-#                                     file_types='LogIT database(*.logdb)'))
-#     else:
-#         open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, 
-#                                     file_types='LogIT database(*.logdb)'))
-#     
-#     # User cancel return
-#     if open_path == False:
-#         return None
-    
     try:
         DatabaseFunctions.updateDatabaseVersion(db_path)
         return errors
@@ -783,27 +771,27 @@ def updateDatabaseVersion(db_path, errors):
         return errors
     
     
-def loadSetup(cur_settings_path, cur_log_path):
+def loadSetup(cur_settings_path, cur_log_path, errors):
     '''Load LogIT setup from file.
     '''
     d = MyFileDialogs()
     open_path = d.openFileDialog(path=os.path.split(cur_log_path)[0], 
                         file_types='Log Settings (*.logset)')
     
+    cur_settings = None
     if open_path == False:
-        return False, None, None
+        return cur_settings, errors
     try:
         # Load the settings dictionary
         open_path = str(open_path)
         cur_settings = cPickle.load(open(open_path, "rb"))
         cur_settings.cur_settings_path = cur_settings_path
-        return cur_settings, None, None
+        return cur_settings, errors
     except:
-        msg = "Unable to load user settings from: %s" % (open_path)
-        logging.info(msg)
+        errors.addError(errors.SETTINGS_LOAD, msg_add='from:\n%s' % (open_path),
+                                                            msgbox_error=True)
         logger.error('Could not load settings file')
-        title = "Load Failed"
-        return False, title, msg
+        return cur_settings, errors
     
     
 def exportToExcel(save_path, export_tables):
@@ -815,28 +803,15 @@ def exportToExcel(save_path, export_tables):
     @note: launches file dialog.
     '''
     error_details = {'Success': True}
-#     d = MyFileDialogs()
-#     save_path = d.saveFileDialog(path=os.path.split(cur_log_path)[0], 
-#                                  file_types='Excel File (*.xls)')
-#     save_path = str(save_path)
-#     
-#     if not save_path == False:
     try:
         Exporters.exportToExcel(cur_log_path, export_tables, save_path)
     except:
         logger.error('Could not export log to Excel')
-        error_details = {'Success': False, 
-            'Status_bar': "Export to Excel Failed",
-            'Error': "Export Failed", 
-            'Message': "Unable to export database to Excel - Is the file open?"}
-        return error_details
+        errors.addError(errors.EXPORT_EXCEL, msgbox_error=True)
+        return errors
    
     logger.info('Database exported to Excel at:\n%s' % (save_path))
-    error_details = {'Success': True, 
-            'Status_bar': "Database exported to Excel at: %s." % save_path,
-            'Error': "Export Failed", 
-            'Message': "Database exported to Excel at: %s." % save_path}
-    return error_details
+    return errors
 
 
     

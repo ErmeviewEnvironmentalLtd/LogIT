@@ -784,12 +784,13 @@ class MainGui(QtGui.QMainWindow):
     def _loadSetup(self):
         '''Load LogIT setup from file.
         '''
-        settings, err_title, err_msg = Controller.loadSetup(
+        settings, errors = Controller.loadSetup(
                 self.settings.cur_settings_path, self.settings.cur_log_path)
          
-        if settings == False:
-            if not err_title == None:
-                QtGui.QMessageBox.warning(self, err_title, err_msg)
+        if settings == None:
+            if errors.has_errors:
+                QtGui.QMessageBox.warning(self, errors.msgbox_error.title, 
+                                                error.msgbox_error.message)
             return
         else:
             self.settings = settings
@@ -897,16 +898,20 @@ class MainGui(QtGui.QMainWindow):
                 return
 
             save_path = str(save_path)
-            err_details = Controller.exportToExcel(save_path, 
-                                                   self.export_tables)
+            errors = GuiStore.ErrorHolder()
+            errors = Controller.exportToExcel(save_path, self.export_tables,
+                                                                    errors)
             
-            if err_details['Success'] == False:
-                self.launchQMsgBox(err_details['Error'], err_details['Message'])
-                self.ui.statusbar.showMessage(err_details['Status_bar'])
+            if errors.has_errors:
+                self.launchQMsgBox(errors.msgbox_error.title, 
+                                   errors.msgbox_error.message)
+                self.ui.statusbar.showMessage(error.msgbox_errors.status_bar)
             else:
-                self.launchQMsgBox(err_details['Error'], 
-                                   err_details['Message'], 'info')
-                self.ui.statusbar.showMessage(err_details['Status_bar'])
+                self.launchQMsgBox('Export Complete', 
+                    'Database exported to Excel (.xls) at:\n%s' % (save_path), 
+                                                                    'info')
+                self.ui.status_bar.showMessage('Database exported to Excel')
+                
         else:
             logger.warning('Cannot export log - no database loaded')
             QtGui.QMessageBox.warning(self, "Cannot Export Log",
