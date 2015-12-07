@@ -981,15 +981,16 @@ class MainGui(QtGui.QMainWindow):
                 # Get the log type index
                 log_type = self.ui.loadModelComboBox.currentIndex()
                 
-                result, log_pages = Controller.fetchAndCheckModel(
-                    self.settings.cur_log_path, open_path, log_type)
+                errors = GuiStore.ErrorHolder()
+                errors, log_pages = Controller.fetchAndCheckModel(
+                    self.settings.cur_log_path, open_path, log_type, errors)
     
-                if result['Success'] == False:
-                    QtGui.QMessageBox.warning(self, result['Error'],
-                    result['Message'])
-                    self.ui.statusbar.showMessage(result['Status_bar'])
+                if errors.has_errors:
+                    self.launchQMsgBox(errors.msgbox_errors.title, 
+                                       errors.msgbox_errors.message)
+                    self.ui.statusbar.showMessage(errors.msgbox_errors.status_bar)
                 else:
-                    self.ui.statusbar.showMessage(result['Status_bar'])
+                    self.ui.statusbar.showMessage('Loaded model at: %s' % open_path)
                     self._fillEntryTables(log_pages)
                     self.ui.submitSingleModelGroup.setEnabled(True) 
 
