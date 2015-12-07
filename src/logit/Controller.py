@@ -58,6 +58,7 @@ import LogBuilder
 import Exporters
 
 import logging
+from email import Errors
 logger = logging.getLogger(__name__)
 
 
@@ -679,6 +680,7 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
     # Load the model at the chosen path.
     log_pages = LogBuilder.loadModel(open_path, log_type)
     if log_pages == False:
+        logger.error('Unable to load model file:\n%s' % (open_path))
         error.addError(errors.MODEL_LOAD, msg_add=('at:\n%s' % (open_path)))
         return errors, log_pages
     else:
@@ -709,6 +711,7 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
                              only_col_name=True)
                     
                     if exists[0]:
+                        logger.error('Model results alreads exist for :\n%s' % (main_ief))
                         errors.addError(errors.RESULTS_EXIST, 
                                         msg_add=('in:\n%s' % (main_ief)))
                         return errors, log_pages
@@ -733,6 +736,7 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
                     found_path = main_tcf
             
             if indb[0]:
+                logger.error('Log entry already exists for :\n%s' % (open_path))
                 errors.addError(errors.LOG_EXISTS, 
                                         msg_add=(':\nfile = %s' % (open_path)))
                 return errors, log_pages
@@ -740,23 +744,24 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
                 return errors, log_pages
                     
         except IOError:
+            logger.error('Cannot load file:\n%s' % (open_path))
             errors.addError(errors.IO_ERROR, 
                                         msg_add=('at:\n%s' % (open_path)))
             return errors, log_pages
         except:
+            logger.error('Cannot load file:\n%s' % (open_path))
             errors.addError(errors.IO_ERROR, 
                                         msg_add=('at:\n%s' % (open_path)))
             return errors, log_pages
         
 
-def updateDatabaseVersion(db_path):
+def updateDatabaseVersion(db_path, errors):
     '''Try to update database to latest version.
     @param db_path: path to the database to update.
     @return: None if user cancels or error_details otherwise. These can be:
              error_details['Success'] = True if all good or False otherwise.
              If False then other dict items contain details.
     '''
-    error_details = {'Success': True}
 #     d = MyFileDialogs()
 #     if not self.checkDbLoaded():
 #         open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
@@ -771,16 +776,13 @@ def updateDatabaseVersion(db_path):
     
     try:
         DatabaseFunctions.updateDatabaseVersion(db_path)
-        return error_details
+        return errors
     except:
         logger.error('Failed to update database scheme: See log for details')
-        error_details = {'Success': False, 
-                'Status_bar': "Database Update Failed",
-                'Error': 'Database Error', 
-                'Message': "Failed to update database scheme: See log for details"}
-        return error_details
-                        
-        
+        errors.addError(errors.DB_SCHEMA, msgbox_error=True)
+        return errors
+    
+    
 def loadSetup(cur_settings_path, cur_log_path):
     '''Load LogIT setup from file.
     '''

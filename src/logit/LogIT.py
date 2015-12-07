@@ -820,13 +820,11 @@ class MainGui(QtGui.QMainWindow):
         # User cancel return
         if open_path == False:
             return None
-        
-        errors = Controller.updateDatabaseVersion(open_path)
-        if errors == None:
-            return
-        elif errors['Success'] == False:
-            msg = "Failed to update database scheme: See log for details"
-            self.launchQMsgBox('Database Update Failed', message)
+        errors = GuiStore.ErrorHolder()
+        errors = Controller.updateDatabaseVersion(open_path, errors)
+        if errors.has_errors:
+            self.launchQMsgBox(errors.msgbox_error.title, 
+                                            errors.msgbox_error.message)
         else:
         
             msg = "Update Successfull\nWould you like to load updated database?"
@@ -838,8 +836,8 @@ class MainGui(QtGui.QMainWindow):
                     self.ui.statusbar.showMessage("Current log: " + open_path)
                 except:
                     logger.error('Cannot load database: see log for details')
-                    msg = "Failed to open database: See log for details"
-                    self.launchQMsgBox('Database Update Failed', message)
+                    self.launchQMsgBox(errors.types[errors.DB_UPDATE].title, 
+                                       errors.types[errors.DB_UPDATE].message)
                     self.settings.cur_log_path = temp
     
     
