@@ -46,17 +46,34 @@ class AllLogs(object):
     '''Container class for all of the SubLog objects.
     '''
     
+    
     SINGLE_FILE = ['RUN', 'DAT']
     
     def __init__(self, log_pages):
         '''Create new SubLog and set multi_file.
         '''
+        self.editing_allowed = ['COMMENTS', 'MODELLER', 'SETUP', 'DESCRIPTION',
+                           'EVENT_NAME', 'EVENT_DURATION', 'ISIS_BUILD',
+                           'TUFLOW_BUILD', 'AMENDMENTS']
+        self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 'BC_DBASE']
+
         self.log_pages = {}        
         for key, page in log_pages.iteritems():
             if key in AllLogs.SINGLE_FILE:
                 self.log_pages[key] = SubLog(key, page, False)
             else:
                 self.log_pages[key] = SubLog(key, page, True)
+    
+    
+    def getLogEntryContents(self, key, index=None):
+        '''Get the log entry at the given key and index.
+        @param key: the key to the SubLog entry.
+        @param index=None: the index in the contents list to return.
+        '''
+        if index == None:
+            return self.log_pages[key].contents
+        else:
+            return self.log_pages[key].contents[index]
     
     def getLogDictionary(self):
         '''Return all logs in class as a dictionary.
@@ -134,6 +151,13 @@ class SubLog(object):
                     return False
 
         return True
+    
+    
+    def updateValues(self, row, index):
+        '''
+        '''
+        self.contents[index] = row
+    
     
     def bracketFiles(self, index, key, files=None):
         '''Encloses all of the files, under a certain key, in brackets.

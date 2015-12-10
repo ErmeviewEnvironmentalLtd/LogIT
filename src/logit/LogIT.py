@@ -204,6 +204,7 @@ class MainGui(QtGui.QMainWindow):
         # database that the user had open
         self.loadModelLog()
         self.log_pages = None
+        self.all_logs = None
         
         self.setWindowIcon(QtGui.QIcon(':Logit_Logo2_25x25.png'))
         
@@ -499,7 +500,7 @@ class MainGui(QtGui.QMainWindow):
                     table.addRows(entry[4], 0)
             
 
-    def _fillEntryTables(self, log_pages):
+    def _fillEntryTables(self, all_logs):
         '''Add the log pages data to the log entry tables that will be
         displayed to the user for amending prior to updating the database.
         
@@ -508,8 +509,9 @@ class MainGui(QtGui.QMainWindow):
         # Reset the tables first
         self.new_entry_tables.clearAll()
         
-        self.log_pages = log_pages
-        log_pages = self._getInputLogVariables(log_pages)
+        #self.log_pages = log_pages
+        self.all_logs = all_logs
+        all_logs = self._getInputLogVariables(all_logs)
         
         # Create a list of all of the available tables and their names
         table_list = []
@@ -518,13 +520,14 @@ class MainGui(QtGui.QMainWindow):
             table_list.append([table.key, table.name])
         
         # Update RUN seperately as it's treated in a different way to others
-        self.new_entry_tables.tables['RUN'].addRowValues(log_pages['RUN'])
+        self.new_entry_tables.tables['RUN'].addRowValues(
+                                            all_logs.getLogEntryContents('RUN', 0)) #log_pages['RUN'])
         self.new_entry_tables.tables['RUN'].setEditColors(0)
         
         # check the new entries against the database and return them with
         # flags set for whether they are new entries or already exist
         entries = Controller.loadEntrysWithStatus(
-                            self.settings.cur_log_path, log_pages, table_list)
+                            self.settings.cur_log_path, all_logs, table_list)
         
         # Add the entries to the gui tables with editable status set
         for entry in entries:
@@ -533,16 +536,17 @@ class MainGui(QtGui.QMainWindow):
             table.setEditColors(entry[2], entry[3])
 
     
-    def _getInputLogVariables(self, log_pages):
+    def _getInputLogVariables(self, all_logs):
         '''Put the variables entered by the user in the Input log variables
         group into the log_pages dictionary.
         '''
-        log_pages['RUN']['MODELLER'] = str(self.ui.modellerTextbox.text())
-        log_pages['RUN']['TUFLOW_BUILD'] = str(self.ui.tuflowVersionTextbox.text())
-        log_pages['RUN']['ISIS_BUILD'] = str(self.ui.isisVersionTextbox.text())
-        log_pages['RUN']['EVENT_NAME'] = str(self.ui.eventNameTextbox.text())
+        run = all_logs.getLogEntryContents('RUN', 0)
+        run['MODELLER'] = str(self.ui.modellerTextbox.text())
+        run['TUFLOW_BUILD'] = str(self.ui.tuflowVersionTextbox.text())
+        run['ISIS_BUILD'] = str(self.ui.isisVersionTextbox.text())
+        run['EVENT_NAME'] = str(self.ui.eventNameTextbox.text())
         
-        return log_pages
+        return all_logs
         
         
     def _createLogEntry(self):
@@ -552,13 +556,14 @@ class MainGui(QtGui.QMainWindow):
         # Check that we have a database
         if not self.checkDbLoaded(): return
 
-        if not self.log_pages == None:
+        #if not self.log_pages == None:
+        if not self.all_logs == None:
             
             self._updateWithUserInputs()
             
             errors = GuiStore.ErrorHolder()
-            errors, self.log_pages, update_check = Controller.updateLog(
-                        self.settings.cur_log_path, self.log_pages, errors)
+            errors, self.all_logs, update_check = Controller.updateLog(
+                        self.settings.cur_log_path, self.all_logs, errors)
             
             if errors.has_errors:
                 self.launchQMsgBox(errors.msgbox_error.title, 
@@ -612,7 +617,7 @@ class MainGui(QtGui.QMainWindow):
             
             prog_mon.update()
             
-            errors, log_pages = Controller.fetchAndCheckModel(
+            errors, all_logs = Controller.fetchAndCheckModel(
                        self.settings.cur_log_path, path, log_type, 
                             errors, launch_error=False)
             
@@ -623,11 +628,11 @@ class MainGui(QtGui.QMainWindow):
             prog_mon.update(bar_only=True)
             
             # Get the global user supplied log variables
-            log_pages = self._getInputLogVariables(log_pages)
+            all_logs = self._getInputLogVariables(all_logs)
 
             # Update the log entries
-            errors, self.log_pages, update_check = Controller.updateLog(
-                                self.settings.cur_log_path, log_pages, 
+            errors, self.all_logs, update_check = Controller.updateLog(
+                                self.settings.cur_log_path, all_logs, 
                                 errors, check_new_entries=True)
             
             if errors.has_local_errors:
@@ -658,62 +663,34 @@ class MainGui(QtGui.QMainWindow):
             This function is a prime example of why the log_pages dictionary
             needs converting to an object such as that used in Controller.
         '''
-        # Fetch the values that have editing allowed from the form tables
-        # These only have single entries
-        updates = {}
-        updates['RUN'] = self.new_entry_tables.tables['RUN'].getValues()
-        updates['DAT'] = self.new_entry_tables.tables['DAT'].getValues()
-        
-        # The others can have multiple entries
-        for table in self.new_entry_tables.tables.values():
-            if table.key == 'RUN' or table.key == 'DAT': continue
+        for log in self.all_logs.log_pages.values():
+            if not log.has_contents: 
+                continue
             
-            updates[table.key] = []
-            if not self.log_pages[table.key] == None:
-                for i, entry in enumerate(self.log_pages[table.key], 0):
-                    updates[table.key].append(table.getValues(row_no=1))
+            for i, row in enumerate(log.contents, 1):
+                table_row = self.new_entry_tables.tables[log.name].getValues(i)
+
+                for key, entry in table_row.iteritems():
+                    row[key] = entry
         
-        # Loop through the updates entries and amend any corresponding log_pages
-        for key, val in updates.iteritems():
-            if key == 'TGC' or key == 'TBC' or key == 'ECF' or \
-                                    key == 'BC_DBASE' or key == 'TCF':
-                
-                # In this case val is a list
-                for i, input_dict in enumerate(val, 0):
-                    for item in input_dict:
-                        if not self.log_pages[key] == None and \
-                            not self.log_pages[key][i] == None and \
-                                item in self.log_pages[key][i]:
-                            self.log_pages[key][i][item] = val[i][item]
-            else:
-                for v in val:
-                    if not self.log_pages[key] == None and v in self.log_pages[key]:
-                        self.log_pages[key][v] = val[v]
-            
     
     def updateLogTable(self, update_check):
         '''Updates the log tables on the log view tab.
         '''
         update_check['RUN'] = True
-        
+          
         for table in self.view_tables.tables.values():
-            
+             
             # Make sure that we have something to update
             if not update_check[table.key] == False:
                 last_row = table.ref.rowCount()
-                
-                # Need to loop through possible multiple rows in these
-                if not table.key == 'RUN' and not table.key == 'DAT':
-                    tab_length = len(self.log_pages[table.key])
-                    for i in range(0, tab_length):
-                        table.ref.setRowCount((last_row + 1))
-                        table.addRowValues(self.log_pages[table.key][i],
-                                                                    last_row)
-                        last_row += 1
-                else:
-                    table.ref.setRowCount(last_row + 1)
-                    table.addRowValues(self.log_pages[table.key], last_row)
-                    
+                 
+                # Loop through each entry in the list for each key
+                for row in self.all_logs.log_pages[table.key].contents:
+                    table.ref.setRowCount((last_row + 1))
+                    table.addRowValues(row, last_row)
+                    last_row += 1
+
 
     def _loadSettings(self):
         '''Get the settings loaded from file if they exist.
@@ -982,7 +959,7 @@ class MainGui(QtGui.QMainWindow):
                 log_type = self.ui.loadModelComboBox.currentIndex()
                 
                 errors = GuiStore.ErrorHolder()
-                errors, log_pages = Controller.fetchAndCheckModel(
+                errors, self.all_logs = Controller.fetchAndCheckModel(
                     self.settings.cur_log_path, open_path, log_type, errors)
     
                 if errors.has_errors:
@@ -991,7 +968,7 @@ class MainGui(QtGui.QMainWindow):
                     self.ui.statusbar.showMessage(errors.msgbox_error.status_bar)
                 else:
                     self.ui.statusbar.showMessage('Loaded model at: %s' % open_path)
-                    self._fillEntryTables(log_pages)
+                    self._fillEntryTables(self.all_logs)
                     self.ui.submitSingleModelGroup.setEnabled(True) 
 
 

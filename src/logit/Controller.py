@@ -228,14 +228,14 @@ class AddedRows(object):
 #         del self.contents[index]
 
 
-def updateLog(db_path, log_pages, errors, check_new_entries=False):
+def updateLog(db_path, all_logs, errors, check_new_entries=False):
     '''Updates the log database with the current value of log_pages.
     
     This is just an entry function that connects to the database and and then
     call logEntryUpdates to do all of the hard work. It deals with handling
     any errors that might pop up and notifying the caller.
     @param dp_path: the path to the log database on file.
-    @param log_pages: log pages dictionary.
+    @param all_logs: AllLogs object.
     @param check_new_entries=False: Flag identifying whether the values in the
            log_pages entries should be checked against the database before they
            are entered. i.e. make sure they don't alreay exist first. This is
@@ -247,7 +247,7 @@ def updateLog(db_path, log_pages, errors, check_new_entries=False):
     update_check = None
     try:
         conn = DatabaseFunctions.loadLogDatabase(db_path)
-        log_pages, update_check = logEntryUpdates(conn, log_pages,
+        all_logs, update_check = logEntryUpdates(conn, all_logs,
                                                   check_new_entries)
     except IOError:
         logger.error('Unable to access database')
@@ -262,10 +262,10 @@ def updateLog(db_path, log_pages, errors, check_new_entries=False):
     finally:
         if not conn == False:
             conn.close()
-        return errors, log_pages, update_check
+        return errors, all_logs, update_check
  
 
-def logEntryUpdates(conn, log_pages, check_new_entries=False):
+def logEntryUpdates(conn, all_logs, check_new_entries=False):
     '''Update the database with the current status of the log_pages dictionary.
     
     This creates a callback function and hands it to loopLogPages method,
@@ -276,7 +276,7 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
     avoid any corruption. This will be logged so the user is aware.
     
     @param conn: an open database connection.
-    @param log_pages: dictionary containing the the data to enter into the 
+    @param all_logs: AllLogs object containing the the data to enter into the 
            database under the database table names.
     @param check_new_entries=False: new entry status may be checked before 
            getting to this stage and we don't want to do it twice.
@@ -360,7 +360,7 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
         return page, callback_args
             
     # Class to hold all the log page objects
-    all_logs = AllLogs(log_pages)  
+    #all_logs = AllLogs(log_pages)  
 
     # Collects all files added to database for resetting
     added_rows = AddedRows()
@@ -372,9 +372,9 @@ def logEntryUpdates(conn, log_pages, check_new_entries=False):
         
         
         # Get the data from the classes in dictionary format
-        log_pages = all_logs.getLogDictionary()
+        #log_pages = all_logs.getLogDictionary()
         update_check = all_logs.getUpdateCheck()
-        return log_pages, update_check
+        return all_logs, update_check
     
     # This acts as a failsafe incase we hit an error after some of the entries
     # were already added to the database. It tries to roll back the entries by
@@ -426,7 +426,7 @@ def loopLogPages(conn, all_logs, callback, callback_args):
     return all_logs, callback_args
     
 
-def loadEntrysWithStatus(db_path, log_pages, table_list):
+def loadEntrysWithStatus(db_path, all_logs, table_list):
     '''Loads the database and checks if the new entries exist.
     
     Builds a new list that stores the log_pages entry for each row as well as
@@ -435,7 +435,7 @@ def loadEntrysWithStatus(db_path, log_pages, table_list):
     Uses the findNewLogEntries function to fo the hard work.
     
     @param db_path: path to a database on file.
-    @param log_pages: the log_pages dictionary with loaded model variables.
+    @param all_logs: the all_logs object containing loaded model variables.
     @param table_list: a list of all of the keys for accessing thetables in the 
            'New log Entry' page of the GUI and the associated db tables.
     @return: list containing sub-lists of all of the rows to be displayed on
@@ -448,7 +448,7 @@ def loadEntrysWithStatus(db_path, log_pages, table_list):
     try:
         conn = DatabaseFunctions.loadLogDatabase(db_path)
         entries = []
-        log_pages, entries = findNewLogEntries(conn, log_pages, table_list)
+        all_logs, entries = findNewLogEntries(conn, all_logs, table_list)
         
         return entries
             
@@ -461,7 +461,7 @@ def loadEntrysWithStatus(db_path, log_pages, table_list):
             conn.close()
 
 
-def findNewLogEntries(conn, log_pages, table_list):
+def findNewLogEntries(conn, all_logs, table_list):
     '''Checks entries against database to see if they're new or already exist.
     '''
     def callbackFunc(conn, i, values, page, callback_args):
@@ -500,15 +500,15 @@ def findNewLogEntries(conn, log_pages, table_list):
     table_dict = dict(combo)
     
     # Get the logs in object format
-    all_logs = AllLogs(log_pages)
+    #all_logs = AllLogs(log_pages)
     callback_args = {'table_dict': table_dict, 'display_data': []}
     
     # Call the looping function, handing it our callback
     all_logs, callback_args = loopLogPages(conn, all_logs, callbackFunc, 
                                                             callback_args)
-    log_pages = all_logs.getLogDictionary()
+    #log_pages = all_logs.getLogDictionary()
     display_data = callback_args['display_data']
-    return log_pages, display_data
+    return all_logs, display_data
     
 
 def insertIntoModelFileTable(conn, table_name, col_name, model_file, files_list):
@@ -675,21 +675,23 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
     @return: tuple containing log_pages (which could be the loaded log
              pages or False if the load failed and a dictionary containing
              the load status and messages for status bars and errors.
-    '''
+    '''   
     
     # Load the model at the chosen path.
-    log_pages = LogBuilder.loadModel(open_path, log_type)
-    if log_pages == False:
+    all_logs = LogBuilder.loadModel(open_path, log_type)
+    if all_logs == False:
         logger.error('Unable to load model file:\n%s' % (open_path))
-        error.addError(errors.MODEL_LOAD, msg_add=('at:\n%s' % (open_path)))
-        return errors, log_pages
+        errors.addError(errors.MODEL_LOAD, msg_add=('at:\n%s' % (open_path)), 
+                                                        msgbox_error=True)
+        return errors, all_logs
     else:
         # Make sure that this ief or tcf do not already exist in the
         # database. You need new ones for each run so this isn't
         # allowed.
-        main_ief = log_pages['RUN']['IEF']
-        main_tcf = log_pages['RUN']['TCF']
-        tcf_results = log_pages['RUN']['RESULTS_LOCATION_2D']
+        main_ief = all_logs.getLogEntryContents('RUN', 0)['IEF'] # .log_pages['RUN'][0].contents['IEF']
+        main_tcf = all_logs.getLogEntryContents('RUN', 0)['TCF'] #.log_pages['RUN'][0].contents['TCF']
+        tcf_results = all_logs.getLogEntryContents('RUN', 0)['RESULTS_LOCATION_2D'] #.log_pages['RUN'][0].contents['RESULTS_LOCATION_2D']
+        
         indb = (False,)
         found_path = ''
         
@@ -713,16 +715,9 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
                     if exists[0]:
                         logger.error('Model results alreads exist for :\n%s' % (main_ief))
                         errors.addError(errors.RESULTS_EXIST, 
-                                        msg_add=('in:\n%s' % (main_ief)))
-                        return errors, log_pages
-    #                     button = QtGui.QMessageBox.question(self, 
-    #                             "ISIS/FMP Results Folder Already Exists",
-    #                             "Results folder location found in previous " +
-    #                             "entry\nDo you want to Continue?",
-    #                             QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-    #                     
-    #                     if button == QtGui.QMessageBox.No:
-    #                         return
+                                        msg_add=('in:\n%s' % (main_ief)), 
+                                                        msgbox_error=True)
+                        return errors, all_logs
                     
                 found_path = main_ief
             
@@ -738,21 +733,24 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
             if indb[0]:
                 logger.error('Log entry already exists for :\n%s' % (open_path))
                 errors.addError(errors.LOG_EXISTS, 
-                                        msg_add=(':\nfile = %s' % (open_path)))
-                return errors, log_pages
+                                        msg_add=(':\nfile = %s' % (open_path)),
+                                                            msgbox_error=True)
+                return errors, all_logs
             else:
-                return errors, log_pages
+                return errors, all_logs
                     
         except IOError:
             logger.error('Cannot load file:\n%s' % (open_path))
             errors.addError(errors.IO_ERROR, 
-                                        msg_add=('at:\n%s' % (open_path)))
-            return errors, log_pages
+                                        msg_add=('at:\n%s' % (open_path)),
+                                                            msgbox_error=True)
+            return errors, all_logs
         except:
             logger.error('Cannot load file:\n%s' % (open_path))
             errors.addError(errors.IO_ERROR, 
-                                        msg_add=('at:\n%s' % (open_path)))
-            return errors, log_pages
+                                        msg_add=('at:\n%s' % (open_path)),
+                                                            msgbox_error=True)
+            return errors, all_logs
         
 
 def updateDatabaseVersion(db_path, errors):
