@@ -203,7 +203,6 @@ class MainGui(QtGui.QMainWindow):
         # Use those settings to get the file path and try and load the last log
         # database that the user had open
         self.loadModelLog()
-        self.log_pages = None
         self.all_logs = None
         
         self.setWindowIcon(QtGui.QIcon(':Logit_Logo2_25x25.png'))
@@ -509,7 +508,6 @@ class MainGui(QtGui.QMainWindow):
         # Reset the tables first
         self.new_entry_tables.clearAll()
         
-        #self.log_pages = log_pages
         self.all_logs = all_logs
         all_logs = self._getInputLogVariables(all_logs)
         
@@ -521,7 +519,7 @@ class MainGui(QtGui.QMainWindow):
         
         # Update RUN seperately as it's treated in a different way to others
         self.new_entry_tables.tables['RUN'].addRowValues(
-                                            all_logs.getLogEntryContents('RUN', 0)) #log_pages['RUN'])
+                                            all_logs.getLogEntryContents('RUN', 0)) 
         self.new_entry_tables.tables['RUN'].setEditColors(0)
         
         # check the new entries against the database and return them with
@@ -538,7 +536,7 @@ class MainGui(QtGui.QMainWindow):
     
     def _getInputLogVariables(self, all_logs):
         '''Put the variables entered by the user in the Input log variables
-        group into the log_pages dictionary.
+        group into the all_logs object.
         '''
         run = all_logs.getLogEntryContents('RUN', 0)
         run['MODELLER'] = str(self.ui.modellerTextbox.text())
@@ -556,7 +554,6 @@ class MainGui(QtGui.QMainWindow):
         # Check that we have a database
         if not self.checkDbLoaded(): return
 
-        #if not self.log_pages == None:
         if not self.all_logs == None:
             
             self._updateWithUserInputs()
@@ -660,7 +657,7 @@ class MainGui(QtGui.QMainWindow):
         '''Get the variables that we want to allow the user to be able to update.
         
         TODO:
-            This function is a prime example of why the log_pages dictionary
+            This function is a prime example of why the all_logs object
             needs converting to an object such as that used in Controller.
         '''
         for log in self.all_logs.log_pages.values():
