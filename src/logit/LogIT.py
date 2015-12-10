@@ -464,16 +464,18 @@ class MainGui(QtGui.QMainWindow):
         '''If there is a model log to load we do it.
         '''
         if self.checkDbLoaded():
-
+            errors = GuiStore.ErrorHolder()
             # Check that the database actually exists. If not get out of here.
             if not os.path.exists(self.settings.cur_log_path):
                 logger.info('No existing log database to load')
                 self.settings.cur_log_path = ''
                 return
             
-            title, error = Controller.checkDatabaseVersion(self.settings.cur_log_path)
-            if not title == None:
-                self.launchQMsgBox(title, error, 'warning')
+            errors = Controller.checkDatabaseVersion(
+                                        self.settings.cur_log_path, errors)
+            if errors.has_errors:
+                self.launchQMsgBox(errors.msgbox_error.title,
+                                                errors.msgbox_error.msg)
                 return
             
             self.view_tables.clearAll()
@@ -483,12 +485,12 @@ class MainGui(QtGui.QMainWindow):
             for table in self.view_tables.tables.values():
                 table_list.append([table.key, table.name])
             
-            entries, success = Controller.fetchTableValues(
-                                    self.settings.cur_log_path, table_list)
+            entries, errors = Controller.fetchTableValues(
+                            self.settings.cur_log_path, table_list, errors)
             
-            if success == False:
-                self.launchQMsgBox('Log Load Error', 
-                'Unable to load model log at %s' % (self.settings.cur_log_path))
+            if errors.has_errors:
+                self.launchQMsgBox(errors.msgbox_error.title,
+                                                errors.msgbox_error.msg) 
                 return
              
             # Add the results to the database tables
@@ -508,8 +510,7 @@ class MainGui(QtGui.QMainWindow):
         # Reset the tables first
         self.new_entry_tables.clearAll()
         
-        self.all_logs = all_logs
-        all_logs = self._getInputLogVariables(all_logs)
+        self.all_logs = self._getInputLogVariables(all_logs)
         
         # Create a list of all of the available tables and their names
         table_list = []
@@ -524,8 +525,9 @@ class MainGui(QtGui.QMainWindow):
         
         # check the new entries against the database and return them with
         # flags set for whether they are new entries or already exist
-        entries = Controller.loadEntrysWithStatus(
-                            self.settings.cur_log_path, all_logs, table_list)
+        errors = GuiStore.ErrorHolder()
+        entries, errors = Controller.loadEntrysWithStatus(
+                self.settings.cur_log_path, self.all_logs, table_list, errors)
         
         # Add the entries to the gui tables with editable status set
         for entry in entries:
@@ -560,7 +562,7 @@ class MainGui(QtGui.QMainWindow):
             
             errors = GuiStore.ErrorHolder()
             errors, self.all_logs, update_check = Controller.updateLog(
-                        self.settings.cur_log_path, self.all_logs, errors)
+                        self.settings.cur_log_path, self.all_logs, errors) # DEBUG , check_new_entries=True
             
             if errors.has_errors:
                 self.launchQMsgBox(errors.msgbox_error.title, 
@@ -956,7 +958,7 @@ class MainGui(QtGui.QMainWindow):
                 log_type = self.ui.loadModelComboBox.currentIndex()
                 
                 errors = GuiStore.ErrorHolder()
-                errors, self.all_logs = Controller.fetchAndCheckModel(
+                errors, all_logs = Controller.fetchAndCheckModel(
                     self.settings.cur_log_path, open_path, log_type, errors)
     
                 if errors.has_errors:
@@ -965,7 +967,7 @@ class MainGui(QtGui.QMainWindow):
                     self.ui.statusbar.showMessage(errors.msgbox_error.status_bar)
                 else:
                     self.ui.statusbar.showMessage('Loaded model at: %s' % open_path)
-                    self._fillEntryTables(self.all_logs)
+                    self._fillEntryTables(all_logs)
                     self.ui.submitSingleModelGroup.setEnabled(True) 
 
 

@@ -78,9 +78,18 @@ class DatabaseManager(object):
         :raise exception: if there's an issue.
         '''
         self.conn = loadLogDatabase(db)
+        self.cur = self.conn.cursor()
+#         version = self.checkVersion()
+#         if not version == DATABASE_VERSION_SAME:
+#             if report_version:
+#                 return version
+#             else:
+#                 raise sqlite3.DatabaseError
+        
         #self.conn.execute('pragma foreign_keys = on')
         #self.conn.commit()
-        self.cur = self.conn.cursor()
+#         if report_version:
+#             return version
 
 
     def __del__(self):
@@ -111,8 +120,7 @@ class DatabaseManager(object):
         columns = ', '.join(row_data.keys())
         placeholders = ", ".join('?' * len(row_data))
         query = 'insert into ' + table_name + ' ({}) values ({})'.format(columns, placeholders)
-        self.writeQuery(query, row_data.values)
-        cur.execute(query, row_data.values())
+        self.writeQuery(query, row_data)
 
     # saveViewChangesToDatabase
     def updateRow(self, table_name, key, values, id):
@@ -127,17 +135,16 @@ class DatabaseManager(object):
         '''
         '''
         if not column_only:
-            query = "select * from %s where %s='%s'" % (table_name, 
-                                                        col_name, entry)
+            query = "select * from %s where %s='%s'" % (table_name, col_name, entry)
         else:
-            query = "select %s from %s where %s='%s'" % (col_name, 
-                                        table_name, col_name, db_entry)
+            query = "select %s from %s where %s='%s'" % (col_name, table_name, col_name, entry)
         
+        self.cur.execute(query)
         result = self._getEntriesFromCursor()
         if return_rows:
             return result
         else:
-            return (result[0],)
+            return result[0]
     
     # findInDatabase
     def findAll(self, table_name, col_name=False, return_rows=False):
@@ -148,18 +155,19 @@ class DatabaseManager(object):
         else:
             query = "select %s from %s" % (col_name, table_name)
         
+        self.cur.execute(query)
         result = self._getEntriesFromCursor()
         if return_rows:
             return result
         else:
-            return (result[0],)
+            return result[0]
             
     # checkDatabaseVersion
     def checkVersion(self):
         '''
         '''
         self.cur.execute("pragma user_version")
-        db_version = cur.fetchone()[0]
+        db_version = self.cur.fetchone()[0]
          
         # If the VERSION_NO doesn't match the current one.
         if not db_version == DATABASE_VERSION_NO:
@@ -182,12 +190,12 @@ class DatabaseManager(object):
             raise ValueError
 
 
-    def writeQuery(self, query, placeholder_vals=None):
+    def writeQuery(self, query, row_data=None):
         try:
-            if placeholders == None:
+            if row_data == None:
                 self.cur.execute(query)
             else:
-                self.cur.execute(query, placeholders)
+                self.cur.execute(query, row_data.values())
 
             self.conn.commit()
             return self.cur
@@ -203,35 +211,33 @@ class DatabaseManager(object):
     def _getEntriesFromCursor(self):
         '''
         '''
-        found_it = False
+        #found_it = False
         found_rows = []
         result = self.cur.fetchall()
         if not result == None:
             
             count = len(result)
             if count > 0:
-                found_it = True
+                #found_it = True
                 # Convert the row factory to a dictionary of the row variables
                 for row in result:
-                    found_rows.append(self._convertRowToDictionary(
-                                                        self.cur, row))
+                    found_rows.append(self._convertRowToDictionary(row))
                     
-            # Return here if we found stuff and return_rows is True
-            return (True, count, found_rows)
+                # Return here if we found stuff and return_rows is True
+                return (True, count, found_rows)
         
-        return (found_it,)
+        return (False, 0, [])
 
 
-    def _convertRowToDictionary(cursor, row):
+    def _convertRowToDictionary(self, row):
         '''Converts a sqlite3 row_factory into a dictionary
         
-        @param cursor: the cursor from the database connection.
         @param row: the row_factory object from sqlite3 cursor.
         @return: dictionary containing the values in the given row with keys
                  set as the column names.
         '''
         d = {}
-        for idx,col in enumerate(cursor.description):
+        for idx, col in enumerate(self.cur.description):
             d[col[0]] = row[idx]
         return d
 
