@@ -186,7 +186,7 @@ class DatabaseManager(object):
             return result
         else:
             return result[0]
-            
+        
 
     def checkVersion(self):
         '''Checks the version of the loaded database against the module value.
@@ -208,6 +208,17 @@ class DatabaseManager(object):
                 return DATABASE_VERSION_LOW
         else:
             return DATABASE_VERSION_SAME       
+        
+    
+    def getTableNames(self):
+        '''Get a list of all of the table names in the database.
+        :return: list containing the table names.
+        '''
+        query = "SELECT name FROM sqlite_master WHERE type='table'"
+        self.cur.execute(query)
+        result = self._getEntriesFromCursor()
+        return result[3]
+        
     
 
     def readQuery(self, query):
@@ -290,8 +301,8 @@ class DatabaseManager(object):
         for idx, col in enumerate(self.cur.description):
             d[col[0]] = row[idx]
         return d
-
-
+    
+    
 
 '''
 ##############################################################################

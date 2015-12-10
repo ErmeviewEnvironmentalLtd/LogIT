@@ -172,7 +172,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     
     added_rows = None    
     
-    def insertSubFiles(db_manager, index, values, page, max_id):
+    def insertSubFiles(db_manager, index, values, page, max_id, max_run_id):
         '''Insert files referenced by one of the log pages into its table.
         
         Looks to see if any of the files it contains aren't already entered. 
@@ -183,7 +183,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     
         new_files, ids = insertIntoModelFileTable(db_manager, 
                             page.subfile_name, page.name, 
-                                values[page.name], values['FILES']) 
+                                values[page.name], values['FILES'], max_run_id) 
         #added_rows.addRows(page.subfile_name, ids)
           
         if not new_files == False:
@@ -195,7 +195,8 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         
         return page
      
-    def insertMainFile(db_manager, index, page, max_id, check_entry):
+    def insertMainFile(db_manager, index, page, max_id, check_entry,
+                                                            max_run_id):
         '''Adds the log page data in 'page' to the log page table.
         
         Will check if entry exists first if check_entry==True.
@@ -207,7 +208,10 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
                                 page.contents[index][page.name])
 
             if not has_entry:
-                db_manager.insertValues(page.name, page.contents[index])
+                insert_vals = page.contents[index]
+                if not page.name == 'RUN':
+                    insert_vals['RUN_ID'] = max_run_id
+                db_manager.insertValues(page.name, insert_vals) #page.contents[index])
               
                 added_rows.addRows(page.name, max_id)
                 page.contents[index]['ID'] = max_id
@@ -227,28 +231,34 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         This function is a callback used by the looping function.
         '''
         check_new_entries = callback_args['check_new_entries']
+        max_run_id = callback_args['RUN_ID']
         
         # We need the maximum id so that we can increment by 1 and put it into
         # the output table in the GUI.
         max_id = db_manager.getMaxId(page.name) + 1
         
         if page.multi_file:
-            page = insertSubFiles(db_manager, i, values, page, max_id)
+            page = insertSubFiles(db_manager, i, values, page, max_id, 
+                                                                max_run_id)
             
         if page.name == 'RUN':
-            page = insertMainFile(db_manager, 0, page, max_id, False)
+            page = insertMainFile(db_manager, 0, page, max_id, False, 
+                                                            max_run_id)
         else:
-            page = insertMainFile(db_manager, i, page, max_id, check_new_entries)
+            page = insertMainFile(db_manager, i, page, max_id, 
+                                  check_new_entries, max_run_id)
         
         return page, callback_args
             
     # Collects all files added to database for resetting
     added_rows = AddedRows()
     check_new_entries = True
+    max_run_id = db_manager.getMaxId('RUN') + 1
     try:
         # Send function as a callback to the log page looping function.
         all_logs, callback_args = loopLogPages(db_manager, all_logs, callbackFunc, 
-                                    {'check_new_entries': check_new_entries})
+                                    {'check_new_entries': check_new_entries,
+                                     'RUN_ID': max_run_id})
         
         
         # Get the data from the classes in dictionary format
@@ -390,13 +400,13 @@ def findNewLogEntries(db_manager, all_logs, table_list):
     
 
 def insertIntoModelFileTable(db_manager, table_name, col_name, model_file, 
-                                                                files_list):
+                                                    files_list, max_run_id):
     '''Insert file references into the model file table if they are not
     already there.
     
     @param conn: the current database connection.
     @param table_name: the name of the column to insert the file name into.
-    @param file_list: the list of files to check against the database.
+    @param files_list: the list of files to check against the database.
     '''
     new_files = []
     added_count = 1
@@ -411,7 +421,7 @@ def insertIntoModelFileTable(db_manager, table_name, col_name, model_file,
         # files database under col_name and add it to the list so that we
         # can put it in the new files col of the main table.
         if results[0] == False:
-            row_data = {col_name: model_file, 'FILES': f}
+            row_data = {col_name: model_file, 'FILES': f, 'RUN_ID': max_run_id}
             db_manager.insertValues(table_name, row_data)
             new_files.append(f)
             ids.append(added_count)
@@ -438,7 +448,7 @@ def createQtTableItem(name, is_editable=False):
     return item
 
 
-def deleteDatabaseRow(db_path, table_name, id):
+def deleteDatabaseRow(db_path, table_name, id, all_entry=False):
     '''Deletes the database row with the given id
     @param db_path: the path to the database on file.
     @param table_name: the name of the table.
@@ -447,6 +457,9 @@ def deleteDatabaseRow(db_path, table_name, id):
     '''
     db_manager = DatabaseFunctions.DatabasManager(db_path)
     try:
+        if all_entry:
+            self._getAssociatedEntries(db_manager, id)
+            
         # Delete the row from the database
         db_manager.deleteRow(table_name, id)
         
@@ -458,6 +471,28 @@ def deleteDatabaseRow(db_path, table_name, id):
         return False
     
     return True
+
+
+def _getAssociatedEntries(db_manager, id):
+    '''
+    '''
+    names = db_manager.getTableNames()
+    
+    # Search through all the names in the database
+    for name in names:
+
+        # See if there's any matches to the RUN table's ID value
+        result = db_manager.findEntry(name, 'RUN_ID', id, return_rows=True)
+        
+        # If there is then check to see if there's any of references to that 
+        # file in other runs.
+        if result[0]:
+            result2 = db_manager.findEntry('RUN', name, result[3][name], return_rows=True)
+            
+            # If not then we can delete the entry.
+            if result2[0]:
+                if len(result2[3]) > 1:
+                    db_manager.deleteRow(name, result[3]['ID'])
     
     
 def checkDatabaseVersion(db_path, errors):

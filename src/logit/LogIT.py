@@ -388,6 +388,8 @@ class MainGui(QtGui.QMainWindow):
         # Find who called us and get the object that the name refers to.
         sender = self.sender()
         sender = str(sender.objectName())
+        if sender == 'RUN':
+            deleteAllRowAction = menu.addAction("Delete All Log Entry")
         
         # lookup the table and database table name
         table_obj = self.view_tables.getTable(name=sender)
@@ -399,9 +401,12 @@ class MainGui(QtGui.QMainWindow):
         
         elif action == deleteRowAction:
             self._deleteRowFromDatabase(table_obj)
+        
+        elif action == deleteAllRowAction:
+            self._delteRowFromDatabase(table_obj, True)
             
     
-    def _deleteRowFromDatabase(self, table):
+    def _deleteRowFromDatabase(self, table, all_entry=False):
         '''Deletes the row in the database based on the location that the mouse
         was last clicked.
         This is fine because this function is called from the context menu and
@@ -415,14 +420,17 @@ class MainGui(QtGui.QMainWindow):
         row_dict = table.getValues(row=row, names=['ID'])
         
         # Just make sure we meant to do this
-        message = "Are you sure you want to delete this row?\nTable = %s, Row ID = %s" % (table.name, row_dict['ID'])
+        if not all_entry:
+            message = "Delete this row?\nTable = %s, Row ID = %s" % (table.name, row_dict['ID'])
+        else:
+            message = "Delete this row AND all assocated rows?\nTable = %s, Row ID = %s" % (table.name, row_dict['ID'])
         answer = self.launchQtQBox('Confirm Delete?', message)            
         if answer == False:
             return
         
         # Delete from database
         success = Controller.deleteDatabaseRow(self.settings.cur_log_path,
-                                    table.key, row_dict['ID'])
+                                    table.key, row_dict['ID'], all_entry)
         # and then from the table
         if success:
             table.removeRow(row)
@@ -475,7 +483,7 @@ class MainGui(QtGui.QMainWindow):
                                         self.settings.cur_log_path, errors)
             if errors.has_errors:
                 self.launchQMsgBox(errors.msgbox_error.title,
-                                                errors.msgbox_error.msg)
+                                                errors.msgbox_error.message)
                 return
             
             self.view_tables.clearAll()
