@@ -59,7 +59,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-DATABASE_VERSION_NO = 3
+DATABASE_VERSION_NO = 4
 DATABASE_VERSION_SAME = 0
 DATABASE_VERSION_LOW = 1
 DATABASE_VERSION_HIGH = 2
@@ -401,7 +401,7 @@ def createRunTable(cur):
                   DATE                    TEXT                      NOT NULL,
                   MODELLER                TEXT,
                   RESULTS_LOCATION_2D     TEXT,
-                  RESULTS_LOCATION_1D   TEXT,
+                  RESULTS_LOCATION_1D     TEXT,
                   EVENT_DURATION          TEXT,
                   DESCRIPTION             TEXT,
                   COMMENTS                TEXT,
@@ -430,7 +430,8 @@ def createTgcTable(cur):
                     TGC            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
-                    COMMENTS       TEXT);
+                    COMMENTS       TEXT,
+                    RUN_ID         INTEGER);
                     ''')
     
 
@@ -445,7 +446,8 @@ def createTbcTable(cur):
                     TBC            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
-                    COMMENTS       TEXT);
+                    COMMENTS       TEXT,
+                    RUN_ID         INTEGER);
                     ''')
     
     
@@ -459,7 +461,8 @@ def createDatTable(cur):
                     DATE           TEXT                       NOT NULL,
                     DAT            TEXT,
                     AMENDMENTS     TEXT,
-                    COMMENTS       TEXT);
+                    COMMENTS       TEXT,
+                    RUN_ID         INTEGER);
                     ''')
 
 
@@ -474,7 +477,8 @@ def createBcTable(cur):
                     BC_DBASE       TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
-                    COMMENTS       TEXT);
+                    COMMENTS       TEXT,
+                    RUN_ID         INTEGER);
                     ''')
     
 
@@ -489,7 +493,8 @@ def createEcfTable(cur):
                     ECF            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
-                    COMMENTS       TEXT);
+                    COMMENTS       TEXT,
+                    RUN_ID         INTEGER);
                     ''')
     
 
@@ -504,7 +509,8 @@ def createTcfTable(cur):
                     TCF            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
-                    COMMENTS       TEXT);
+                    COMMENTS       TEXT,
+                    RUN_ID         INTEGER);
                     ''')
     
 
@@ -516,7 +522,8 @@ def createTgcFilesTable(cur):
     cur.execute('''CREATE TABLE TGC_FILES
                     (ID            INTEGER     PRIMARY KEY    NOT NULL,
                     TGC            TEXT,
-                    FILES          TEXT);
+                    FILES          TEXT,
+                    RUN_ID         INTEGER);
                     ''')
     
 
@@ -528,7 +535,8 @@ def createTbcFilesTable(cur):
     cur.execute('''CREATE TABLE TBC_FILES
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     TBC                TEXT,
-                    FILES              TEXT);
+                    FILES              TEXT,
+                    RUN_ID             INTEGER);
                     ''')
     
     
@@ -540,7 +548,8 @@ def createBcFilesTable(cur):
     cur.execute('''CREATE TABLE BC_DBASE_FILES 
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     BC_DBASE           TEXT,
-                    FILES              TEXT);
+                    FILES              TEXT,
+                    RUN_ID             INTEGER);
                     ''')
     
 
@@ -552,7 +561,8 @@ def createEcfFilesTable(cur):
     cur.execute('''CREATE TABLE ECF_FILES 
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     ECF                TEXT,
-                    FILES              TEXT);
+                    FILES              TEXT,
+                    RUN_ID             INTEGER);
                     ''')
 
 
@@ -564,7 +574,8 @@ def createTcfFilesTable(cur):
     cur.execute('''CREATE TABLE TCF_FILES 
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     TCF                TEXT,
-                    FILES              TEXT);
+                    FILES              TEXT,
+                    RUN_ID             INTEGER     NOT NULL);
                     ''')
 
         
@@ -608,17 +619,17 @@ run = ['ID', 'DATE', 'MODELLER', 'RESULTS_LOCATION_2D', 'RESULTS_LOCATION_1D',
        'EVENT_DURATION', 'DESCRIPTION', 'COMMENTS', 'SETUP', 'ISIS_BUILD', 
        'IEF', 'DAT', 'TUFLOW_BUILD', 'TCF', 'TGC', 'TBC', 'BC_DBASE', 'ECF',
        'EVENT_NAME'] 
-tgc = ['ID', 'DATE', 'TGC', 'FILES', 'NEW_FILES', 'COMMENTS']
-tbc = ['ID', 'DATE', 'TBC', 'FILES', 'NEW_FILES', 'COMMENTS']
-dat = ['ID', 'DATE', 'DAT', 'AMENDMENTS', 'COMMENTS']
-bc_dbase = ['ID', 'BC_DBASE', 'FILES', 'NEW_FILES', 'COMMENTS']
-ecf = ['ID', 'ECF', 'FILES', 'NEW_FILES', 'COMMENTS']
-tcf = ['ID', 'TCF', 'FILES', 'NEW_FILES', 'COMMENTS']
-tgc_files = ['ID', 'TGC', 'FILES']
-tbc_files = ['ID', 'TBC', 'FILES']
-bc_dbase_files = ['ID', 'BC_DBASE', 'FILES']
-ecf_files = ['ID', 'ECF', 'FILES']
-tcf_files = ['ID', 'TCF', 'FILES']
+tgc = ['ID', 'DATE', 'TGC', 'FILES', 'NEW_FILES', 'COMMENTS', 'RUN_ID']
+tbc = ['ID', 'DATE', 'TBC', 'FILES', 'NEW_FILES', 'COMMENTS', 'RUN_ID']
+dat = ['ID', 'DATE', 'DAT', 'AMENDMENTS', 'COMMENTS', 'RUN_ID']
+bc_dbase = ['ID', 'BC_DBASE', 'FILES', 'NEW_FILES', 'COMMENTS', 'RUN_ID']
+ecf = ['ID', 'ECF', 'FILES', 'NEW_FILES', 'COMMENTS', 'RUN_ID']
+tcf = ['ID', 'TCF', 'FILES', 'NEW_FILES', 'COMMENTS', 'RUN_ID']
+tgc_files = ['ID', 'TGC', 'FILES', 'RUN_ID']
+tbc_files = ['ID', 'TBC', 'FILES', 'RUN_ID']
+bc_dbase_files = ['ID', 'BC_DBASE', 'FILES', 'RUN_ID']
+ecf_files = ['ID', 'ECF', 'FILES', 'RUN_ID']
+tcf_files = ['ID', 'TCF', 'FILES', 'RUN_ID']
 
 cur_tables = {'RUN': run, 'TGC': tgc, 'TBC': tbc, 'DAT': dat, 'ECF': ecf, 'TCF': tcf,
               'BC_DBASE': bc_dbase, 'TGC_FILES': tgc_files, 
