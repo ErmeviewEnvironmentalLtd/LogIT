@@ -106,14 +106,14 @@ class AddedRows(object):
         else:
             return False
         
-    def deleteEntries(self, conn):
+    def deleteEntries(self, db_manager):
         '''Deletes all of the entries in this object from the database.
         @note: This may raise an error that should be dealt with by the 
                calling code.
         '''
         for name, table in self.tables.iteritems():
             for id in table: #reverse_enumerate(table):
-                DatabaseFunctions.deleteRowFromTable(conn, name, id)
+                db_manager.deleteRow(name, id)
         
 
 def updateLog(db_path, all_logs, errors, check_new_entries=False):
@@ -131,11 +131,12 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
            and it will cost unnecessary processing effort.
     '''
     # Connect to the database and then update the log entries
-    conn = False
-    update_check = None
+    #conn = False
+    #update_check = None
     try:
-        conn = DatabaseFunctions.loadLogDatabase(db_path)
-        all_logs, update_check = logEntryUpdates(conn, all_logs,
+#         conn = DatabaseFunctions.loadLogDatabase(db_path)
+        db_manager = DatabaseFunctions.DatabaseManager(db_path)
+        all_logs, update_check = logEntryUpdates(db_manager, all_logs,
                                                   check_new_entries)
     except IOError:
         logger.error('Unable to access database')
@@ -148,12 +149,12 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
                                         msg_add=':\n%s' % (db_path))
 
     finally:
-        if not conn == False:
-            conn.close()
+#         if not conn == False:
+#             conn.close()
         return errors, all_logs, update_check
  
 
-def logEntryUpdates(conn, all_logs, check_new_entries=False):
+def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     '''Update the database with the current status of the all_logs object.
     
     This creates a callback function and hands it to loopLogPages method,
@@ -175,7 +176,7 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
     
     added_rows = None    
     
-    def insertSubFiles(conn, index, values, page, max_id):
+    def insertSubFiles(db_manager, index, values, page, max_id):
         '''Insert files referenced by one of the log pages into its table.
         
         Looks to see if any of the files it contains aren't already entered. 
@@ -183,10 +184,13 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
         Then converts to a bracket wrapped string for adding to main log table
         (e.g. TGC).
         '''
-        new_files, ids = insertIntoModelFileTable(conn, 
+#         new_files, ids = insertIntoModelFileTable(conn, 
+#                             page.subfile_name, 'FILES', 
+#                                 values[page.name], values['FILES']) 
+    
+        new_files, ids = insertIntoModelFileTable(db_manager, 
                             page.subfile_name, 'FILES', 
                                 values[page.name], values['FILES']) 
-    
         #added_rows.addRows(page.subfile_name, ids)
           
         if not new_files == False:
@@ -198,7 +202,7 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
         
         return page
      
-    def insertMainFile(conn, index, page, max_id, check_entry):
+    def insertMainFile(db_manager, index, page, max_id, check_entry):
         '''Adds the log page data in 'page' to the log page table.
         
         Will check if entry exists first if check_entry==True.
@@ -206,13 +210,18 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
         try:
             is_in_db = False
             if check_entry:
-                is_in_db = DatabaseFunctions.findInDatabase(
-                        page.name, conn=conn, col_name=page.name, 
-                        db_entry=page.contents[index][page.name])[0]
+#                 is_in_db = DatabaseFunctions.findInDatabase(
+#                         page.name, conn=conn, col_name=page.name, 
+#                         db_entry=page.contents[index][page.name])[0]
+
+                is_in_db = db_manager.find(page.name, page.name,
+                                           page.contents[index][page.name])[0]
 
             if not is_in_db:
-                DatabaseFunctions.insertValuesIntoTable(conn, 
-                            page.name, page.contents[index])
+#                 DatabaseFunctions.insertValuesIntoTable(conn, 
+#                             page.name, page.contents[index])
+
+                db_manager.insertValues(page.name, page.contents[index])
               
                 added_rows.addRows(page.name, max_id)
                 page.contents[index]['ID'] = max_id
@@ -227,7 +236,7 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
         
         return page
     
-    def callbackFunc(conn, i, values, page, callback_args):
+    def callbackFunc(db_manager, i, values, page, callback_args):
         '''Insert entries into database and update page values.
         This function is a callback used by the looping function.
         '''
@@ -238,12 +247,12 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
         max_id = DatabaseFunctions.getMaxIDFromTable(conn, page.name) + 1
         
         if page.multi_file:
-            page = insertSubFiles(conn, i, values, page, max_id)
+            page = insertSubFiles(db_manager, i, values, page, max_id)
             
         if page.name == 'RUN':
-            page = insertMainFile(conn, 0, page, max_id, False)
+            page = insertMainFile(db_manager, 0, page, max_id, False)
         else:
-            page = insertMainFile(conn, i, page, max_id, check_new_entries)
+            page = insertMainFile(db_manager, i, page, max_id, check_new_entries)
         
         return page, callback_args
             
@@ -252,7 +261,7 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
     check_new_entries = True
     try:
         # Send function as a callback to the log page looping function.
-        all_logs, callback_args = loopLogPages(conn, all_logs, callbackFunc, 
+        all_logs, callback_args = loopLogPages(db_manager, all_logs, callbackFunc, 
                                     {'check_new_entries': check_new_entries})
         
         
@@ -268,7 +277,7 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
         logger.debug(traceback.format_exc())
 
         try:
-            added_rows.deleteEntries(conn)
+            added_rows.deleteEntries(db_manager)
             logger.warning('Successfully rolled back database')
         except:
             logger.error('Unable to roll back database: CHECK ENTRIES!')
@@ -276,7 +285,7 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
             raise 
 
 
-def loopLogPages(conn, all_logs, callback, callback_args):
+def loopLogPages(db_manager, all_logs, callback, callback_args):
     '''Loop all the pages in the log applying the given callback function.
     
     The callback function expects to get back a copy of the all_logs object
@@ -305,7 +314,7 @@ def loopLogPages(conn, all_logs, callback, callback_args):
         
         for i, values in reverse_enumerate(page.contents):
         
-            page, callback_args = callback(conn, i, values, page, callback_args)
+            page, callback_args = callback(db_manager, i, values, page, callback_args)
     
     return all_logs, callback_args
     
@@ -328,11 +337,12 @@ def loadEntrysWithStatus(db_path, all_logs, table_list):
      # We need to find if the TGC and TBC files have been registered with the
     # database before. If they have then we don't need to register them 
     # again.
-    conn = False
+#     conn = False
+    db_manager = DatabaseFunctions.DatabaseManager(db_path)
     try:
-        conn = DatabaseFunctions.loadLogDatabase(db_path)
+#         conn = DatabaseFunctions.loadLogDatabase(db_path)
         entries = []
-        all_logs, entries = findNewLogEntries(conn, all_logs, table_list)
+        all_logs, entries = findNewLogEntries(db_manager, all_logs, table_list)
         
         return entries
             
@@ -340,23 +350,25 @@ def loadEntrysWithStatus(db_path, all_logs, table_list):
         logger.error('IOError - Unable to access database')
     except:
         logger.error('SQLError - Could not query database')
-    finally:
-        if not conn == False:
-            conn.close()
+#     finally:
+#         if not conn == False:
+#             conn.close()
 
 
-def findNewLogEntries(conn, all_logs, table_list):
+def findNewLogEntries(db_manager, all_logs, table_list):
     '''Checks entries against database to see if they're new or already exist.
     '''
-    def callbackFunc(conn, i, values, page, callback_args):
+    def callbackFunc(db_manager, i, values, page, callback_args):
         '''
         This function is a callback used by the looping function.
         '''
         if page.name == 'RUN':
             return page, callback_args
          
-        is_new_entry = DatabaseFunctions.findNewEntries(
-                                        conn, page.name, page.contents[i])
+#         is_new_entry = DatabaseFunctions.findNewEntries(
+#                                         conn, page.name, page.contents[i])
+
+        is_new_entry = db_manager.findNewEntries(page.name, page.contents[i])
     
         table_dict = callback_args['table_dict']
            
@@ -388,13 +400,14 @@ def findNewLogEntries(conn, all_logs, table_list):
     callback_args = {'table_dict': table_dict, 'display_data': []}
     
     # Call the looping function, handing it our callback
-    all_logs, callback_args = loopLogPages(conn, all_logs, callbackFunc, 
+    all_logs, callback_args = loopLogPages(db_manager, all_logs, callbackFunc, 
                                                             callback_args)
     display_data = callback_args['display_data']
     return all_logs, display_data
     
 
-def insertIntoModelFileTable(conn, table_name, col_name, model_file, files_list):
+def insertIntoModelFileTable(db_manager, table_name, col_name, model_file, 
+                                                                files_list):
     '''Insert file references into the model file table if they are not
     already there.
     
@@ -408,9 +421,12 @@ def insertIntoModelFileTable(conn, table_name, col_name, model_file, files_list)
     for f in files_list:
         
         # Check if we have any matched to the file name.            
-        results = DatabaseFunctions.findInDatabase(table_name, conn=conn, 
-                    col_name=col_name, db_entry=f, return_rows=True, 
-                            only_col_name=False)
+#         results = DatabaseFunctions.findInDatabase(table_name, conn=conn, 
+#                     col_name=col_name, db_entry=f, return_rows=True, 
+#                             only_col_name=False)
+
+        results = db_manager.findEntry(table_name, col_name, f, 
+                                                        return_rows=True) 
         
         # If we didn't find any matches we can put the file into the
         # files database under col_name and add it to the list so that we
@@ -516,19 +532,19 @@ def fetchTableValues(db_path, table_list):
     @return: tuple (boolean success flag, row count, row data) or an error
              with (False, error title, message)
     '''
-    conn = False
+#     conn = False
     title = 'Load Error'
     entries = []
     try:
-        conn = DatabaseFunctions.loadLogDatabase(db_path)
-        conn.row_factory = sqlite3.Row
+#         conn = DatabaseFunctions.loadLogDatabase(db_path)
+#         conn.row_factory = sqlite3.Row
+        db_manager = DatabaseFunctions.DatabaseManager(db_path)
                 
         for table in table_list:
             # If there's nothing in the table it will fail, but we don't care
             # so just pass the error.
             try:
-                results = DatabaseFunctions.findInDatabase(table[0], 
-                                    db_path=False, conn=conn, return_rows=True)
+                results = DatabaseFunctions.find(table[0], return_rows=True)
                  
                 entries.append([table[0], table[1], results[0], results[1], results[2]])
             except:
@@ -579,21 +595,27 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
         found_path = ''
         
         try:
+            db_manager = DatabaseFunctions.DatabaseManager(db_path)
             # If we have an ief get the ief name to see if we already
             # recorded a run using that model
             if not main_ief == 'None':
-                indb = DatabaseFunctions.findInDatabase(
-                         'RUN', db_path=db_path, 
-                         db_entry=main_ief, col_name='IEF', 
-                         only_col_name=True)
+#                 indb = DatabaseFunctions.findInDatabase(
+#                          'RUN', db_path=db_path, 
+#                          db_entry=main_ief, col_name='IEF', 
+#                          only_col_name=True)
+                indb = db_manager.findEntry('RUN', 'IEF', main_ief,
+                                                    column_only=True)
                 
                 # Then check if we've already used the results locations
                 # location for a previous run and return error if it has.
                 if indb[0]:
-                    exists = DatabaseFunctions.findInDatabase(
-                             'RUN', db_path=db_path, 
-                             db_entry=tcf_results, col_name='RESULTS_LOCATION_1D', 
-                             only_col_name=True)
+#                     exists = DatabaseFunctions.findInDatabase(
+#                              'RUN', db_path=db_path, 
+#                              db_entry=tcf_results, col_name='RESULTS_LOCATION_1D', 
+#                              only_col_name=True)
+
+                    indb = db_manager.findEntry('RUN', 'RESULTS_LOCATION_1D', 
+                                            tcf_results,column_only=True)
                     
                     if exists[0]:
                         logger.error('Model results alreads exist for :\n%s' % (main_ief))
@@ -607,10 +629,12 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
             # Do the whole lot again for the tuflow run
             if not main_tcf == 'None':
                 if not indb[0]:
-                    indb = DatabaseFunctions.findInDatabase(
-                             'RUN', db_path=db_path, 
-                             db_entry=main_tcf, col_name='TCF', 
-                             only_col_name=True)
+#                     indb = DatabaseFunctions.findInDatabase(
+#                              'RUN', db_path=db_path, 
+#                              db_entry=main_tcf, col_name='TCF', 
+#                              only_col_name=True)
+                    indb = db_manager.findEntry('RUN', 'TCF', 
+                                            main_tcf,column_only=True)
                     found_path = main_tcf
             
             if indb[0]:
