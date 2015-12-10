@@ -116,120 +116,8 @@ class AddedRows(object):
                 DatabaseFunctions.deleteRowFromTable(conn, name, id)
         
 
-# class AllLogs(object):
-#     '''Container class for all of the SubLog objects.
-#     '''
-#     
-#     SINGLE_FILE = ['RUN', 'DAT']
-#     
-#     def __init__(self, log_pages):
-#         '''Create new SubLog and set multi_file.
-#         '''
-#         self.log_pages = {}        
-#         for key, page in log_pages.iteritems():
-#             if key in AllLogs.SINGLE_FILE:
-#                 self.log_pages[key] = SubLog(key, page, False)
-#             else:
-#                 self.log_pages[key] = SubLog(key, page, True)
-#     
-#     def getLogDictionary(self):
-#         '''Return all logs in class as a dictionary.
-#         '''
-#         out_log = {}
-#         for page in self.log_pages.values():
-#             # DEBUG - have to convert back from list at the moment
-#             if page.name in AllLogs.SINGLE_FILE:
-#                 if not len(page.contents) < 1:
-#                     page.contents = page.contents[0]
-#             out_log[page.name] = page.contents
-#         
-#         return out_log
-#     
-#     def getUpdateCheck(self):
-#         '''Return dictionary containing update status.
-#         Update status is a boolean flag indicating whether a log page should
-#         be updated or not.
-#         '''
-#         out_check = {}
-#         for page in self.log_pages.values():
-#             out_check[page.name] = page.update_check
-#         
-#         return out_check
-#         
-# 
-# class SubLog(object):
-#     '''Log page objects.
-#     E.g. RUN, TGC, etc.
-#     '''
-#     
-#     def __init__(self, name, sub_page, multi_file):
-#         '''Set vars and make sure everything is in the format needed.
-#         '''
-#         self.name = name
-#         self.multi_file = multi_file
-#         self.has_contents = self._checkHasContents(sub_page)
-#         sub_page = self._checkIsList(sub_page)
-#         self.contents = sub_page
-#         self.update_check = False
-#         #self.update_check = self._createUpdateCheck(sub_page)
-#         self.subfile_name = None
-#         if multi_file: self.subfile_name = name + '_FILES'
-#     
-#     
-# #     def _createUpdateCheck(self, sub_page):
-# #         '''
-# #         '''
-# #         return [False] * len(sub_page)
-#     
-#     def _checkIsList(self, sub_page):
-#         '''Checks if given page is in a list and puts it in one if not.
-#         
-#         Some pages like RUN and DAT can only have one entry, while the others
-#         may have many. Originally the others were put in a list and RUN & DAT
-#         weren't. This is a design fault and this method can be removed once 
-#         it is dealt with throughout the codebase.
-#         '''
-#         if not isinstance(sub_page, list):
-#             sub_page = [sub_page]
-#         return sub_page
-#     
-#     def _checkHasContents(self, contents):
-#         '''Checks the status of the page contents.
-#         
-#         If the contents are set to a default value this will return False.
-#         This should also be possible to clean up by ensuring only a single
-#         default value is used throughout the codebase.
-#         '''
-#         if not self.name == 'RUN':
-#             if self.multi_file:
-#                 if contents[0] == 'None' or contents[0] == False or contents[0] == None:
-#                     return False
-#                 elif contents[0][self.name] == 'None':
-#                     return False
-#             else:
-#                 if contents == 'None' or contents == False or contents == None:
-#                     return False
-#                 elif contents[self.name] == 'None':
-#                     return False
-# 
-#         return True
-#     
-#     def bracketFiles(self, index, key, files=None):
-#         '''Encloses all of the files, under a certain key, in brackets.
-#         If not files==None a new key will be created and those files will be
-#         enclosed in brackets.
-#         '''
-#         if not files == None: self.contents[index][key] = files
-#         self.contents[index][key] = "[" + ", ".join(self.contents[index][key]) + "]"
-#     
-#     def deleteItem(self, index):
-#         '''Deletes an item (i.e. a row) from the contents.
-#         '''
-#         del self.contents[index]
-
-
 def updateLog(db_path, all_logs, errors, check_new_entries=False):
-    '''Updates the log database with the current value of log_pages.
+    '''Updates the log database with the current value of all_logs.
     
     This is just an entry function that connects to the database and and then
     call logEntryUpdates to do all of the hard work. It deals with handling
@@ -237,7 +125,7 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
     @param dp_path: the path to the log database on file.
     @param all_logs: AllLogs object.
     @param check_new_entries=False: Flag identifying whether the values in the
-           log_pages entries should be checked against the database before they
+           all_logs entries should be checked against the database before they
            are entered. i.e. make sure they don't alreay exist first. This is
            needed because the check may have already been carries out before
            and it will cost unnecessary processing effort.
@@ -266,7 +154,7 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
  
 
 def logEntryUpdates(conn, all_logs, check_new_entries=False):
-    '''Update the database with the current status of the log_pages dictionary.
+    '''Update the database with the current status of the all_logs object.
     
     This creates a callback function and hands it to loopLogPages method,
     which loops through the log pages applying the call back each time.
@@ -359,9 +247,6 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
         
         return page, callback_args
             
-    # Class to hold all the log page objects
-    #all_logs = AllLogs(log_pages)  
-
     # Collects all files added to database for resetting
     added_rows = AddedRows()
     check_new_entries = True
@@ -372,7 +257,6 @@ def logEntryUpdates(conn, all_logs, check_new_entries=False):
         
         
         # Get the data from the classes in dictionary format
-        #log_pages = all_logs.getLogDictionary()
         update_check = all_logs.getUpdateCheck()
         return all_logs, update_check
     
@@ -429,7 +313,7 @@ def loopLogPages(conn, all_logs, callback, callback_args):
 def loadEntrysWithStatus(db_path, all_logs, table_list):
     '''Loads the database and checks if the new entries exist.
     
-    Builds a new list that stores the log_pages entry for each row as well as
+    Builds a new list that stores the SubLog entry for each row as well as
     some info on the key to that table in the gui, whether the entry already
     exists or not adn the row count.
     Uses the findNewLogEntries function to fo the hard work.
@@ -484,7 +368,8 @@ def findNewLogEntries(conn, all_logs, table_list):
             callback_args['display_data'].append([page.contents[i], 
                                             table_dict[page.name], i, False])
             #DEBUG - I don't think this is necessary as it's dealt with by the
-            #        False flag in the 'display_data'.
+            #        False flag in the 'display_data'. NOTE: currently not
+            #        updated to use the AllLogs object.
             #del log_pages[log_name][i]
         else:
             callback_args['display_data'].append([page.contents[i], 
@@ -500,13 +385,11 @@ def findNewLogEntries(conn, all_logs, table_list):
     table_dict = dict(combo)
     
     # Get the logs in object format
-    #all_logs = AllLogs(log_pages)
     callback_args = {'table_dict': table_dict, 'display_data': []}
     
     # Call the looping function, handing it our callback
     all_logs, callback_args = loopLogPages(conn, all_logs, callbackFunc, 
                                                             callback_args)
-    #log_pages = all_logs.getLogDictionary()
     display_data = callback_args['display_data']
     return all_logs, display_data
     
@@ -672,7 +555,7 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
     @param log_type: the model type to load (tuflow or ISIS only).
     @param lauch_error=True: whether to launch message boxes if an error is
            found or not. We don't want to if we're loading multiple files.
-    @return: tuple containing log_pages (which could be the loaded log
+    @return: tuple containing AllLogs (which could be the loaded log
              pages or False if the load failed and a dictionary containing
              the load status and messages for status bars and errors.
     '''   
@@ -688,9 +571,9 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
         # Make sure that this ief or tcf do not already exist in the
         # database. You need new ones for each run so this isn't
         # allowed.
-        main_ief = all_logs.getLogEntryContents('RUN', 0)['IEF'] # .log_pages['RUN'][0].contents['IEF']
-        main_tcf = all_logs.getLogEntryContents('RUN', 0)['TCF'] #.log_pages['RUN'][0].contents['TCF']
-        tcf_results = all_logs.getLogEntryContents('RUN', 0)['RESULTS_LOCATION_2D'] #.log_pages['RUN'][0].contents['RESULTS_LOCATION_2D']
+        main_ief = all_logs.getLogEntryContents('RUN', 0)['IEF'] 
+        main_tcf = all_logs.getLogEntryContents('RUN', 0)['TCF'] 
+        tcf_results = all_logs.getLogEntryContents('RUN', 0)['RESULTS_LOCATION_2D'] 
         
         indb = (False,)
         found_path = ''
