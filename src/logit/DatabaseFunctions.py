@@ -220,6 +220,13 @@ class DatabaseManager(object):
         return result[3]
         
     
+    def insertBlob(self, table_name, col_name, pdata, row_id):
+        '''Inserts data into a blob entry.
+        '''
+        query = "update " + table_name + " set " + col_name + "=:blobData where id = " + str(row_id)
+        self.cur.execute (query, [sqlite3.Binary(pdata)],) 
+        self.conn.commit()
+    
 
     def readQuery(self, query):
         '''Used to read in a query from the database.

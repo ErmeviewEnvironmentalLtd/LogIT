@@ -114,6 +114,48 @@ class AddedRows(object):
         for name, table in self.tables.iteritems():
             for id in table: #reverse_enumerate(table):
                 db_manager.deleteRow(name, id)
+                
+
+class RunIds(object):
+    '''
+    '''
+    
+    def __init__(self):
+        '''
+        '''
+        self.ids = {'RUN': -1, 'TCF': [], 'ECF': [], 'TGC': [], 'TBC': [], 
+                    'DAT': [], 'BC_DBASE': []}
+        
+    
+    def add(self, page_name, id):
+        '''
+        '''
+        if page_name == 'RUN':
+            self.ids['RUN'] = id
+        else:
+            self.ids[page_name].append(id)
+    
+    
+    def convertDict(self):
+        '''
+        '''
+        self.run = self.ids['RUN']
+        self.dat = self.ids['DAT']
+        self.tgc = self.ids['TGC']
+        self.tbc = self.ids['TBC']
+        self.bc_dbase = self.ids['BC_DBASE']
+        self.ecf = self.ids['ECF']
+        self.tcf = self.ids['TCF']
+        del self.ids
+        
+    def convertToDict(self):
+        '''
+        '''
+        self.ids = {'RUN': self.run, 'TCF': self.tcf, 'ECF': self.ecf, 
+                    'TGC': self.tgc, 'TBC': self.tbc, 'DAT': self.dat, 
+                    'BC_DBASE': self.bc_dbase}
+        
+    
         
 
 def updateLog(db_path, all_logs, errors, check_new_entries=False):
@@ -171,6 +213,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     '''
     
     added_rows = None    
+    run_ids = None
     
     def insertSubFiles(db_manager, index, values, page, max_id):
         '''Insert files referenced by one of the log pages into its table.
@@ -201,19 +244,24 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         Will check if entry exists first if check_entry==True.
         '''
         try:
+            result = None
             has_entry = False
             if check_entry:
-                has_entry = db_manager.findEntry(page.name, page.name,
-                                page.contents[index][page.name])
+                result = db_manager.findEntry(page.name, page.name,
+                            page.contents[index][page.name], return_rows=True)
+                has_entry = result[0]
 
             if not has_entry:
+
                 db_manager.insertValues(page.name, page.contents[index])
-              
+                run_ids.add(page.name, max_id)
                 added_rows.addRows(page.name, max_id)
                 page.contents[index]['ID'] = max_id
                 page.update_check = True
 
             else:
+                id = result[2][0]['ID']
+                run_ids.add(page.name, id)
                 page.deleteItem(index)
                 #page.update_check[index] = False
         except:
@@ -242,8 +290,16 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
                                   check_new_entries)
         
         return page, callback_args
+    
+    
+    def insertRunIds(run_id):
+        '''
+        '''
+        pdata = cPickle.dumps(run_ids, cPickle.HIGHEST_PROTOCOL)
+        db_manager.insertBlob('RUN', 'LINKED_IDS', pdata, run_id)
             
     # Collects all files added to database for resetting
+    run_ids = RunIds()
     added_rows = AddedRows()
     check_new_entries = True
     max_run_id = db_manager.getMaxId('RUN') + 1
@@ -255,6 +311,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         
         # Get the data from the classes in dictionary format
         update_check = all_logs.getUpdateCheck()
+        insertRunIds(max_run_id)
         return all_logs, update_check
     
     # This acts as a failsafe incase we hit an error after some of the entries
