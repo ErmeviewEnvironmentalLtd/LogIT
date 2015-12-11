@@ -426,7 +426,8 @@ def createRunTable(cur):
                   TBC                     TEXT,
                   BC_DBASE                TEXT,
                   ECF                     TEXT,
-                  EVENT_NAME              TEXT);
+                  EVENT_NAME              TEXT,
+                  LINKED_IDS              BLOB);
                  ''')
     
     
@@ -441,8 +442,7 @@ def createTgcTable(cur):
                     TGC            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
-                    COMMENTS       TEXT,
-                    RUN_ID         INTEGER);
+                    COMMENTS       TEXT);
                     ''')
     
 
@@ -457,8 +457,7 @@ def createTbcTable(cur):
                     TBC            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
-                    COMMENTS       TEXT,
-                    RUN_ID         INTEGER);
+                    COMMENTS       TEXT);
                     ''')
     
     
@@ -472,8 +471,7 @@ def createDatTable(cur):
                     DATE           TEXT                       NOT NULL,
                     DAT            TEXT,
                     AMENDMENTS     TEXT,
-                    COMMENTS       TEXT,
-                    RUN_ID         INTEGER);
+                    COMMENTS       TEXT);
                     ''')
 
 
@@ -488,8 +486,7 @@ def createBcTable(cur):
                     BC_DBASE       TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
-                    COMMENTS       TEXT,
-                    RUN_ID         INTEGER);
+                    COMMENTS       TEXT);
                     ''')
     
 
@@ -504,8 +501,7 @@ def createEcfTable(cur):
                     ECF            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
-                    COMMENTS       TEXT,
-                    RUN_ID         INTEGER);
+                    COMMENTS       TEXT);
                     ''')
     
 
@@ -520,8 +516,7 @@ def createTcfTable(cur):
                     TCF            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
-                    COMMENTS       TEXT,
-                    RUN_ID         INTEGER);
+                    COMMENTS       TEXT);
                     ''')
     
 
@@ -546,8 +541,7 @@ def createTbcFilesTable(cur):
     cur.execute('''CREATE TABLE TBC_FILES
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     TBC                TEXT,
-                    FILES              TEXT,
-                    RUN_ID             INTEGER);
+                    FILES              TEXT);
                     ''')
     
     
@@ -559,8 +553,7 @@ def createBcFilesTable(cur):
     cur.execute('''CREATE TABLE BC_DBASE_FILES 
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     BC_DBASE           TEXT,
-                    FILES              TEXT,
-                    RUN_ID             INTEGER);
+                    FILES              TEXT);
                     ''')
     
 
@@ -572,8 +565,7 @@ def createEcfFilesTable(cur):
     cur.execute('''CREATE TABLE ECF_FILES 
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     ECF                TEXT,
-                    FILES              TEXT,
-                    RUN_ID             INTEGER);
+                    FILES              TEXT);
                     ''')
 
 
@@ -585,8 +577,7 @@ def createTcfFilesTable(cur):
     cur.execute('''CREATE TABLE TCF_FILES 
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     TCF                TEXT,
-                    FILES              TEXT,
-                    RUN_ID             INTEGER     NOT NULL);
+                    FILES              TEXT);
                     ''')
 
         

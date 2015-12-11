@@ -172,7 +172,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     
     added_rows = None    
     
-    def insertSubFiles(db_manager, index, values, page, max_id, max_run_id):
+    def insertSubFiles(db_manager, index, values, page, max_id):
         '''Insert files referenced by one of the log pages into its table.
         
         Looks to see if any of the files it contains aren't already entered. 
@@ -183,7 +183,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     
         new_files, ids = insertIntoModelFileTable(db_manager, 
                             page.subfile_name, page.name, 
-                                values[page.name], values['FILES'], max_run_id) 
+                                values[page.name], values['FILES']) 
         #added_rows.addRows(page.subfile_name, ids)
           
         if not new_files == False:
@@ -195,8 +195,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         
         return page
      
-    def insertMainFile(db_manager, index, page, max_id, check_entry,
-                                                            max_run_id):
+    def insertMainFile(db_manager, index, page, max_id, check_entry):
         '''Adds the log page data in 'page' to the log page table.
         
         Will check if entry exists first if check_entry==True.
@@ -208,10 +207,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
                                 page.contents[index][page.name])
 
             if not has_entry:
-                insert_vals = page.contents[index]
-                if not page.name == 'RUN':
-                    insert_vals['RUN_ID'] = max_run_id
-                db_manager.insertValues(page.name, insert_vals) #page.contents[index])
+                db_manager.insertValues(page.name, page.contents[index])
               
                 added_rows.addRows(page.name, max_id)
                 page.contents[index]['ID'] = max_id
@@ -231,22 +227,19 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         This function is a callback used by the looping function.
         '''
         check_new_entries = callback_args['check_new_entries']
-        max_run_id = callback_args['RUN_ID']
         
         # We need the maximum id so that we can increment by 1 and put it into
         # the output table in the GUI.
         max_id = db_manager.getMaxId(page.name) + 1
         
         if page.multi_file:
-            page = insertSubFiles(db_manager, i, values, page, max_id, 
-                                                                max_run_id)
+            page = insertSubFiles(db_manager, i, values, page, max_id)
             
         if page.name == 'RUN':
-            page = insertMainFile(db_manager, 0, page, max_id, False, 
-                                                            max_run_id)
+            page = insertMainFile(db_manager, 0, page, max_id, False)
         else:
             page = insertMainFile(db_manager, i, page, max_id, 
-                                  check_new_entries, max_run_id)
+                                  check_new_entries)
         
         return page, callback_args
             
@@ -257,8 +250,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     try:
         # Send function as a callback to the log page looping function.
         all_logs, callback_args = loopLogPages(db_manager, all_logs, callbackFunc, 
-                                    {'check_new_entries': check_new_entries,
-                                     'RUN_ID': max_run_id})
+                                    {'check_new_entries': check_new_entries})
         
         
         # Get the data from the classes in dictionary format
@@ -400,7 +392,7 @@ def findNewLogEntries(db_manager, all_logs, table_list):
     
 
 def insertIntoModelFileTable(db_manager, table_name, col_name, model_file, 
-                                                    files_list, max_run_id):
+                                                    files_list):
     '''Insert file references into the model file table if they are not
     already there.
     
@@ -421,7 +413,7 @@ def insertIntoModelFileTable(db_manager, table_name, col_name, model_file,
         # files database under col_name and add it to the list so that we
         # can put it in the new files col of the main table.
         if results[0] == False:
-            row_data = {col_name: model_file, 'FILES': f, 'RUN_ID': max_run_id}
+            row_data = {col_name: model_file, 'FILES': f}
             db_manager.insertValues(table_name, row_data)
             new_files.append(f)
             ids.append(added_count)
