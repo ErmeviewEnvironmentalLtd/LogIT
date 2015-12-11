@@ -238,7 +238,8 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         
         return page
      
-    def insertMainFile(db_manager, index, page, max_id, check_entry):
+    def insertMainFile(db_manager, index, page, max_id, check_entry, 
+                                                        run_id=None):
         '''Adds the log page data in 'page' to the log page table.
         
         Will check if entry exists first if check_entry==True.
@@ -246,6 +247,15 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         try:
             result = None
             has_entry = False
+            
+            # Every entry gets put into the RUN_ID table. Unless it's RUN
+            if not run_id == None:
+                db_manager.insertValues('RUN_ID', 
+                                    {'RUN_ID': run_id, 
+                                     'FILE': page.contents[index][page.name],
+                                     'TYPE': page.name
+                                     })
+            
             if check_entry:
                 result = db_manager.findEntry(page.name, page.name,
                             page.contents[index][page.name], return_rows=True)
@@ -275,6 +285,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         This function is a callback used by the looping function.
         '''
         check_new_entries = callback_args['check_new_entries']
+        run_id = callback_args['run_id']
         
         # We need the maximum id so that we can increment by 1 and put it into
         # the output table in the GUI.
@@ -287,17 +298,11 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
             page = insertMainFile(db_manager, 0, page, max_id, False)
         else:
             page = insertMainFile(db_manager, i, page, max_id, 
-                                  check_new_entries)
+                                  check_new_entries, run_id)
         
         return page, callback_args
     
-    
-    def insertRunIds(run_id):
-        '''
-        '''
-        pdata = cPickle.dumps(run_ids, cPickle.HIGHEST_PROTOCOL)
-        db_manager.insertBlob('RUN', 'LINKED_IDS', pdata, run_id)
-            
+
     # Collects all files added to database for resetting
     run_ids = RunIds()
     added_rows = AddedRows()
@@ -306,12 +311,12 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     try:
         # Send function as a callback to the log page looping function.
         all_logs, callback_args = loopLogPages(db_manager, all_logs, callbackFunc, 
-                                    {'check_new_entries': check_new_entries})
+                                    {'check_new_entries': check_new_entries,
+                                     'run_id': max_run_id})
         
         
         # Get the data from the classes in dictionary format
         update_check = all_logs.getUpdateCheck()
-        insertRunIds(max_run_id)
         return all_logs, update_check
     
     # This acts as a failsafe incase we hit an error after some of the entries
@@ -504,12 +509,14 @@ def deleteDatabaseRow(db_path, table_name, id, all_entry=False):
     @param id: the unique id of the row to delete.
     @return: True if successful, false otherwise.
     '''
-    db_manager = DatabaseFunctions.DatabasManager(db_path)
+    db_manager = DatabaseFunctions.DatabaseManager(db_path)
     try:
         if all_entry:
-            self._getAssociatedEntries(db_manager, id)
-            
-        # Delete the row from the database
+            # Delete all associated rows
+            _deleteAssociatedEntries(db_manager, id)
+
+        # Delete the row from the database this will remove the run row if
+        # all_entry == True
         db_manager.deleteRow(table_name, id)
         
     except IOError:
@@ -522,27 +529,39 @@ def deleteDatabaseRow(db_path, table_name, id, all_entry=False):
     return True
 
 
-def _getAssociatedEntries(db_manager, id):
+def _deleteAssociatedEntries(db_manager, run_id):
+    '''Delete all of the log page entries associated with the run_id
     '''
-    '''
+    # Get all of the table names in the database
     names = db_manager.getTableNames()
     
-    # Search through all the names in the database
-    for name in names:
-
-        # See if there's any matches to the RUN table's ID value
-        result = db_manager.findEntry(name, 'RUN_ID', id, return_rows=True)
-        
-        # If there is then check to see if there's any of references to that 
-        # file in other runs.
-        if result[0]:
-            result2 = db_manager.findEntry('RUN', name, result[3][name], return_rows=True)
-            
-            # If not then we can delete the entry.
-            if result2[0]:
-                if len(result2[3]) > 1:
-                    db_manager.deleteRow(name, result[3]['ID'])
+    # I think this is superflous now that wer've got rid of the need to do 
+    # the pickling and storing of id's in an object in the database.
+#     run_results = db_manager.findEntry('RUN', 'ID', run_id, return_rows=True)
+#     run_id = run_results[2][0]['ID']
     
+    # Get all the entries made with this run_id and then delete them
+    file_results = db_manager.findEntry('RUN_ID', 'RUN_ID', run_id, return_rows=True)
+    db_manager.deleteClause('RUN_ID', 'RUN_ID', run_id)
+
+    # Search the RUN_ID table to see if there are any file name matches with
+    # the ones we just deleted. If there is then we can't delete the associated
+    # rows in the page tables.
+    del_list = []
+    for file in file_results[2]:
+        result = db_manager.findEntry('RUN_ID', 'FILE', file['FILE'], return_rows=True)
+        if not result[0]:
+            del_list.append([file['TYPE'], file['FILE']])
+    
+    # Delete any TGC, TBC etc entries that are no longer needed.
+    for item in del_list:
+        db_manager.deleteClause(item[0], item[0], item[1])
+        
+        if not item[0] == 'DAT':
+            files_name = item[0] + '_FILES'
+            db_manager.deleteClause(files_name, item[0], item[1])
+        
+
     
 def checkDatabaseVersion(db_path, errors):
     '''Tests database to see if it's the right version.

@@ -384,12 +384,15 @@ class MainGui(QtGui.QMainWindow):
         menu = QtGui.QMenu()
         updateRowAction = menu.addAction("Update Row")
         deleteRowAction = menu.addAction("Delete Row")
-    
+        #deleteAllRowAction = menu.addAction("Delete All Log Entry")
+        
         # Find who called us and get the object that the name refers to.
         sender = self.sender()
         sender = str(sender.objectName())
-        if sender == 'RUN':
-            deleteAllRowAction = menu.addAction("Delete All Log Entry")
+        has_delall = False
+        if sender == self.view_tables.tables['RUN'].name:
+            deleteAllRowAction = menu.addAction("Delete Associated Entries")
+            has_delall = True
         
         # lookup the table and database table name
         table_obj = self.view_tables.getTable(name=sender)
@@ -400,13 +403,13 @@ class MainGui(QtGui.QMainWindow):
             self._saveViewChangesToDatabase(table_obj)
         
         elif action == deleteRowAction:
-            self._deleteRowFromDatabase(table_obj)
+            self._deleteRowFromDatabase(table_obj, False)
         
-        elif action == deleteAllRowAction:
-            self._delteRowFromDatabase(table_obj, True)
+        elif has_delall and action == deleteAllRowAction:
+            self._deleteRowFromDatabase(table_obj, True)
             
     
-    def _deleteRowFromDatabase(self, table, all_entry=False):
+    def _deleteRowFromDatabase(self, table, all_entry):
         '''Deletes the row in the database based on the location that the mouse
         was last clicked.
         This is fine because this function is called from the context menu and

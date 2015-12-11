@@ -105,6 +105,13 @@ class DatabaseManager(object):
         query = "delete from %s where ID='%s'" % (table_name, row_id)
         self.writeQuery(query)
         
+        
+    def deleteClause(self, table_name, col_name, entry):
+        '''
+        '''
+        query = "delete from %s where %s='%s'" % (table_name, col_name, entry)
+        self.writeQuery(query)
+        
 
     def insertValues(self, table_name, row_data):   
         '''Inserts a dictionary of values into the given table_name
@@ -217,7 +224,7 @@ class DatabaseManager(object):
         query = "SELECT name FROM sqlite_master WHERE type='table'"
         self.cur.execute(query)
         result = self._getEntriesFromCursor()
-        return result[3]
+        return result[2]
         
     
     def insertBlob(self, table_name, col_name, pdata, row_id):
@@ -226,6 +233,14 @@ class DatabaseManager(object):
         query = "update " + table_name + " set " + col_name + "=:blobData where id = " + str(row_id)
         self.cur.execute (query, [sqlite3.Binary(pdata)],) 
         self.conn.commit()
+    
+    
+#     def selectBlob(self):
+#         '''
+#         '''
+#         self.cur.execute("select data from table limit 1")
+#         for row in curr:
+#             data = cPickle.loads(str(row['data']))
     
 
     def readQuery(self, query):
@@ -393,6 +408,9 @@ def createNewLogDatabase(db_path):
         createTcfFilesTable(cur)
         logger.info('Tcf Files table created')
         
+        createRunIdTable(cur)
+        logger.info('Run id table created')
+        
         cur.execute("pragma user_version = %s" % DATABASE_VERSION_NO)
         
         conn.commit()
@@ -433,8 +451,20 @@ def createRunTable(cur):
                   TBC                     TEXT,
                   BC_DBASE                TEXT,
                   ECF                     TEXT,
-                  EVENT_NAME              TEXT,
-                  LINKED_IDS              BLOB);
+                  EVENT_NAME              TEXT);
+                 ''')
+    
+
+def createRunIdTable(cur):
+    '''Create the run table
+    
+    @param cur: a cursor to an open database connection
+    '''
+    cur.execute('''CREATE TABLE RUN_ID
+                 (ID            INTEGER    PRIMARY KEY       NOT NULL,
+                  RUN_ID        INTEGER,
+                  FILE          TEXT,
+                  TYPE          TEXT);
                  ''')
     
     
@@ -611,6 +641,7 @@ def dropAllTables(db_path):
             cur.execute('''DROP TABLE IF EXISTS BC_DBASE_FILES''')
             cur.execute('''DROP TABLE IF EXISTS ECF_FILES''')
             cur.execute('''DROP TABLE IF EXISTS TCF_FILES''')
+            cur.execute('''DROP TABLE IF EXISTS RUN_ID''')
             con.commit()
         except con.Error:
             con.rollback()
@@ -628,23 +659,25 @@ run = ['ID', 'DATE', 'MODELLER', 'RESULTS_LOCATION_2D', 'RESULTS_LOCATION_1D',
        'EVENT_DURATION', 'DESCRIPTION', 'COMMENTS', 'SETUP', 'ISIS_BUILD', 
        'IEF', 'DAT', 'TUFLOW_BUILD', 'TCF', 'TGC', 'TBC', 'BC_DBASE', 'ECF',
        'EVENT_NAME'] 
-tgc = ['ID', 'DATE', 'TGC', 'FILES', 'NEW_FILES', 'COMMENTS', 'RUN_ID']
-tbc = ['ID', 'DATE', 'TBC', 'FILES', 'NEW_FILES', 'COMMENTS', 'RUN_ID']
-dat = ['ID', 'DATE', 'DAT', 'AMENDMENTS', 'COMMENTS', 'RUN_ID']
-bc_dbase = ['ID', 'BC_DBASE', 'FILES', 'NEW_FILES', 'COMMENTS', 'RUN_ID']
-ecf = ['ID', 'ECF', 'FILES', 'NEW_FILES', 'COMMENTS', 'RUN_ID']
-tcf = ['ID', 'TCF', 'FILES', 'NEW_FILES', 'COMMENTS', 'RUN_ID']
-tgc_files = ['ID', 'TGC', 'FILES', 'RUN_ID']
-tbc_files = ['ID', 'TBC', 'FILES', 'RUN_ID']
-bc_dbase_files = ['ID', 'BC_DBASE', 'FILES', 'RUN_ID']
-ecf_files = ['ID', 'ECF', 'FILES', 'RUN_ID']
-tcf_files = ['ID', 'TCF', 'FILES', 'RUN_ID']
+tgc = ['ID', 'DATE', 'TGC', 'FILES', 'NEW_FILES', 'COMMENTS']
+tbc = ['ID', 'DATE', 'TBC', 'FILES', 'NEW_FILES', 'COMMENTS']
+dat = ['ID', 'DATE', 'DAT', 'AMENDMENTS', 'COMMENTS']
+bc_dbase = ['ID', 'BC_DBASE', 'FILES', 'NEW_FILES', 'COMMENTS']
+ecf = ['ID', 'ECF', 'FILES', 'NEW_FILES', 'COMMENTS']
+tcf = ['ID', 'TCF', 'FILES', 'NEW_FILES', 'COMMENTS']
+tgc_files = ['ID', 'TGC', 'FILES']
+tbc_files = ['ID', 'TBC', 'FILES']
+bc_dbase_files = ['ID', 'BC_DBASE', 'FILES']
+ecf_files = ['ID', 'ECF', 'FILES']
+tcf_files = ['ID', 'TCF', 'FILES']
+run_id = ['ID', 'RUN_ID', 'FILE']
 
 cur_tables = {'RUN': run, 'TGC': tgc, 'TBC': tbc, 'DAT': dat, 'ECF': ecf, 'TCF': tcf,
               'BC_DBASE': bc_dbase, 'TGC_FILES': tgc_files, 
               'TBC_FILES': tbc_files, 'BC_DBASE_FILES': bc_dbase_files,
-              'ECF_FILES': ecf_files, 'TCF_FILES': tcf_files
-             }
+              'ECF_FILES': ecf_files, 'TCF_FILES': tcf_files,
+              'RUN_ID': run_id
+              }
 
 def buildTableFromName(table_type, cur):
     '''Builds the table based on the name
@@ -660,7 +693,8 @@ def buildTableFromName(table_type, cur):
                         'TBC_FILES': createTbcFilesTable, 
                         'BC_DBASE_FILES': createBcFilesTable,
                         'ECF_FILES': createEcfFilesTable,
-                        'TCF_FILES': createTcfFilesTable
+                        'TCF_FILES': createTcfFilesTable,
+                        'RUN_ID': createRunIdTable,
                        }
         
         table_types[table_type](cur)
