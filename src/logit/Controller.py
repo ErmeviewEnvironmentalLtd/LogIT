@@ -173,10 +173,10 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
            and it will cost unnecessary processing effort.
     '''
     # Connect to the database and then update the log entries
-    update_check = None
+    #update_check = None
     try:
         db_manager = DatabaseFunctions.DatabaseManager(db_path)
-        all_logs, update_check = logEntryUpdates(db_manager, all_logs,
+        all_logs = logEntryUpdates(db_manager, all_logs,
                                                   check_new_entries)
     except IOError:
         logger.error('Unable to access database')
@@ -189,7 +189,7 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
                                         msg_add=':\n%s' % (db_path))
 
     finally:
-        return errors, all_logs, update_check
+        return errors, all_logs#, update_check
  
 
 def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
@@ -267,7 +267,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
                 run_ids.add(page.name, max_id)
                 added_rows.addRows(page.name, max_id)
                 page.contents[index]['ID'] = max_id
-                page.update_check = True
+                #page.update_check = True
 
             else:
                 id = result[2][0]['ID']
@@ -316,8 +316,8 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         
         
         # Get the data from the classes in dictionary format
-        update_check = all_logs.getUpdateCheck()
-        return all_logs, update_check
+        #update_check = all_logs.getUpdateCheck()
+        return all_logs#, update_check
     
     # This acts as a failsafe incase we hit an error after some of the entries
     # were already added to the database. It tries to roll back the entries by

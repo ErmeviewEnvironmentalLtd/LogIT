@@ -384,7 +384,6 @@ class MainGui(QtGui.QMainWindow):
         menu = QtGui.QMenu()
         updateRowAction = menu.addAction("Update Row")
         deleteRowAction = menu.addAction("Delete Row")
-        #deleteAllRowAction = menu.addAction("Delete All Log Entry")
         
         # Find who called us and get the object that the name refers to.
         sender = self.sender()
@@ -572,7 +571,7 @@ class MainGui(QtGui.QMainWindow):
             self._updateWithUserInputs()
             
             errors = GuiStore.ErrorHolder()
-            errors, self.all_logs, update_check = Controller.updateLog(
+            errors, self.all_logs = Controller.updateLog(
                         self.settings.cur_log_path, self.all_logs, errors) # DEBUG , check_new_entries=True
             
             if errors.has_errors:
@@ -582,7 +581,8 @@ class MainGui(QtGui.QMainWindow):
                 return
             
             # Add the new entries to the view table as well
-            self.updateLogTable(update_check)
+            #self.updateLogTable(update_check)
+            self.loadModelLog()
             
             # Clear the entry rows and deactivate add new log button
             self.new_entry_tables.clearAll()
@@ -650,7 +650,8 @@ class MainGui(QtGui.QMainWindow):
                 continue
             
             # Add the new entries to the view table as well
-            self.updateLogTable(update_check)
+#             self.updateLogTable(update_check)
+            self.loadModelLog()
             
         # Clear the list entries
         self.ui.loadMultiModelTable.setRowCount(0)
@@ -668,10 +669,6 @@ class MainGui(QtGui.QMainWindow):
     
     def _updateWithUserInputs(self):
         '''Get the variables that we want to allow the user to be able to update.
-        
-        TODO:
-            This function is a prime example of why the all_logs object
-            needs converting to an object such as that used in Controller.
         '''
         for log in self.all_logs.log_pages.values():
             if not log.has_contents: 
@@ -684,6 +681,7 @@ class MainGui(QtGui.QMainWindow):
                     row[key] = entry
         
     
+    # TODO: Remove if no longer called.
     def updateLogTable(self, update_check):
         '''Updates the log tables on the log view tab.
         '''
