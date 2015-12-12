@@ -431,11 +431,17 @@ class MainGui(QtGui.QMainWindow):
             return
         
         # Delete from database
-        success = Controller.deleteDatabaseRow(self.settings.cur_log_path,
-                                    table.key, row_dict['ID'], all_entry)
+        errors = GuiStore.ErrorHolder()
+        errors = Controller.deleteDatabaseRow(self.settings.cur_log_path,
+                                table.key, row_dict['ID'], errors, all_entry)
         # and then from the table
-        if success:
-            table.removeRow(row)
+        if errors.has_errors:
+            self.launchQMsgBox(errors.msgbox_error.title, 
+                               errors.msgbox_error.message)
+            logger.error('Failed to delete row(s)')
+        else:
+            self.loadModelLog()
+#             table.removeRow(row)
             logger.info('Row ID=%s deleted successfully' % (row_dict['ID']))
     
     
@@ -454,20 +460,20 @@ class MainGui(QtGui.QMainWindow):
         id_key = save_dict['ID']
         
         # Add the updates to the database
-        error = DatabaseFunctions.saveViewChangesToDatabase(table.key, 
-                                save_dict, id_key, self.settings.cur_log_path)
+        errors = GuiStore.ErrorHolder()
+        errors = Controller.editDatabaseRow(self.settings.cur_log_path, 
+                                        table.key, id_key, save_dict, errors)
         
         db_path = os.path.split(self.settings.cur_log_path)[0]
-        if not error == False:
+        if errors.has_errors:
             logger.error('Row ID=%s failed to update' % (id_key))
-            QtGui.QMessageBox.warning(self, "Log Entry Update Fail",
-                        "Log (%s) entry for ID=%s has failed to update." % (
-                                                            db_path, id_key))
+            self.launchQMsgBox(errors.msgbox_error.title, 
+                               errors.msgbox_error.message)
         else:
             logger.info('Row ID=%s updated successfully' % (id_key))
-            QtGui.QMessageBox.information(self, "Log Entry Updated",
-                        "Log (%s) entry for ID=%s has been updated." % (
-                                                        db_path, id_key))
+            self.ui.statusbar.showMessage(
+                                "Log entry (Table=%s : ID=%s) has been"
+                                " updated" % (table.key, id_key))
                 
         
     def loadModelLog(self):

@@ -383,6 +383,7 @@ class ErrorHolder(object):
         '''
         errors = {}
         self.DB_UPDATE = 'Database Update Error'
+        self.DB_EDIT = 'Database Edit Error'
         self.DB_OLD = 'Database Old Error'
         self.DB_NEW = 'Database New Error'
         self.DB_ACCESS = 'Database Access Error'
@@ -400,6 +401,12 @@ class ErrorHolder(object):
         message = status_bar
         errors[title] = ErrorType(title, status_bar, message)
         
+        #
+        title = self.DB_EDIT
+        status_bar = 'Unable to edit log database'
+        message = status_bar
+        errors[title] = ErrorType(title, status_bar, message)
+
         #
         title = self.DB_OLD
         status_bar = 'Unable to load database '
@@ -447,7 +454,7 @@ class ErrorHolder(object):
         
         #
         title = self.DB_SCHEMA
-        status_bar = 'Failed to update database scheme: See log for details '
+        status_bar = 'Failed to update database schema: See log for details '
         message = status_bar
         errors[title] = ErrorType(title, status_bar, message)
         

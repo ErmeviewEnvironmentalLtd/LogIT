@@ -489,6 +489,8 @@ def insertIntoModelFileTable(db_manager, table_name, col_name, model_file,
     
 def createQtTableItem(name, is_editable=False):
     '''Create a QTableWidgetItem and return
+    TODO: Check if this can be dealt with meaningfully in the Table classes.
+          Currently only used by the multiModelLoad path list.
     @param is_editable=False: Set editable flag.
     @return: QTableWidgetItem
     '''
@@ -502,7 +504,37 @@ def createQtTableItem(name, is_editable=False):
     return item
 
 
-def deleteDatabaseRow(db_path, table_name, id, all_entry=False):
+def editDatabaseRow(db_path, table_name, id, values, errors):
+    '''Updates the database table with the row data provided.
+    Uses UPDATE syntax to update all of the rows in the data base with the
+    given dictionary. The keys must correspond to the column names or an
+    error will be thrown.
+    :param dp_path: path to an existing database.
+    :param table_name: name of a table in the database.
+    :param id: the index of the row to update.
+    :param values: the dictionary containing update values.
+    :param errors: An ErrorHolder object.
+    :raise IOError: if connection to database fails.
+    :raise Exception: if anything else goes wrong (TODO)
+    '''
+    try:
+        db_manager = DatabaseFunctions.DatabaseManager(db_path)
+        db_manager.updateRowValues(table_name, 'ID', values, id)
+        return errors
+    
+    except IOError:
+        logger.error('Unable to access database - see log for details')
+        errors.addError(errors.DB_EDIT, msgbox_error=True)
+        return errors
+    except Exception:
+        logger.error('Unable to access database - see log for details')
+        errors.addError(errors.DB_EDIT, msgbox_error=True)
+        return errors
+
+    
+
+
+def deleteDatabaseRow(db_path, table_name, id, errors, all_entry=False):
     '''Deletes the database row with the given id
     @param db_path: the path to the database on file.
     @param table_name: the name of the table.
@@ -521,12 +553,14 @@ def deleteDatabaseRow(db_path, table_name, id, all_entry=False):
         
     except IOError:
         logger.error('Unable to access database - see log for details')
-        return False
+        errors.addError(errors.DB_EDIT, msgbox_error=True)
+        return errors
     except Exception:
         logger.error('Unable to access database - see log for details')
-        return False
+        errors.addError(errors.DB_EDIT, msgbox_error=True)
+        return errors
     
-    return True
+    return errors
 
 
 def _deleteAssociatedEntries(db_manager, run_id):
@@ -534,11 +568,6 @@ def _deleteAssociatedEntries(db_manager, run_id):
     '''
     # Get all of the table names in the database
     names = db_manager.getTableNames()
-    
-    # I think this is superflous now that wer've got rid of the need to do 
-    # the pickling and storing of id's in an object in the database.
-#     run_results = db_manager.findEntry('RUN', 'ID', run_id, return_rows=True)
-#     run_id = run_results[2][0]['ID']
     
     # Get all the entries made with this run_id and then delete them
     file_results = db_manager.findEntry('RUN_ID', 'RUN_ID', run_id, return_rows=True)

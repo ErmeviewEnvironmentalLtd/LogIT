@@ -130,11 +130,25 @@ class DatabaseManager(object):
         '''Updates the values of a row in the given table.
         :param table_name: the name of the table to update.
         :param column: name of the column to update.
-        :param value: the values to insert.
+        :param value: the value to insert.
         :param id: the row index to insert the value into.
         '''
         query = "update %s set %s='%s' where ID=%s" % (table_name, column, value, id)
         self.writeQuery(query)
+    
+    
+    def updateRowValues(self, table_name, column, row_data, id):
+        '''
+        '''
+        columns = ' = ?, '.join(row_data.keys())
+        columns += ' = ?'
+#         placeholders = ", ".join('?' * len(row_data))
+#         set home_score = ?\
+#                     ,away_score = ?\
+#                 WHERE home_team in ?\
+#                 and away_team in ?",(row[1],row[2],row[0],row[3]))
+        query = "update " + table_name + " set " + columns + " where ID='" + id + "'"#.format(row_data.values())
+        self.writeQuery(query, row_data)
 
 
     def findEntry(self, table_name, col_name, entry, column_only=False, 
