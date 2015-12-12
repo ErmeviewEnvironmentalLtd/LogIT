@@ -111,6 +111,21 @@ class DatabaseManager(object):
         '''
         query = "delete from %s where %s='%s'" % (table_name, col_name, entry)
         self.writeQuery(query)
+    
+    
+    def insertQueue(self, queue_obj):
+        '''
+        '''
+        while not queue_obj.isEmpty():
+            entry = queue_obj.dequeue()
+            table_name = entry[0]
+            row_data = entry[1]
+            columns = ', '.join(row_data.keys())
+            placeholders = ", ".join('?' * len(row_data))
+            query = 'insert into ' + table_name + ' ({}) values ({})'.format(columns, placeholders)
+            self.writeQuery(query, row_data, False)
+        
+        self.conn.commit()
         
 
     def insertValues(self, table_name, row_data):   
@@ -142,12 +157,7 @@ class DatabaseManager(object):
         '''
         columns = ' = ?, '.join(row_data.keys())
         columns += ' = ?'
-#         placeholders = ", ".join('?' * len(row_data))
-#         set home_score = ?\
-#                     ,away_score = ?\
-#                 WHERE home_team in ?\
-#                 and away_team in ?",(row[1],row[2],row[0],row[3]))
-        query = "update " + table_name + " set " + columns + " where ID='" + id + "'"#.format(row_data.values())
+        query = "update " + table_name + " set " + columns + " where ID='" + id + "'"
         self.writeQuery(query, row_data)
 
 
@@ -273,7 +283,7 @@ class DatabaseManager(object):
             raise ValueError
 
 
-    def writeQuery(self, query, row_data=None):
+    def writeQuery(self, query, row_data=None, commit=True):
         '''Used to write a query to the database.
         Will commit once the query has been evaluated.
         :param query: the query to evaluate.
@@ -291,7 +301,8 @@ class DatabaseManager(object):
             else:
                 self.cur.execute(query, row_data.values())
 
-            self.conn.commit()
+            if commit:
+                self.conn.commit()
             return self.cur
 
         except self.conn.Error:
@@ -384,6 +395,8 @@ def createNewLogDatabase(db_path):
         conn = sqlite3.connect(db_path)
         
         logger.debug('New log database created at: ' + db_path)
+        
+        logger.info('Start building database ...')
         cur = conn.cursor()
         
         createRunTable(cur)
@@ -428,6 +441,7 @@ def createNewLogDatabase(db_path):
         cur.execute("pragma user_version = %s" % DATABASE_VERSION_NO)
         
         conn.commit()
+        logger.info('Build database complete.')
 
     except OperationalError:
         conn.rollback()

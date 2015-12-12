@@ -441,7 +441,6 @@ class MainGui(QtGui.QMainWindow):
             logger.error('Failed to delete row(s)')
         else:
             self.loadModelLog()
-#             table.removeRow(row)
             logger.info('Row ID=%s deleted successfully' % (row_dict['ID']))
     
     

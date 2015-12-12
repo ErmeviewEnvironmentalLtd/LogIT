@@ -67,7 +67,22 @@ def reverse_enumerate(iterable):
     '''
     return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
 
-    
+class DbQueue(object):
+    def __init__(self):
+        self.items = []
+
+    def isEmpty(self):
+        return self.items == []
+
+    def enqueue(self, item):
+        self.items.insert(0,item)
+
+    def dequeue(self):
+        return self.items.pop()
+
+    def size(self):
+        return len(self.items)
+ 
 class AddedRows(object):
     '''Keeps track of any new rows added to the database.
     
@@ -214,6 +229,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     
     added_rows = None    
     run_ids = None
+    db_q = None
     
     def insertSubFiles(db_manager, index, values, page, max_id):
         '''Insert files referenced by one of the log pages into its table.
@@ -226,7 +242,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     
         new_files, ids = insertIntoModelFileTable(db_manager, 
                             page.subfile_name, page.name, 
-                                values[page.name], values['FILES']) 
+                                values[page.name], values['FILES'], db_q) 
         #added_rows.addRows(page.subfile_name, ids)
           
         if not new_files == False:
@@ -250,11 +266,17 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
             
             # Every entry gets put into the RUN_ID table. Unless it's RUN
             if not run_id == None:
-                db_manager.insertValues('RUN_ID', 
+                query = ['RUN_ID', 
                                     {'RUN_ID': run_id, 
                                      'FILE': page.contents[index][page.name],
                                      'TYPE': page.name
-                                     })
+                                     }]
+                db_q.enqueue(query)
+#                 db_manager.insertValues('RUN_ID', 
+#                                     {'RUN_ID': run_id, 
+#                                      'FILE': page.contents[index][page.name],
+#                                      'TYPE': page.name
+#                                      })
             
             if check_entry:
                 result = db_manager.findEntry(page.name, page.name,
@@ -262,8 +284,9 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
                 has_entry = result[0]
 
             if not has_entry:
-
-                db_manager.insertValues(page.name, page.contents[index])
+                query = [page.name, page.contents[index]]
+                db_q.enqueue(query)
+#                 db_manager.insertValues(page.name, page.contents[index])
                 run_ids.add(page.name, max_id)
                 added_rows.addRows(page.name, max_id)
                 page.contents[index]['ID'] = max_id
@@ -306,6 +329,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     # Collects all files added to database for resetting
     run_ids = RunIds()
     added_rows = AddedRows()
+    db_q = DbQueue() 
     check_new_entries = True
     max_run_id = db_manager.getMaxId('RUN') + 1
     try:
@@ -314,10 +338,9 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
                                     {'check_new_entries': check_new_entries,
                                      'run_id': max_run_id})
         
-        
-        # Get the data from the classes in dictionary format
-        #update_check = all_logs.getUpdateCheck()
-        return all_logs#, update_check
+        # Add all the new rows to the database
+        db_manager.insertQueue(db_q)
+        return all_logs
     
     # This acts as a failsafe incase we hit an error after some of the entries
     # were already added to the database. It tries to roll back the entries by
@@ -454,7 +477,7 @@ def findNewLogEntries(db_manager, all_logs, table_list):
     
 
 def insertIntoModelFileTable(db_manager, table_name, col_name, model_file, 
-                                                    files_list):
+                                                    files_list, db_q):
     '''Insert file references into the model file table if they are not
     already there.
     
@@ -476,7 +499,9 @@ def insertIntoModelFileTable(db_manager, table_name, col_name, model_file,
         # can put it in the new files col of the main table.
         if results[0] == False:
             row_data = {col_name: model_file, 'FILES': f}
-            db_manager.insertValues(table_name, row_data)
+            query = [table_name, row_data]
+            db_q.enqueue(query)
+#             db_manager.insertValues(table_name, row_data)
             new_files.append(f)
             ids.append(added_count)
             added_count += 1
