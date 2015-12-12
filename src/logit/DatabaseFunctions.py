@@ -107,14 +107,17 @@ class DatabaseManager(object):
         
         
     def deleteClause(self, table_name, col_name, entry):
-        '''
+        '''Deletes rows from the database that meet the given query.
+        All rows where col_name == entry will be deleted.
+        :param entry: the entry to test.
         '''
         query = "delete from %s where %s='%s'" % (table_name, col_name, entry)
         self.writeQuery(query)
     
     
     def insertQueue(self, queue_obj):
-        '''
+        '''Inserts all of the items in the DbQueue object into the database.
+        :param queue_obj: the DbQueue object that contains all the query data.
         '''
         while not queue_obj.isEmpty():
             entry = queue_obj.dequeue()
@@ -141,7 +144,7 @@ class DatabaseManager(object):
         self.writeQuery(query, row_data)
 
 
-    def updateRow(self, table_name, column, value, id):
+    def updateRowValue(self, table_name, column, value, id):
         '''Updates the values of a row in the given table.
         :param table_name: the name of the table to update.
         :param column: name of the column to update.
@@ -152,8 +155,8 @@ class DatabaseManager(object):
         self.writeQuery(query)
     
     
-    def updateRowValues(self, table_name, column, row_data, id):
-        '''
+    def updateRow(self, table_name, column, row_data, id):
+        '''Updates all of the values in the given columns according to row index.
         '''
         columns = ' = ?, '.join(row_data.keys())
         columns += ' = ?'
@@ -184,6 +187,38 @@ class DatabaseManager(object):
             query = "select %s from %s where %s='%s'" % (col_name, table_name, col_name, entry)
         
         self.cur.execute(query)
+        result = self._getEntriesFromCursor()
+        if return_rows:
+            return result
+        else:
+            return result[0]
+    
+    
+    def findMultipleEntry(self, table_name, entry_data, return_rows=False, 
+                                                                AND=True):
+        '''Searches for entries in the given table_name.
+        These must meet the AND/OR criteria provided.
+        :param table_name: the name of the table to search.
+        :param entry_data: dict containing the {column: value} pairs.
+        :param return_rows=False: if True a tuple will be return containing:
+              - True.
+              - Number of rows found.
+              - The values in the rows containing entry.
+              If False then only a boolean will be returned stating whether
+              the entry exists in the column or not.
+        :param AND=True: If equality should be check with AND. Set to False
+               if OR should be used instead.
+        :return: Boolean flag for entry exists or tuple (see above) if 
+                 return_rows is set to True.
+        '''
+        if AND:
+            columns = '=? AND '.join(entry_data.keys())
+        else:
+            columns = '=? OR '.join(entry_data.keys())
+        columns += '=?'
+        query = "SELECT * FROM " + table_name + " WHERE " + columns
+        
+        self.readQuery(query, entry_data)
         result = self._getEntriesFromCursor()
         if return_rows:
             return result
@@ -267,7 +302,7 @@ class DatabaseManager(object):
 #             data = cPickle.loads(str(row['data']))
     
 
-    def readQuery(self, query):
+    def readQuery(self, query, row_data=None):
         '''Used to read in a query from the database.
         This is only used to read from the database and doesn't commit
         anything. If that is needed use writeQuery function.
@@ -275,7 +310,10 @@ class DatabaseManager(object):
         :return: self.cur containing the output of the query.
         '''
         try:
-            self.cur.execute(query)
+            if row_data == None:
+                self.cur.execute(query)
+            else:
+                self.cur.execute(query, row_data.values())
             return self.cur
         except self.conn.Error:
             logger.error('Problem querying database')
@@ -306,7 +344,7 @@ class DatabaseManager(object):
             return self.cur
 
         except self.conn.Error:
-            conn.rollback()
+            self.conn.rollback()
             logger.debug(traceback.format_exc())
             logger.error('SQL exception when trying to perform\n' +
                          'sql: %s' % (query))
@@ -593,8 +631,7 @@ def createTgcFilesTable(cur):
     cur.execute('''CREATE TABLE TGC_FILES
                     (ID            INTEGER     PRIMARY KEY    NOT NULL,
                     TGC            TEXT,
-                    FILES          TEXT,
-                    RUN_ID         INTEGER);
+                    FILES          TEXT);
                     ''')
     
 

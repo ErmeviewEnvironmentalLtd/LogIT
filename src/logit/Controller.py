@@ -67,21 +67,35 @@ def reverse_enumerate(iterable):
     '''
     return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
 
+
 class DbQueue(object):
+    '''Queueing class for storing data to go into the database
+    '''
+    
     def __init__(self):
         self.items = []
 
     def isEmpty(self):
+        '''Returns True if list is empty
+        '''
         return self.items == []
 
     def enqueue(self, item):
+        '''Add an item to the queue
+        '''
         self.items.insert(0,item)
 
     def dequeue(self):
+        '''Pop an item from the front of the queue.
+        '''
         return self.items.pop()
 
     def size(self):
+        '''Get the size of the queue
+        '''
         return len(self.items)
+ 
+ 
  
 class AddedRows(object):
     '''Keeps track of any new rows added to the database.
@@ -131,47 +145,6 @@ class AddedRows(object):
                 db_manager.deleteRow(name, id)
                 
 
-class RunIds(object):
-    '''
-    '''
-    
-    def __init__(self):
-        '''
-        '''
-        self.ids = {'RUN': -1, 'TCF': [], 'ECF': [], 'TGC': [], 'TBC': [], 
-                    'DAT': [], 'BC_DBASE': []}
-        
-    
-    def add(self, page_name, id):
-        '''
-        '''
-        if page_name == 'RUN':
-            self.ids['RUN'] = id
-        else:
-            self.ids[page_name].append(id)
-    
-    
-    def convertDict(self):
-        '''
-        '''
-        self.run = self.ids['RUN']
-        self.dat = self.ids['DAT']
-        self.tgc = self.ids['TGC']
-        self.tbc = self.ids['TBC']
-        self.bc_dbase = self.ids['BC_DBASE']
-        self.ecf = self.ids['ECF']
-        self.tcf = self.ids['TCF']
-        del self.ids
-        
-    def convertToDict(self):
-        '''
-        '''
-        self.ids = {'RUN': self.run, 'TCF': self.tcf, 'ECF': self.ecf, 
-                    'TGC': self.tgc, 'TBC': self.tbc, 'DAT': self.dat, 
-                    'BC_DBASE': self.bc_dbase}
-        
-    
-        
 
 def updateLog(db_path, all_logs, errors, check_new_entries=False):
     '''Updates the log database with the current value of all_logs.
@@ -188,7 +161,6 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
            and it will cost unnecessary processing effort.
     '''
     # Connect to the database and then update the log entries
-    #update_check = None
     try:
         db_manager = DatabaseFunctions.DatabaseManager(db_path)
         all_logs = logEntryUpdates(db_manager, all_logs,
@@ -204,7 +176,7 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
                                         msg_add=':\n%s' % (db_path))
 
     finally:
-        return errors, all_logs#, update_check
+        return errors, all_logs
  
 
 def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
@@ -228,7 +200,6 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     '''
     
     added_rows = None    
-    run_ids = None
     db_q = None
     
     def insertSubFiles(db_manager, index, values, page, max_id):
@@ -243,7 +214,6 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         new_files, ids = insertIntoModelFileTable(db_manager, 
                             page.subfile_name, page.name, 
                                 values[page.name], values['FILES'], db_q) 
-        #added_rows.addRows(page.subfile_name, ids)
           
         if not new_files == False:
             added_rows.addRows(page.subfile_name, ids)
@@ -266,17 +236,14 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
             
             # Every entry gets put into the RUN_ID table. Unless it's RUN
             if not run_id == None:
+                if page.name == 'TGC':
+                    i=0
                 query = ['RUN_ID', 
                                     {'RUN_ID': run_id, 
                                      'FILE': page.contents[index][page.name],
                                      'TYPE': page.name
                                      }]
                 db_q.enqueue(query)
-#                 db_manager.insertValues('RUN_ID', 
-#                                     {'RUN_ID': run_id, 
-#                                      'FILE': page.contents[index][page.name],
-#                                      'TYPE': page.name
-#                                      })
             
             if check_entry:
                 result = db_manager.findEntry(page.name, page.name,
@@ -286,24 +253,19 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
             if not has_entry:
                 query = [page.name, page.contents[index]]
                 db_q.enqueue(query)
-#                 db_manager.insertValues(page.name, page.contents[index])
-                run_ids.add(page.name, max_id)
                 added_rows.addRows(page.name, max_id)
                 page.contents[index]['ID'] = max_id
-                #page.update_check = True
 
             else:
                 id = result[2][0]['ID']
-                run_ids.add(page.name, id)
                 page.deleteItem(index)
-                #page.update_check[index] = False
         except:
             logger.debug(traceback.format_exc())
             raise 
         
         return page
     
-    def callbackFunc(db_manager, i, values, page, callback_args):
+    def callbackFunc(db_manager, i, max_id, values, page, callback_args):
         '''Insert entries into database and update page values.
         This function is a callback used by the looping function.
         '''
@@ -312,7 +274,7 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         
         # We need the maximum id so that we can increment by 1 and put it into
         # the output table in the GUI.
-        max_id = db_manager.getMaxId(page.name) + 1
+        max_id = max_id + i
         
         if page.multi_file:
             page = insertSubFiles(db_manager, i, values, page, max_id)
@@ -327,7 +289,6 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     
 
     # Collects all files added to database for resetting
-    run_ids = RunIds()
     added_rows = AddedRows()
     db_q = DbQueue() 
     check_new_entries = True
@@ -382,12 +343,12 @@ def loopLogPages(db_manager, all_logs, callback, callback_args):
     for page in all_logs.log_pages.values():
             
         if not page.has_contents: 
-            #page.update_check[0] = False
             continue
         
+        max_id = db_manager.getMaxId(page.name) + 1
         for i, values in reverse_enumerate(page.contents):
         
-            page, callback_args = callback(db_manager, i, values, page, callback_args)
+            page, callback_args = callback(db_manager, i, max_id, values, page, callback_args)
     
     return all_logs, callback_args
     
@@ -430,7 +391,7 @@ def loadEntrysWithStatus(db_path, all_logs, table_list, errors):
 def findNewLogEntries(db_manager, all_logs, table_list):
     '''Checks entries against database to see if they're new or already exist.
     '''
-    def callbackFunc(db_manager, i, values, page, callback_args):
+    def callbackFunc(db_manager, i, max_id, values, page, callback_args):
         '''
         This function is a callback used by the looping function.
         '''
@@ -449,10 +410,6 @@ def findNewLogEntries(db_manager, all_logs, table_list):
         if has_entry:
             callback_args['display_data'].append([page.contents[i], 
                                             table_dict[page.name], i, False])
-            #DEBUG - I don't think this is necessary as it's dealt with by the
-            #        False flag in the 'display_data'. NOTE: currently not
-            #        updated to use the AllLogs object.
-            #del log_pages[log_name][i]
         else:
             callback_args['display_data'].append([page.contents[i], 
                                             table_dict[page.name], i, True])
@@ -463,7 +420,7 @@ def findNewLogEntries(db_manager, all_logs, table_list):
     
     # DEBUG - Deal with this earlier as it should be unnecessary here.
     table_keys, table_names = zip(*table_list)
-    combo = zip(table_keys,table_names)
+    combo = zip(table_keys, table_names)
     table_dict = dict(combo)
     
     # Get the logs in object format
@@ -490,19 +447,20 @@ def insertIntoModelFileTable(db_manager, table_name, col_name, model_file,
     ids = []
     for f in files_list:
         
-        # Check if we have any matched to the file name.            
-        results = db_manager.findEntry(table_name, col_name, f, 
-                                                        return_rows=True) 
+        # See if the subfile exists in the table at all. If it doesn't then
+        # append it to the new file list.
+        sub_results = db_manager.findEntry(table_name, 'FILES', f, return_rows=True)
+        if not sub_results[0]:
+            new_files.append(f)
         
-        # If we didn't find any matches we can put the file into the
-        # files database under col_name and add it to the list so that we
-        # can put it in the new files col of the main table.
+        # See if the combination of model file (TGC, etc) and file (.mif, etc)
+        # exist. If not then add them to the table.
+        row_data = {col_name: model_file, 'FILES': f}
+        results = db_manager.findMultipleEntry(table_name, row_data, return_rows=True)
         if results[0] == False:
             row_data = {col_name: model_file, 'FILES': f}
             query = [table_name, row_data]
             db_q.enqueue(query)
-#             db_manager.insertValues(table_name, row_data)
-            new_files.append(f)
             ids.append(added_count)
             added_count += 1
     
@@ -544,7 +502,7 @@ def editDatabaseRow(db_path, table_name, id, values, errors):
     '''
     try:
         db_manager = DatabaseFunctions.DatabaseManager(db_path)
-        db_manager.updateRowValues(table_name, 'ID', values, id)
+        db_manager.updateRow(table_name, 'ID', values, id)
         return errors
     
     except IOError:
