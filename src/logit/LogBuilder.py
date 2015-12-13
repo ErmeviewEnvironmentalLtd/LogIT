@@ -1,4 +1,4 @@
-'''
+"""
 ###############################################################################
     
  Name: LogIT (Logger for Isis and Tuflow) 
@@ -46,7 +46,7 @@
  TODO:
 
 ###############################################################################
-'''
+"""
 
 # Import python standard modules
 import os
@@ -76,16 +76,16 @@ TYPE_ISIS = 1
 TYPE_ESTRY = 2
 
 def loadModel(file_path, log_type):
-    '''Load the model at the given file path.
+    """Load the model at the given file path.
     The path given can be for either an .ief file or a .tcf file. It will use
     the tmac_tools_lib to load the model file references and collect them into
     dictionaries for the different pages of the log file.
     
-    @param file_path: the path to either an .ief or .tcf file.
-    @param log_type: the type of model to load (tuflow/isis only/estry only)
-    @return: dictionary containing dictionaries of log data retrieved from the
+    :param file_path: the path to either an .ief or .tcf file.
+    :param log_type: the type of model to load (tuflow/isis only/estry only)
+    :return: dictionary containing dictionaries of log data retrieved from the
              model files.
-    '''
+    """
     # Check that the path actually exists before we start.
     if not os.path.exists(file_path):
         return False
@@ -185,7 +185,7 @@ def loadModel(file_path, log_type):
 
 
 def buildRunRowFromModel(cur_date, ief_file, tuflow_model, log_type):
-    '''Creates the row for the 'run' model log entry based on the contents
+    """Creates the row for the 'run' model log entry based on the contents
     of the loaded ief file and tuflow model.
     
     TODO:
@@ -193,11 +193,11 @@ def buildRunRowFromModel(cur_date, ief_file, tuflow_model, log_type):
         This is because the tmac_tools_lib doesn't currently try and find the
         event duration from the .tcf file. When it does this will be supported.
     
-    @param ief_file: the Ief object loaded from file.
-    @param tuflow_model: the TuflowModel object loaded from file.
-    @param log_type: the type of run being logged. I.e. Tulfow run/isis only
+    :param ief_file: the Ief object loaded from file.
+    :param tuflow_model: the TuflowModel object loaded from file.
+    :param log_type: the type of run being logged. I.e. Tulfow run/isis only
            run/estry only run.
-    '''
+    """
     run_cols = {'DATE': str(cur_date), 'MODELLER': 'None', 
                 'RESULTS_LOCATION_2D': 'None', 'RESULTS_LOCATION_1D': 'None', 
                 'EVENT_DURATION': 'None', 'DESCRIPTION': 'None', 
@@ -216,12 +216,12 @@ def buildRunRowFromModel(cur_date, ief_file, tuflow_model, log_type):
 
 
 def buildIsisRun(ief_file, run_cols):
-    '''Get all of the required log data from the ief file.
+    """Get all of the required log data from the ief file.
     
-    @param ief_file: the Ief object.
-    @param run_cols: the log data dictionary to fill.
-    @return: the updated log_files dictionary.
-    '''    
+    :param ief_file: the Ief object.
+    :param run_cols: the log data dictionary to fill.
+    :return: the updated log_files dictionary.
+    """    
     ief_paths = ief_file.getFilePaths()[0]
     run_cols['IEF'] = ief_file.path_holder.getFileNameAndExtension()
     run_cols['DAT'] = FileTools.getFileName(ief_paths['datafile'], True)
@@ -237,19 +237,19 @@ def buildIsisRun(ief_file, run_cols):
     return run_cols
 
 def buildEstryRun():
-    '''Build the necessaries for an Estry only run.
-    '''
+    """Build the necessaries for an Estry only run.
+    """
     raise NotImplementedError
         
 
 def buildTuflowRun(has_ief_file, tuflow_model, run_cols):
-    '''Get all of the required log data for a tuflow run.
+    """Get all of the required log data for a tuflow run.
     
-    @param has_ief_file: True is log entry has an ief file.
-    @param tuflow_model: the TuflowModel object.
-    @param run_cols: the log data dictionary to fill.
-    @return: the updated log_files dictionary.
-    '''    
+    :param has_ief_file: True is log entry has an ief file.
+    :param tuflow_model: the TuflowModel object.
+    :param run_cols: the log data dictionary to fill.
+    :return: the updated log_files dictionary.
+    """    
     # Fetch the main tcf file and the list of .trd files referenced by it.
     tcf = tuflow_model.getModelObject('main_tcf')
     tcf_trds = tuflow_model.getModelObject(Tcf.TYPE)
@@ -357,10 +357,10 @@ def buildTuflowRun(has_ief_file, tuflow_model, run_cols):
                 
 
 def buildEcfRowFromModel(cur_date, tuflow_model):
-    '''Create a new row for the ECF file page
+    """Create a new row for the ECF file page
     @var tulfow_model: The TuflowModel object loaded from file
     @attention: See superclass for more details 
-    '''
+    """
     ecf_cols = {'DATE': str(cur_date), 'ECF': 'None', 'FILES': 'None', 
                 'COMMENTS': 'None'}
     ecf_list = []
@@ -392,10 +392,10 @@ def buildEcfRowFromModel(cur_date, tuflow_model):
 
 
 def buildTcfRowFromModel(cur_date, tuflow_model):
-    '''Create a new row for the TCF file page
+    """Create a new row for the TCF file page
     @var tulfow_model: The TuflowModel object loaded from file
     @attention: See superclass for more details 
-    '''
+    """
     tcf_cols = {'DATE': str(cur_date), 'TCF': 'None', 'FILES': 'None', 
                 'COMMENTS': 'None'}
     tcf_list = []
@@ -436,10 +436,10 @@ def buildTcfRowFromModel(cur_date, tuflow_model):
 
                 
 def buildTgcRowFromModel(cur_date, tuflow_model):
-    '''Create a new row for the TGC file page
+    """Create a new row for the TGC file page
     @var tulfow_model: The TuflowModel object loaded from file
     @attention: See superclass for more details 
-    '''
+    """
     tgc_cols = {'DATE': str(cur_date), 'TGC': 'None', 'FILES': 'None', 
                 'COMMENTS': 'None'}
     tgc_list = []
@@ -470,10 +470,10 @@ def buildTgcRowFromModel(cur_date, tuflow_model):
 
 
 def buildTbcRowFromModel(cur_date, tuflow_model):
-    '''Create a new row for the TGC file page
+    """Create a new row for the TGC file page
     @var tulfow_model: The TuflowModel object loaded from file
     @attention: See superclass for more details 
-    '''
+    """
     tbc_cols = {'DATE': str(cur_date), 'TBC': 'None', 'FILES': 'None', 
                 'COMMENTS': 'None'}
     tbc_list = []
@@ -504,11 +504,11 @@ def buildTbcRowFromModel(cur_date, tuflow_model):
 
     
 def buildDatRowFromModel(cur_date, run_page):
-    '''Create a new row for the DAT file page
+    """Create a new row for the DAT file page
     @var cur_date: todays date.
     @var run_page: the run page details.
     @attention: See superclass for more details 
-    '''
+    """
     dat_cols = {'DATE': str(cur_date), 'DAT': 'None', 'AMENDMENTS': 'None', 
                 'COMMENTS': 'None'}
 
@@ -518,12 +518,12 @@ def buildDatRowFromModel(cur_date, run_page):
         
         
 def buildBcRowFromModel(cur_date, tuflow_model):
-    '''Create a new row for the BC Databas file page
+    """Create a new row for the BC Databas file page
     @var cur_date: todays date.
     @var tuflow_model: the TuflowModel object loaded from file.
     @attention: See superclass for more details.
-    @return: Dictionary containing the data needed for the page.
-    '''
+    :return: Dictionary containing the data needed for the page.
+    """
     bc_cols = {'DATE': str(cur_date), 'BC_DBASE': 'None', 'FILES': 'None', 
                 'COMMENTS': 'None'}
     bc_list = []

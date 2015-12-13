@@ -1,4 +1,4 @@
-'''
+"""
 ###############################################################################
     
  Name: LogIT (Logger for Isis and Tuflow) 
@@ -51,7 +51,7 @@
     used (it can use connection.rollback() if needed.
 
 ###############################################################################
-'''
+"""
 import os
 import traceback
 import itertools
@@ -73,62 +73,62 @@ logger = logging.getLogger(__name__)
 
 
 def reverse_enumerate(iterable):
-    '''Enumerate over an iterable in reverse order while retaining proper indexes
-    '''
+    """Enumerate over an iterable in reverse order while retaining proper indexes
+    """
     return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
 
 
 class DbQueue(object):
-    '''Queueing class for storing data to go into the database
-    '''
+    """Queueing class for storing data to go into the database
+    """
     
     def __init__(self):
         self.items = []
 
     def isEmpty(self):
-        '''Returns True if list is empty
-        '''
+        """Returns True if list is empty
+        """
         return self.items == []
 
     def enqueue(self, item):
-        '''Add an item to the queue
-        '''
+        """Add an item to the queue
+        """
         self.items.insert(0,item)
 
     def dequeue(self):
-        '''Pop an item from the front of the queue.
-        '''
+        """Pop an item from the front of the queue.
+        """
         return self.items.pop()
 
     def size(self):
-        '''Get the size of the queue
-        '''
+        """Get the size of the queue
+        """
         return len(self.items)
  
  
  
 class AddedRows(object):
-    '''Keeps track of any new rows added to the database.
+    """Keeps track of any new rows added to the database.
     
     It stores the primary key ID of any rows that are added. This can be used
     for many things I suppose, but at the moment it is used to deal with a
     problem in data entry. If an issue is found and some entries have already
     been made to the database it will re-wind all of the entries stored by
     deleting them from the database.
-    '''
+    """
     
     def __init__(self):
         self.tables = {}
     
     def _createHolder(self, key):
-        '''Creates a new key in the dict if it doesn't exist.
-        '''
+        """Creates a new key in the dict if it doesn't exist.
+        """
         if not key in self.tables:
             self.tables[key] = []
             
     def addRows(self, key, new_rows):
-        '''Adds a new row to the list under key
-        '''
+        """Adds a new row to the list under key
+        """
         self._createHolder(key)
         if self._checkIsList(new_rows):
             self.tables[key] = self.tables[key] + new_rows
@@ -136,20 +136,20 @@ class AddedRows(object):
             self.tables[key] = self.tables[key] + [new_rows]     
     
     def _checkIsList(self, row_item):
-        '''Returns True if a list or False if not.
+        """Returns True if a list or False if not.
         Essentially this is testing whether a single value or a list of values
         is being passed.
-        '''
+        """
         if isinstance(row_item, list):
             return True
         else:
             return False
         
     def deleteEntries(self, db_manager):
-        '''Deletes all of the entries in this object from the database.
-        @note: This may raise an error that should be dealt with by the 
+        """Deletes all of the entries in this object from the database.
+        :note: This may raise an error that should be dealt with by the 
                calling code.
-        '''
+        """
         for name, table in self.tables.iteritems():
             for id in table: #reverse_enumerate(table):
                 db_manager.deleteRow(name, id)
@@ -157,19 +157,19 @@ class AddedRows(object):
 
 
 def updateLog(db_path, all_logs, errors, check_new_entries=False):
-    '''Updates the log database with the current value of all_logs.
+    """Updates the log database with the current value of all_logs.
     
     This is just an entry function that connects to the database and and then
     call logEntryUpdates to do all of the hard work. It deals with handling
     any errors that might pop up and notifying the caller.
-    @param dp_path: the path to the log database on file.
-    @param all_logs: AllLogs object.
-    @param check_new_entries=False: Flag identifying whether the values in the
+    :param dp_path: the path to the log database on file.
+    :param all_logs: AllLogs object.
+    :param check_new_entries=False: Flag identifying whether the values in the
            all_logs entries should be checked against the database before they
            are entered. i.e. make sure they don't alreay exist first. This is
            needed because the check may have already been carries out before
            and it will cost unnecessary processing effort.
-    '''
+    """
     # Connect to the database and then update the log entries
     try:
         db_manager = DatabaseFunctions.DatabaseManager(db_path)
@@ -190,7 +190,7 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
  
 
 def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
-    '''Update the database with the current status of the all_logs object.
+    """Update the database with the current status of the all_logs object.
     
     This creates a callback function and hands it to loopLogPages method,
     which loops through the log pages applying the call back each time.
@@ -199,27 +199,27 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
     will attempt to roll back the changes to all of the tables to 'hopefully'
     avoid any corruption. This will be logged so the user is aware.
     
-    @param conn: an open database connection.
-    @param all_logs: AllLogs object containing the the data to enter into the 
+    :param conn: an open database connection.
+    :param all_logs: AllLogs object containing the the data to enter into the 
            database under the database table names.
-    @param check_new_entries=False: new entry status may be checked before 
+    :param check_new_entries=False: new entry status may be checked before 
            getting to this stage and we don't want to do it twice.
-    @raise IOError: If there's any issue connecting to the database.
-    @raise Exception: if anything else goes wrong. 
+    :raise IOError: If there's any issue connecting to the database.
+    :raise Exception: if anything else goes wrong. 
     
-    '''
+    """
     
     added_rows = None    
     db_q = None
     
     def insertSubFiles(db_manager, index, values, page, max_id):
-        '''Insert files referenced by one of the log pages into its table.
+        """Insert files referenced by one of the log pages into its table.
         
         Looks to see if any of the files it contains aren't already entered. 
         If they aren't it adds them to the files table (e.g. TGC_FILES).
         Then converts to a bracket wrapped string for adding to main log table
         (e.g. TGC).
-        '''
+        """
     
         new_files, ids = insertIntoModelFileTable(db_manager, 
                             page.subfile_name, page.name, 
@@ -236,10 +236,10 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
      
     def insertMainFile(db_manager, index, page, max_id, check_entry, 
                                                         run_id=None):
-        '''Adds the log page data in 'page' to the log page table.
+        """Adds the log page data in 'page' to the log page table.
         
         Will check if entry exists first if check_entry==True.
-        '''
+        """
         try:
             result = None
             has_entry = False
@@ -276,9 +276,9 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         return page
     
     def callbackFunc(db_manager, i, max_id, values, page, callback_args):
-        '''Insert entries into database and update page values.
+        """Insert entries into database and update page values.
         This function is a callback used by the looping function.
-        '''
+        """
         check_new_entries = callback_args['check_new_entries']
         run_id = callback_args['run_id']
         
@@ -330,24 +330,24 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
 
 
 def loopLogPages(db_manager, all_logs, callback, callback_args):
-    '''Loop all the pages in the log applying the given callback function.
+    """Loop all the pages in the log applying the given callback function.
     
     The callback function expects to get back a copy of the all_logs object
     and the call_back_args as (all_logs, callback_args). If it doesn't it will
     raise an exeption when trying to return at the end.
-    @note: list is iterated in reverse so any deletions will be sane.
+    :note: list is iterated in reverse so any deletions will be sane.
     
-    @param conn: an open database connection.
-    @param all_logs: an instance of the AllLogs class.
-    @param callback: a callback function to execute in the loop.
-    @param callback_args: a dictionary of arguments for the callback function.
-    @return: all_logs, callback_args (tuple). Updated by whatever happens in
+    :param conn: an open database connection.
+    :param all_logs: an instance of the AllLogs class.
+    :param callback: a callback function to execute in the loop.
+    :param callback_args: a dictionary of arguments for the callback function.
+    :return: all_logs, callback_args (tuple). Updated by whatever happens in
              the callback function.
-    '''
+    """
     
     def reverse_enumerate(iterable):
-        '''Enumerate over an iterable in reverse order while retaining proper indexes
-        '''
+        """Enumerate over an iterable in reverse order while retaining proper indexes
+        """
         return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
     
     for page in all_logs.log_pages.values():
@@ -364,20 +364,20 @@ def loopLogPages(db_manager, all_logs, callback, callback_args):
     
 
 def loadEntrysWithStatus(db_path, all_logs, table_list, errors):
-    '''Loads the database and checks if the new entries exist.
+    """Loads the database and checks if the new entries exist.
     
     Builds a new list that stores the SubLog entry for each row as well as
     some info on the key to that table in the gui, whether the entry already
     exists or not adn the row count.
     Uses the findNewLogEntries function to fo the hard work.
     
-    @param db_path: path to a database on file.
-    @param all_logs: the all_logs object containing loaded model variables.
-    @param table_list: a list of all of the keys for accessing thetables in the 
+    :param db_path: path to a database on file.
+    :param all_logs: the all_logs object containing loaded model variables.
+    :param table_list: a list of all of the keys for accessing thetables in the 
            'New log Entry' page of the GUI and the associated db tables.
-    @return: list containing sub-lists of all of the rows to be displayed on
+    :return: list containing sub-lists of all of the rows to be displayed on
              the New log entry page tables.
-    '''
+    """
      # We need to find if the TGC and TBC files have been registered with the
     # database before. If they have then we don't need to register them 
     # again.
@@ -399,12 +399,12 @@ def loadEntrysWithStatus(db_path, all_logs, table_list, errors):
 
 
 def findNewLogEntries(db_manager, all_logs, table_list):
-    '''Checks entries against database to see if they're new or already exist.
-    '''
+    """Checks entries against database to see if they're new or already exist.
+    """
     def callbackFunc(db_manager, i, max_id, values, page, callback_args):
-        '''
+        """
         This function is a callback used by the looping function.
-        '''
+        """
         if page.name == 'RUN':
             return page, callback_args
          
@@ -445,13 +445,13 @@ def findNewLogEntries(db_manager, all_logs, table_list):
 
 def insertIntoModelFileTable(db_manager, table_name, col_name, model_file, 
                                                     files_list, db_q):
-    '''Insert file references into the model file table if they are not
+    """Insert file references into the model file table if they are not
     already there.
     
-    @param conn: the current database connection.
-    @param table_name: the name of the column to insert the file name into.
-    @param files_list: the list of files to check against the database.
-    '''
+    :param conn: the current database connection.
+    :param table_name: the name of the column to insert the file name into.
+    :param files_list: the list of files to check against the database.
+    """
     new_files = []
     added_count = 1
     ids = []
@@ -481,12 +481,12 @@ def insertIntoModelFileTable(db_manager, table_name, col_name, model_file,
     
     
 def createQtTableItem(name, is_editable=False):
-    '''Create a QTableWidgetItem and return
+    """Create a QTableWidgetItem and return
     TODO: Check if this can be dealt with meaningfully in the Table classes.
           Currently only used by the multiModelLoad path list.
-    @param is_editable=False: Set editable flag.
-    @return: QTableWidgetItem
-    '''
+    :param is_editable=False: Set editable flag.
+    :return: QTableWidgetItem
+    """
     item = QtGui.QTableWidgetItem(str(name))
     
     if is_editable:
@@ -498,7 +498,7 @@ def createQtTableItem(name, is_editable=False):
 
 
 def editDatabaseRow(db_path, table_name, id, values, errors):
-    '''Updates the database table with the row data provided.
+    """Updates the database table with the row data provided.
     Uses UPDATE syntax to update all of the rows in the data base with the
     given dictionary. The keys must correspond to the column names or an
     error will be thrown.
@@ -509,7 +509,7 @@ def editDatabaseRow(db_path, table_name, id, values, errors):
     :param errors: An ErrorHolder object.
     :raise IOError: if connection to database fails.
     :raise Exception: if anything else goes wrong (TODO)
-    '''
+    """
     try:
         db_manager = DatabaseFunctions.DatabaseManager(db_path)
         db_manager.updateRow(table_name, 'ID', values, id)
@@ -528,12 +528,12 @@ def editDatabaseRow(db_path, table_name, id, values, errors):
 
 
 def deleteDatabaseRow(db_path, table_name, id, errors, all_entry=False):
-    '''Deletes the database row with the given id
-    @param db_path: the path to the database on file.
-    @param table_name: the name of the table.
-    @param id: the unique id of the row to delete.
-    @return: True if successful, false otherwise.
-    '''
+    """Deletes the database row with the given id
+    :param db_path: the path to the database on file.
+    :param table_name: the name of the table.
+    :param id: the unique id of the row to delete.
+    :return: True if successful, false otherwise.
+    """
     db_manager = DatabaseFunctions.DatabaseManager(db_path)
     try:
         if all_entry:
@@ -557,8 +557,8 @@ def deleteDatabaseRow(db_path, table_name, id, errors, all_entry=False):
 
 
 def _deleteAssociatedEntries(db_manager, run_id):
-    '''Delete all of the log page entries associated with the run_id
-    '''
+    """Delete all of the log page entries associated with the run_id
+    """
     # Get all of the table names in the database
     names = db_manager.getTableNames()
     
@@ -586,8 +586,8 @@ def _deleteAssociatedEntries(db_manager, run_id):
 
     
 def checkDatabaseVersion(db_path, errors):
-    '''Tests database to see if it's the right version.
-    '''
+    """Tests database to see if it's the right version.
+    """
     if not db_path == '' and not db_path == False:
 
         try:
@@ -617,12 +617,12 @@ def checkDatabaseVersion(db_path, errors):
     
 
 def fetchTableValues(db_path, table_list, errors):
-    '''Fetches all rows from the given table name.
-    @param db_path: path to a database on file.
-    @param table_name: name of the table to fetch rows from.
-    @return: tuple (boolean success flag, row count, row data) or an error
+    """Fetches all rows from the given table name.
+    :param db_path: path to a database on file.
+    :param table_name: name of the table to fetch rows from.
+    :return: tuple (boolean success flag, row count, row data) or an error
              with (False, error title, message)
-    '''
+    """
     entries = []
     try:
         db_manager = DatabaseFunctions.DatabaseManager(db_path)
@@ -646,20 +646,20 @@ def fetchTableValues(db_path, table_list, errors):
  
 
 def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
-    '''Loads a model and makes a few conditional checks on it.
+    """Loads a model and makes a few conditional checks on it.
     Loads model from the given .tcf/.ief file and checks that the .ief, 
     .tcf and ISIS results don't already exist in the DB and then returns
     a success or fail status.
     
-    @param db_path: path to the database on file.
-    @param open_path: the .ief or .tcf file path.
-    @param log_type: the model type to load (tuflow or ISIS only).
-    @param lauch_error=True: whether to launch message boxes if an error is
+    :param db_path: path to the database on file.
+    :param open_path: the .ief or .tcf file path.
+    :param log_type: the model type to load (tuflow or ISIS only).
+    :param lauch_error=True: whether to launch message boxes if an error is
            found or not. We don't want to if we're loading multiple files.
-    @return: tuple containing AllLogs (which could be the loaded log
+    :return: tuple containing AllLogs (which could be the loaded log
              pages or False if the load failed and a dictionary containing
              the load status and messages for status bars and errors.
-    '''   
+    """   
     
     # Load the model at the chosen path.
     all_logs = LogBuilder.loadModel(open_path, log_type)
@@ -733,12 +733,12 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
         
 
 def updateDatabaseVersion(db_path, errors):
-    '''Try to update database to latest version.
-    @param db_path: path to the database to update.
-    @return: None if user cancels or error_details otherwise. These can be:
+    """Try to update database to latest version.
+    :param db_path: path to the database to update.
+    :return: None if user cancels or error_details otherwise. These can be:
              error_details['Success'] = True if all good or False otherwise.
              If False then other dict items contain details.
-    '''
+    """
     try:
         DatabaseFunctions.updateDatabaseVersion(db_path)
         return errors
@@ -749,8 +749,8 @@ def updateDatabaseVersion(db_path, errors):
     
     
 def loadSetup(cur_settings_path, cur_log_path, errors):
-    '''Load LogIT setup from file.
-    '''
+    """Load LogIT setup from file.
+    """
     d = MyFileDialogs()
     open_path = d.openFileDialog(path=os.path.split(cur_log_path)[0], 
                         file_types='Log Settings (*.logset)')
@@ -772,13 +772,13 @@ def loadSetup(cur_settings_path, cur_log_path, errors):
     
     
 def exportToExcel(db_path, export_tables, save_path, errors):
-    '''Export database to Excel (.xls) format at user chosen location.
-    @param cur_log_path: the current log database file path.
-    @param export_tables: list with order to create worksheet.
-    @return dictionary containing error_details (or success details if
+    """Export database to Excel (.xls) format at user chosen location.
+    :param cur_log_path: the current log database file path.
+    :param export_tables: list with order to create worksheet.
+    :return dictionary containing error_details (or success details if
             error_details['Success'] is True.
-    @note: launches file dialog.
-    '''
+    :note: launches file dialog.
+    """
     try:
         Exporters.exportToExcel(db_path, export_tables, save_path)
     except:

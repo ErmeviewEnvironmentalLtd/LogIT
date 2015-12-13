@@ -1,4 +1,4 @@
-'''
+"""
 ###############################################################################
     
  Name: LogIT (Logger for Isis and Tuflow) 
@@ -43,7 +43,7 @@
  TODO:
     
 ###############################################################################
-'''
+"""
 
 from PyQt4 import QtCore, QtGui
 
@@ -54,8 +54,8 @@ logger = logging.getLogger(__name__)
 
 
 class TableHolder(object):
-    '''Container class for a collection of QTableWidget objects.
-    '''
+    """Container class for a collection of QTableWidget objects.
+    """
     
     # Collection key
     VIEW_LOG = 0
@@ -67,17 +67,17 @@ class TableHolder(object):
     
     
     def addTable(self, table_info_obj):
-        '''Add a new table to the collection.
-        '''
+        """Add a new table to the collection.
+        """
         self.tables[table_info_obj.key] = table_info_obj
     
     
     def _findTable(self, key=None, name=None):
-        '''Find table key based on given parameter.
+        """Find table key based on given parameter.
         Locates the correct table whether given the key to the table or the
         name of the QTableWidget object.
-        @return key to table.
-        '''
+        :return key to table.
+        """
         if not key == None or (key == None and name == None):
             return key
         else:
@@ -86,27 +86,27 @@ class TableHolder(object):
     
     
     def getNameFromKey(self, key):
-        '''Return the table name when given the key.
-        '''
+        """Return the table name when given the key.
+        """
         return self.tables[key].name
     
     
     def getKeyFromName(self, name):
-        '''Return the table key when given the name.
-        '''
+        """Return the table key when given the name.
+        """
         return self._findTable(name=name)
     
     
     def getTable(self, key=None, name=None):
-        '''Return table referenced by either the key or the name.
-        '''
+        """Return table referenced by either the key or the name.
+        """
         key = self._findTable(key, name)
         return self.tables[key]
     
     
     def clearAll(self):
-        '''Clears the row data and completely resets the table.
-        '''
+        """Clears the row data and completely resets the table.
+        """
         if self.type == TableHolder.NEW_LOG:         
             for table in self.tables.values():
                 table.ref.clearContents()
@@ -118,9 +118,9 @@ class TableHolder(object):
 
 
 class TableWidget(object):
-    '''Conveniance class for accessing regularly used attributes of the 
+    """Conveniance class for accessing regularly used attributes of the 
     QTableWidget object in the GUI.
-    '''
+    """
     
     # Columns that are editable by the user
     EDITING_ALLOWED = ['COMMENTS', 'MODELLER', 'SETUP', 'DESCRIPTION',
@@ -134,13 +134,13 @@ class TableWidget(object):
         
         
     def removeRow(self, row=None, row_no=0):
-        '''Removes the row denoted by paramaters.
+        """Removes the row denoted by paramaters.
         
         If no arguments are given it will do nothing.
-        @param row=None: The row object to delete.
-        @param row_no=None: The index of the row to delete.
+        :param row=None: The row object to delete.
+        :param row_no=None: The index of the row to delete.
         
-        '''
+        """
         if not row == None:
             self.ref.removeRow(row)
         else:
@@ -148,14 +148,14 @@ class TableWidget(object):
     
     
     def currentRow(self):
-        '''Returns the currently selected row.
-        '''
+        """Returns the currently selected row.
+        """
         return self.ref.currentItem().row()
         
     
     def getAllRows(self):
-        '''Get a list containing dictionaries of all rows in this table.
-        '''
+        """Get a list containing dictionaries of all rows in this table.
+        """
         row_count = self.ref.rowCount()
         all_rows = []
         for i in range(1, row_count):
@@ -164,13 +164,13 @@ class TableWidget(object):
 
 
     def getValues(self, row_no=0, row=None, names=None):
-        '''Get the item from the table where the header of the column in the
+        """Get the item from the table where the header of the column in the
         table matches the given name.
         
-        @param names: dictionary of names that are being looked for in the
+        :param names: dictionary of names that are being looked for in the
                the table.
-        @return: dictionary with the allowed items taken from the table.
-        '''
+        :return: dictionary with the allowed items taken from the table.
+        """
         all_names = False
         if names == None:
             names = TableWidget.EDITING_ALLOWED
@@ -198,24 +198,24 @@ class TableWidget(object):
     
     
     def addRows(self, row_data, start_row):
-        '''Adds the given rows to the table.
+        """Adds the given rows to the table.
         
-        @param row_data: list of row dictionaries containing the data for the
+        :param row_data: list of row dictionaries containing the data for the
                table.
-        @param start_row: the first row in the table to start entering data.
-        '''
+        :param start_row: the first row in the table to start entering data.
+        """
         for row in row_data:
             self.addRowValues(row, start_row)
             start_row += 1
             
     
     def addRowValues(self, row_dict, row_no=0):
-        '''Put values in the given dictionary into the given table where the
+        """Put values in the given dictionary into the given table where the
         dictionary keys match the column headers of the table.
         
-        @param row_dict: dictionary containing the values to put in the table.
-        @param row_no=0: the row to add the values at.
-        '''
+        :param row_dict: dictionary containing the values to put in the table.
+        :param row_no=0: the row to add the values at.
+        """
         # Insert a new row first if needed
         row_count = self.ref.rowCount()
         if not row_count > row_no:
@@ -238,17 +238,17 @@ class TableWidget(object):
     
     
     def setEditColors(self, row_no, is_editable=True):
-        '''Sets the colour of the cells in a row according to whether the cell
+        """Sets the colour of the cells in a row according to whether the cell
         is editable or not.
         Cells that can be edited will be set to green.
         Cells that can't be edited will be set to red.
         If a model file has already been entered into the database the entire
         row will be set to red.
         
-        @param row_no: the index of the row to change editing settings on.
-        @param is_editable=True: Sets whether the entire row should be set to
+        :param row_no: the index of the row to change editing settings on.
+        :param is_editable=True: Sets whether the entire row should be set to
                non-editable or not.
-        '''
+        """
         if is_editable:
             my_color = QtGui.QColor(204, 255, 153) # Light green
         else:
@@ -267,11 +267,11 @@ class TableWidget(object):
         
     
 def createQtTableItem(name, is_editable):
-    '''Create a QTableWidgetItem and return
-    @param name: value to put into the item text.
-    @param is_editable=False: Set editable flag.
-    @return: QTableWidgetItem
-    '''
+    """Create a QTableWidgetItem and return
+    :param name: value to put into the item text.
+    :param is_editable=False: Set editable flag.
+    :return: QTableWidgetItem
+    """
     item = QtGui.QTableWidgetItem(str(name))
     
     if is_editable:
@@ -284,9 +284,9 @@ def createQtTableItem(name, is_editable):
 
 def getModelFileLocation(multi_paths, last_model_directory,
                                         cur_log_path, cur_settings_path):
-    '''Launch dialog for user to choose model to load.
-    @param param: 
-    '''
+    """Launch dialog for user to choose model to load.
+    :param param: 
+    """
     # Create a file dialog with an initial path based on the availability
     # of path variables.
     d = MyFileDialogs()
@@ -310,8 +310,8 @@ def getModelFileLocation(multi_paths, last_model_directory,
 
 
 class ErrorHolder(object):
-    '''Container for errors logged for later use.
-    '''
+    """Container for errors logged for later use.
+    """
     
     def __init__(self):
         self.reset()
@@ -319,15 +319,15 @@ class ErrorHolder(object):
     
     def addError(self, key, msg_add='', change_status=False,
                                                 msgbox_error=False):
-        '''Adds a new error to the log list.
-        @param key: the key to the error. If this doesn't exist it will raise a 
+        """Adds a new error to the log list.
+        :param key: the key to the error. If this doesn't exist it will raise a 
                KeyError. If you want to create a new type of error either add 
                it to the _initErrorTypes function or call addErrorType with an 
                ErrorType object if you only want it at run time.
-        @param message_additional='': Any additional text to add to the error.
-        @param change_status=False: If set to True the message_additional text
+        :param message_additional='': Any additional text to add to the error.
+        :param change_status=False: If set to True the message_additional text
                will be added to the status text as well.
-        '''
+        """
         if not key in self.types:
             raise KeyError
         title = self.types[key].title+''
@@ -345,13 +345,13 @@ class ErrorHolder(object):
     
     
     def formatErrors(self, prologue=''):
-        '''Return the message from the error logs formatted as text.
+        """Return the message from the error logs formatted as text.
         Takes the message from each of the ErrorType objects stored in the
         self.log and combines them into a single formatted text string.
-        @param prologue: string containing any text that should be prepended
+        :param prologue: string containing any text that should be prepended
                to the output text.
-        @return: string of formatted log messages.
-        '''
+        :return: string of formatted log messages.
+        """
         if len(self.log) < 1:
             return ''
         else:
@@ -363,10 +363,10 @@ class ErrorHolder(object):
         
     
     def addErrorType(self, error_type, key):
-        '''Adds a new ErrorType to the self.types dictionary.
-        @param error_type: The ErrorType object to add.
-        @param key: the key to use to access the error_type.
-        '''
+        """Adds a new ErrorType to the self.types dictionary.
+        :param error_type: The ErrorType object to add.
+        :param key: the key to use to access the error_type.
+        """
         self.types[key] = error_type
         
     
@@ -379,8 +379,8 @@ class ErrorHolder(object):
     
     
     def _initErrorTypes(self):
-        '''Initialise all of the available error types.
-        '''
+        """Initialise all of the available error types.
+        """
         errors = {}
         self.DB_UPDATE = 'Database Update Error'
         self.DB_EDIT = 'Database Edit Error'
@@ -474,8 +474,8 @@ class ErrorHolder(object):
 
 
 class ErrorType(object):
-    '''Holds details of error types for use in ErrorHolder.
-    '''
+    """Holds details of error types for use in ErrorHolder.
+    """
     
     def __init__(self, title, status_bar, message=None):        
         self.error_found = False

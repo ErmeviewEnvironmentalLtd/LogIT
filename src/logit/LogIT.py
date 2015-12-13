@@ -1,4 +1,4 @@
-'''
+"""
 ##############################################################################
   Name: LogIT (Logger for Isis and Tuflow) 
   Version: 0.2-Beta
@@ -54,7 +54,7 @@
   TODO:
      
 ############################################################################## 
-'''
+"""
 
 # Python standard modules
 import os
@@ -110,13 +110,13 @@ import GuiStore
 
 
 class MainGui(QtGui.QMainWindow):
-    '''Main GUI application window for the PysisTools software.
-    '''
+    """Main GUI application window for the PysisTools software.
+    """
      
     def __init__(self, cur_settings, cur_settings_path, parent = None):
-        '''Constructor.
-        @param parent: Reference to the calling class.
-        '''        
+        """Constructor.
+        :param parent: Reference to the calling class.
+        """        
         # Setup some variables
         if not cur_settings == False:
             self.settings = cur_settings
@@ -222,8 +222,8 @@ class MainGui(QtGui.QMainWindow):
         
     
     def _setupUiContainer(self):
-        '''Create a convenient holding object for the gui inputs.
-        '''
+        """Create a convenient holding object for the gui inputs.
+        """
         
         self.new_entry_tables = GuiStore.TableHolder(GuiStore.TableHolder.NEW_LOG)
         self.new_entry_tables.addTable(GuiStore.TableWidget('RUN', 
@@ -259,10 +259,10 @@ class MainGui(QtGui.QMainWindow):
         
     
     def _updateLoggingLevel(self):
-        '''Alters to logging level based on the name of the calling action
+        """Alters to logging level based on the name of the calling action
         
         This is set by an action on the menu.
-        '''
+        """
         caller = self.sender()
         call_name = caller.objectName()
         #logger.debug('Caller = ' + call_name)
@@ -301,15 +301,15 @@ class MainGui(QtGui.QMainWindow):
             
         
     def _clearMultiErrorText(self):
-        '''Clears the error outputs in multi model load error textbox.
-        '''
+        """Clears the error outputs in multi model load error textbox.
+        """
         self.ui.multiModelLoadErrorTextEdit.clear()
     
     
     def _copyToClipboard(self):
-        '''Copies the contents of a textbox to clipboard.
+        """Copies the contents of a textbox to clipboard.
         Textbox to copy is based on the calling action name.
-        '''
+        """
         caller = self.sender()
         call_name = caller.objectName()
         
@@ -323,11 +323,11 @@ class MainGui(QtGui.QMainWindow):
         
     
     def _updateMultipleLogSelection(self):
-        '''Updates the contents of the loadMultiModelListView.
+        """Updates the contents of the loadMultiModelListView.
         Called by both the add and remove buttons. It will open a multiple
         choice file dialog by the former or remove the selected items by the
         latter.
-        '''
+        """
         caller = self.sender()
         call_name = caller.objectName()
         logger.debug('Caller = ' + call_name)
@@ -374,7 +374,7 @@ class MainGui(QtGui.QMainWindow):
        
     
     def _tablePopup(self, pos):
-        '''This is the action performed when the user opens the context menu
+        """This is the action performed when the user opens the context menu
         with right click on on of the tables in the View Log tab.
         
         Finds out what the user selected from the menu and then performs the
@@ -388,8 +388,8 @@ class MainGui(QtGui.QMainWindow):
               value in the row which is supposedly kept in sync with the
               database whenever any changes are made so should be safe?
         
-        @param pos: the QPoint of the mouse cursor when clicked.
-        '''
+        :param pos: the QPoint of the mouse cursor when clicked.
+        """
         menu = QtGui.QMenu()
         updateRowAction = menu.addAction("Update Row")
         deleteRowAction = menu.addAction("Delete Row")
@@ -418,13 +418,13 @@ class MainGui(QtGui.QMainWindow):
             
     
     def _deleteRowFromDatabase(self, table, all_entry):
-        '''Deletes the row in the database based on the location that the mouse
+        """Deletes the row in the database based on the location that the mouse
         was last clicked.
         This is fine because this function is called from the context menu and
         therefore relies on the user right-clicking on the correct row.
         
-        @param table: the TableWidget item to get the row data from.
-        '''
+        :param table: the TableWidget item to get the row data from.
+        """
         
         # Get the currently active row in the table and find it's ID value
         row = table.currentRow()
@@ -454,12 +454,12 @@ class MainGui(QtGui.QMainWindow):
     
     
     def _saveViewChangesToDatabase(self, table):
-        '''Saves the edits made to the row in the View Log table to the database
+        """Saves the edits made to the row in the View Log table to the database
         based on the id value in the row that was clicked to launch the context
         menu.
         
-        @param table: the table in the user form to takes  updates from.
-        '''
+        :param table: the table in the user form to takes  updates from.
+        """
         row = table.currentRow()
         
         # Search through the current row and get the values in the columns that
@@ -485,8 +485,8 @@ class MainGui(QtGui.QMainWindow):
                 
         
     def loadModelLog(self):
-        '''If there is a model log to load we do it.
-        '''
+        """If there is a model log to load we do it.
+        """
         if self.checkDbLoaded():
             errors = GuiStore.ErrorHolder()
             # Check that the database actually exists. If not get out of here.
@@ -526,11 +526,11 @@ class MainGui(QtGui.QMainWindow):
             
 
     def _fillEntryTables(self, all_logs):
-        '''Add the log pages data to the log entry tables that will be
+        """Add the log pages data to the log entry tables that will be
         displayed to the user for amending prior to updating the database.
         
-        @param log_pages: the log pages dictionary loaded from the model.
-        '''
+        :param log_pages: the log pages dictionary loaded from the model.
+        """
         # Reset the tables first
         self.new_entry_tables.clearAll()
         
@@ -561,9 +561,9 @@ class MainGui(QtGui.QMainWindow):
 
     
     def _getInputLogVariables(self, all_logs):
-        '''Put the variables entered by the user in the Input log variables
+        """Put the variables entered by the user in the Input log variables
         group into the all_logs object.
-        '''
+        """
         run = all_logs.getLogEntryContents('RUN', 0)
         run['MODELLER'] = str(self.ui.modellerTextbox.text())
         run['TUFLOW_BUILD'] = str(self.ui.tuflowVersionTextbox.text())
@@ -574,9 +574,9 @@ class MainGui(QtGui.QMainWindow):
         
         
     def _createLogEntry(self):
-        '''Take the updated data in the provisional table and load it into the
+        """Take the updated data in the provisional table and load it into the
         model log.
-        '''
+        """
         # Check that we have a database
         if not self.checkDbLoaded(): return
 
@@ -608,9 +608,9 @@ class MainGui(QtGui.QMainWindow):
             
     
     def _createMultipleLogEntry(self):
-        '''Takes all the files in the multiple model list, load them and add
+        """Takes all the files in the multiple model list, load them and add
         them to the database.        
-        '''
+        """
             
         # Check that we have a database
         if not self.checkDbLoaded(): return
@@ -680,8 +680,8 @@ class MainGui(QtGui.QMainWindow):
         
     
     def _updateWithUserInputs(self):
-        '''Get the variables that we want to allow the user to be able to update.
-        '''
+        """Get the variables that we want to allow the user to be able to update.
+        """
         for log in self.all_logs.log_pages.values():
             if not log.has_contents: 
                 continue
@@ -694,8 +694,8 @@ class MainGui(QtGui.QMainWindow):
         
 
     def _loadSettings(self):
-        '''Get the settings loaded from file if they exist.
-        '''
+        """Get the settings loaded from file if they exist.
+        """
         try:
             self.ui.statusbar.showMessage("Current log: " + str(self.settings.cur_log_path))
             self.ui.modellerTextbox.setText(self.settings.modeller)
@@ -726,8 +726,8 @@ class MainGui(QtGui.QMainWindow):
         
     
     def _writeSettings(self, save_path):
-        '''Need a custom close event so that we can save the user settings.
-        '''            
+        """Need a custom close event so that we can save the user settings.
+        """            
         logger.info('Closing program')
         logger.info('Saving user settings to: ' + save_path)
         self.settings.modeller = str(self.ui.modellerTextbox.text())
@@ -745,8 +745,8 @@ class MainGui(QtGui.QMainWindow):
     
     
     def _saveSetup(self):
-        '''Write the current LogIT setup to file.
-        '''
+        """Write the current LogIT setup to file.
+        """
         d = MyFileDialogs()
         save_path = d.saveFileDialog(path=os.path.split(
                             self.settings.cur_log_path)[0], 
@@ -758,8 +758,8 @@ class MainGui(QtGui.QMainWindow):
         
     
     def _loadSetup(self):
-        '''Load LogIT setup from file.
-        '''
+        """Load LogIT setup from file.
+        """
         settings, errors = Controller.loadSetup(
                 self.settings.cur_settings_path, self.settings.cur_log_path)
          
@@ -774,8 +774,8 @@ class MainGui(QtGui.QMainWindow):
         
     
     def _customClose(self):
-        '''Do the things that need doing before closing window.
-        '''
+        """Do the things that need doing before closing window.
+        """
         save_path = self.settings.cur_settings_path
         self._writeSettings(save_path)
         # We need sys.exit because otherwise this function will be called twice.
@@ -784,9 +784,9 @@ class MainGui(QtGui.QMainWindow):
 
  
     def _updateDatabaseVersion(self): 
-        '''Checks if the databse at the given path is compatible with the
+        """Checks if the databse at the given path is compatible with the
         latest version of LogIT.
-        '''
+        """
         d = MyFileDialogs()
         if not self.checkDbLoaded():
             open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
@@ -819,8 +819,8 @@ class MainGui(QtGui.QMainWindow):
     
     
     def _createNewLogDatabase(self):
-        '''Create a new model log database.
-        '''
+        """Create a new model log database.
+        """
         d = MyFileDialogs()
         save_path = d.saveFileDialog(path=os.path.split(
                                     self.settings.cur_settings_path)[0], 
@@ -838,8 +838,8 @@ class MainGui(QtGui.QMainWindow):
     
     
     def _loadDatabaseFromUser(self):
-        '''Load database chosen by user in dialog.
-        '''
+        """Load database chosen by user in dialog.
+        """
         d = MyFileDialogs()
         if not self.checkDbLoaded():
             open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
@@ -864,8 +864,8 @@ class MainGui(QtGui.QMainWindow):
     
     
     def _exportDatabase(self, call_name):
-        '''Exports the database based on calling action.
-        '''
+        """Exports the database based on calling action.
+        """
         if self.checkDbLoaded():
             d = MyFileDialogs()
             save_path = d.saveFileDialog(path=os.path.split(
@@ -897,8 +897,8 @@ class MainGui(QtGui.QMainWindow):
         
 
     def fileMenuActions(self):
-        '''Respond to actions that occur on the file menu
-        '''
+        """Respond to actions that occur on the file menu
+        """
         caller = self.sender()
         call_name = caller.objectName()
         logger.debug('Caller = ' + call_name)
@@ -914,13 +914,13 @@ class MainGui(QtGui.QMainWindow):
             
             
     def _getModelFileDialog(self, multi_paths=False):
-        '''Launches an open file dialog to get .ief or .tcf files.
+        """Launches an open file dialog to get .ief or .tcf files.
         
-        @param multi_paths=False: if set to True it will return a list of all
+        :param multi_paths=False: if set to True it will return a list of all
                the user selected paths, otherwise a single string path.
-        @return: The chosen file path, a list of paths or false if the user 
+        :return: The chosen file path, a list of paths or false if the user 
                  cancelled.
-        '''
+        """
 
         # Check that we have a database
         if not self.checkDbLoaded():
@@ -938,8 +938,8 @@ class MainGui(QtGui.QMainWindow):
     
           
     def _loadFileActions(self, shortcut=None):
-        '''Respond to the user clicking a button that loads a file.
-        '''
+        """Respond to the user clicking a button that loads a file.
+        """
         caller = self.sender()
         call_name = caller.objectName()
         logger.debug('Caller = ' + call_name)
@@ -974,8 +974,8 @@ class MainGui(QtGui.QMainWindow):
 
 
     def launchQtQBox(self, title, message):
-        '''Launch QtQMessageBox.
-        '''
+        """Launch QtQMessageBox.
+        """
         answer = QtGui.QMessageBox.question(self, title, message,
                 QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
         if answer == QtGui.QMessageBox.No:
@@ -985,8 +985,8 @@ class MainGui(QtGui.QMainWindow):
     
     
     def launchQMsgBox(self, title, message, type='warning'):
-        '''Launch a QMessageBox
-        '''
+        """Launch a QMessageBox
+        """
         if type == 'warning':
             QtGui.QMessageBox.warning(self, title, message)
         
@@ -995,8 +995,8 @@ class MainGui(QtGui.QMainWindow):
     
     
     def checkDbLoaded(self):
-        '''Check if there's a database filepath set.
-        '''
+        """Check if there's a database filepath set.
+        """
         if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
             QtGui.QMessageBox.warning(self, "No Database Loaded",
                     "No log database active. Please load or create one from the file menu.")
@@ -1006,12 +1006,12 @@ class MainGui(QtGui.QMainWindow):
         
 
 class ProgressMonitor(object):
-    '''Convenience class for updating progress bars and text.
+    """Convenience class for updating progress bars and text.
     
     This stays in this module becuase it sort of breaks the encapsulation of
     the MainGui class by updating its progress bar and text label. It's better
     than having to little progress update code all over the place though.
-    '''
+    """
      
     def __init__(self, progbar_ui, text_ui=None):
         self.progbar_ui = progbar_ui
@@ -1020,12 +1020,12 @@ class ProgressMonitor(object):
         self.text_cur = 0
     
     def setRanges(self, prog_up, text_down=None, text_up=None, textform='%d of %d'): 
-        '''Set the range to operate on.
-        @param prog_up: max progress bar value.
-        @param text_down=None: lowest text counter value.
-        @param text_up=None: max text counter value.
-        @param textform=None: format to dislplay text counter in.
-        '''
+        """Set the range to operate on.
+        :param prog_up: max progress bar value.
+        :param text_down=None: lowest text counter value.
+        :param text_up=None: max text counter value.
+        :param textform=None: format to dislplay text counter in.
+        """
         self.prog_up = prog_up
         self.text_up = text_up
         self.text_current = self.text_down = text_down
@@ -1034,26 +1034,26 @@ class ProgressMonitor(object):
         self.setToStart()
     
     def setToStart(self):
-        '''Set progress counters to start point.
-        '''
+        """Set progress counters to start point.
+        """
         self.progbar_ui.setValue(0)
         if not self.text_ui == None:
             text_out = self.textform % (self.text_cur, self.text_up)
             self.text_ui.setText(text_out)
     
     def reset(self, text=None):
-        '''Reset the progress bar to normal state.
-        @param text=None: text to display in text label.
-        '''
+        """Reset the progress bar to normal state.
+        :param text=None: text to display in text label.
+        """
         self.setToStart()
         if text == None: text = ''
         self.text_ui.setText(text)
     
     def update(self, bar_only=False, text_only=False):
-        '''Update progress.
-        @param bar_only=False: don't update the progress bar.
-        @param text_only=False: don't update the text counter.
-        '''
+        """Update progress.
+        :param bar_only=False: don't update the progress bar.
+        :param text_only=False: don't update the text counter.
+        """
         if not text_only:
             self.updateBarProgress()
         if not bar_only:
@@ -1061,14 +1061,14 @@ class ProgressMonitor(object):
         QtGui.QApplication.processEvents()
     
     def updateBarProgress(self):
-        '''Iterate and update progress bar
-        '''
+        """Iterate and update progress bar
+        """
         self.prog_cur += 1
         self.progbar_ui.setValue(self.prog_cur)
     
     def updateTextProgress(self):
-        '''Iterate and update text counter label.
-        '''
+        """Iterate and update text counter label.
+        """
         if self.text_ui == None:
             return
         else:
@@ -1078,13 +1078,13 @@ class ProgressMonitor(object):
 
 
 class LogitSettings(object):
-    '''Storage class for holding all of the settings that the current user has
+    """Storage class for holding all of the settings that the current user has
     stored.
-    '''
+    """
     
     def __init__(self):
-        '''Constructor.
-        '''
+        """Constructor.
+        """
         self.cur_log_path = ''
         self.cur_settings_path = ''
         self.last_model_directory = ''

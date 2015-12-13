@@ -1,5 +1,6 @@
-'''
-    
+"""
+###############################################################################
+
  Name: LogIT (Logger for Isis and Tuflow) 
  Author: Duncan Runnacles
  Copyright: (C) 2014 Duncan Runnacles
@@ -54,7 +55,7 @@
     for table names, so need to find a way around this.
 
 ###############################################################################
-'''
+"""
 
 import os
 import sqlite3
@@ -72,30 +73,30 @@ DATABASE_VERSION_HIGH = 2
 
 
 class DatabaseManager(object):
-    '''Database class
+    """Database class
     
     :note: This should not be subclassed as it relies on __del__ to close the
            connection. If you need to subclass it you will have to use the
            weakref module. Just don't do it.
-    '''
+    """
     
     def __init__(self, db):
-        '''Initiate the log by loading it.
+        """Initiate the log by loading it.
         :raise exception: if there's an issue.
-        '''
+        """
         self.conn = loadLogDatabase(db)
         self.cur = self.conn.cursor()
 
 
     def __del__(self):
-        '''Destructor to ensure the connection gets closed.
-        '''
+        """Destructor to ensure the connection gets closed.
+        """
         self.conn.close()
         
 
     def getMaxId(self, table_name):
-        '''Return the highest id value in given table_name
-        '''
+        """Return the highest id value in given table_name
+        """
         query = 'SELECT max(id) FROM %s' % (table_name)
         self.readQuery(query)
         max_id = self.cur.fetchone()[0]
@@ -106,25 +107,25 @@ class DatabaseManager(object):
 
 
     def deleteRow(self, table_name, row_id):
-        '''Delete the row at the provided index in the provided table_name
-        '''
+        """Delete the row at the provided index in the provided table_name
+        """
         query = "delete from %s where ID='%s'" % (table_name, row_id)
         self.writeQuery(query)
         
         
     def deleteClause(self, table_name, col_name, entry):
-        '''Deletes rows from the database that meet the given query.
+        """Deletes rows from the database that meet the given query.
         All rows where col_name == entry will be deleted.
         :param entry: the entry to test.
-        '''
+        """
         query = "delete from %s where %s='%s'" % (table_name, col_name, entry)
         self.writeQuery(query)
     
     
     def insertQueue(self, queue_obj):
-        '''Inserts all of the items in the DbQueue object into the database.
+        """Inserts all of the items in the DbQueue object into the database.
         :param queue_obj: the DbQueue object that contains all the query data.
-        '''
+        """
         while not queue_obj.isEmpty():
             entry = queue_obj.dequeue()
             table_name = entry[0]
@@ -138,11 +139,11 @@ class DatabaseManager(object):
         
 
     def insertValues(self, table_name, row_data):   
-        '''Inserts a dictionary of values into the given table_name
+        """Inserts a dictionary of values into the given table_name
         :param table_name: the name of the table to update.
         :param row_data: a dictionary containing keys that match the schema of
                the table and values to insert.
-        '''
+        """
         
         columns = ', '.join(row_data.keys())
         placeholders = ", ".join('?' * len(row_data))
@@ -151,19 +152,19 @@ class DatabaseManager(object):
 
 
     def updateRowValue(self, table_name, column, value, id):
-        '''Updates the values of a row in the given table.
+        """Updates the values of a row in the given table.
         :param table_name: the name of the table to update.
         :param column: name of the column to update.
         :param value: the value to insert.
         :param id: the row index to insert the value into.
-        '''
+        """
         query = "update %s set %s='%s' where ID=%s" % (table_name, column, value, id)
         self.writeQuery(query)
     
     
     def updateRow(self, table_name, column, row_data, id):
-        '''Updates all of the values in the given columns according to row index.
-        '''
+        """Updates all of the values in the given columns according to row index.
+        """
         columns = ' = ?, '.join(row_data.keys())
         columns += ' = ?'
         query = "update " + table_name + " set " + columns + " where ID='" + id + "'"
@@ -172,7 +173,7 @@ class DatabaseManager(object):
 
     def findEntry(self, table_name, col_name, entry, column_only=False, 
                                                     return_rows=False):
-        '''Searches for a specific entry in the database.
+        """Searches for a specific entry in the database.
         :param table_name: the name of the table to search.
         :param col_name: the name of the column to search.
         :param entry: the value to search for.
@@ -186,7 +187,7 @@ class DatabaseManager(object):
               the entry exists in the column or not.
         :return: Boolean flag for entry exists or tuple (see above) if 
                  return_rows is set to True.
-        '''
+        """
         if not column_only:
             query = "select * from %s where %s='%s'" % (table_name, col_name, entry)
         else:
@@ -202,7 +203,7 @@ class DatabaseManager(object):
     
     def findMultipleEntry(self, table_name, entry_data, return_rows=False, 
                                                                 AND=True):
-        '''Searches for entries in the given table_name.
+        """Searches for entries in the given table_name.
         These must meet the AND/OR criteria provided.
         :param table_name: the name of the table to search.
         :param entry_data: dict containing the {column: value} pairs.
@@ -216,7 +217,7 @@ class DatabaseManager(object):
                if OR should be used instead.
         :return: Boolean flag for entry exists or tuple (see above) if 
                  return_rows is set to True.
-        '''
+        """
         if AND:
             columns = '=? AND '.join(entry_data.keys())
         else:
@@ -233,7 +234,7 @@ class DatabaseManager(object):
     
 
     def findAll(self, table_name, col_name=False, return_rows=False):
-        '''Returns all values in the given table or column.
+        """Returns all values in the given table or column.
         :param table_name: the table to return values from.
         :param col_name=False: the column to return values from if set to True.
                If set to False (default) all values in the table will be
@@ -246,7 +247,7 @@ class DatabaseManager(object):
               the entry exists in the column or not.
         :return: Boolean flag for entry exists or tuple (see above) if 
                  return_rows is set to True.
-        '''
+        """
         if col_name == False:
             query = "select * from %s" % (table_name)
         else:
@@ -261,13 +262,13 @@ class DatabaseManager(object):
         
 
     def checkVersion(self):
-        '''Checks the version of the loaded database against the module value.
+        """Checks the version of the loaded database against the module value.
         :return: a constant representing the state of the database loaded into
                  this class:
                  - DATABASE_VERSION_SAME = 0: Same as currently used by LogIT
                  - DATABASE_VERSION_HIGH = 1: Newer than currently used.
                  - DATABASE_VERSION_LOW = 2: Older than currently used.
-        '''
+        """
         self.cur.execute("pragma user_version")
         db_version = self.cur.fetchone()[0]
          
@@ -283,9 +284,9 @@ class DatabaseManager(object):
         
     
     def getTableNames(self):
-        '''Get a list of all of the table names in the database.
+        """Get a list of all of the table names in the database.
         :return: list containing the table names.
-        '''
+        """
         query = "SELECT name FROM sqlite_master WHERE type='table'"
         self.cur.execute(query)
         result = self._getEntriesFromCursor()
@@ -293,28 +294,28 @@ class DatabaseManager(object):
         
     
     def insertBlob(self, table_name, col_name, pdata, row_id):
-        '''Inserts data into a blob entry.
-        '''
+        """Inserts data into a blob entry.
+        """
         query = "update " + table_name + " set " + col_name + "=:blobData where id = " + str(row_id)
         self.cur.execute (query, [sqlite3.Binary(pdata)],) 
         self.conn.commit()
     
     
 #     def selectBlob(self):
-#         '''
-#         '''
+#         """
+#         """
 #         self.cur.execute("select data from table limit 1")
 #         for row in curr:
 #             data = cPickle.loads(str(row['data']))
     
 
     def readQuery(self, query, row_data=None):
-        '''Used to read in a query from the database.
+        """Used to read in a query from the database.
         This is only used to read from the database and doesn't commit
         anything. If that is needed use writeQuery function.
         :param query: the sql query to evaluate.
         :return: self.cur containing the output of the query.
-        '''
+        """
         try:
             if row_data == None:
                 self.cur.execute(query)
@@ -328,7 +329,7 @@ class DatabaseManager(object):
 
 
     def writeQuery(self, query, row_data=None, commit=True):
-        '''Used to write a query to the database.
+        """Used to write a query to the database.
         Will commit once the query has been evaluated.
         :param query: the query to evaluate.
         :param row_data=None: if additional data is needed to evaluate the
@@ -338,7 +339,7 @@ class DatabaseManager(object):
         :return: self.cur containing the output of the query.
         :raise ValueError: if there's a problem entering the data into the
                database.
-        '''
+        """
         try:
             if row_data == None:
                 self.cur.execute(query)
@@ -358,13 +359,13 @@ class DatabaseManager(object):
             
         
     def _getEntriesFromCursor(self):
-        '''Converts the outputs of the cursor query into a list.
+        """Converts the outputs of the cursor query into a list.
         Call self._convertRowToDictionary to do this.
         :return: a tuple containing:
                  - Boolean flag stating if any results were found.
                  - integer count of number of results.
                  - A list containing dictionaries for each row. 
-        '''
+        """
         found_rows = []
         result = self.cur.fetchall()
         if not result == None:
@@ -382,12 +383,12 @@ class DatabaseManager(object):
 
 
     def _convertRowToDictionary(self, row):
-        '''Converts a sqlite3 row_factory into a dictionary
+        """Converts a sqlite3 row_factory into a dictionary
         
-        @param row: the row_factory object from sqlite3 cursor.
-        @return: dictionary containing the values in the given row with keys
+        :param row: the row_factory object from sqlite3 cursor.
+        :return: dictionary containing the values in the given row with keys
                  set as the column names.
-        '''
+        """
         d = {}
         for idx, col in enumerate(self.cur.description):
             d[col[0]] = row[idx]
@@ -395,7 +396,7 @@ class DatabaseManager(object):
     
     
 
-'''
+"""
 ##############################################################################
     Below here is all of the module wide functionality for doing the creation,
     updating, deleting, etc of the database.
@@ -404,13 +405,13 @@ class DatabaseManager(object):
     don't think. It will just make the class messy and hard to follow.
 
 ##############################################################################
-'''
+"""
 
 def loadLogDatabase(db_path):
-    '''Load a log database from file
+    """Load a log database from file
     
-    @param db_path: path to the sqlite database to load
-    '''
+    :param db_path: path to the sqlite database to load
+    """
     con = False
     
     try:
@@ -424,11 +425,11 @@ def loadLogDatabase(db_path):
 
 
 def createNewLogDatabase(db_path):
-    '''Creates a new SqLite database and sets up the tables for adding the
+    """Creates a new SqLite database and sets up the tables for adding the
     log entries into.
     
-    @param db_path: path to use to create the database.
-    '''
+    :param db_path: path to use to create the database.
+    """
     conn = None
     
     if os.path.exists(db_path):
@@ -500,11 +501,11 @@ def createNewLogDatabase(db_path):
 
 
 def createRunTable(cur):
-    '''Create the run table
+    """Create the run table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE RUN
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE RUN
                  (ID                      INTEGER    PRIMARY KEY    NOT NULL,
                   DATE                    TEXT                      NOT NULL,
                   MODELLER                TEXT,
@@ -524,195 +525,195 @@ def createRunTable(cur):
                   BC_DBASE                TEXT,
                   ECF                     TEXT,
                   EVENT_NAME              TEXT);
-                 ''')
+                 """)
     
 
 def createRunIdTable(cur):
-    '''Create the run table
+    """Create the run table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE RUN_ID
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE RUN_ID
                  (ID            INTEGER    PRIMARY KEY       NOT NULL,
                   RUN_ID        INTEGER,
                   FILE          TEXT,
                   TYPE          TEXT);
-                 ''')
+                 """)
     
     
 def createTgcTable(cur):
-    '''Create the tgc table
+    """Create the tgc table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE TGC
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE TGC
                     (ID            INTEGER     PRIMARY KEY    NOT NULL,
                     DATE           TEXT                       NOT NULL,
                     TGC            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
                     COMMENTS       TEXT);
-                    ''')
+                    """)
     
 
 def createTbcTable(cur):
-    '''Create the tbc table
+    """Create the tbc table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE TBC
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE TBC
                     (ID            INTEGER     PRIMARY KEY    NOT NULL,
                     DATE           TEXT                       NOT NULL,
                     TBC            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
                     COMMENTS       TEXT);
-                    ''')
+                    """)
     
     
 def createDatTable(cur):
-    '''Create the dat table
+    """Create the dat table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE DAT
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE DAT
                     (ID            INTEGER     PRIMARY KEY    NOT NULL,
                     DATE           TEXT                       NOT NULL,
                     DAT            TEXT,
                     AMENDMENTS     TEXT,
                     COMMENTS       TEXT);
-                    ''')
+                    """)
 
 
 def createBcTable(cur):
-    '''Create the bc_dbase table
+    """Create the bc_dbase table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE BC_DBASE
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE BC_DBASE
                     (ID            INTEGER     PRIMARY KEY    NOT NULL,
                     DATE           TEXT                       NOT NULL,
                     BC_DBASE       TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
                     COMMENTS       TEXT);
-                    ''')
+                    """)
     
 
 def createEcfTable(cur):
-    '''Create the ecf table
+    """Create the ecf table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE ECF
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE ECF
                     (ID            INTEGER     PRIMARY KEY    NOT NULL,
                     DATE           TEXT                       NOT NULL,
                     ECF            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
                     COMMENTS       TEXT);
-                    ''')
+                    """)
     
 
 def createTcfTable(cur):
-    '''Create the tcf table
+    """Create the tcf table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE TCF
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE TCF
                     (ID            INTEGER     PRIMARY KEY    NOT NULL,
                     DATE           TEXT                       NOT NULL,
                     TCF            TEXT,
                     FILES          TEXT,
                     NEW_FILES      TEXT,
                     COMMENTS       TEXT);
-                    ''')
+                    """)
     
 
 def createTgcFilesTable(cur):
-    '''Create the tgc_files table
+    """Create the tgc_files table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE TGC_FILES
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE TGC_FILES
                     (ID            INTEGER     PRIMARY KEY    NOT NULL,
                     TGC            TEXT,
                     FILES          TEXT);
-                    ''')
+                    """)
     
 
 def createTbcFilesTable(cur):
-    '''Create the tbc_files table
+    """Create the tbc_files table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE TBC_FILES
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE TBC_FILES
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     TBC                TEXT,
                     FILES              TEXT);
-                    ''')
+                    """)
     
     
 def createBcFilesTable(cur):
-    '''Create the bc_dbase_files table
+    """Create the bc_dbase_files table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE BC_DBASE_FILES 
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE BC_DBASE_FILES 
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     BC_DBASE           TEXT,
                     FILES              TEXT);
-                    ''')
+                    """)
     
 
 def createEcfFilesTable(cur):
-    '''Create the ecf_files table
+    """Create the ecf_files table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE ECF_FILES 
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE ECF_FILES 
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     ECF                TEXT,
                     FILES              TEXT);
-                    ''')
+                    """)
 
 
 def createTcfFilesTable(cur):
-    '''Create the tcf_files table
+    """Create the tcf_files table
     
-    @param cur: a cursor to an open database connection
-    '''
-    cur.execute('''CREATE TABLE TCF_FILES 
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE TCF_FILES 
                     (ID                INTEGER     PRIMARY KEY    NOT NULL,
                     TCF                TEXT,
                     FILES              TEXT);
-                    ''')
+                    """)
 
         
 def dropAllTables(db_path):
-    '''Drops all of the tables in the database at the given path.
+    """Drops all of the tables in the database at the given path.
     
-    @param db_path: the path to the sqlite3 database.
-    '''
+    :param db_path: the path to the sqlite3 database.
+    """
     con = None
     try:
         con = sqlite3.connect(db_path)
         con.isolation_level = None
         try:
             cur = con.cursor()
-            cur.execute('''DROP TABLE IF EXISTS RUN''')
-            cur.execute('''DROP TABLE IF EXISTS TGC''')
-            cur.execute('''DROP TABLE IF EXISTS TBC''')
-            cur.execute('''DROP TABLE IF EXISTS DAT''')
-            cur.execute('''DROP TABLE IF EXISTS BC_DBASE''')
-            cur.execute('''DROP TABLE IF EXISTS ECF''')
-            cur.execute('''DROP TABLE IF EXISTS TCF''')
-            cur.execute('''DROP TABLE IF EXISTS TGC_FILES''')
-            cur.execute('''DROP TABLE IF EXISTS TBC_FILES''')
-            cur.execute('''DROP TABLE IF EXISTS BC_DBASE_FILES''')
-            cur.execute('''DROP TABLE IF EXISTS ECF_FILES''')
-            cur.execute('''DROP TABLE IF EXISTS TCF_FILES''')
-            cur.execute('''DROP TABLE IF EXISTS RUN_ID''')
+            cur.execute("""DROP TABLE IF EXISTS RUN""")
+            cur.execute("""DROP TABLE IF EXISTS TGC""")
+            cur.execute("""DROP TABLE IF EXISTS TBC""")
+            cur.execute("""DROP TABLE IF EXISTS DAT""")
+            cur.execute("""DROP TABLE IF EXISTS BC_DBASE""")
+            cur.execute("""DROP TABLE IF EXISTS ECF""")
+            cur.execute("""DROP TABLE IF EXISTS TCF""")
+            cur.execute("""DROP TABLE IF EXISTS TGC_FILES""")
+            cur.execute("""DROP TABLE IF EXISTS TBC_FILES""")
+            cur.execute("""DROP TABLE IF EXISTS BC_DBASE_FILES""")
+            cur.execute("""DROP TABLE IF EXISTS ECF_FILES""")
+            cur.execute("""DROP TABLE IF EXISTS TCF_FILES""")
+            cur.execute("""DROP TABLE IF EXISTS RUN_ID""")
             con.commit()
         except con.Error:
             con.rollback()
@@ -751,10 +752,10 @@ cur_tables = {'RUN': run, 'TGC': tgc, 'TBC': tbc, 'DAT': dat, 'ECF': ecf, 'TCF':
               }
 
 def buildTableFromName(table_type, cur):
-    '''Builds the table based on the name
+    """Builds the table based on the name
     
-    @param table_type: the type of table to build.
-    '''
+    :param table_type: the type of table to build.
+    """
     try:
         table_types = {'RUN': createRunTable, 'TGC': createTgcTable, 
                         'TBC': createTbcTable, 'DAT': createDatTable, 
@@ -775,11 +776,11 @@ def buildTableFromName(table_type, cur):
     
 
 def updateDatabaseVersion(db_path):
-    '''Update an existing version of the database to the latest version of
+    """Update an existing version of the database to the latest version of
     the software.
     
-    @param db_path: the path to the sqlite3 database.
-    '''
+    :param db_path: the path to the sqlite3 database.
+    """
     version_check = checkDatabaseVersion(db_path)
     if version_check == DATABASE_VERSION_SAME:
         logger.error('Database version is up to date')
@@ -821,11 +822,11 @@ def updateDatabaseVersion(db_path):
     
 
 def testDatabaseCompatibility(conn, add_update=False):
-    '''Test the database at the given path to see if it is compatible with this
+    """Test the database at the given path to see if it is compatible with this
     version of LogIT.
     
-    @param db_path: the path to the sqlite3 database.
-    '''
+    :param db_path: the path to the sqlite3 database.
+    """
     try:
         cur = conn.cursor()
         for tab in cur_tables:
@@ -886,15 +887,15 @@ def testDatabaseCompatibility(conn, add_update=False):
 
 
 def checkDatabaseVersion(db_path):
-    '''Check the database version number to make sure it is the same as the
+    """Check the database version number to make sure it is the same as the
     current version of the software. If it's not we return False because the
     user needs to either update the database settings or use an older version.
     
-    @param db_path: path to an existing database.
-    @param version_no: the database version used by this version of LogIT.
-    @raise IOError: if db_path does not point to a database or it is not a
+    :param db_path: path to an existing database.
+    :param version_no: the database version used by this version of LogIT.
+    :raise IOError: if db_path does not point to a database or it is not a
            LogIT database file.
-    '''
+    """
     if not os.path.exists(db_path):
         raise IOError
     if not os.path.splitext(os.path.split(db_path)[1])[1] == '.logdb':
