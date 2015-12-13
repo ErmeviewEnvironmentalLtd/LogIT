@@ -1,45 +1,55 @@
 '''
 ###############################################################################
-#    
-# Name: LogIT (Logger for Isis and Tuflow) 
-# Version: 0.2-Beta
-# Author: Duncan Runnacles
-# Copyright: (C) 2014 Duncan Runnacles
-# email: duncan.runnacles@thomasmackay.co.uk
-# License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-#
-# Module:  Controller.py 
-# Date:  16/11/2014
-# Author:  Duncan Runnacles
-# Version: 1.1
-# 
-# Summary:
-#    Controller functions for the GUI. Code that is not directly responsible 
-#    for updating or retrieving from the GUI is included in this module in
-#    order to separate it from the application library.
-#
-# UPDATES:
-#    DR (03/12/15) - Moved lots of the MainGui code into functions in here
-#                    during extensive refactoring in that class.
-#
-# TODO:
-#    Some heavy refactoring needed in some funtions.
-#
+    
+ Name: LogIT (Logger for Isis and Tuflow) 
+ Author: Duncan Runnacles
+ Copyright: (C) 2014 Duncan Runnacles
+ email: duncan.runnacles@thomasmackay.co.uk
+ License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+
+ Module:          Controller.py 
+ Date:            16/11/2014
+ Author:          Duncan Runnacles
+ Since-Version:   0.1
+ 
+ Summary:
+    Controller functions for the GUI. Code that is not directly responsible 
+    for updating or retrieving from the GUI is included in this module in
+    order to separate it from the application library.
+
+ UPDATES:
+    DR - 03/12/15):
+        Moved lots of the MainGui code into functions in here
+        during extensive refactoring in that class.
+    DR - 13/12/2015:
+        Big refactor. Cleared up lots of functions, combined and removed a few
+        as well. 
+        Added a BdQueue class to store all database calls when creating new
+        model entries until end so that they are all added at once. This really
+        speeds up the process.
+        Added the AddedRows class for storing the entries made to the DB. 
+        The functions in this module are now A LOT easier to follow and 
+        quite a few bugs have been removed. This is a big improvement.
+
+ TODO:
+    AddedRows class may not be needed now that there is a bulk insert statement
+    used (it can use connection.rollback() if needed.
+
 ###############################################################################
 '''
 import os

@@ -1,52 +1,58 @@
 '''
-###############################################################################
-#    
-# Name: LogIT (Logger for Isis and Tuflow) 
-# Version: 0.2-Beta
-# Author: Duncan Runnacles
-# Copyright: (C) 2014 Duncan Runnacles
-# email: duncan.runnacles@thomasmackay.co.uk
-# License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-#
-# Module:  DatabaseFunctions.py
-# Date:  16/11/2014
-# Author:  Duncan Runnacles
-# Version:  1.1
-# 
-# Summary:
-#    Contains all of the functions that communicate with the database. These
-#    included generic select and update queries, as well as specific actions
-#    and workflows required by the software.
-#
-# UPDATES:
-#    DR - 19/11/2014
-#        Added functionality to update an existing database if there are 
-#        changes to the way that the software uses the log database. This means
-#        that existing databases can be converted to the format used in new 
-#        releases without losing data/starting again.
-#
-# TODO:
-#    The functions almost entirely use string replacement to create the
-#    queries. This is not good practice (although probably fairly safe from
-#    problems while the software is used locally). This should be changed to
-#    use placeholders. The problem with placeholders is that you can't use them
-#    for table names, so need to find a way around this.
-#
+    
+ Name: LogIT (Logger for Isis and Tuflow) 
+ Author: Duncan Runnacles
+ Copyright: (C) 2014 Duncan Runnacles
+ email: duncan.runnacles@thomasmackay.co.uk
+ License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+
+ Module:           DatabaseFunctions.py
+ Date:             16/11/2014
+ Author:           Duncan Runnacles
+ Since-Version:    0.1
+ 
+ Summary:
+    Contains all of the functions that communicate with the database. These
+    included generic select and update queries, as well as specific actions
+    and workflows required by the software.
+    There is a class that should be used to do all of this, called 
+    DatabaseManager. It will create a connection and provided methods for 
+    reading and writing from the database.
+
+ UPDATES:
+    DR - 19/11/2014
+        Added functionality to update an existing database if there are 
+        changes to the way that the software uses the log database. This means
+        that existing databases can be converted to the format used in new 
+        releases without losing data/starting again.
+    DR - 13/12/2015:
+        Added DatabaseManager class and put most of the functionality into 
+        that class. This is what should be used by almost all calling code now.
+        The original module methods have been deleted, except for the 
+        database creation, update and delete functionality.
+
+ TODO:
+    The functions almost entirely use string replacement to create the
+    queries. This is not good practice (although probably fairly safe from
+    problems while the software is used locally). This should be changed to
+    use placeholders. The problem with placeholders is that you can't use them
+    for table names, so need to find a way around this.
+
 ###############################################################################
 '''
 

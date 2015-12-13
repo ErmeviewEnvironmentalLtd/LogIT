@@ -1,50 +1,50 @@
 '''
 ###############################################################################
-#    
-# Name: LogIT (Logger for Isis and Tuflow) 
-# Version: 0.2-Beta
-# Author: Duncan Runnacles
-# Copyright: (C) 2014 Duncan Runnacles
-# email: duncan.runnacles@thomasmackay.co.uk
-# License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-#
-# Module:  LogBuilder.py
-# Date:  16/11/2014
-# Author:  Duncan Runnacles
-# Version:  1.1
-# 
-# Summary:
-#    Created the initial log_pages dictionary that is used by the application
-#    to update the GUI and the database.
-#    Uses the tmac_tools_lib package to read the ief and tuflow files and
-#    retrieve all the necessary data from the files. This data is then used to
-#    populate the different pages of the log. The log is split into pages 
-#    according to the required outputs (Run, Tgc, Tbc, Dat, BC DBase).
-#
-# UPDATES:
-#    DR - 19/11/2014
-#        Added ability to log ISIS only runs.
-#
-# TODO:
-#    Currently no support for .ecf files and therefore no support for
-#    BC DBase files either. Can't do anything about this until the 
-#    tmac_tools_lib implements this capability.
-#
+    
+ Name: LogIT (Logger for Isis and Tuflow) 
+ Author: Duncan Runnacles
+ Copyright: (C) 2014 Duncan Runnacles
+ email: duncan.runnacles@thomasmackay.co.uk
+ License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+
+ Module:          LogBuilder.py
+ Date:            16/11/2014
+ Author:          Duncan Runnacles
+ Since-Version:   0.1
+ 
+ Summary:
+    Created the initial log_pages dictionary that is used by the application
+    to update the GUI and the database.
+    Uses the tmac_tools_lib package to read the ief and tuflow files and
+    retrieve all the necessary data from the files. This data is then used to
+    populate the different pages of the log. The log is split into pages 
+    according to the required outputs (Run, Tgc, Tbc, Dat, BC DBase).
+
+ UPDATES:
+    DR - 19/11/2014:
+        Added ability to log ISIS only runs.
+    DR - 03/12/2015:
+        Added functionality for loading ECF and BC_DBASE files from the model.
+    DR - 13/12/2015:
+        Now returns logs as an AllLogs object rather than as a dictionary.
+
+ TODO:
+
 ###############################################################################
 '''
 

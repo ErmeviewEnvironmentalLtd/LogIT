@@ -1,44 +1,47 @@
 '''
 ###############################################################################
-#    
-# Name: LogIT (Logger for Isis and Tuflow) 
-# Version: 0.4-Beta
-# Author: Duncan Runnacles
-# Copyright: (C) 2015 Duncan Runnacles
-# email: duncan.runnacles@thomasmackay.co.uk
-# License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-#
-# Module:  logit.py
-# Date:  05/12/2015
-# Author:  Duncan Runnacles
-# Version:  1.0
-# 
-# Summary:
-#    Convenience classes for use with the UI. Nothing kept here will be of
-#    use to anything other than the GUI. It's a collection of classes for 
-#    helping the GUI manage code bloat.
-#
-# UPDATES:
-#   
-#
-# TODO:
-#    
-#
+    
+ Name: LogIT (Logger for Isis and Tuflow) 
+ Author: Duncan Runnacles
+ Copyright: (C) 2015 Duncan Runnacles
+ email: duncan.runnacles@thomasmackay.co.uk
+ License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+
+ Module:           logit.py
+ Date:             05/12/2015
+ Author:           Duncan Runnacles
+ Since-Version:    0.3
+ 
+ Summary:
+    Convenience classes for use with the UI. Nothing kept here will be of
+    use to anything other than the GUI. It's a collection of classes for 
+    helping the GUI manage code bloat.
+
+ UPDATES:
+    DR - 13/12/2015:
+        Added ErrorHolder and ErrorType classes. These are used to simplify
+        the lauching of errors from the GUI. They can be handed to any
+        business coded and updated with new errors that the GUI can deal with
+        as it likes later. Useful for easy message box launching and storing 
+        a series of errors that need writing out somewhere in the UI.
+
+ TODO:
+    
 ###############################################################################
 '''
 
@@ -48,9 +51,6 @@ from tmac_tools_lib.utils.qtclasses import MyFileDialogs
 
 import logging
 logger = logging.getLogger(__name__)
-
-
-
 
 
 class TableHolder(object):

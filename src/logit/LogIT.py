@@ -1,50 +1,59 @@
 '''
-###############################################################################
-#    
-# Name: LogIT (Logger for Isis and Tuflow) 
-# Version: 0.2-Beta
-# Author: Duncan Runnacles
-# Copyright: (C) 2014 Duncan Runnacles
-# email: duncan.runnacles@thomasmackay.co.uk
-# License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-#
-#
-# Module:  logit.py
-# Date:  16/11/2014
-# Author:  Duncan Runnacles
-# Version:  1.2
-# 
-# Summary:
-#    Main file and GUI for the LogIT software. Deals with all interactions with
-#    the user through the interface and updates the GUI.
-#
-# UPDATES:
-#    DR - 19/11/2014:
-#        Changed logging procedure so that it is now possible to log an ISIS
-#        only model without a Tuflow component.
-#    DR - 03/12/2015:
-#        Cleaned out a lot of non GUI related code from here and refeactored
-#        a lot of the methods. It's still quite big, but a lot neater and
-#        more focused on dealing with the UI.
-#
-# TODO:
-#    
-#
-###############################################################################
+##############################################################################
+  Name: LogIT (Logger for Isis and Tuflow) 
+  Version: 0.2-Beta
+  Author: Duncan Runnacles
+  Copyright: (C) 2014 Duncan Runnacles
+  email: duncan.runnacles@thomasmackay.co.uk
+  License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
+ 
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License along
+  with this program; if not, write to the Free Software Foundation, Inc.,
+  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ 
+ 
+  Module:          logit.py
+  Date:            16/11/2014
+  Author:          Duncan Runnacles
+  Since-Version:   0.1
+  
+  Summary:
+     Main file and GUI for the LogIT software. Deals with all interactions with
+     the user through the interface and updates the GUI.
+ 
+  UPDATES:
+     DR - 19/11/2014:
+         Changed logging procedure so that it is now possible to log an ISIS
+         only model without a Tuflow component.
+     DR - 03/12/2015:
+         Cleaned out a lot of non GUI related code from here and refeactored
+         a lot of the methods. It's still quite big, but a lot neater and
+         more focused on dealing with the UI.
+     DR - 13/12/2015:
+         Lots more refactoring. The MainGui now uses some new classes to better
+         handle the data. These include TableHolder, ErrorHolder, and 
+         AllLogs. 
+         The last bits of direct DatabaseFunctions.py calls have been
+         removed.
+         There is no longer and updating of the UI tables. A call to reload
+         the database is made instead. This simplifies, and in a lot cases,
+         speeds up the refresh.
+         The RUN page now has a "Delete associated Entries" menu item for 
+         deleting all of the entires associated with that run.
+ 
+  TODO:
+     
+############################################################################## 
 '''
 
 # Python standard modules
@@ -586,7 +595,6 @@ class MainGui(QtGui.QMainWindow):
                 return
             
             # Add the new entries to the view table as well
-            #self.updateLogTable(update_check)
             self.loadModelLog()
             
             # Clear the entry rows and deactivate add new log button
@@ -655,7 +663,6 @@ class MainGui(QtGui.QMainWindow):
                 continue
             
             # Add the new entries to the view table as well
-#             self.updateLogTable(update_check)
             self.loadModelLog()
             
         # Clear the list entries

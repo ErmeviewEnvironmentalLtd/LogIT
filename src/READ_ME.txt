@@ -6,7 +6,7 @@
 
 
 Name: LogIT (Logger for Isis and Tuflow) 
-Version: 0.3-Beta
+Version: 0.3.1-Beta
 Author: Duncan Runnacles
 Copyright: (C) 2015 Duncan Runnacles
 email: duncan.runnacles@thomasmackay.co.uk
@@ -91,6 +91,21 @@ v0.3-Beta:
 	- Removed some of the more annoying message boxes. Now writes to statusbar.
 	- Updated LogFormatter.bas (version 2) to deal with updated Excel outputs.
 	- Updated tab contents.
+v0.3.1-Beta:
+	- Added Remove Associated entries options to RUN table.
+	- Added GuiStore module with TableHolder and TableWidget classes. Used to 
+	  store regularly access data in the MainGui class.
+	- Added LogClasses module with AllLogs and SubLogs classes. Used to store
+	  the loaded log entries for easy access and update. Replaces the use of
+	  the log_pages dictionary in most parts of the code.
+	- Added DatabaseManager class to the DatabaseFunctions module. This
+	  encapsulates all of the reading and writing from/to database code. All
+	  the module wide functions that performed this have been removed.
+	- Major refactoring of the Controller module. Much easier to understand
+	  and update now.
+	- Fixed lots of bugs.
+	- This release has significantly altered parts of the design and 
+	  functionality to make it easier to maintain and understand.
 
 
 LICENSE
