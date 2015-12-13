@@ -685,25 +685,6 @@ class MainGui(QtGui.QMainWindow):
                 for key, entry in table_row.iteritems():
                     row[key] = entry
         
-    
-    # TODO: Remove if no longer called.
-    def updateLogTable(self, update_check):
-        '''Updates the log tables on the log view tab.
-        '''
-        update_check['RUN'] = True
-          
-        for table in self.view_tables.tables.values():
-             
-            # Make sure that we have something to update
-            if not update_check[table.key] == False:
-                last_row = table.ref.rowCount()
-                 
-                # Loop through each entry in the list for each key
-                for row in self.all_logs.log_pages[table.key].contents:
-                    table.ref.setRowCount((last_row + 1))
-                    table.addRowValues(row, last_row)
-                    last_row += 1
-
 
     def _loadSettings(self):
         '''Get the settings loaded from file if they exist.
