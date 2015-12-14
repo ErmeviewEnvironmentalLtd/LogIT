@@ -106,6 +106,12 @@ v0.3.1-Beta:
 	- Fixed lots of bugs.
 	- This release has significantly altered parts of the design and 
 	  functionality to make it easier to maintain and understand.
+v0.3.2-Beta:
+	- Bug fix in multiple model loader. Issue with logic in finding whether a
+	  log entry exists or not.
+	- Better use of error messages in this now as well.
+	- Some checks on database schema now included when using "Delete associated
+	  entries". Won't allow this on entries added in an old db version.
 
 
 LICENSE

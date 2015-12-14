@@ -45,6 +45,11 @@
         Added the AddedRows class for storing the entries made to the DB. 
         The functions in this module are now A LOT easier to follow and 
         quite a few bugs have been removed. This is a big improvement.
+    DR - 14/12/2015:
+        Fixed bug in fetchAndCheckModel to do with if-else logic when a file
+        was already found in the database.
+        Added checks to deleteAssociatedEntries to ensure entry was made in
+        new enough version of the database.
 
  TODO:
     AddedRows class may not be needed now that there is a bulk insert statement
