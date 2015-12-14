@@ -645,7 +645,7 @@ def fetchTableValues(db_path, table_list, errors):
         return entries, errors
  
 
-def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
+def fetchAndCheckModel(db_path, open_path, log_type, errors):
     """Loads a model and makes a few conditional checks on it.
     Loads model from the given .tcf/.ief file and checks that the .ief, 
     .tcf and ISIS results don't already exist in the DB and then returns
@@ -654,8 +654,6 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
     :param db_path: path to the database on file.
     :param open_path: the .ief or .tcf file path.
     :param log_type: the model type to load (tuflow or ISIS only).
-    :param lauch_error=True: whether to launch message boxes if an error is
-           found or not. We don't want to if we're loading multiple files.
     :return: tuple containing AllLogs (which could be the loaded log
              pages or False if the load failed and a dictionary containing
              the load status and messages for status bars and errors.
@@ -677,7 +675,6 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
         tcf_results = all_logs.getLogEntryContents('RUN', 0)['RESULTS_LOCATION_2D'] 
         
         indb = False
-        found_path = ''
         
         try:
             db_manager = DatabaseFunctions.DatabaseManager(db_path)
@@ -687,36 +684,36 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors, launch_error=True):
                 indb = db_manager.findEntry('RUN', 'IEF', main_ief,
                                                     column_only=True)
                 
-                # Then check if we've already used the results locations
-                # location for a previous run and return error if it has.
+                # Check if the .ief file has already been logged
                 if indb:
+                    logger.error('Log entry already exists for :\n%s' % (main_ief))
+                    errors.addError(errors.LOG_EXISTS, 
+                                        msg_add=(':\nfile = %s' % (open_path)),
+                                                            msgbox_error=True)
+                    return errors, all_logs
+
+                # Check if results file has already been logged
+                else:                    
                     indb = db_manager.findEntry('RUN', 'RESULTS_LOCATION_1D', 
                                             tcf_results,column_only=True)
-                    
-                    if exists[0]:
+                    if indb:
                         logger.error('Model results alreads exist for :\n%s' % (main_ief))
                         errors.addError(errors.RESULTS_EXIST, 
                                         msg_add=('in:\n%s' % (main_ief)), 
                                                         msgbox_error=True)
                         return errors, all_logs
                     
-                found_path = main_ief
-            
             # Do the whole lot again for the tuflow run
             if not main_tcf == 'None':
-                if not indb:
-                    indb = db_manager.findEntry('RUN', 'TCF', 
+                indb = db_manager.findEntry('RUN', 'TCF', 
                                             main_tcf,column_only=True)
-                    found_path = main_tcf
             
-            if indb:
-                logger.error('Log entry already exists for :\n%s' % (open_path))
-                errors.addError(errors.LOG_EXISTS, 
-                                        msg_add=(':\nfile = %s' % (open_path)),
-                                                            msgbox_error=True)
-                return errors, all_logs
-            else:
-                return errors, all_logs
+                if indb:
+                    logger.error('Log entry already exists for :\n%s' % (open_path))
+                    errors.addError(errors.LOG_EXISTS, 
+                                            msg_add=(':\nfile = %s' % (open_path)),
+                                                                msgbox_error=True)
+            return errors, all_logs
                     
         except IOError:
             logger.error('Cannot load file:\n%s' % (open_path))

@@ -642,7 +642,7 @@ class MainGui(QtGui.QMainWindow):
             
             errors, all_logs = Controller.fetchAndCheckModel(
                        self.settings.cur_log_path, path, log_type, 
-                            errors, launch_error=False)
+                            errors)
             
             # Go to next if we find an error
             if errors.has_local_errors:
@@ -654,7 +654,7 @@ class MainGui(QtGui.QMainWindow):
             all_logs = self._getInputLogVariables(all_logs)
 
             # Update the log entries
-            errors, self.all_logs, update_check = Controller.updateLog(
+            errors, self.all_logs = Controller.updateLog(
                                 self.settings.cur_log_path, all_logs, 
                                 errors, check_new_entries=True)
             
@@ -662,12 +662,12 @@ class MainGui(QtGui.QMainWindow):
                 errors.has_local_errors = False
                 continue
             
-            # Add the new entries to the view table as well
-            self.loadModelLog()
-            
+        self.loadModelLog()
+
         # Clear the list entries
         self.ui.loadMultiModelTable.setRowCount(0)
         if errors.has_errors:
+            prog_mon.reset('Complete')
             text = errors.formatErrors('Some models could not be logged:')
             self.ui.multiModelLoadErrorTextEdit.setText(text)
             QtGui.QMessageBox.warning(self, 'Logging Error:',
@@ -675,8 +675,7 @@ class MainGui(QtGui.QMainWindow):
         else:
             logger.info('Log Database updated successfully')
             self.ui.statusbar.showMessage("Log Database successfully updated")
-                
-        prog_mon.reset('Complete')
+            prog_mon.reset('Complete')
         
     
     def _updateWithUserInputs(self):
@@ -960,8 +959,7 @@ class MainGui(QtGui.QMainWindow):
                 log_type = self.ui.loadModelComboBox.currentIndex()
                 
                 errors = GuiStore.ErrorHolder()
-                errors, all_logs = Controller.fetchAndCheckModel(
-                    self.settings.cur_log_path, open_path, log_type, errors)
+                errors, all_logs = Controller.fetchAndCheckModel(self.settings.cur_log_path, open_path, log_type, errors)
     
                 if errors.has_errors:
                     self.launchQMsgBox(errors.msgbox_error.title, 
