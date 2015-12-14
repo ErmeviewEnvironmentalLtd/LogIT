@@ -538,7 +538,9 @@ def deleteDatabaseRow(db_path, table_name, id, errors, all_entry=False):
     try:
         if all_entry:
             # Delete all associated rows
-            _deleteAssociatedEntries(db_manager, id)
+            errors = _deleteAssociatedEntries(db_manager, id, errors)
+            if errors.has_errors:
+                return errors
 
         # Delete the row from the database this will remove the run row if
         # all_entry == True
@@ -556,14 +558,23 @@ def deleteDatabaseRow(db_path, table_name, id, errors, all_entry=False):
     return errors
 
 
-def _deleteAssociatedEntries(db_manager, run_id):
+def _deleteAssociatedEntries(db_manager, run_id, errors):
     """Delete all of the log page entries associated with the run_id
     """
     # Get all of the table names in the database
-    names = db_manager.getTableNames()
+    #names = db_manager.getTableNames()
     
     # Get all the entries made with this run_id and then delete them
     file_results = db_manager.findEntry('RUN_ID', 'RUN_ID', run_id, return_rows=True)
+    
+    # Just check that we can do this
+    if not file_results[0]:
+        errors.addError(errors.DB_EDIT, msgbox_error=True, 
+                        msg_add=("\nEntry was probably added in an old verion" 
+                                 "of LogIT that did not have this"
+                                 "functionality.\nCANNOT remove all entries."))
+        return errors
+    
     db_manager.deleteClause('RUN_ID', 'RUN_ID', run_id)
 
     # Search the RUN_ID table to see if there are any file name matches with
@@ -583,6 +594,7 @@ def _deleteAssociatedEntries(db_manager, run_id):
             files_name = item[0] + '_FILES'
             db_manager.deleteClause(files_name, item[0], item[1])
         
+    return errors
 
     
 def checkDatabaseVersion(db_path, errors):
