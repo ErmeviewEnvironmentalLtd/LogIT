@@ -49,7 +49,7 @@
          speeds up the refresh.
          The RUN page now has a "Delete associated Entries" menu item for 
          deleting all of the entires associated with that run.
-    DR - :
+    DR - 29/02/16:
          Added CopyLogsToClipboard to File menu. Allows for automatic zipping
          up of log files and copying to system clipboard.
          Added drag and drop extensions to files in multiple model file
