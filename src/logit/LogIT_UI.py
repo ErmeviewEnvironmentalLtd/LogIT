@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '..\..\Gui\LogIT_UI.ui'
+# Form implementation generated from reading ui file 'LogIT_UI.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -1534,6 +1534,8 @@ class Ui_MainWindow(object):
         self.actionLogDebug.setObjectName(_fromUtf8("actionLogDebug"))
         self.actionReloadDatabase = QtGui.QAction(MainWindow)
         self.actionReloadDatabase.setObjectName(_fromUtf8("actionReloadDatabase"))
+        self.actionCopyLogsToClipboard = QtGui.QAction(MainWindow)
+        self.actionCopyLogsToClipboard.setObjectName(_fromUtf8("actionCopyLogsToClipboard"))
         self.menuExport.addAction(self.actionExportToExcel)
         self.menuFile.addAction(self.actionNewModelLog)
         self.menuFile.addAction(self.actionLoad)
@@ -1542,6 +1544,8 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionLoadSetup)
         self.menuFile.addAction(self.actionSaveSetupAs)
+        self.menuFile.addSeparator()
+        self.menuFile.addAction(self.actionCopyLogsToClipboard)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
         self.menuTools.addAction(self.actionUpdateDatabaseSchema)
@@ -2009,7 +2013,9 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Reporting Bugs</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600; text-decoration: underline;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">If you find an error that is not included in the Common Errors list above please report it as a bug to duncan.runnacles@thomasmackay.co.uk.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">There should be a folder called /logs/ in the same folder as the executable. This should be zipped up and sent along with any bug report. If this folder is empty there has been a problem wth setting up the logging on your computer (probably due to access rights or a virus checker not allowing LogIT to write to disc - If this is the case a warning will be sent to the console saying &quot;Unable to create log file directory&quot;). To get the log entry you can try and reproduce the error and copy the text from the console window. </p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Click File &gt; Copy Logs to Clipboard. This should automatically zip up the log files and copy them to the system clipboard so that you can paste them into an email client, or a folder somewhere, to send with the bug report. If for some reason this does not work, there should be a folder called /logs/ in the same folder as the executable. If this folder is empty there has been a problem with setting up the logging on your computer (probably due to access rights or a virus checker not allowing LogIT to write to disc; If this is the case a warning will be sent to the console saying &quot;Unable to create log file directory&quot;). To get the log entry you can try and reproduce the error and copy the text from the console window. </p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Any other details about the contents and setup of the model that you are trying to log should also be included in the bug report. It may be easier to just send the ief/tcf/tgc/tbc/trd files if you are happy to do it. </p></body></html>", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.helpTab), _translate("MainWindow", "Help", None))
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
@@ -2050,5 +2056,6 @@ class Ui_MainWindow(object):
         self.actionLogInfo.setText(_translate("MainWindow", "Info", None))
         self.actionLogDebug.setText(_translate("MainWindow", "Debug", None))
         self.actionReloadDatabase.setText(_translate("MainWindow", "Reload Database", None))
+        self.actionCopyLogsToClipboard.setText(_translate("MainWindow", "Copy Logs to Clipboard", None))
 
 import LogIT_RC_rc

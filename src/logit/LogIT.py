@@ -50,6 +50,9 @@
          speeds up the refresh.
          The RUN page now has a "Delete associated Entries" menu item for 
          deleting all of the entires associated with that run.
+    DR - :
+         Added CopyLogsToClipboard to File menu. Allows for automatic zipping
+         up of log files and copying to system clipboard.
  
   TODO:
      
@@ -58,10 +61,12 @@
 
 # Python standard modules
 import os
+from os.path import basename
 import sys
 import cPickle
 import sqlite3
 import logging
+import zipfile
  
 # Setup the logging protocols. Try and create a directory to put the logs into.
 # If that fails we call the console only logger, if not detailed logs will be
@@ -164,6 +169,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionLogDebug.triggered.connect(self._updateLoggingLevel)
         self.ui.actionLogInfo.triggered.connect(self._updateLoggingLevel)
         self.ui.actionReloadDatabase.triggered.connect(self.loadModelLog)
+        self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
         
         # A couple of keyboard shortcuts...because I'm lazy!
         # Launch the browse for model dialog
@@ -1002,6 +1008,35 @@ class MainGui(QtGui.QMainWindow):
             logger.error('No log database found. Load or create one from File menu')
             return False
         return True
+    
+    
+    def _copyLogs(self):
+        """Zip up all of the log file and copy them to the system clipbaord.
+        """
+        zip_log = os.path.join(log_path, '..', 'logs.zip')
+        
+        # Remove any existing zip file
+        if os.path.exists(zip_log):
+            try:
+                os.remove(zip_log)
+            except:
+                logger.warning('Unable to delete existing log zip file')
+        
+        # Create a zipfile handler
+        zipper = zipfile.ZipFile(zip_log, 'w', zipfile.ZIP_DEFLATED)
+        
+        # Grab all of the log files into it
+        for roots, dir, files in os.walk(log_path):
+            for f in files:
+                write_path = os.path.join(log_path, f)
+                zipper.write(write_path, basename(write_path))
+        zipper.close()
+        
+        # Copy the logs zip file to clipboard
+        data = QtCore.QMimeData()
+        url = QtCore.QUrl.fromLocalFile(zip_log)
+        data.setUrls([url])
+        self.app.clipboard().setMimeData(data)
         
 
 class ProgressMonitor(object):
