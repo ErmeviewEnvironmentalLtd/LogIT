@@ -487,7 +487,7 @@ class MainGui(QtGui.QMainWindow):
     def loadModelLog(self):
         """If there is a model log to load we do it.
         """
-        if self.checkDbLoaded():
+        if self.checkDbLoaded(False):
             errors = GuiStore.ErrorHolder()
             # Check that the database actually exists. If not get out of here.
             if not os.path.exists(self.settings.cur_log_path):
@@ -840,7 +840,7 @@ class MainGui(QtGui.QMainWindow):
         """Load database chosen by user in dialog.
         """
         d = MyFileDialogs()
-        if not self.checkDbLoaded():
+        if not self.checkDbLoaded(False):
             open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
                                         file_types='LogIT database(*.logdb)'))
         else:
@@ -992,12 +992,13 @@ class MainGui(QtGui.QMainWindow):
             QtGui.QMessageBox.information(self, title, message)
     
     
-    def checkDbLoaded(self):
+    def checkDbLoaded(self, show_dialog=True):
         """Check if there's a database filepath set.
         """
         if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
-            QtGui.QMessageBox.warning(self, "No Database Loaded",
-                    "No log database active. Please load or create one from the file menu.")
+            if show_dialog:
+                QtGui.QMessageBox.warning(self, "No Database Loaded",
+                        "No log database active. Please load or create one from the file menu.")
             logger.error('No log database found. Load or create one from File menu')
             return False
         return True
