@@ -48,16 +48,17 @@ class AllLogs(object):
     '''Container class for all of the SubLog objects.
     '''
     
-    
     SINGLE_FILE = ['RUN', 'DAT']
     
-    def __init__(self, log_pages):
+    def __init__(self, log_pages, tcf_dir=None):
         '''Create new SubLog and set multi_file.
         '''
         self.editing_allowed = ['COMMENTS', 'MODELLER', 'SETUP', 'DESCRIPTION',
                            'EVENT_NAME', 'EVENT_DURATION', 'ISIS_BUILD',
                            'TUFLOW_BUILD', 'AMENDMENTS']
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 'BC_DBASE']
+        
+        self.tcf_dir = tcf_dir
 
         self.log_pages = {}        
         for key, page in log_pages.iteritems():

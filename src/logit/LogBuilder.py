@@ -75,6 +75,8 @@ TYPE_TUFLOW = 0
 TYPE_ISIS = 1
 TYPE_ESTRY = 2
 
+missing_files = []
+
 def loadModel(file_path, log_type):
     """Load the model at the given file path.
     The path given can be for either an .ief file or a .tcf file. It will use
@@ -86,6 +88,8 @@ def loadModel(file_path, log_type):
     :return: dictionary containing dictionaries of log data retrieved from the
              model files.
     """
+    missing_files = []
+    
     # Check that the path actually exists before we start.
     if not os.path.exists(file_path):
         return False
@@ -145,6 +149,11 @@ def loadModel(file_path, log_type):
 
             try:
                 tuflow = loader.loadFile(tcf_path)
+                tcf_dir = os.path.split(file_path)[0]
+                missing_files = tuflow.missing_model_files
+                if missing_files:
+                    return False
+                
             except IOError:
                 logger.error('Unable to load Tuflow .tcf file at: ' + tcf_path)
                 return False
@@ -158,6 +167,10 @@ def loadModel(file_path, log_type):
                 return False 
             
         tuflow = model_file
+        tcf_dir = os.path.split(file_path)[0]
+        missing_files = tuflow.missing_model_files
+        if missing_files:
+            return False
 
     # Get the current date
     date_now = datetime.datetime.now()
@@ -185,7 +198,13 @@ def loadModel(file_path, log_type):
     else:
         log_pages['DAT'] = buildDatRowFromModel(cur_date, log_pages['RUN'])
     
-    all_logs = LogClasses.AllLogs(log_pages)
+
+    # Record location of tuflow tcf file if included
+    if log_type == TYPE_TUFLOW:
+        all_logs = LogClasses.AllLogs(log_pages, tcf_dir)
+    else:
+        all_logs = LogClasses.AllLogs(log_pages)
+        
     return all_logs
 
 
