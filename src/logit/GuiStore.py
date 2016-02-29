@@ -53,6 +53,141 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class TableWidgetDragRows(QtGui.QTableWidget):
+
+    def __init__(self, rows, cols, parent=None):
+        QtGui.QTableWidget.__init__(self, rows, cols, parent)
+    
+        
+        self.setAcceptDrops(True)
+        self.viewport().setAcceptDrops(True)
+        self.setAcceptDrops(True)
+        self.setDragDropOverwriteMode(False)
+        self.setDropIndicatorShown(True)
+
+        self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection) 
+        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
+        self.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.setDragEnabled(True)  
+        self.setSortingEnabled(False)
+        
+
+    def dropEvent(self, event):
+        if event.source() == self and (event.dropAction() == QtCore.Qt.MoveAction or self.dragDropMode() == QtGui.QAbstractItemView.InternalMove):
+            
+            success, row, col, topIndex = self.dropOn(event)
+            if success:             
+                selRows = self.getSelectedRowsFast()                        
+
+                top = selRows[0]
+                dropRow = row
+                if dropRow == -1:
+                    dropRow = self.rowCount()
+                offset = dropRow - top
+
+                for i, row in enumerate(selRows):
+                    r = row + offset
+                    if r > self.rowCount() or r < 0:
+                        r = 0
+                    self.insertRow(r)
+
+
+                selRows = self.getSelectedRowsFast()
+
+                top = selRows[0]
+                offset = dropRow - top                
+                for i, row in enumerate(selRows):
+                    r = row + offset
+                    if r > self.rowCount() or r < 0:
+                        r = 0
+
+                    for j in range(self.columnCount()):
+                        source = QtGui.QTableWidgetItem(self.item(row, j))
+                        self.setItem(r, j, source)
+
+                event.accept()
+            
+                
+
+        else:
+            QtGui.QTableView.dropEvent(event)                
+
+
+    def getSelectedRowsFast(self):
+        selRows = []
+        for item in self.selectedItems():
+            if item.row() not in selRows:
+                selRows.append(item.row())
+        return selRows
+
+
+    def droppingOnItself(self, event, index):
+        dropAction = event.dropAction()
+
+        if self.dragDropMode() == QtGui.QAbstractItemView.InternalMove:
+            dropAction = QtCore.Qt.MoveAction
+
+        if event.source() == self and event.possibleActions() & QtCore.Qt.MoveAction and dropAction == QtCore.Qt.MoveAction:
+            selectedIndexes = self.selectedIndexes()
+            child = index
+            while child.isValid() and child != self.rootIndex():
+                if child in selectedIndexes:
+                    return True
+                child = child.parent()
+
+        return False
+
+
+    def dropOn(self, event):
+        if event.isAccepted():
+            return False, None, None, None
+
+        index = QtCore.QModelIndex()
+        row = -1
+        col = -1
+
+        if self.viewport().rect().contains(event.pos()):
+            index = self.indexAt(event.pos())
+            if not index.isValid() or not self.visualRect(index).contains(event.pos()):
+                index = self.rootIndex()
+
+        if self.model().supportedDropActions() & event.dropAction():
+            if index != self.rootIndex():
+                dropIndicatorPosition = self.position(event.pos(), self.visualRect(index), index)
+
+                if dropIndicatorPosition == QtGui.QAbstractItemView.AboveItem:
+                    row = index.row()
+                    col = index.column()
+                elif dropIndicatorPosition == QtGui.QAbstractItemView.BelowItem:
+                    row = index.row() + 1
+                    col = index.column()
+                else:
+                    row = index.row()
+                    col = index.column()
+
+            if not self.droppingOnItself(event, index):
+                return True, row, col, index
+
+        return False, None, None, None
+
+
+    def position(self, pos, rect, index):
+        r = QtGui.QAbstractItemView.OnViewport
+        margin = 2
+        if pos.y() - rect.top() < margin:
+            r = QtGui.QAbstractItemView.AboveItem
+        elif rect.bottom() - pos.y() < margin:
+            r = QtGui.QAbstractItemView.BelowItem 
+        elif rect.contains(pos, True):
+            r = QtGui.QAbstractItemView.OnItem
+
+        if r == QtGui.QAbstractItemView.OnItem and not (self.model().flags(index) & QtCore.Qt.ItemIsDropEnabled):
+            r = QtGui.QAbstractItemView.AboveItem if pos.y() < rect.center().y() else QtGui.QAbstractItemView.BelowItem
+
+        return r
+    
+    
+
 class TableHolder(object):
     """Container class for a collection of QTableWidget objects.
     """

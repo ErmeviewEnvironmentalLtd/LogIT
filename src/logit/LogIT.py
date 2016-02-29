@@ -53,7 +53,7 @@
     DR - :
          Added CopyLogsToClipboard to File menu. Allows for automatic zipping
          up of log files and copying to system clipboard.
- 
+
   TODO:
      
 ############################################################################## 
@@ -149,7 +149,28 @@ class MainGui(QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(MainGui)
-        
+
+        # Setup a custom QTableWidget for multiple model choice table so that
+        # It can be drag and dropped into order
+        self.ui.horizontalLayout_5.removeItem(self.ui.verticalLayout_21)
+        self.ui.loadMultiModelTable = GuiStore.TableWidgetDragRows(0, 2, self)
+        self.ui.loadMultiModelTable.setHorizontalHeaderLabels(['File name', 'Abs Path'])
+        item = QtGui.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.ui.loadMultiModelTable.setHorizontalHeaderItem(0, item)
+        item.setText("TCF / IEF File Name")
+        item = QtGui.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.ui.loadMultiModelTable.setHorizontalHeaderItem(1, item)
+        item.setText("Absolute Path")
+        self.ui.loadMultiModelTable.horizontalHeader().setDefaultSectionSize(350)
+        self.ui.loadMultiModelTable.horizontalHeader().setMinimumSectionSize(350)
+        self.ui.loadMultiModelTable.horizontalHeader().setStretchLastSection(True)
+        self.ui.loadMultiModelTable.setStyleSheet('QTableWidget {background-color: rgb(255, 255, 255);}')
+        self.ui.loadMultiModelTable.setSortingEnabled(True)
+        self.ui.horizontalLayout_5.addWidget(self.ui.loadMultiModelTable)
+        self.ui.horizontalLayout_5.addItem(self.ui.verticalLayout_21)
+
         # Connect the slots
         self.ui.loadModelButton.clicked.connect(self._loadFileActions)
         self.ui.addSingleLogEntryButton.clicked.connect(self._createLogEntry)
@@ -344,6 +365,10 @@ class MainGui(QtGui.QMainWindow):
             if open_paths == False:
                 return
             
+            paths = [str(x) for x in open_paths]
+            paths.reverse()
+            self.ui.loadMultiModelTable.setSortingEnabled(False)
+            
             row_count = self.ui.loadMultiModelTable.rowCount()
             for p in open_paths:
                 
@@ -356,12 +381,15 @@ class MainGui(QtGui.QMainWindow):
                 
                 # Create a couple of items and add to the table
                 self.ui.loadMultiModelTable.setItem(row_count, 0, 
-                                        Controller.createQtTableItem(fname))
+                                        Controller.createQtTableItem(fname, drag_enabled=True))
                 self.ui.loadMultiModelTable.setItem(row_count, 1, 
-                                        Controller.createQtTableItem(p))
+                                        Controller.createQtTableItem(p, drag_enabled=True))
                 
-                # Set the sumbit button to enabled
-                self.ui.submitMultiModelGroup.setEnabled(True)
+            # Set the sumbit button to enabled
+            self.ui.submitMultiModelGroup.setEnabled(True)
+            self.ui.loadMultiModelTable.setSortingEnabled(True)
+            self.ui.loadMultiModelTable.sortItems(0,  QtCore.Qt.AscendingOrder)
+                
             
         elif call_name == 'removeMultiModelButton':
 
@@ -398,6 +426,7 @@ class MainGui(QtGui.QMainWindow):
         """
         menu = QtGui.QMenu()
         updateRowAction = menu.addAction("Update Row")
+        updateMultipleRowAction = menu.addAction("Update Multiple Rows")
         deleteRowAction = menu.addAction("Delete Row")
         
         # Find who called us and get the object that the name refers to.
@@ -415,6 +444,16 @@ class MainGui(QtGui.QMainWindow):
         action = menu.exec_(table_obj.ref.viewport().mapToGlobal(pos))
         if action == updateRowAction:
             self._saveViewChangesToDatabase(table_obj)
+            
+        if action == updateMultipleRowAction:
+            sel_range = table_obj.ref.selectedRanges()
+            for sel in sel_range:
+                top_row = sel.topRow()
+                bottom_row = sel.bottomRow()
+                for row in range(top_row, bottom_row+1):
+                    self._saveViewChangesToDatabase(table_obj, row)
+                    logger.info('Updating row no: ' + str(row+1))
+                
         
         elif action == deleteRowAction:
             self._deleteRowFromDatabase(table_obj, False)
@@ -459,14 +498,15 @@ class MainGui(QtGui.QMainWindow):
             logger.info('Row ID=%s deleted successfully' % (row_dict['ID']))
     
     
-    def _saveViewChangesToDatabase(self, table):
+    def _saveViewChangesToDatabase(self, table, row=None):
         """Saves the edits made to the row in the View Log table to the database
         based on the id value in the row that was clicked to launch the context
         menu.
         
         :param table: the table in the user form to takes  updates from.
         """
-        row = table.currentRow()
+        if row is None:
+            row = table.currentRow()
         
         # Search through the current row and get the values in the columns that
         # we are going to allow the user to update.

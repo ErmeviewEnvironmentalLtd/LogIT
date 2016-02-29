@@ -485,7 +485,7 @@ def insertIntoModelFileTable(db_manager, table_name, col_name, model_file,
         return new_files, ids
     
     
-def createQtTableItem(name, is_editable=False):
+def createQtTableItem(name, is_editable=False, drag_enabled=False):
     """Create a QTableWidgetItem and return
     TODO: Check if this can be dealt with meaningfully in the Table classes.
           Currently only used by the multiModelLoad path list.
@@ -495,9 +495,15 @@ def createQtTableItem(name, is_editable=False):
     item = QtGui.QTableWidgetItem(str(name))
     
     if is_editable:
-        item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+        if drag_enabled:
+            item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled)
+        else:
+            item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
     else:
-        item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+        if drag_enabled:
+            item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled)
+        else:
+            item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
         
     return item
 
