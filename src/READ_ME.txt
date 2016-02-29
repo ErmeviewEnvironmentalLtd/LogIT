@@ -6,7 +6,7 @@
 
 
 Name: LogIT (Logger for Isis and Tuflow) 
-Version: 0.3.1-Beta
+Version: 0.4.0-Beta
 Author: Duncan Runnacles
 Copyright: (C) 2015 Duncan Runnacles
 email: duncan.runnacles@thomasmackay.co.uk
@@ -70,13 +70,14 @@ VERSION HISTORY
 =============================
 
 v0.1-Beta:
-	Initial release
+	- Initial release
 	
 v0.2-Beta:
 	- Added 1D only logging capability.
 	- Built database update functionality.
 	- Changed Excel exporter to use DatabaseFunction.cur_table list orders for
 	  fetching columns rather than writing by column order.
+	  
 v0.3-Beta:
 	- Added ESTRY and BC Database file reading capability.
 	- Added Tcf and Ecf tabs to the log tables.
@@ -91,6 +92,7 @@ v0.3-Beta:
 	- Removed some of the more annoying message boxes. Now writes to statusbar.
 	- Updated LogFormatter.bas (version 2) to deal with updated Excel outputs.
 	- Updated tab contents.
+	
 v0.3.1-Beta:
 	- Added Remove Associated entries options to RUN table.
 	- Added GuiStore module with TableHolder and TableWidget classes. Used to 
@@ -106,12 +108,24 @@ v0.3.1-Beta:
 	- Fixed lots of bugs.
 	- This release has significantly altered parts of the design and 
 	  functionality to make it easier to maintain and understand.
+	  
 v0.3.2-Beta:
 	- Bug fix in multiple model loader. Issue with logic in finding whether a
 	  log entry exists or not.
 	- Better use of error messages in this now as well.
 	- Some checks on database schema now included when using "Delete associated
 	  entries". Won't allow this on entries added in an old db version.
+
+v0.4.0-Beta:
+	- New iteration due to major changes in LogBuilder module.
+	- Uses new setup of TmacToolsLibrary, which has had a complete re-write of
+	  the tuflow loader and some significant changes to the isis functionality.
+	- Added drag and drop functionality to the multiple model load file
+	  selection table.
+	- Added Copy logs to clipboard menu item. Automatically zips up the log
+	  files and copies them to the system clipboard for easy extraction.
+	- Added multiple row update functionality to view tables. All selected
+	  rows can now be updated at once.
 
 
 LICENSE

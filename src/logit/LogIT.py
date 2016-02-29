@@ -1,7 +1,6 @@
 """
 ##############################################################################
   Name: LogIT (Logger for Isis and Tuflow) 
-  Version: 0.2-Beta
   Author: Duncan Runnacles
   Copyright: (C) 2014 Duncan Runnacles
   email: duncan.runnacles@thomasmackay.co.uk
@@ -53,6 +52,9 @@
     DR - :
          Added CopyLogsToClipboard to File menu. Allows for automatic zipping
          up of log files and copying to system clipboard.
+         Added drag and drop extensions to files in multiple model file
+         selection table.
+         Added update multiple rows to view tables context menu.
 
   TODO:
      
@@ -1179,7 +1181,7 @@ def main():
      
     # Need to do this so that the icons show up properly
     import ctypes
-    myappid = 'logit.0-3-Beta'
+    myappid = 'logit.0-4-Beta'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     QPlugin = QtCore.QPluginLoader("qico4.dll")
      
