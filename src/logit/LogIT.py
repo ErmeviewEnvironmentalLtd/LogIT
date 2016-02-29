@@ -367,9 +367,8 @@ class MainGui(QtGui.QMainWindow):
             if open_paths == False:
                 return
             
-            paths = [str(x) for x in open_paths]
-            paths.reverse()
-            self.ui.loadMultiModelTable.setSortingEnabled(False)
+#             paths = [str(x) for x in open_paths]
+#             paths.reverse()
             
             row_count = self.ui.loadMultiModelTable.rowCount()
             for p in open_paths:
@@ -389,8 +388,8 @@ class MainGui(QtGui.QMainWindow):
                 
             # Set the sumbit button to enabled
             self.ui.submitMultiModelGroup.setEnabled(True)
-            self.ui.loadMultiModelTable.setSortingEnabled(True)
             self.ui.loadMultiModelTable.sortItems(0,  QtCore.Qt.AscendingOrder)
+            self.ui.loadMultiModelTable.setSortingEnabled(False)
                 
             
         elif call_name == 'removeMultiModelButton':
