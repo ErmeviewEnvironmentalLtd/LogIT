@@ -217,18 +217,25 @@ class MainGui(QtGui.QMainWindow):
         # Set the context menu and connect the tables
         self.ui.runEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.runEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.runEntryViewTable.cellChanged.connect(self._highlightEditRow)
         self.ui.tgcEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tgcEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.tgcEntryViewTable.itemChanged.connect(self._highlightEditRow)
         self.ui.tbcEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tbcEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.tbcEntryViewTable.itemChanged.connect(self._highlightEditRow)
         self.ui.datEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.datEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.datEntryViewTable.itemChanged.connect(self._highlightEditRow)
         self.ui.bcEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.bcEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.bcEntryViewTable.itemChanged.connect(self._highlightEditRow)
         self.ui.ecfEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.ecfEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.ecfEntryViewTable.itemChanged.connect(self._highlightEditRow)
         self.ui.tcfEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tcfEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.tcfEntryViewTable.itemChanged.connect(self._highlightEditRow)
         
         # Custom quit function
         #self.app.aboutToQuit.connect(self._customClose)
@@ -285,7 +292,18 @@ class MainGui(QtGui.QMainWindow):
                             'bcEntryViewTable', self.ui.bcEntryViewTable))
         self.view_tables.addTable(GuiStore.TableWidget('DAT', 
                             'datEntryViewTable', self.ui.datEntryViewTable))
+    
+    
+    def _highlightEditRow(self):
+        """
+        """
+        sender = self.sender()
+        s_name = str(sender.objectName())
+        item = sender.currentItem()
+        if not item is None:
+            item.setBackgroundColor(QtGui.QColor(178, 255, 102)) # Light Green
         
+     
     
     def _updateLoggingLevel(self):
         """Alters to logging level based on the name of the calling action
@@ -445,16 +463,21 @@ class MainGui(QtGui.QMainWindow):
         action = menu.exec_(table_obj.ref.viewport().mapToGlobal(pos))
         if action == updateRowAction:
             self._saveViewChangesToDatabase(table_obj)
+            self.loadModelLog()               
             
         if action == updateMultipleRowAction:
+            
+            # Get a list of selected ranges and loop from top row to bottom
             sel_range = table_obj.ref.selectedRanges()
             for sel in sel_range:
                 top_row = sel.topRow()
                 bottom_row = sel.bottomRow()
+                
+                # Save row contents to database
                 for row in range(top_row, bottom_row+1):
                     self._saveViewChangesToDatabase(table_obj, row)
                     logger.info('Updating row no: ' + str(row+1))
-                
+            self.loadModelLog()               
         
         elif action == deleteRowAction:
             self._deleteRowFromDatabase(table_obj, False)

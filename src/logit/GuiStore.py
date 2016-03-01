@@ -365,10 +365,10 @@ class TableWidget(object):
                 # If it's a loaded variable or db ID then we need to stop 
                 # user for corrupting the data and/or database
                 if not headertext in TableWidget.EDITING_ALLOWED:
-                    self.ref.setItem(row_no, x, createQtTableItem(
+                    self.ref.setItem(row_no, x, self.createQtTableItem(
                                         str(row_dict[headertext]), False))
                 else:
-                    self.ref.setItem(row_no, x, createQtTableItem(
+                    self.ref.setItem(row_no, x, self.createQtTableItem(
                                         str(row_dict[headertext]), True))
     
     
@@ -401,20 +401,20 @@ class TableWidget(object):
 
         
     
-def createQtTableItem(name, is_editable):
-    """Create a QTableWidgetItem and return
-    :param name: value to put into the item text.
-    :param is_editable=False: Set editable flag.
-    :return: QTableWidgetItem
-    """
-    item = QtGui.QTableWidgetItem(str(name))
-    
-    if is_editable:
-        item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
-    else:
-        item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+    def createQtTableItem(self, name, is_editable):
+        """Create a QTableWidgetItem and return
+        :param name: value to put into the item text.
+        :param is_editable=False: Set editable flag.
+        :return: QTableWidgetItem
+        """
+        item = QtGui.QTableWidgetItem(str(name))
         
-    return item
+        if is_editable:
+            item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
+        else:
+            item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+            
+        return item
 
 
 def getModelFileLocation(multi_paths, last_model_directory,
