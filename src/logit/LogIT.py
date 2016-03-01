@@ -806,8 +806,11 @@ class MainGui(QtGui.QMainWindow):
     def _loadSetup(self):
         """Load LogIT setup from file.
         """
+        errors = GuiStore.ErrorHolder()
         settings, errors = Controller.loadSetup(
-                self.settings.cur_settings_path, self.settings.cur_log_path)
+                                        self.settings.cur_settings_path, 
+                                        self.settings.cur_log_path,
+                                        errors)
          
         if settings == None:
             if errors.has_errors:
