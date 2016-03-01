@@ -514,8 +514,9 @@ class MainGui(QtGui.QMainWindow):
                                 table.key, row_dict['ID'], errors, all_entry)
         # and then from the table
         if errors.has_errors:
-            self.launchQMsgBox(errors.msgbox_error.title, 
-                               errors.msgbox_error.message)
+            if errors.msgbox_error:
+                self.launchQMsgBox(errors.msgbox_error.title, 
+                                   errors.msgbox_error.message)
             logger.error('Failed to delete row(s)')
         else:
             self.loadModelLog()
@@ -545,8 +546,9 @@ class MainGui(QtGui.QMainWindow):
         db_path = os.path.split(self.settings.cur_log_path)[0]
         if errors.has_errors:
             logger.error('Row ID=%s failed to update' % (id_key))
-            self.launchQMsgBox(errors.msgbox_error.title, 
-                               errors.msgbox_error.message)
+            if errors.msgbox_error:
+                self.launchQMsgBox(errors.msgbox_error.title, 
+                                   errors.msgbox_error.message)
         else:
             logger.info('Row ID=%s updated successfully' % (id_key))
             self.ui.statusbar.showMessage(
@@ -568,7 +570,8 @@ class MainGui(QtGui.QMainWindow):
             errors = Controller.checkDatabaseVersion(
                                         self.settings.cur_log_path, errors)
             if errors.has_errors:
-                self.launchQMsgBox(errors.msgbox_error.title,
+                if errors.msgbox_error:
+                    self.launchQMsgBox(errors.msgbox_error.title,
                                                 errors.msgbox_error.message)
                 return
             
@@ -583,7 +586,8 @@ class MainGui(QtGui.QMainWindow):
                             self.settings.cur_log_path, table_list, errors)
             
             if errors.has_errors:
-                self.launchQMsgBox(errors.msgbox_error.title,
+                if errors.msgbox_error:
+                    self.launchQMsgBox(errors.msgbox_error.title,
                                                 errors.msgbox_error.msg) 
                 return
              
@@ -659,7 +663,8 @@ class MainGui(QtGui.QMainWindow):
                         self.settings.cur_log_path, self.all_logs, errors) # DEBUG , check_new_entries=True
             
             if errors.has_errors:
-                self.launchQMsgBox(errors.msgbox_error.title, 
+                if errors.msgbox_error:
+                    self.launchQMsgBox(errors.msgbox_error.title, 
                                         errors.msgbox_error.message)
                 del errors
                 return
@@ -740,7 +745,8 @@ class MainGui(QtGui.QMainWindow):
             prog_mon.reset('Complete')
             text = errors.formatErrors('Some models could not be logged:')
             self.ui.multiModelLoadErrorTextEdit.setText(text)
-            QtGui.QMessageBox.warning(self, 'Logging Error:',
+            if errors.msgbox_error:
+                QtGui.QMessageBox.warning(self, 'Logging Error:',
                             'See Error Logs window for details')
         else:
             logger.info('Log Database updated successfully')
@@ -837,7 +843,8 @@ class MainGui(QtGui.QMainWindow):
          
         if settings == None:
             if errors.has_errors:
-                QtGui.QMessageBox.warning(self, errors.msgbox_error.title, 
+                if errors.msgbox_error:
+                    QtGui.QMessageBox.warning(self, errors.msgbox_error.title, 
                                                 error.msgbox_error.message)
             return
         else:
@@ -872,7 +879,8 @@ class MainGui(QtGui.QMainWindow):
         errors = GuiStore.ErrorHolder()
         errors = Controller.updateDatabaseVersion(open_path, errors)
         if errors.has_errors:
-            self.launchQMsgBox(errors.msgbox_error.title, 
+            if errors.msgbox_error:
+                self.launchQMsgBox(errors.msgbox_error.title, 
                                             errors.msgbox_error.message)
         else:
         
@@ -953,7 +961,8 @@ class MainGui(QtGui.QMainWindow):
                                                                     errors)
             
             if errors.has_errors:
-                self.launchQMsgBox(errors.msgbox_error.title, 
+                if errors.msgbox_error:
+                    self.launchQMsgBox(errors.msgbox_error.title, 
                                    errors.msgbox_error.message)
                 self.ui.statusbar.showMessage(errors.msgbox_error.status_bar)
             else:
@@ -996,11 +1005,11 @@ class MainGui(QtGui.QMainWindow):
 
         # Check that we have a database
         if not self.checkDbLoaded():
-            QtGui.QMessageBox.warning(self, "No Database Loaded",
-                "No log database active. Please load or create one from" +
-                                                    " the file menu.")
-            logger.error('No log database found. Load or create one from File menu')
-            return            
+#             QtGui.QMessageBox.warning(self, "No Database Loaded",
+#                 "No log database active. Please load or create one from" +
+#                                                     " the file menu.")
+#             logger.error('No log database found. Load or create one from File menu')
+            return False          
 
         open_path = GuiStore.getModelFileLocation(multi_paths,
             self.settings.last_model_directory, self.settings.cur_log_path,
@@ -1035,9 +1044,10 @@ class MainGui(QtGui.QMainWindow):
                 errors, all_logs = Controller.fetchAndCheckModel(self.settings.cur_log_path, open_path, log_type, errors)
     
                 if errors.has_errors:
-                    self.launchQMsgBox(errors.msgbox_error.title, 
-                                       errors.msgbox_error.message)
-                    self.ui.statusbar.showMessage(errors.msgbox_error.status_bar)
+                    if errors.msgbox_error:
+                        self.launchQMsgBox(errors.msgbox_error.title, 
+                                           errors.msgbox_error.message)
+                        self.ui.statusbar.showMessage(errors.msgbox_error.status_bar)
                 else:
                     self.ui.statusbar.showMessage('Loaded model at: %s' % open_path)
                     self._fillEntryTables(all_logs)

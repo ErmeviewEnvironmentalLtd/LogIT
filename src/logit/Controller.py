@@ -681,19 +681,27 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors):
              pages or False if the load failed and a dictionary containing
              the load status and messages for status bars and errors.
     """   
+    def checkMissingFiles(open_path):
+        """
+        """
+        # Check if it's because model files are missing
+        message = ' at:\n%s' % (open_path)
+        if LogBuilder.missing_files:
+            file_str = 'The following tuflow model files could not be loaded:\n' + '\n'.join(LogBuilder.missing_files)
+            message = ' at:\n%s\n\n%s' % (open_path, file_str)
+        return message
+#             message = 'The following tuflow model files could not be loaded:\n' + file_str
+        
     
     # Load the model at the chosen path.
     all_logs = LogBuilder.loadModel(open_path, log_type)
     if all_logs == False:
         
-        # Check if it's because model files are missing
-        if missing_model_files:
-            file_str = '\n'.join(missing_model_files)
-            message = 'The following tuflow model files could not be loaded:\n' + file_str
-            
-        logger.error('Unable to load model file:\n%s\n\n%s' % (open_path, message))
-        errors.addError(errors.MODEL_LOAD, msg_add=('at:\n%s\n\n%s' % (open_path, message)), 
-                                                        msgbox_error=True)
+#         logger.error('Unable to load model file:\n%s\n\n%s' % (open_path, message))
+#         logger.error(message)
+#         errors.addError(errors.MODEL_LOAD, message, #msg_add=('at:\n%s\n\n%s' % (open_path, message)), 
+#                                                         msgbox_error=True)
+        errors.addError(errors.USER_CANCEL, msgbox_error=False)
         return errors, all_logs
     else:
         # Make sure that this ief or tcf do not already exist in the
@@ -745,16 +753,22 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors):
             return errors, all_logs
                     
         except IOError:
-            logger.error('Cannot load file:\n%s' % (open_path))
-            errors.addError(errors.IO_ERROR, 
-                                        msg_add=('at:\n%s' % (open_path)),
-                                                            msgbox_error=True)
+            msg = checkMissingFiles(open_path)
+            logger.error(msg)
+            errors.addError(errors.IO_ERROR, msg_add=(msg), msgbox_error=True)
+#             logger.error('Cannot load file:\n%s' % (open_path))
+#             errors.addError(errors.IO_ERROR, 
+#                                         msg_add=('at:\n%s' % (open_path)),
+#                                                             msgbox_error=True)
             return errors, all_logs
         except:
-            logger.error('Cannot load file:\n%s' % (open_path))
-            errors.addError(errors.IO_ERROR, 
-                                        msg_add=('at:\n%s' % (open_path)),
-                                                            msgbox_error=True)
+            msg = checkMissingFiles(open_path)
+            logger.error(msg)
+            errors.addError(errors.IO_ERROR, msg_add=(msg), msgbox_error=True)
+#             logger.error('Cannot load file:\n%s' % (open_path))
+#             errors.addError(errors.IO_ERROR, 
+#                                         msg_add=('at:\n%s' % (open_path)),
+#                                                             msgbox_error=True)
             return errors, all_logs
         
 

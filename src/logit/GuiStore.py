@@ -529,6 +529,7 @@ class ErrorHolder(object):
         self.IO_ERROR = 'IO Error'
         self.SETTINGS_LOAD = 'Load Settings Error' 
         self.EXPORT_EXCEL = 'Export to Excel Error'
+        self.USER_CANCEL = 'User Cancelled File Error'
             
         #
         title = self.DB_UPDATE
@@ -605,6 +606,12 @@ class ErrorHolder(object):
         message = 'Unable to export database to Excel - Is the file open? '
         errors[title] = ErrorType(title, status_bar, message)
         
+        #
+        title = self.USER_CANCEL
+        status_bar = ''
+        message = 'User cancelled file dialog. '
+        errors[title] = ErrorType(title, status_bar, message)
+
         return errors
 
 
