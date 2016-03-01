@@ -66,7 +66,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-DATABASE_VERSION_NO = 4
+DATABASE_VERSION_NO = 5
 DATABASE_VERSION_SAME = 0
 DATABASE_VERSION_LOW = 1
 DATABASE_VERSION_HIGH = 2
@@ -524,7 +524,9 @@ def createRunTable(cur):
                   TBC                     TEXT,
                   BC_DBASE                TEXT,
                   ECF                     TEXT,
-                  EVENT_NAME              TEXT);
+                  EVENT_NAME              TEXT,
+                  RUN_OPTIONS             TEXT,
+                  TCF_DIR                 TEXT);
                  """)
     
 
@@ -730,7 +732,7 @@ def dropAllTables(db_path):
 run = ['ID', 'DATE', 'MODELLER', 'RESULTS_LOCATION_2D', 'RESULTS_LOCATION_1D', 
        'EVENT_DURATION', 'DESCRIPTION', 'COMMENTS', 'SETUP', 'ISIS_BUILD', 
        'IEF', 'DAT', 'TUFLOW_BUILD', 'TCF', 'TGC', 'TBC', 'BC_DBASE', 'ECF',
-       'EVENT_NAME'] 
+       'EVENT_NAME', 'RUN_OPTIONS', 'TCF_DIR'] 
 tgc = ['ID', 'DATE', 'TGC', 'FILES', 'NEW_FILES', 'COMMENTS']
 tbc = ['ID', 'DATE', 'TBC', 'FILES', 'NEW_FILES', 'COMMENTS']
 dat = ['ID', 'DATE', 'DAT', 'AMENDMENTS', 'COMMENTS']

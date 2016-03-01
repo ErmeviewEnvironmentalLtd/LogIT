@@ -149,7 +149,7 @@ def loadModel(file_path, log_type):
 
             try:
                 tuflow = loader.loadFile(tcf_path)
-                tcf_dir = os.path.split(file_path)[0]
+                tcf_dir = os.path.split(tcf_path)[0]
                 missing_files = tuflow.missing_model_files
                 if missing_files:
                     return False
@@ -163,7 +163,7 @@ def loadModel(file_path, log_type):
         
         if not ufunc.checkFileType(file_path, ext=['.tcf', '.TCF']):
                 logger.error('File path is not a TUFLOW tcf file:\n' +
-                              str(tcf_path))
+                              str(file_path))
                 return False 
             
         tuflow = model_file
@@ -178,7 +178,7 @@ def loadModel(file_path, log_type):
     
     # Load the data needed for the log into the log pages dictionary.
     log_pages = {}
-    log_pages['RUN'] = buildRunRowFromModel(cur_date, ief, tuflow, log_type)
+    log_pages['RUN'] = buildRunRowFromModel(cur_date, ief, tuflow, log_type, tcf_dir)
     
     if log_type == TYPE_ISIS:
         log_pages['TGC'] = None
@@ -208,7 +208,7 @@ def loadModel(file_path, log_type):
     return all_logs
 
 
-def buildRunRowFromModel(cur_date, ief, tuflow, log_type):
+def buildRunRowFromModel(cur_date, ief, tuflow, log_type, tcf_dir):
     """Creates the row for the 'run' model log entry based on the contents
     of the loaded ief file and tuflow model.
     
@@ -228,13 +228,16 @@ def buildRunRowFromModel(cur_date, ief, tuflow, log_type):
                 'COMMENTS': 'None', 'SETUP': 'None', 'ISIS_BUILD': 'None', 
                 'IEF': 'None', 'DAT': 'None', 'TUFLOW_BUILD': 'None', 
                 'TCF': 'None', 'TGC': 'None', 'TBC': 'None', 'BC_DBASE': 'None', 
-                'ECF': 'None', 'EVENT_NAME': 'None'}
+                'ECF': 'None', 'EVENT_NAME': 'None', 'RUN_OPTIONS': 'None',
+                'TCF_DIR': 'None'}
     
     if not log_type == TYPE_ESTRY and not ief == None:
-        run_cols = buildIsisRun(ief, run_cols)
+        run_cols, options = buildIsisRun(ief, run_cols)
+        run_cols['RUN_OPTIONS'] = options
     
     if log_type == TYPE_TUFLOW:
         run_cols = buildTuflowRun(ief, tuflow, run_cols)
+        run_cols['TCF_DIR'] = tcf_dir
         
     return run_cols
 
@@ -257,8 +260,12 @@ def buildIsisRun(ief_file, run_cols):
         run_cols['EVENT_DURATION'] = str(float(end) - float(start))
     else:
         run_cols['EVENT_DURATION'] = 'None'
+        
+    options = None
+    if ief_file.event_details.has_key('2DOptions'):
+        options = ief_file.event_details['2DOptions']
     
-    return run_cols
+    return run_cols, options
 
 
 def buildEstryRun():
@@ -335,7 +342,10 @@ def buildTuflowRun(has_ief_file, tuflow, run_cols):
     # Use the global_order variable same as for the duration calls
     result = max(result, key=attrgetter('global_order'))
     if result.file_name == '':
-        result = os.path.join(result.getRelativePath(), tcf_paths[0])
+        if not result.getRelativePath() :
+            result = tcf_paths[0]
+        else:
+            result = os.path.join(result.getRelativePath(), tcf_paths[0])
     run_cols['RESULTS_LOCATION_2D'] = result
         
     return run_cols
