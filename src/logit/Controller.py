@@ -685,8 +685,14 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors):
     # Load the model at the chosen path.
     all_logs = LogBuilder.loadModel(open_path, log_type)
     if all_logs == False:
-        logger.error('Unable to load model file:\n%s' % (open_path))
-        errors.addError(errors.MODEL_LOAD, msg_add=('at:\n%s' % (open_path)), 
+        
+        # Check if it's because model files are missing
+        if missing_model_files:
+            file_str = '\n'.join(missing_model_files)
+            message = 'The following tuflow model files could not be loaded:\n' + file_str
+            
+        logger.error('Unable to load model file:\n%s\n\n%s' % (open_path, message))
+        errors.addError(errors.MODEL_LOAD, msg_add=('at:\n%s\n\n%s' % (open_path, message)), 
                                                         msgbox_error=True)
         return errors, all_logs
     else:
