@@ -576,6 +576,8 @@ class MainGui(QtGui.QMainWindow):
                 return
             
             self.view_tables.clearAll()
+            self.all_logs = None
+#             self._setupUiContainer()
              
             # load each of the tables from the database
             table_list = []

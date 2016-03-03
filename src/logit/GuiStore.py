@@ -48,6 +48,7 @@
 from PyQt4 import QtCore, QtGui
 
 from tmac_tools_lib.utils.qtclasses import MyFileDialogs
+from tmac_tools_lib.utils.qtclasses import QNumericSortTableWidgetItem
 
 import logging
 logger = logging.getLogger(__name__)
@@ -249,6 +250,7 @@ class TableHolder(object):
                 
         elif self.type == TableHolder.VIEW_LOG:
             for table in self.tables.values():
+                table.ref.clearContents()
                 table.ref.setRowCount(0)
 
 
@@ -339,9 +341,12 @@ class TableWidget(object):
                table.
         :param start_row: the first row in the table to start entering data.
         """
+        self.ref.setSortingEnabled(False)
         for row in row_data:
             self.addRowValues(row, start_row)
             start_row += 1
+        self.ref.setSortingEnabled(True)
+        self.ref.sortItems(0, QtCore.Qt.AscendingOrder)
             
     
     def addRowValues(self, row_dict, row_no=0):
@@ -407,7 +412,8 @@ class TableWidget(object):
         :param is_editable=False: Set editable flag.
         :return: QTableWidgetItem
         """
-        item = QtGui.QTableWidgetItem(str(name))
+#         item = QtGui.QTableWidgetItem(str(name))
+        item = QNumericSortTableWidgetItem(str(name))
         
         if is_editable:
             item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)

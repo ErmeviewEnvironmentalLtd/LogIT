@@ -125,7 +125,12 @@ v0.4.0-Beta:
 	- Added Copy logs to clipboard menu item. Automatically zips up the log
 	  files and copies them to the system clipboard for easy extraction.
 	- Added multiple row update functionality to view tables. All selected
-	  rows can now be updated at once.
+	  rows can now be updated at once. Rows that have been edited but not 
+	  updated will now be highlighted green.
+	- Added RUN_OPTIONS and TCF_DIR columns to RUN table.
+	- Added check for missing model files (tgc, tbc, etc) when loading a model.
+	  If these are not found the load will continue and will note which ones
+	  cannot be found to display to user after load.
 
 
 LICENSE
