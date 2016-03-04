@@ -385,9 +385,6 @@ class MainGui(QtGui.QMainWindow):
             if open_paths == False:
                 return
             
-#             paths = [str(x) for x in open_paths]
-#             paths.reverse()
-            
             row_count = self.ui.loadMultiModelTable.rowCount()
             for p in open_paths:
                 
@@ -447,6 +444,7 @@ class MainGui(QtGui.QMainWindow):
         updateRowAction = menu.addAction("Update Row")
         updateMultipleRowAction = menu.addAction("Update Multiple Rows")
         deleteRowAction = menu.addAction("Delete Row")
+        extractRowAction = menu.addAction("Extract Model")
         
         # Find who called us and get the object that the name refers to.
         sender = self.sender()
@@ -465,7 +463,7 @@ class MainGui(QtGui.QMainWindow):
             self._saveViewChangesToDatabase(table_obj)
             self.loadModelLog()               
             
-        if action == updateMultipleRowAction:
+        elif action == updateMultipleRowAction:
             
             # Get a list of selected ranges and loop from top row to bottom
             sel_range = table_obj.ref.selectedRanges()
@@ -484,6 +482,13 @@ class MainGui(QtGui.QMainWindow):
         
         elif has_delall and action == deleteAllRowAction:
             self._deleteRowFromDatabase(table_obj, True)
+        
+        elif action == extractRowAction:
+            errors = GuiStore.ErrorHolder()
+            row = table_obj.currentRow()
+            row_dict = table_obj.getValues(row=row, names=['ID'])
+            errors = Controller.extractModel(self.settings.cur_settings_path, 
+                                             row_dict, errors)
             
     
     def _deleteRowFromDatabase(self, table, all_entry):

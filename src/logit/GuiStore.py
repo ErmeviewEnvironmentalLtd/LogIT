@@ -535,6 +535,7 @@ class ErrorHolder(object):
         self.IO_ERROR = 'IO Error'
         self.SETTINGS_LOAD = 'Load Settings Error' 
         self.EXPORT_EXCEL = 'Export to Excel Error'
+        self.EXTRACT_MODEL = 'Extract Model Error'
         self.USER_CANCEL = 'User Cancelled File Error'
             
         #
@@ -612,6 +613,12 @@ class ErrorHolder(object):
         message = 'Unable to export database to Excel - Is the file open? '
         errors[title] = ErrorType(title, status_bar, message)
         
+        #
+        title = self.EXTRACT_MODEL
+        status_bar = 'Extract Model Failed '
+        message = 'Unable to extract model '
+        errors[title] = ErrorType(title, status_bar, message)
+
         #
         title = self.USER_CANCEL
         status_bar = ''
