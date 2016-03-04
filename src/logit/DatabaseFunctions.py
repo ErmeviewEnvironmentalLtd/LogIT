@@ -526,7 +526,8 @@ def createRunTable(cur):
                   ECF                     TEXT,
                   EVENT_NAME              TEXT,
                   RUN_OPTIONS             TEXT,
-                  TCF_DIR                 TEXT);
+                  TCF_DIR                 TEXT,
+                  IEF_DIR                 TEXT);
                  """)
     
 
@@ -732,7 +733,7 @@ def dropAllTables(db_path):
 run = ['ID', 'DATE', 'MODELLER', 'RESULTS_LOCATION_2D', 'RESULTS_LOCATION_1D', 
        'EVENT_DURATION', 'DESCRIPTION', 'COMMENTS', 'SETUP', 'ISIS_BUILD', 
        'IEF', 'DAT', 'TUFLOW_BUILD', 'TCF', 'TGC', 'TBC', 'BC_DBASE', 'ECF',
-       'EVENT_NAME', 'RUN_OPTIONS', 'TCF_DIR'] 
+       'EVENT_NAME', 'RUN_OPTIONS', 'TCF_DIR', 'IEF_DIR'] 
 tgc = ['ID', 'DATE', 'TGC', 'FILES', 'NEW_FILES', 'COMMENTS']
 tbc = ['ID', 'DATE', 'TBC', 'FILES', 'NEW_FILES', 'COMMENTS']
 dat = ['ID', 'DATE', 'DAT', 'AMENDMENTS', 'COMMENTS']

@@ -116,6 +116,8 @@ def loadModel(file_path, log_type):
     tuflow = None
     ief = None
     tcf_path = None
+    ief_dir = 'None'
+    tcf_dir = 'None'
     
     loader = FileLoader()
     model_file = loader.loadFile(file_path)
@@ -127,6 +129,7 @@ def loadModel(file_path, log_type):
     if file_type == 'ief' and not log_type == TYPE_ESTRY:
         
         ief = model_file
+        ief_dir = os.path.split(file_path)[0]
         
         # Get the ief filepaths (this returns a tuple of main paths, ied paths 
         # and snapshot paths, but we only want the main ones)
@@ -178,7 +181,8 @@ def loadModel(file_path, log_type):
     
     # Load the data needed for the log into the log pages dictionary.
     log_pages = {}
-    log_pages['RUN'] = buildRunRowFromModel(cur_date, ief, tuflow, log_type, tcf_dir)
+    log_pages['RUN'] = buildRunRowFromModel(cur_date, ief, tuflow, log_type, 
+                                            tcf_dir, ief_dir)
     
     if log_type == TYPE_ISIS:
         log_pages['TGC'] = None
@@ -201,14 +205,14 @@ def loadModel(file_path, log_type):
 
     # Record location of tuflow tcf file if included
     if log_type == TYPE_TUFLOW:
-        all_logs = LogClasses.AllLogs(log_pages, tcf_dir)
+        all_logs = LogClasses.AllLogs(log_pages, tcf_dir, ief_dir)
     else:
         all_logs = LogClasses.AllLogs(log_pages)
         
     return all_logs
 
 
-def buildRunRowFromModel(cur_date, ief, tuflow, log_type, tcf_dir):
+def buildRunRowFromModel(cur_date, ief, tuflow, log_type, tcf_dir, ief_dir):
     """Creates the row for the 'run' model log entry based on the contents
     of the loaded ief file and tuflow model.
     
@@ -229,11 +233,12 @@ def buildRunRowFromModel(cur_date, ief, tuflow, log_type, tcf_dir):
                 'IEF': 'None', 'DAT': 'None', 'TUFLOW_BUILD': 'None', 
                 'TCF': 'None', 'TGC': 'None', 'TBC': 'None', 'BC_DBASE': 'None', 
                 'ECF': 'None', 'EVENT_NAME': 'None', 'RUN_OPTIONS': 'None',
-                'TCF_DIR': 'None'}
+                'TCF_DIR': 'None', 'IEF_DIR': 'None'}
     
     if not log_type == TYPE_ESTRY and not ief == None:
         run_cols, options = buildIsisRun(ief, run_cols)
         run_cols['RUN_OPTIONS'] = options
+        run_cols['IEF_DIR'] = ief_dir
     
     if log_type == TYPE_TUFLOW:
         run_cols = buildTuflowRun(ief, tuflow, run_cols)
