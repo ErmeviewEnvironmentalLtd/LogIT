@@ -244,6 +244,8 @@ class MainGui(QtGui.QMainWindow):
         self._loadSettings()
         
         self._setupUiContainer()
+        # Set the column widths
+        self._setColumnWidths()
         
         # Use those settings to get the file path and try and load the last log
         # database that the user had open
@@ -802,6 +804,7 @@ class MainGui(QtGui.QMainWindow):
                     self.settings.last_model_directory = os.path.split(self.settings.cur_log_path)[0]
        
             self.ui.loadModelTextbox.setText(self.settings.last_model_directory)
+            
         
         except:
             logger.warning('Was unable to retrieve previous settings - Has LogIT been updated?')
@@ -812,11 +815,17 @@ class MainGui(QtGui.QMainWindow):
         """            
         logger.info('Closing program')
         logger.info('Saving user settings to: ' + save_path)
-        self.settings.modeller = str(self.ui.modellerTextbox.text())
-        self.settings.tuflow_version = str(self.ui.tuflowVersionTextbox.text())
-        self.settings.isis_version = str(self.ui.isisVersionTextbox.text())
-        self.settings.event_name = str(self.ui.eventNameTextbox.text())
-        self.settings.cur_model_type = str(self.ui.loadModelComboBox.currentIndex())
+        try:
+            self.settings.modeller = str(self.ui.modellerTextbox.text())
+            self.settings.tuflow_version = str(self.ui.tuflowVersionTextbox.text())
+            self.settings.isis_version = str(self.ui.isisVersionTextbox.text())
+            self.settings.event_name = str(self.ui.eventNameTextbox.text())
+            self.settings.cur_model_type = str(self.ui.loadModelComboBox.currentIndex())
+            self._getColumnWidths()
+        except:
+            logger.error('Unable to save settings - resetting to new')
+            self.settings = LogitSettings()
+
         try:
             # Load the UnitCollection from file and convert it back to the
             # dictionary format being used.
@@ -1012,10 +1021,6 @@ class MainGui(QtGui.QMainWindow):
 
         # Check that we have a database
         if not self.checkDbLoaded():
-#             QtGui.QMessageBox.warning(self, "No Database Loaded",
-#                 "No log database active. Please load or create one from" +
-#                                                     " the file menu.")
-#             logger.error('No log database found. Load or create one from File menu')
             return False          
 
         open_path = GuiStore.getModelFileLocation(multi_paths,
@@ -1121,7 +1126,25 @@ class MainGui(QtGui.QMainWindow):
         url = QtCore.QUrl.fromLocalFile(zip_log)
         data.setUrls([url])
         self.app.clipboard().setMimeData(data)
+    
+    
+    def _getColumnWidths(self):
+        """Store the current column widths for the view tables."""
+        for key, table in self.view_tables.tables.iteritems():
+            self.settings.column_widths[key] = []
+            count = table.ref.columnCount()
+            for i in range(0, count):
+                self.settings.column_widths[key].append(table.ref.columnWidth(i))
+
+
+    def _setColumnWidths(self):
+        """Load the saved column widths for the view tables."""
+        for key, table in self.view_tables.tables.iteritems():
+            count = table.ref.columnCount()
+            for i in range(0, count):
+                table.ref.setColumnWidth(i, self.settings.column_widths[key][i])
         
+
 
 class ProgressMonitor(object):
     """Convenience class for updating progress bars and text.
@@ -1214,6 +1237,8 @@ class LogitSettings(object):
         self.log_export_path = ''
         self.cur_model_type = 0
         self.logging_level = 0
+        self.column_widths = {}
+                             
         
         
 def main():
@@ -1234,6 +1259,7 @@ def main():
         # Load the settings dictionary
         cur_settings = cPickle.load(open(settings_path, "rb"))
         cur_settings.cur_settings_path = settings_path 
+#         cur_settings.column_widths = {}
     except:
         cur_settings = False
         #logging.info('Unable to load user defined settings')
