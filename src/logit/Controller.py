@@ -836,17 +836,12 @@ def exportToExcel(db_path, export_tables, save_path, errors):
 def extractModel(cur_settings_path, run_row, errors):
     """
     """
-    d = MyFileDialogs()
-    dir_path = d.dirFileDialog(cur_settings_path)
-    if dir_path == False:
-        return
     
     ief = run_row['IEF']
-    tcf = run_row['TCF']
+    tcf = run_row['TCF'][1:-1].split(',')[0]
     ief_dir = run_row['IEF_DIR']
     tcf_dir = run_row['TCF_DIR']
-    tcf_path = None
-    ief_path = None
+    input_path = None
     
     # Make sure that the main input files we need exist and suchlike before 
     # we go any further
@@ -857,26 +852,28 @@ def extractModel(cur_settings_path, run_row, errors):
                 msgbox_error=True)
         
     if not ief == 'None':
-        tcf_path = os.path.join(tcf_dir, tcf)
-    if not tcf == 'None':
-        ief_path = os.path.join(ief_dir, ief)
-    
-    if not os.path.exists(tcf_path):
-        logger.error('Tcf file does not exist - Do you need to update model location?')
-        errors.addError(errors.EXTRACT_MODEL, 
-                msg_add='\nTcf file does not exist - Do you need to update model location?\n' + tcf_path,
-                msgbox_error=True)
-        return errors
+        input_path = os.path.join(ief_dir, ief)
+        if not os.path.exists(input_path):
+            logger.error('Ief file does not exist - Do you need to update model location?')
+            errors.addError(errors.EXTRACT_MODEL, 
+                    msg_add='\nIef file does not exist - Do you need to update model location?\n' + input_path,
+                    msgbox_error=True)
+            return errors, None
+#         input_path = os.path.join(ief_dir, ief)
 
-    if not os.path.exists(ief_path):
-        logger.error('Ecf file does not exist - Do you need to update model location?')
-        errors.addError(errors.EXTRACT_MODEL, 
-                msg_add='\nIef file does not exist - Do you need to update model location?\n' + tcf_path,
-                msgbox_error=True)
-        return errors
+    if not tcf == 'None':
+        input_path = os.path.join(tcf_dir, tcf)
+        if not os.path.exists(input_path):
+            logger.error('Tcf file does not exist - Do you need to update model location?')
+            errors.addError(errors.EXTRACT_MODEL, 
+                    msg_add='\nTcf file does not exist - Do you need to update model location?\n' + input_path,
+                    msgbox_error=True)
+            return errors, None
+#         input_path = os.path.join(tcf_dir, tcf)
     
-    errors = ModelExtractor.extractModel(dir_path, tcf_path, ief_path, run_row, 
-                                         errors)
+    return errors, input_path
+#     errors = ModelExtractor.extractModel(dir_path, tcf_path, ief_path, run_row, 
+#                                          errors)
     
     
     

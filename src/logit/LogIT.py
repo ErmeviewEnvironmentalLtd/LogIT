@@ -114,6 +114,7 @@ import DatabaseFunctions
 import Exporters
 import Controller
 import GuiStore
+from extractmodel import ModelExtractor
 
 
 class MainGui(QtGui.QMainWindow):
@@ -151,6 +152,14 @@ class MainGui(QtGui.QMainWindow):
         QtGui.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(MainGui)
+        
+        # Add a progress bar to the status bar
+        self.progress_bar = QtGui.QProgressBar(self.ui.statusbar)
+        self.progress_bar.setMaximumSize(200, 20)
+        self.ui.statusbar.addPermanentWidget(self.progress_bar)
+        self.progress_bar.setValue(0)
+#         self.progress_monitor = ProgressMonitor(self.progress_bar, 
+#                                    self.ui.statusbar)
 
         # Setup a custom QTableWidget for multiple model choice table so that
         # It can be drag and dropped into order
@@ -294,6 +303,36 @@ class MainGui(QtGui.QMainWindow):
                             'bcEntryViewTable', self.ui.bcEntryViewTable))
         self.view_tables.addTable(GuiStore.TableWidget('DAT', 
                             'datEntryViewTable', self.ui.datEntryViewTable))
+        
+        self._addWidgets()
+        
+    
+    def _addWidgets(self):
+        """Adds tool widgets to the tabbed interface."""
+        self.widgets = {}
+        
+        # Storm calculator
+        model_extractor = ModelExtractor.ModelExtractor_UI(cur_location)
+        self.widgets[model_extractor.tool_name] = model_extractor
+        self.ui.tabWidget.insertTab(self.ui.tabWidget.count() - 1,model_extractor, model_extractor.tool_name)
+        
+        # Connect slots and load the settings.
+        for w in self.widgets.values():
+            try:
+                self.connect(w, QtCore.SIGNAL("statusUpdate"), self._updateStatusBar)
+                self.connect(w, QtCore.SIGNAL("setRange"), self._updateMaxProgress)
+                self.connect(w, QtCore.SIGNAL("updateProgress"), self._updateCurrentProgress)
+            except:
+                logger.warning('Unable to connect slots for %s' % (w.tool_name))
+            
+            try:
+                w.loadSettings(self.settings.tool_settings[w.tool_name])
+            except:
+                logger.info('No loadSettings() found for %s' % (w.tool_name))
+
+        # Do this here so it account for all the tabs
+        self.ui.tabWidget.setCurrentIndex(self.settings.cur_tab)
+         
     
     
     def _highlightEditRow(self):
@@ -446,7 +485,6 @@ class MainGui(QtGui.QMainWindow):
         updateRowAction = menu.addAction("Update Row")
         updateMultipleRowAction = menu.addAction("Update Multiple Rows")
         deleteRowAction = menu.addAction("Delete Row")
-        extractRowAction = menu.addAction("Extract Model")
         
         # Find who called us and get the object that the name refers to.
         sender = self.sender()
@@ -455,6 +493,7 @@ class MainGui(QtGui.QMainWindow):
         if sender == self.view_tables.tables['RUN'].name:
             deleteAllRowAction = menu.addAction("Delete Associated Entries")
             has_delall = True
+        extractRowAction = menu.addAction("Extract Model")
         
         # lookup the table and database table name
         table_obj = self.view_tables.getTable(name=sender)
@@ -488,9 +527,18 @@ class MainGui(QtGui.QMainWindow):
         elif action == extractRowAction:
             errors = GuiStore.ErrorHolder()
             row = table_obj.currentRow()
-            row_dict = table_obj.getValues(row=row, names=['ID'])
-            errors = Controller.extractModel(self.settings.cur_settings_path, 
-                                             row_dict, errors)
+            row_dict = table_obj.getValues(row=row, names=['ID', 'IEF', 'IEF_DIR', 'TCF', 'TCF_DIR'])
+            errors, in_path = Controller.extractModel(
+                                            self.settings.cur_settings_path, 
+                                            row_dict, errors)
+            
+            if errors.has_errors:
+                if errors.msgbox_error:
+                    self.launchQMsgBox(errors.msgbox_error.title, 
+                                   errors.msgbox_error.message)
+            else:
+                self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
+                self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
             
     
     def _deleteRowFromDatabase(self, table, all_entry):
@@ -713,16 +761,17 @@ class MainGui(QtGui.QMainWindow):
         errors = GuiStore.ErrorHolder()
         
         # Setup the progress monitor. It updates prgress bars etc
-        total = len(model_paths)
-        prog_mon = ProgressMonitor(self.ui.multiLoadProgressBar, 
-                                   self.ui.multiLoadProgressLabel)
-        prog_mon.setRanges(total*2, 1, total, 'Loading Model %d or %d')
+        total = len(model_paths) * 2
+        prog_count = 1
+        self._updateMaxProgress(total)
         
         # Loop through all of the file paths given
         for path in model_paths:
             error_found = False
             
-            prog_mon.update()
+            self._updateStatusBar('Loading model %s or %s' % (prog_count, total))
+            self._updateCurrentProgress(prog_count)
+            prog_count += 1
             
             errors, all_logs = Controller.fetchAndCheckModel(
                        self.settings.cur_log_path, path, log_type, 
@@ -732,7 +781,8 @@ class MainGui(QtGui.QMainWindow):
             if errors.has_local_errors:
                 continue
             
-            prog_mon.update(bar_only=True)
+            self._updateCurrentProgress(prog_count)
+            prog_count += 1
             
             # Get the global user supplied log variables
             all_logs = self._getInputLogVariables(all_logs)
@@ -748,19 +798,21 @@ class MainGui(QtGui.QMainWindow):
             
         self.loadModelLog()
 
-        # Clear the list entries
-        self.ui.loadMultiModelTable.setRowCount(0)
         if errors.has_errors:
-            prog_mon.reset('Complete')
+            self._updateStatusBar('')
+            self._updateCurrentProgress(0)
             text = errors.formatErrors('Some models could not be logged:')
             self.ui.multiModelLoadErrorTextEdit.setText(text)
             if errors.msgbox_error:
                 QtGui.QMessageBox.warning(self, 'Logging Error:',
                             'See Error Logs window for details')
         else:
+            # Clear the list entries
+            self.ui.loadMultiModelTable.setRowCount(0)
             logger.info('Log Database updated successfully')
             self.ui.statusbar.showMessage("Log Database successfully updated")
-            prog_mon.reset('Complete')
+            self._updateStatusBar('')
+            self._updateCurrentProgress(0)
         
     
     def _updateWithUserInputs(self):
@@ -804,7 +856,6 @@ class MainGui(QtGui.QMainWindow):
                     self.settings.last_model_directory = os.path.split(self.settings.cur_log_path)[0]
        
             self.ui.loadModelTextbox.setText(self.settings.last_model_directory)
-            
         
         except:
             logger.warning('Was unable to retrieve previous settings - Has LogIT been updated?')
@@ -812,7 +863,18 @@ class MainGui(QtGui.QMainWindow):
     
     def _writeSettings(self, save_path):
         """Need a custom close event so that we can save the user settings.
-        """            
+        """
+        
+        def _writeWidgetSettings():
+            """Write external widget settings."""
+            for w in self.widgets.values():
+                try:
+                    settings = w.saveSettings()
+                    self.settings.tool_settings[w.tool_name] = settings
+                except:
+                    logger.info('No saveSettings() found for %s' % (w.tool_name))
+            
+         
         logger.info('Closing program')
         logger.info('Saving user settings to: ' + save_path)
         try:
@@ -821,7 +883,9 @@ class MainGui(QtGui.QMainWindow):
             self.settings.isis_version = str(self.ui.isisVersionTextbox.text())
             self.settings.event_name = str(self.ui.eventNameTextbox.text())
             self.settings.cur_model_type = str(self.ui.loadModelComboBox.currentIndex())
+            self.settings.cur_tab = self.ui.tabWidget.currentIndex()
             self._getColumnWidths()
+            _writeWidgetSettings()
         except:
             logger.error('Unable to save settings - resetting to new')
             self.settings = LogitSettings()
@@ -917,10 +981,14 @@ class MainGui(QtGui.QMainWindow):
     def _createNewLogDatabase(self):
         """Create a new model log database.
         """
+        if not self.settings.cur_log_path == '':
+            p = self.settings.cur_log_path
+        else:
+            p = self.settings.cur_settings_path
+            
+        #self.settings.cur_settings_path)[0]
         d = MyFileDialogs()
-        save_path = d.saveFileDialog(path=os.path.split(
-                                    self.settings.cur_settings_path)[0], 
-                                     file_types='LogIT database(*.logdb)')
+        save_path = d.saveFileDialog(path=p, file_types='LogIT database(*.logdb)')
         
         if not save_path == False:
             self.settings.cur_log_path = str(save_path)
@@ -1144,78 +1212,99 @@ class MainGui(QtGui.QMainWindow):
             for i in range(0, count):
                 table.ref.setColumnWidth(i, self.settings.column_widths[key][i])
         
+    
+    ''' 
+        Progress bar and status bar updates.
+    '''
+    def _updateStatusBar(self, string): 
+        self.ui.statusbar.showMessage(string)
+        logger.debug('updating status bar: ' + string)
+        
+    def _updateMaxProgress(self, value):
+        """"""
+        self.progress_bar.setMaximum(value)
+        
+    def _updateCurrentProgress(self, value):
+        """"""
+        self.progress_bar.setValue(value)
+    
 
-
-class ProgressMonitor(object):
-    """Convenience class for updating progress bars and text.
-    
-    This stays in this module becuase it sort of breaks the encapsulation of
-    the MainGui class by updating its progress bar and text label. It's better
-    than having to little progress update code all over the place though.
-    """
-     
-    def __init__(self, progbar_ui, text_ui=None):
-        self.progbar_ui = progbar_ui
-        self.text_ui = text_ui
-        self.prog_cur = 0
-        self.text_cur = 0
-    
-    def setRanges(self, prog_up, text_down=None, text_up=None, textform='%d of %d'): 
-        """Set the range to operate on.
-        :param prog_up: max progress bar value.
-        :param text_down=None: lowest text counter value.
-        :param text_up=None: max text counter value.
-        :param textform=None: format to dislplay text counter in.
-        """
-        self.prog_up = prog_up
-        self.text_up = text_up
-        self.text_current = self.text_down = text_down
-        self.textform = textform
-        self.progbar_ui.setRange(0, prog_up)
-        self.setToStart()
-    
-    def setToStart(self):
-        """Set progress counters to start point.
-        """
-        self.progbar_ui.setValue(0)
-        if not self.text_ui == None:
-            text_out = self.textform % (self.text_cur, self.text_up)
-            self.text_ui.setText(text_out)
-    
-    def reset(self, text=None):
-        """Reset the progress bar to normal state.
-        :param text=None: text to display in text label.
-        """
-        self.setToStart()
-        if text == None: text = ''
-        self.text_ui.setText(text)
-    
-    def update(self, bar_only=False, text_only=False):
-        """Update progress.
-        :param bar_only=False: don't update the progress bar.
-        :param text_only=False: don't update the text counter.
-        """
-        if not text_only:
-            self.updateBarProgress()
-        if not bar_only:
-            self.updateTextProgress()
-        QtGui.QApplication.processEvents()
-    
-    def updateBarProgress(self):
-        """Iterate and update progress bar
-        """
-        self.prog_cur += 1
-        self.progbar_ui.setValue(self.prog_cur)
-    
-    def updateTextProgress(self):
-        """Iterate and update text counter label.
-        """
-        if self.text_ui == None:
-            return
-        else:
-            self.text_cur += 1
-            text_out = self.textform % (self.text_cur, self.text_up)
-            self.text_ui.setText(text_out)
+# class ProgressMonitor(object):
+#     """Convenience class for updating progress bars and text.
+#     
+#     This stays in this module becuase it sort of breaks the encapsulation of
+#     the MainGui class by updating its progress bar and text label. It's better
+#     than having to little progress update code all over the place though.
+#     """
+#      
+#     def __init__(self, progbar_ui, statustext_ui=None):
+#         self.progbar_ui = progbar_ui
+#         self.statustext_ui = statustext_ui
+#         self.prog_cur = 0
+#         self.text_cur = 0
+#     
+#     def setRanges(self, prog_up, text_down=None, text_up=None, textform='%d of %d'): 
+#         """Set the range to operate on.
+#         :param prog_up: max progress bar value.
+#         :param text_down=None: lowest text counter value.
+#         :param text_up=None: max text counter value.
+#         :param textform=None: format to dislplay text counter in.
+#         """
+#         self.prog_up = prog_up
+#         self.text_up = text_up
+#         self.text_current = self.text_down = text_down
+#         self.textform = textform
+#         self.progbar_ui.setRange(0, prog_up)
+#         self.setToStart()
+#     
+#     def setToStart(self):
+#         """Set progress counters to start point.
+#         """
+#         self.progbar_ui.setValue(0)
+#         if not self.statustext_ui == None and not self.text_cur == None and not self.text_up == None:
+#             text_out = self.textform % (self.text_cur, self.text_up)
+#             self.statustext_ui.showMessage(text_out)
+#     
+#     def reset(self, text=None):
+#         """Reset the progress bar to normal state.
+#         :param text=None: text to display in text label.
+#         """
+#         self.setToStart()
+#         if text == None: text = ''
+#         self.statustext_ui.showMessage(text)
+#     
+#     def update(self, do_bar=True, do_text=False):
+#         """Update progress.
+#         :param bar_only=False: don't update the progress bar.
+#         :param text_only=False: don't update the text counter.
+#         """
+#         if do_bar:
+#             self.updateBarProgress()
+#         if do_text:
+#             self.updateTextProgress()
+#         QtGui.QApplication.processEvents()
+#     
+#     def updateBarProgress(self):
+#         """Iterate and update progress bar
+#         """
+#         self.prog_cur += 1
+#         self.progbar_ui.setValue(self.prog_cur)
+#     
+#     
+#     def updateStatus(self, status_text):
+#         """Update the status text."""
+#         self.statustext_ui.showMessage(status_text)
+#         
+#     
+#     def updateTextProgress(self):
+#         """Iterate and update text counter label.
+#         """
+#         if self.statustext_ui == None:
+#             return
+#         else:
+#             self.text_cur += 1
+#             text_out = self.textform % (self.text_cur, self.text_up)
+#             self.statustext_ui.showMessage(text_out)
 
 
 class LogitSettings(object):
@@ -1238,6 +1327,8 @@ class LogitSettings(object):
         self.cur_model_type = 0
         self.logging_level = 0
         self.column_widths = {}
+        self.tool_settings = {}
+        self.cur_tab = 0
                              
         
         
@@ -1258,8 +1349,16 @@ def main():
     try:
         # Load the settings dictionary
         cur_settings = cPickle.load(open(settings_path, "rb"))
+        
+        # Check that this version of the settings has all the necessary
+        # attributes, and if not add the missing ones
+        temp_set = LogitSettings()
+        settings_attrs = [s for s in dir(temp_set) if not s.startswith('__')]
+        for s in settings_attrs:
+            if not hasattr(cur_settings, s):
+                setattr(cur_settings, s, getattr(temp_set, s))
         cur_settings.cur_settings_path = settings_path 
-#         cur_settings.column_widths = {}
+
     except:
         cur_settings = False
         #logging.info('Unable to load user defined settings')
