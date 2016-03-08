@@ -485,29 +485,28 @@ class MainGui(QtGui.QMainWindow):
         :param pos: the QPoint of the mouse cursor when clicked.
         """
         menu = QtGui.QMenu()
-        updateRowAction = menu.addAction("Update Row")
-        updateMultipleRowAction = menu.addAction("Update Multiple Rows")
+#         updateRowAction = menu.addAction("Update Row")
+        updateMultipleRowAction = menu.addAction("Update Row(s)")
         deleteRowAction = menu.addAction("Delete Row")
         
         # Find who called us and get the object that the name refers to.
         sender = self.sender()
         sender = str(sender.objectName())
-        has_delall = False
+        has_extras = False
         if sender == self.view_tables.tables['RUN'].name:
             deleteAllRowAction = menu.addAction("Delete Associated Entries")
-            has_delall = True
-        extractRowAction = menu.addAction("Extract Model")
+            updateIefRowAction = menu.addAction("Update Ief Location")
+            updateTcfRowAction = menu.addAction("Update Tcf Location")
+            extractRowAction = menu.addAction("Extract Model")
+            has_extras = True
         
         # lookup the table and database table name
         table_obj = self.view_tables.getTable(name=sender)
         
         # Get the action and do whatever it says
         action = menu.exec_(table_obj.ref.viewport().mapToGlobal(pos))
-        if action == updateRowAction:
-            self._saveViewChangesToDatabase(table_obj)
-            self.loadModelLog()               
-            
-        elif action == updateMultipleRowAction:
+             
+        if action == updateMultipleRowAction:
             
             # Get a list of selected ranges and loop from top row to bottom
             sel_range = table_obj.ref.selectedRanges()
@@ -524,25 +523,59 @@ class MainGui(QtGui.QMainWindow):
         elif action == deleteRowAction:
             self._deleteRowFromDatabase(table_obj, False)
         
-        elif has_delall and action == deleteAllRowAction:
-            self._deleteRowFromDatabase(table_obj, True)
+        # These are only available on the RUN table
+        elif has_extras:
         
-        elif action == extractRowAction:
-            errors = GuiStore.ErrorHolder()
-            row = table_obj.currentRow()
-            row_dict = table_obj.getValues(row=row, names=['ID', 'IEF', 'IEF_DIR', 'TCF', 'TCF_DIR'])
-            errors, in_path = Controller.extractModel(
-                                            self.settings.cur_settings_path, 
-                                            row_dict, errors)
+            if action == deleteAllRowAction:
+                self._deleteRowFromDatabase(table_obj, True)
             
-            if errors.has_errors:
-                if errors.msgbox_error:
-                    self.launchQMsgBox(errors.msgbox_error.title, 
-                                   errors.msgbox_error.message)
-            else:
-                self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
-                self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
+            elif action == extractRowAction:
+                errors = GuiStore.ErrorHolder()
+                row = table_obj.currentRow()
+                row_dict = table_obj.getValues(row=row, names=['ID', 'IEF', 'IEF_DIR', 'TCF', 'TCF_DIR'])
+                errors, in_path = Controller.extractModel(
+                                                self.settings.cur_settings_path, 
+                                                row_dict, errors)
+                
+                if errors.has_errors:
+                    if errors.msgbox_error:
+                        self.launchQMsgBox(errors.msgbox_error.title, 
+                                       errors.msgbox_error.message)
+                else:
+                    self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
+                    self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
             
+            elif action == updateIefRowAction or action == updateTcfRowAction:
+                if not self.settings.last_model_directory == '':
+                    p = self.settings.last_model_directory
+                elif not self.settings.cur_log_path == '':
+                    p = self.settings.cur_log_path
+                else:
+                    p = self.settings.cur_settings_path
+                
+                if action == updateIefRowAction:
+                    file_types = 'IEF(*.ief)'
+                    lookup_name = 'IEF_DIR'
+                else:
+                    file_types = 'TCF(*.tcf)'
+                    lookup_name = 'TCF_DIR'
+                    
+                d = MyFileDialogs()
+                open_path = str(d.openFileDialog(p, file_types=file_types, 
+                                                 multi_file=False))
+                    
+                if not open_path == 'False' and not open_path == False:
+                    p = os.path.split(open_path)[0]
+                    
+                    row = table_obj.currentRow()
+                    row_dict = table_obj.getValues(row=row, names=['ID', lookup_name])
+                    row_dict[lookup_name] = p
+                    table_obj.addRowValues(row_dict, row)
+                    self._saveViewChangesToDatabase(table_obj, row)
+                    self.loadModelLog()
+                    self.settings.last_model_directory = p
+            
+
     
     def _deleteRowFromDatabase(self, table, all_entry):
         """Deletes the row in the database based on the location that the mouse
