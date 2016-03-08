@@ -842,6 +842,7 @@ def extractModel(cur_settings_path, run_row, errors):
     ief_dir = run_row['IEF_DIR']
     tcf_dir = run_row['TCF_DIR']
     input_path = None
+    tcf_path = None
     
     # Make sure that the main input files we need exist and suchlike before 
     # we go any further
@@ -862,11 +863,13 @@ def extractModel(cur_settings_path, run_row, errors):
 #         input_path = os.path.join(ief_dir, ief)
 
     if not tcf == 'None':
-        input_path = os.path.join(tcf_dir, tcf)
-        if not os.path.exists(input_path):
+        tcf_path = os.path.join(tcf_dir, tcf)
+        if input_path is None:
+            input_path = tcf_path
+        if not os.path.exists(tcf_path):
             logger.error('Tcf file does not exist - Do you need to update model location?')
             errors.addError(errors.EXTRACT_MODEL, 
-                    msg_add='\nTcf file does not exist - Do you need to update model location?\n' + input_path,
+                    msg_add='\nTcf file does not exist - Do you need to update model location?\n' + tcf_path,
                     msgbox_error=True)
             return errors, None
 #         input_path = os.path.join(tcf_dir, tcf)

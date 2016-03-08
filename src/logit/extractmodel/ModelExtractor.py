@@ -67,6 +67,7 @@ class ExtractVars(object):
         self.tcf_path = None
         self.ief_path = None
         self.out_dir = None
+        self.has_tcf = False
         
         self.in_files = []
         self.out_files = []
@@ -95,11 +96,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         self.extractOutputButton.clicked.connect(self._setOutputDirectory)
         self.extractModelButton.clicked.connect(self._extractModel)
     
-        # Example signal call
-#         self.emit(QtCore.SIGNAL("statusUpdate"), 'Calculating Storm')
-#         self.emit(QtCore.SIGNAL("setRange"), 100)
-#         self.emit(QtCore.SIGNAL("updateProgress"))
-    
+
     def _setInputFile(self):
         """Get the input model file to use."""
 
@@ -138,6 +135,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         """
         """
         self._extractVars = ExtractVars()
+        self.extractOutputTextArea.clear()
         
         in_path = str(self.extractModelFileTextbox.text())
         out_dir = str(self.extractOutputTextbox.text())
@@ -151,14 +149,10 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             QtGui.QMessageBox.warning(self, "Directory not found",
                                       "Output directory does not exist")
 
-#         in_path = r'C:\Users\duncan.runnacles\Documents\Programming\Python\TMacToolsLibrary\TmacTools\TMacToolsLibrary\tmac_tools\tests\testinputdata\Model\tuflow\runs\Option1aPlus_ilo3_Cul6_Grange_T100D5CC_CWI_Run3_F_MHWS_v1-01.tcf'
-#         ief_path = os.path.join(curd, '..', r'tmac_tools\tests\testinputdata\Model\isis\iefs\Kennford_v1.7.ief')
-#         out_dir = r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\Test_Model_Copy\Logit_test'
-        
         self._extractVars.out_dir = out_dir
         
         # Check if we're dealing with an ief or a tcf
-        ext = os.path.splitext(in_path)[1] 
+        ext = os.path.splitext(in_path)[1]
         if ext == '.ief':
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Reading ISIS/FMP files')
             self._extractVars.ief_path = in_path
@@ -167,6 +161,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             if not ext == '.tcf':
                 logger.error('File type is not recognised:\n' + in_path)
             self._extractVars.tcf_path = in_path
+            self.has_tcf = True
             
         if not self._extractVars.tcf_path == None:
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Reading Tuflow files')
@@ -174,20 +169,29 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             loader = FileLoader()
             self._extractVars.tuflow = loader.loadFile(self._extractVars.tcf_path)
             self._loadModelFiles()
-            combo_files = self._mergeFiles() 
             
             success = self._updateModelFilePaths() 
             if not success:
                 return
-            
+
             tuflow_files = self._extractVars.tuflow.getPrintableContents()
         
+        elif not self._extractVars.has_tcf:
+            logger.error('Model has found tcf but tcf_path is None')
+            return 
+            
+        
+        # Get the input and output files together and copy everything
+        combo_files = self._mergeFiles() 
         self._writeOutResultsFiles() 
         self._writeOutModelFiles(combo_files)
         
         if not self._extractVars.ief == None:
             contents = self._extractVars.ief.getPrintableContents()
             p = self._extractVars.ief.path_holder.getAbsPath()
+            d = os.path.split(p)[0]
+            if not os.path.exists(d):
+                os.makedirs(d, 0777)
             filetools.writeFile(contents, 
                                 self._extractVars.ief.path_holder.getAbsPath(), 
                                 add_newline=True)
@@ -243,6 +247,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         curd = os.getcwd()
         not_moved = []
         no_results = len(file_paths)
+
+        self.emit(QtCore.SIGNAL("statusUpdate"), 'Copying model files...')
         self.emit(QtCore.SIGNAL("setRange"), no_results)
         for i, p in enumerate(file_paths, 1):
             tester = os.path.exists(p[0])
@@ -263,23 +269,16 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                         self.emit(QtCore.SIGNAL("updateProgress"), i)
                         shutil.copy(f, p[1])
                 except IOError:
-#                     print 'Cannot copy file: ' + p[0]
                     self._extractVars.missing_model_files.append(p[0])
-#                     not_moved.append(p[0])
 
             else:
-#                 print 'File not found: ' + p[0]
                 self._extractVars.missing_model_files.append(p[0])
-#                 not_moved.append(p[0])
 
         os.chdir(curd)
-#         print '\nFiles not moved:'
-#         for f in not_moved:
-#             print f
     
     
     def _writeOutResultsFiles(self): 
-        """
+        """Copy the result files into the new directory.
         """
         curd = os.getcwd()
         results_names_in = []
@@ -314,19 +313,37 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             
             no_results = len(file_list)
             self.emit(QtCore.SIGNAL("setRange"), no_results)
-            for f in file_list:
+            found_file = False
+            
+            '''Results are always several files with the same name, but
+               different extensions. This checks that the filename + extension
+               starts with the same string.
+            '''
+            for j, f in enumerate(file_list, 1):
                 if f.startswith(old_n):
+                    found_file = True
                     try:
-                        self.emit(QtCore.SIGNAL("updateProgress"), i)
+                        self.emit(QtCore.SIGNAL("updateProgress"), j)
                         shutil.copy(f, new_p)
                     except IOError:
-                        self._extractVars.missing_results_files.append(r[0]) 
+                        self._extractVars.missing_results_files.append(r[0])
+            
+            if not found_file:
+                self._extractVars.missing_results_files.append(r[0])
         
         os.chdir(curd)
 
     
     def _fetchResultsFiles(self, model_file, rel_root, model_root, run_name): 
-        """
+        """Fetches the output files from the tuflow model.
+        
+        Args:
+            model_file(ATuflowModelFile): the model file being read.
+            rel_root(str): the relative path to set for the files.
+            model_root(str): the relative path of the model file to set.
+            run_name(str): the name of the tuflow entry file (tcf/ecf).
+        
+        These are the result, check and log files.
         """
         result_hashes = model_file.getHashCategory(self._extractVars.tuflow.RESULT)
         for r in result_hashes:
@@ -357,7 +374,18 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         
 
     def _fetchDataFiles(self, model_file, source_root, rel_root, model_root): 
-        """
+        """Get all of the data files and any subfiles they contain.
+        
+        Attempts to load any data files (.tmf, .csv, etc) and checks to see if
+        they contain references to any subfiles. If they do it calls 
+        getSourceFiles() to create the in and out paths for them as well.
+        
+        Args:
+            model_file(ATuflowModelFile): the model file being read.
+            source_root(str): location to set for the out file.
+            rel_root(str): the relative path to set for the files.
+            model_root(str): the relative path of the model file to set.
+        
         """
         data_hashes = model_file.getHashCategory(self._extractVars.tuflow.DATA)
         for d in data_hashes:
@@ -385,7 +413,17 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
 
 
     def _getSourceFiles(self, data_file, source_root, model_root, rel_root): 
-        """
+        """Get all of the sub files contained by a data file.
+        
+        Loads the given SomeFile reference and checks to see if it contains
+        any references to other files. If it does it gets/sets the in/out file
+        locations.
+        
+        Args:
+            data_file(SomeFile): the ATuflowFilePart.
+            source_root(str): location to set for the out file.
+            rel_root(str): the relative path to set for the files.
+            model_root(str): the relative path of the model file to set.
         """
         missing_files = []
         try:
@@ -409,14 +447,26 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 self._extractVars.out_files.append(f.getAbsPath())
                 
         except IOError:
-            self._extractVars.missing_files.append(data_file.getAbsPath())
             return False 
         
         return True 
 
 
     def _fetchGisFiles(self, model_file, source_root, main_root, rel_root, model_root): 
-        """
+        """Get all of the data files and any subfiles they contain.
+        
+        Attempts to load any data files (.tmf, .csv, etc) and checks to see if
+        they contain references to any subfiles. If they do it calls 
+        getSourceFiles() to create the in and out paths for them as well.
+        
+        Args:
+            model_file(ATuflowModelFile): the model file being read.
+            source_root(str): location to set for the out file.
+            main_root(str): location to set for the gis file, which may be 
+                different to that for the subfiles.
+            rel_root(str): the relative path to set for the files.
+            model_root(str): the relative path of the model file to set.
+        
         """
         hashes = model_file.getHashCategory(self._extractVars.tuflow.GIS)
         for h in hashes:
@@ -442,7 +492,12 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
 
     
     def _updateModelFilePaths(self): 
-        """
+        """Update the paths of the ATuflowModelFiles (tcf, tgc, etc).
+        
+        These are being read and updated for the new location so it is
+        important that they don't overwrite the existing versions. The paths
+        before update are checked against those after update to ensure that 
+        this can't happen. If there's an issue we stop and retreat.
         """
         out_name_check = []
         in_name_check = []
@@ -465,6 +520,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             logger.error('Problem changing paths - aborting to avoid overwriting file!')
             return False
         
+        # Make sure all paths have been updated.
         for o in out_name_check:
             if o in in_name_check:
                 logger.warning('Some file paths have failed to update - Aborting to avoid overwriting file!')
@@ -474,7 +530,10 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         
     
     def _mergeFiles(self): 
-        """
+        """Combine the infile and outfiles lists.
+        
+        Take the in files list and the outfiles list and combine them, while
+        removing any duplicate entries. 
         """
         no_dup_old = []
         for f in self._extractVars.in_files:
@@ -489,9 +548,17 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         
         
     def _loadModelFiles(self): 
+        """Gets copies of all of the model files and fetches their contents.
+        
+        Loops through all of the model files and fetches anything that can
+        contain a files (gis files, data files, results files, etc). The 
+        functions called updated the path variables on all of these files.
         """
-        """
+        
+        # Get only the path name of the main file.
         run_name = self._extractVars.tuflow.getModelFiles('main', name_only=True)[0]
+        
+        # Get the ATuflowModelFile reference of all of the others.
         tcfs = self._extractVars.tuflow.getModelFiles('tcf', tuflowmodelfile=True)
         ecfs = self._extractVars.tuflow.getModelFiles('ecf', tuflowmodelfile=True)
         tbcs = self._extractVars.tuflow.getModelFiles('tbc', tuflowmodelfile=True)
@@ -515,7 +582,9 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             
     
     def _getIsisFiles(self): 
-        """
+        """Get all of the ISIS/FMP related files from the ief.
+        
+        Any reference to any file components in the ief is stored.
         """
         dat_name = ''
         
@@ -523,11 +592,12 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         self._extractVars.ief = loader.loadFile(self._extractVars.ief_path)
         
         if '2DFile' in self._extractVars.ief.event_details.keys():
-            self._extractVars.tcf = self._extractVars.ief.event_details['2DFile']
-            out_tcf = os.path.split(self._extractVars.tcf)[1]
+            self._extractVars.tcf_path = self._extractVars.ief.event_details['2DFile']
+            out_tcf = os.path.split(self._extractVars.tcf_path)[1]
             self._extractVars.ief.event_details['2DFile'] = os.path.join(r'..\..\tuflow\runs', out_tcf)
+            self._extractVars.has_tcf = True
         
-        if 'InitialConditions' in ief.event_details.keys():
+        if 'InitialConditions' in self._extractVars.ief.event_details.keys():
             ic = self._extractVars.ief.event_details['InitialConditions']
             out_ic = os.path.join(os.path.split(ic)[1])
             self._extractVars.ief.event_details['InitialConditions'] = os.path.join(r'..\ics', out_ic)
@@ -544,20 +614,21 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             
         
         if not self._extractVars.ief.event_header['Results'] == '':
-            self._extractVars.results_files.append([os.path.join(self._extractVars.ief.event_header['Results'], dat_name),
-                               os.path.join(self._extractVars.out_dir, r'fmp\results', dat_name)
+            d, f = os.path.split(self._extractVars.ief.event_header['Results'])
+            self._extractVars.results_files.append([os.path.join(d, f),
+                               os.path.join(self._extractVars.out_dir, r'fmp\results', f)
                               ])
             self._extractVars.ief.event_header['Results'] = r'..\results'
         
         for i, ied in enumerate(self._extractVars.ief.ied_data):
             ied_in = ied['file']
             ied_name = os.path.split(ied_in)[1]
-            ief.ied_data[i]['file'] = os.path.join(r'..\ieds', ied_name)
+            self._extractVars.ief.ied_data[i]['file'] = os.path.join(r'..\ieds', ied_name)
             self._extractVars.in_files.append(ied_in)
             self._extractVars.out_files.append(os.path.join(self._extractVars.out_dir, r'fmp\ieds', ied_name))
         
 
-        self._extractVars.ief.path_holder.root = os.path.join(self._extractVars.out_dir, r'fmp\self._extractVars.iefs')
+        self._extractVars.ief.path_holder.root = os.path.join(self._extractVars.out_dir, 'fmp', 'iefs')
 
 
     def loadSettings(self, settings):
@@ -579,6 +650,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
     def saveSettings(self):
         """Return state of settings back to caller."""
         
+        self.settings.cur_model_path = str(self.extractModelFileTextbox.text())
+        self.settings.cur_output_dir = str(self.extractOutputTextbox.text())
         return self.settings
 
 

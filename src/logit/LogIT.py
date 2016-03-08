@@ -55,6 +55,9 @@
          Added drag and drop extensions to files in multiple model file
          selection table.
          Added update multiple rows to view tables context menu.
+         Added ModelExtractor widget and module code.
+         Added progress bar to status bar and removed from multiple load.
+         Added load/save widget (tools) functionality.
 
   TODO:
      
@@ -761,7 +764,7 @@ class MainGui(QtGui.QMainWindow):
         errors = GuiStore.ErrorHolder()
         
         # Setup the progress monitor. It updates prgress bars etc
-        total = len(model_paths) * 2
+        total = len(model_paths)
         prog_count = 1
         self._updateMaxProgress(total)
         
@@ -781,8 +784,8 @@ class MainGui(QtGui.QMainWindow):
             if errors.has_local_errors:
                 continue
             
-            self._updateCurrentProgress(prog_count)
-            prog_count += 1
+#             self._updateCurrentProgress(prog_count)
+#             prog_count += 1
             
             # Get the global user supplied log variables
             all_logs = self._getInputLogVariables(all_logs)
@@ -1219,6 +1222,7 @@ class MainGui(QtGui.QMainWindow):
     def _updateStatusBar(self, string): 
         self.ui.statusbar.showMessage(string)
         logger.debug('updating status bar: ' + string)
+        self.app.processEvents()
         
     def _updateMaxProgress(self, value):
         """"""
@@ -1227,6 +1231,7 @@ class MainGui(QtGui.QMainWindow):
     def _updateCurrentProgress(self, value):
         """"""
         self.progress_bar.setValue(value)
+        self.app.processEvents()
     
 
 # class ProgressMonitor(object):
