@@ -293,6 +293,10 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             before the extension matches a known ending it will return True.
             """
             
+            # Always grab a projection file
+            if os.path.splitext(file_to_check)[0] == ' Projection':
+                return True
+            
             parts = file_to_check.split(filename)
             
             # If it's only the filename matched exactly
@@ -727,7 +731,11 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         '_TS',
         '_TSF',
         '_TSMB',
-        '_TSMB1D2D']
+        '_TSMB1D2D',
+        '_MB1',
+        '_POMM',
+        '_TIMES',
+        ]
         
         self.check_list = [
         '_2D_BC_TABLES_CHECK',
@@ -745,7 +753,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         '_FCSH_UVPT_CHECK_P',
         '_GLO_CHECK',
         '_GLO_CHECK_P',
-        'GRD_CHECK',
+        '_GRD_CHECK',
         '_GRD_CHECK_R',
         '_INPUT_LAYERS',
         '_LFCSH_UVPT_CHECK',
@@ -798,7 +806,9 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         '_XSL_CHECK',
         '_XSL_CHECK_L',
         '_X1D_CHANS_CHECK',
-        '_X1D_CHANS_CHECK_L',
+        '_X1D_CHANS_CHECK_L'
+        '_X1D_CHANNELS_CHECK',
+        '_X1D_CHANNELS_CHECK_L',
         '_X1D_NODES_CHECK',
         '_X1D_NODES_CHECK_P',
         '_1D_TO_2D_CHECK',
