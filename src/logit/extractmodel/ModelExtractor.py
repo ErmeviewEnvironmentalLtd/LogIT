@@ -139,7 +139,6 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 if response == False:
                     return
         
-        logger.info('Setting output directory')
         self.extractOutputTextbox.setText(dir_path)
         self.settings.cur_output_dir = dir_path
         
@@ -153,6 +152,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             """
             self.emit(QtCore.SIGNAL("updateProgress"), 0)
             self.emit(QtCore.SIGNAL("statusUpdate"), '')
+            
         
         self._extractVars = ExtractVars()
         self.extractOutputTextArea.clear()
@@ -216,6 +216,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             logger.error('File paths have corrupted in load')
             QtGui.QMessageBox.warning(self, "File path corruption",
                                       "Some in-filenames do not mach out-filenames.\nThis has corrupted the copy attempt")
+            finalizeExtraction()
             return 
         
         if not self._extractVars.ief == None:
