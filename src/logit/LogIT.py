@@ -1245,7 +1245,8 @@ class MainGui(QtGui.QMainWindow):
         for key, table in self.view_tables.tables.iteritems():
             count = table.ref.columnCount()
             for i in range(0, count):
-                table.ref.setColumnWidth(i, self.settings.column_widths[key][i])
+                if key in self.settings.column_widths.keys():
+                    table.ref.setColumnWidth(i, self.settings.column_widths[key][i])
         
     
     ''' 
