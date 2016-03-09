@@ -126,9 +126,17 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             path = self.settings.cur_location
 
         d = MyFileDialogs()
-        dir_path = d.dirFileDialog(path) 
+        dir_path = str(d.dirFileDialog(path)) 
         if dir_path == 'False' or dir_path == False:
             return
+        
+        # Make sure we don't accidentally write over input files
+        if not self.settings.cur_model_path == '':
+            if dir_path == os.path.normpath(os.path.split(self.settings.cur_model_path)[0]):
+                message = 'Output directory matches model directory.\n This may lead to overwritten files.\n Are you sure?'
+                response = self.launchQtQBox('Directory Match', message)
+                if response == False:
+                    return
         
         self.extractOutputTextbox.setText(dir_path)
         self.settings.cur_output_dir = dir_path
@@ -809,6 +817,17 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         '_2D_Q_FROM_X1D',
         '_2D_TO_2D_CHECK',
         '_2D_TO_2D_CHECK_R']
+
+
+    def launchQtQBox(self, title, message):
+        """Launch QtQMessageBox.
+        """
+        answer = QtGui.QMessageBox.question(self, title, message,
+                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+        if answer == QtGui.QMessageBox.No:
+            return False
+        else:
+            return answer
 
 
 class ToolSettings(object):
