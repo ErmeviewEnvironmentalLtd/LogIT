@@ -75,6 +75,7 @@ import LogBuilder
 import Exporters
 import LogClasses
 import ModelExtractor
+from app_metrics.utils import logger as applog
 
 import logging
 logger = logging.getLogger(__name__)
@@ -183,6 +184,9 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
         db_manager = DatabaseFunctions.DatabaseManager(db_path)
         all_logs = logEntryUpdates(db_manager, all_logs,
                                                   check_new_entries)
+        # Log use on the server
+        applog().write('Logger')
+        
     except IOError:
         logger.error('Unable to access database')
         errors.addError(errors.DB_ACCESS, msgbox_error=True, 

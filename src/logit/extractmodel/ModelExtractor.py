@@ -56,6 +56,7 @@ from tmac_tools_lib.tuflow.data_files import datafileloader
 from tmac_tools_lib.utils import filetools
     
 import  ModelExtractor_Widget as extractwidget
+from app_metrics.utils import logger as applog
 
 
 
@@ -233,6 +234,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         self._displayOutput()
         finalizeExtraction()
         
+        # Log use on the server
+        applog().write('Extractor')
     
     
     def _displayOutput(self):
