@@ -120,7 +120,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
     def _setOutputDirectory(self):
         """Set the directory to extract the model to."""
 
-        if not self.settings.cur_model_path == '':
+        if not self.settings.cur_output_dir == '':
             path = self.settings.cur_output_dir
         else:
             path = self.settings.cur_location
