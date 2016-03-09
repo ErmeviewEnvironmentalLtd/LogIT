@@ -12,7 +12,7 @@ from getpass import getuser
 import logging
 logger = logging.getLogger(__name__)
 
-class logger(object):
+class AppLogger(object):
     '''
     Class for logging APP tool and util usage.
     

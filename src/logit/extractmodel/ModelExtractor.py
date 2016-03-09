@@ -56,7 +56,7 @@ from tmac_tools_lib.tuflow.data_files import datafileloader
 from tmac_tools_lib.utils import filetools
     
 import  ModelExtractor_Widget as extractwidget
-from app_metrics.utils import logger as applog
+from app_metrics import utils as applog
 
 
 
@@ -115,7 +115,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             return
         
         self.extractModelFileTextbox.setText(open_path)
-        self.settings.cur_model_path = open_path         
+        self.settings.cur_model_path = open_path
         
     
     def _setOutputDirectory(self):
@@ -139,6 +139,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 if response == False:
                     return
         
+        logger.info('Setting output directory')
         self.extractOutputTextbox.setText(dir_path)
         self.settings.cur_output_dir = dir_path
         
@@ -235,7 +236,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         finalizeExtraction()
         
         # Log use on the server
-        applog().write('Extractor')
+        applog.AppLogger().write('Extractor')
     
     
     def _displayOutput(self):
