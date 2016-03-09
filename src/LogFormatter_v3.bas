@@ -13,7 +13,7 @@ Attribute VB_Name = "LogFormatter"
 '
 ' Author: Duncan Runnacles
 ' Date: 17/11/2014
-' Version: 1.0
+' Version: 3.0
 '
 '##############################################################################
 
@@ -124,7 +124,7 @@ Private Sub setupRunSheet()
     ' Setup cell header colours
     run_sheet.Range("A9:I9").Interior.Color = RGB(204, 255, 255) ' Turquise
     run_sheet.Range("J9:L9").Interior.Color = RGB(153, 204, 255) ' Blue
-    run_sheet.Range("M9:S9").Interior.Color = RGB(153, 204, 0) ' Green
+    run_sheet.Range("M9:V9").Interior.Color = RGB(153, 204, 0) ' Green
     
     ' Fit the title contents
     Dim used_range As Range
@@ -132,7 +132,7 @@ Private Sub setupRunSheet()
     used_range.ColumnWidth = 20
     Set used_range = run_sheet.Range("C9")
     used_range.ColumnWidth = 15
-    Set used_range = run_sheet.Range("D9:S9")
+    Set used_range = run_sheet.Range("D9:V9")
     used_range.ColumnWidth = 20
     
     ' Set bold titles
@@ -148,7 +148,7 @@ Private Sub setupRunSheet()
         .BorderAround Weight:=xlMedium
     End With
 
-    Set used_range = run_sheet.Range("A9:S9")
+    Set used_range = run_sheet.Range("A9:V9")
     With used_range
         .Font.Bold = True
         .BorderAround Weight:=xlMedium

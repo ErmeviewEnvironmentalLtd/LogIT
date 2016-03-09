@@ -485,7 +485,6 @@ class MainGui(QtGui.QMainWindow):
         :param pos: the QPoint of the mouse cursor when clicked.
         """
         menu = QtGui.QMenu()
-#         updateRowAction = menu.addAction("Update Row")
         updateMultipleRowAction = menu.addAction("Update Row(s)")
         deleteRowAction = menu.addAction("Delete Row")
         

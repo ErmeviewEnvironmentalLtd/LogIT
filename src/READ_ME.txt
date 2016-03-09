@@ -127,10 +127,24 @@ v0.4.0-Beta:
 	- Added multiple row update functionality to view tables. All selected
 	  rows can now be updated at once. Rows that have been edited but not 
 	  updated will now be highlighted green.
-	- Added RUN_OPTIONS and TCF_DIR columns to RUN table.
+	- Added RUN_OPTIONS, IEF_DIR and TCF_DIR columns to RUN table.
 	- Added check for missing model files (tgc, tbc, etc) when loading a model.
 	  If these are not found the load will continue and will note which ones
 	  cannot be found to display to user after load.
+	- Added widget loading capability to the MainGUI. Should help to reduce 
+	  code bloat within the class when adding additional features. 
+	- Added ModelExtractor module. This can be used to extract the files
+	  associated with a particular model into an output directory.
+	- Added update Ief/Tcf location to the RUN table right-click menu.
+	- Added extract model to the RUN table right-click menu.
+	- Removed update row option from right-click menu as this has been replaced
+	  by the more useful update multiple rows functionality.
+	- Added functionality to update existing settings files when loaded with
+	  any missing members. If new members are added to the settings file it 
+	  should gracefully add them and allow user to continue using settings.
+	- Added progress bar to status bar. Have also removed the multiple model
+	  load progress bar; it uses the status bar version instead.
+	- Updated LogFormatter to v3 to accomodate new rows in the RUN table.
 
 
 LICENSE

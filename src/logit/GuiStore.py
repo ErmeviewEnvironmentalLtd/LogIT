@@ -39,6 +39,11 @@
         business coded and updated with new errors that the GUI can deal with
         as it likes later. Useful for easy message box launching and storing 
         a series of errors that need writing out somewhere in the UI.
+    DR - 04/03/2016:
+        Added TableWidgetDragRows class. Subclasses the QTableWidget class to 
+        allow for internal dragging and dropping (reordering) of rows within
+        the table.
+        
 
  TODO:
     
