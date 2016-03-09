@@ -8,6 +8,10 @@ from datetime import datetime as dt
 from inspect import stack
 from getpass import getuser
 
+# Import logging and get a logger with the name of the module
+import logging
+logger = logging.getLogger(__name__)
+
 class logger(object):
     '''
     Class for logging APP tool and util usage.
@@ -34,31 +38,39 @@ class logger(object):
         '''
         self.log_path = log_path
         self.log_exists = os.path.exists(self.log_path)
-        print "I will log to " + self.log_path
-        print "Does it exist? " + str(self.log_exists)
+        logger.info("I will log to " + self.log_path)
+        logger.debug("Does it exist? " + str(self.log_exists))
+        #print "I will log to " + self.log_path
+        #print "Does it exist? " + str(self.log_exists)
         
         headers = "Timestamp,User,Caller,Message\n"
         
         if not self.log_exists:
-            print "Creating log and headers"
+            logger.debug("Creating log and headers")
+            #print "Creating log and headers"
             
             try:
                 with open(self.log_path,'w') as log:            
                     log.write(headers)
             except:
-                print "Creating log failed, path: " + self.log_path
+                logger.error("Creating log failed, path: " + self.log_path)
+                #print "Creating log failed, path: " + self.log_path
         else:
-            print "Checking headers"
+            logger.debug("Checking headers")
+            #print "Checking headers"
             
             try:
                 with open(self.log_path,'r') as log:   
                     found_headers = log.readline().strip()         
                     if  found_headers == headers.strip():
-                        print "Headers look good: " + headers.strip()
+                        logger.debug("Headers look good: " + headers.strip())
+                        #print "Headers look good: " + headers.strip()
                     else:
-                        print "Headers are inconsistant: " + found_headers
+                        logger.info("Headers are inconsistant: " + found_headers)
+                        #print "Headers are inconsistant: " + found_headers
             except:
-                print "Could not check headers: " + self.log_path
+                logger.warning("Could not check headers: " + self.log_path)
+                #print "Could not check headers: " + self.log_path
         
     def write(self, message = ""):
         '''
@@ -100,7 +112,8 @@ class logger(object):
             
                 log.write(build_entry(message))
         except:
-            print "Writing to log failed, path: " + self.log_path
+            logger.error("Writing to log failed, path: " + self.log_path)
+            #print "Writing to log failed, path: " + self.log_path
         
     def getLogPath(self):
         '''
@@ -120,4 +133,4 @@ class logger(object):
         Returns:
             self.log_exists (str)
         '''
-        return self.log_exists           
+        return self.log_exists 
