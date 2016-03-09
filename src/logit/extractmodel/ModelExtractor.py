@@ -42,6 +42,7 @@
 import os
 import time
 import shutil
+import re
 
 import logging
 logger = logging.getLogger(__name__)
@@ -95,6 +96,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         self.extractModelFileButton.clicked.connect(self._setInputFile)
         self.extractOutputButton.clicked.connect(self._setOutputDirectory)
         self.extractModelButton.clicked.connect(self._extractModel)
+        
+        self.setupLookupLists()
     
 
     def _setInputFile(self):
@@ -280,6 +283,39 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
     def _writeOutResultsFiles(self): 
         """Copy the result files into the new directory.
         """
+        
+        def checkIfRightFile(filename, file_to_check):
+            """Check to see if we have a result file that we need.
+            
+            It can be a bit complicated so there are probably some issues here,
+            but at the moment it seems to do ok.
+            If there is only an extensino after the known name, or the rest 
+            before the extension matches a known ending it will return True.
+            """
+            
+            parts = file_to_check.split(filename)
+            
+            # If it's only the filename matched exactly
+            if len(parts) < 2:
+                return False
+            # If second part is the start of the extension
+            if parts[1].startswith('.'):
+                return True
+            
+            subparts = parts[1].split('.')
+            if len(subparts) < 2:
+                return False
+            # If the extra bit before extension is an '_' followed by three
+            # numbers (matches isis run output .bmp's)
+            if re.match(r'[_]\d{3}', subparts[0]):
+                return True
+            # If bit before extension is in the known check/result file endings
+            if subparts[0] in self.check_list or subparts[0] in self.result_list:
+                return True
+            
+            return False
+            
+        
         curd = os.getcwd()
         results_names_in = []
         results_names_out = []
@@ -297,13 +333,14 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             file_list = os.listdir(old_p)
             
             try:
-                if os.path.isdir(new_p):
-                    d = os.path.dirname(new_p)
-                else:
-                    d = new_p
+                # It may be just a directory o
+#                 if os.path.isfile(new_p):
+#                     d = os.path.dirname(new_p)
+#                 else:
+#                     d = new_p
 
-                if not os.path.exists(d):
-                    os.makedirs(d, 0777)
+                if not os.path.exists(new_p):
+                    os.makedirs(new_p, 0777)
             except IOError:
                 print 'Cannot make directory for: ' + new_p
                 continue
@@ -320,7 +357,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                starts with the same string.
             '''
             for j, f in enumerate(file_list, 1):
-                if f.startswith(old_n):
+                if checkIfRightFile(old_n.upper(), f.upper()):
                     found_file = True
                     try:
                         self.emit(QtCore.SIGNAL("updateProgress"), j)
@@ -357,9 +394,12 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             
             elif part.command.upper() == 'WRITE CHECK FILES':
                 new_root = r'..\checks'
+            
+            elif part.command.upper() == 'LOG FOLDER':
+                new_root = r'logs'
 
+            p = os.path.join(part.root, part.parent_relative_root, part.relative_root)
             if part.file_name == '':
-                p = os.path.join(part.root, part.parent_relative_root, part.relative_root)
                 self._extractVars.results_files.append([os.path.join(p, run_name),
                                           os.path.join(self._extractVars.out_dir, new_root, run_name)
                                          ])
@@ -653,6 +693,122 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         self.settings.cur_model_path = str(self.extractModelFileTextbox.text())
         self.settings.cur_output_dir = str(self.extractOutputTextbox.text())
         return self.settings
+    
+    
+    def setupLookupLists(self):
+        """
+        """
+        
+        self.result_list = [
+        '_D',
+        '_D_EXTENT',
+        '_D_FE',
+        '_DMAX_G002',
+        '_H',
+        '_HMAX_G002',
+        '_MB',
+        '_MB2D',
+        '_PO',
+        '_Q',
+        '_V',
+        '_ZUK1',
+        '_ZUK0',
+        '_1D_H',
+        '_1D_MB',
+        '_1D_MMH',
+        '_1D_MMQ',
+        '_1D_MMV',
+        '_1D_MMD',
+        '_1D_Q',
+        '_1D_V',
+        '_1D_D',
+        '_1D_H',
+        '_MB1D',
+        '_TS',
+        '_TSF',
+        '_TSMB',
+        '_TSMB1D2D']
+        
+        self.check_list = [
+        '_2D_BC_TABLES_CHECK',
+        '_BCC_CHECK',
+        '_BCC_CHECK_R',
+        '_DEM_M',
+        '_DEM_M',
+        'DEM_Z',
+        '_DEM_Z',
+        '_DOM_CHECK',
+        '_DOM_CHECK_R',
+        '_FC_CHECK',
+        '_FC_CHECK_R',
+        '_FCSH_UVPT_CHECK',
+        '_FCSH_UVPT_CHECK_P',
+        '_GLO_CHECK',
+        '_GLO_CHECK_P',
+        'GRD_CHECK',
+        '_GRD_CHECK_R',
+        '_INPUT_LAYERS',
+        '_LFCSH_UVPT_CHECK',
+        '_LFCSH_UVPT_CHECK_P',
+        '_LP_CHECK',
+        '_LP_CHECK_L',
+        '_PO_CHECK',
+        '_PO_CHECK_P',
+        '_PO_CHECK_L',
+        '_SAC_CHECK',
+        '_SAC_CHECK_R',
+        '_SH_OBJ_CHECK',
+        '_SH_OBJ_CHECK_R',
+        '_UVPT_CHECK',
+        '_UVPT_CHECK_P',
+        '_VZSH_CHECK',
+        '_VZSH_CHECK_P',
+        '_VZSH_CHECK_L',
+        '_ZLN_ZPT_CHECK',
+        '_ZLN_ZPT_CHECK_P',
+        '_ZPT_CHECK',
+        '_ZPT_CHECK_P',
+        '_ZSH_ZPT_CHECK',
+        '_ZSH_ZPT_CHECK_P',
+        '_1D_BC_TABLES_CHECK',
+        '_PIT_INLET_TABLES_CHECK',
+        '1D_TA_TABLES_CHECK',
+        '_BC_CHECK',
+        '_BC_CHECK_P',
+        '_HYDROPROP_CHECK',
+        '_HYDROPROP_CHECK_L',
+        '_INVERTS_CHECK',
+        '_INVERTS_CHECK_P',
+        '_IWL_CHECK',
+        '_IWL_CHECK_P',
+        '_MHC_CHECK',
+        '_MHC_CHECK_P',
+        '_NWK_C_CHECK',
+        '_NWK_C_CHECK_L',
+        '_NWK_N_CHECK',
+        '_NWK_N_CHECK_P',
+        '_WLLO_CHECK',
+        '_WLLO_CHECK_L',
+        '_XWLLO_CHECK',
+        '_XWLLO_CHECK_L',
+        '_WLLP_CHECK',
+        '_WLLP_CHECK_P',
+        '_XWLLP_CHECK',
+        '_XWLLP_CHECK_P',
+        '_XSL_CHECK',
+        '_XSL_CHECK_L',
+        '_X1D_CHANS_CHECK',
+        '_X1D_CHANS_CHECK_L',
+        '_X1D_NODES_CHECK',
+        '_X1D_NODES_CHECK_P',
+        '_1D_TO_2D_CHECK',
+        '_1D_TO_2D_CHECK_R',
+        '_X1D_H_TO_2D',
+        '_X1D_H_FROM_2D',
+        '_2D_Q_TO_X1D',
+        '_2D_Q_FROM_X1D',
+        '_2D_TO_2D_CHECK',
+        '_2D_TO_2D_CHECK_R']
 
 
 class ToolSettings(object):
