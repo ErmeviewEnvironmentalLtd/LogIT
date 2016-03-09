@@ -145,6 +145,13 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
     def _extractModel(self):
         """
         """
+        
+        def finalizeExtraction():
+            """
+            """
+            self.emit(QtCore.SIGNAL("updateProgress"), 0)
+            self.emit(QtCore.SIGNAL("statusUpdate"), '')
+        
         self._extractVars = ExtractVars()
         self.extractOutputTextArea.clear()
         
@@ -155,10 +162,13 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             logger.error('Model file does not exist')
             QtGui.QMessageBox.warning(self, "File not found",
                                       "Model file does not exist")
+            return
+            
         if not os.path.exists(out_dir):
             logger.error('Output directory does not exist')
             QtGui.QMessageBox.warning(self, "Directory not found",
                                       "Output directory does not exist")
+            return
 
         self._extractVars.out_dir = out_dir
         
@@ -183,19 +193,28 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             
             success = self._updateModelFilePaths() 
             if not success:
+                finalizeExtraction()
                 return
 
             tuflow_files = self._extractVars.tuflow.getPrintableContents()
         
         elif not self._extractVars.has_tcf:
             logger.error('Model has found tcf but tcf_path is None')
+            QtGui.QMessageBox.warning(self, "Tcf is None",
+                                      "Model has found tcf but tcf_path is None")
+            finalizeExtraction()
             return 
             
         
         # Get the input and output files together and copy everything
         combo_files = self._mergeFiles() 
         self._writeOutResultsFiles() 
-        self._writeOutModelFiles(combo_files)
+        success = self._writeOutModelFiles(combo_files)
+        if not success:
+            logger.error('File paths have corrupted in load')
+            QtGui.QMessageBox.warning(self, "File path corruption",
+                                      "Some in-filenames do not mach out-filenames.\nThis has corrupted the copy attempt")
+            return 
         
         if not self._extractVars.ief == None:
             contents = self._extractVars.ief.getPrintableContents()
@@ -212,9 +231,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 filetools.writeFile(contents, path, add_newline=False)
         
         self._displayOutput()
+        finalizeExtraction()
         
-        self.emit(QtCore.SIGNAL("updateProgress"), 0)
-        self.emit(QtCore.SIGNAL("statusUpdate"), '')
     
     
     def _displayOutput(self):
@@ -276,6 +294,10 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 try:
                     if not os.path.isdir(p[0]):
                         d, f = os.path.split(p[0])
+                        if not os.path.split(p[1])[1] == f:
+                            os.chdir(curd)
+                            return False
+                        
                         os.chdir(d)
                         self.emit(QtCore.SIGNAL("updateProgress"), i)
                         shutil.copy(f, p[1])
@@ -286,6 +308,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 self._extractVars.missing_model_files.append(p[0])
 
         os.chdir(curd)
+        return True
     
     
     def _writeOutResultsFiles(self): 
@@ -300,6 +323,9 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             If there is only an extensino after the known name, or the rest 
             before the extension matches a known ending it will return True.
             """
+            
+            # If it's a projection file
+            if file_to_check == 'Projection.prj': return True
             
             parts = file_to_check.split(filename)
             
@@ -341,12 +367,6 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             file_list = os.listdir(old_p)
             
             try:
-                # It may be just a directory o
-#                 if os.path.isfile(new_p):
-#                     d = os.path.dirname(new_p)
-#                 else:
-#                     d = new_p
-
                 if not os.path.exists(new_p):
                     os.makedirs(new_p, 0777)
             except IOError:
@@ -440,10 +460,12 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             part = self._extractVars.tuflow.file_parts[d]
             self._extractVars.in_files.extend(part.getAbsPath(all_types=True))
             
-            data_subfiles = []
+            subfiles_in = []
+            subfiles_out = []
             if not part.extension == 'tmf':
                 
-                success = self._getSourceFiles(part, r'..\bc_dbase', model_root, rel_root)
+                success, subfiles_in, subfiles_out = self._getSourceFiles(part, 
+                                        r'..\bc_dbase', model_root, rel_root)
                 if not success:
                     self._extractVars.failed_data_files.append(part.getAbsPath()) 
 
@@ -456,8 +478,11 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             elif part.command.upper() == 'READ MATERIALS FILE':
                 part.relative_root = model_root
             
+            
             self._extractVars.tuflow.file_parts[part.hex_hash] = part
             self._extractVars.out_files.extend(part.getAbsPath(all_types=True))
+            self._extractVars.in_files.extend(subfiles_in)
+            self._extractVars.out_files.extend(subfiles_out)
 
 
     def _getSourceFiles(self, data_file, source_root, model_root, rel_root): 
@@ -474,30 +499,32 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             model_root(str): the relative path of the model file to set.
         """
         missing_files = []
+        subfiles_in = []
+        subfiles_out = []
         try:
             dobj = datafileloader.loadDataFile(data_file)
 
             try:
                 i = dobj.keys.SOURCE
             except AttributeError:
-                return False 
+                return False, [], []
             
             source = dobj.row_collection.getRowDataAsList(dobj.keys.SOURCE)
             for s in source:
                 # Create a path holder
                 f = filetools.PathHolder(s, data_file.root)
                 f.relative_root = data_file.relative_root
-                self._extractVars.in_files.append(f.getAbsPath())
+                subfiles_in.append(f.getAbsPath())
                 
                 f.relative_root = os.path.join(model_root, source_root)
                 f.parent_relative_root = rel_root
                 f.root = self._extractVars.out_dir
-                self._extractVars.out_files.append(f.getAbsPath())
+                subfiles_out.append(f.getAbsPath())
                 
         except IOError:
-            return False 
+            return False, [], []
         
-        return True 
+        return True, subfiles_in, subfiles_out
 
 
     def _fetchGisFiles(self, model_file, source_root, main_root, rel_root, model_root): 
@@ -521,13 +548,19 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             part = self._extractVars.tuflow.file_parts[h]
             self._extractVars.in_files.extend(part.getAbsPath(all_types=True))
             
+            subfiles_in = []
+            subfiles_out = []
             if part.command.upper() == 'READ MI TABLE LINKS':
                 
-                success = self._getSourceFiles(part, 'xs', model_root, rel_root)
+                success, subfiles_in, subfiles_out = self._getSourceFiles(part, 
+                                                    'xs', model_root, rel_root)
                 if not success:
                     self._extractVars.failed_data_files.append(part.getAbsPath()) 
 
                 part.relative_root = os.path.join(model_root, source_root)
+
+            elif part.command.upper().startswith('READ GRID'):
+                part.relative_root = os.path.join(model_root, 'grid')
 
             else:
                 part.relative_root = os.path.join(model_root, main_root)
@@ -537,6 +570,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             part.root = self._extractVars.out_dir
             self._extractVars.tuflow.file_parts[part.hex_hash] = part
             self._extractVars.out_files.extend(part.getAbsPath(all_types=True))
+            self._extractVars.in_files.extend(subfiles_in)
+            self._extractVars.out_files.extend(subfiles_out)
 
     
     def _updateModelFilePaths(self): 
@@ -735,7 +770,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         '_TS',
         '_TSF',
         '_TSMB',
-        '_TSMB1D2D']
+        '_TSMB1D2D',
+        '_MESSAGES']
         
         self.check_list = [
         '_2D_BC_TABLES_CHECK',
@@ -753,7 +789,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         '_FCSH_UVPT_CHECK_P',
         '_GLO_CHECK',
         '_GLO_CHECK_P',
-        'GRD_CHECK',
+        'GRD_CHECK'
+        '_GRD_CHECK',
         '_GRD_CHECK_R',
         '_INPUT_LAYERS',
         '_LFCSH_UVPT_CHECK',
