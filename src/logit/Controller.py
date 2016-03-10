@@ -831,7 +831,8 @@ def exportToExcel(db_path, export_tables, save_path, errors):
 def checkVersionInfo():
     """Tests whether this is up to date with the version info on the server."""
     
-    from __init__ import __version__
+    #from __init__ import __version__
+    __version__ = '0.4.1-Beta'
     version_path = r'P:\04 IT\utils\beta\LogIT\Version_Info\versioninfo.ver'
     
     with open(version_path, 'rb') as f:

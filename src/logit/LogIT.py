@@ -1403,10 +1403,8 @@ def main():
      
     # Need to do this so that the icons show up properly
     import ctypes
-    from __init__ import __appid__
-    #myappid = __appid__
-    #myappid = 'logit.0-4-Beta'
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(__appid__)
+    myappid = 'logit.0-4-Beta'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
     QPlugin = QtCore.QPluginLoader("qico4.dll")
      
     cur_location = os.getcwd()
