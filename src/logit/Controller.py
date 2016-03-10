@@ -64,6 +64,8 @@ import traceback
 import itertools
 import sqlite3
 import cPickle
+import shutil
+import zipfile
 
 from PyQt4 import QtCore, QtGui
 
@@ -697,19 +699,14 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors):
             file_str = 'The following tuflow model files could not be loaded:\n' + '\n'.join(LogBuilder.missing_files)
             message = ' at:\n%s\n\n%s' % (open_path, file_str)
         return message
-#             message = 'The following tuflow model files could not be loaded:\n' + file_str
         
     
     # Load the model at the chosen path.
     all_logs = LogBuilder.loadModel(open_path, log_type)
     if all_logs == False:
-        
-#         logger.error('Unable to load model file:\n%s\n\n%s' % (open_path, message))
-#         logger.error(message)
-#         errors.addError(errors.MODEL_LOAD, message, #msg_add=('at:\n%s\n\n%s' % (open_path, message)), 
-#                                                         msgbox_error=True)
         errors.addError(errors.USER_CANCEL, msgbox_error=False)
         return errors, all_logs
+
     else:
         # Make sure that this ief or tcf do not already exist in the
         # database. You need new ones for each run so this isn't
@@ -763,19 +760,13 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors):
             msg = checkMissingFiles(open_path)
             logger.error(msg)
             errors.addError(errors.IO_ERROR, msg_add=(msg), msgbox_error=True)
-#             logger.error('Cannot load file:\n%s' % (open_path))
-#             errors.addError(errors.IO_ERROR, 
-#                                         msg_add=('at:\n%s' % (open_path)),
-#                                                             msgbox_error=True)
             return errors, all_logs
+
         except:
             msg = checkMissingFiles(open_path)
             logger.error(msg)
             errors.addError(errors.IO_ERROR, msg_add=(msg), msgbox_error=True)
-#             logger.error('Cannot load file:\n%s' % (open_path))
-#             errors.addError(errors.IO_ERROR, 
-#                                         msg_add=('at:\n%s' % (open_path)),
-#                                                             msgbox_error=True)
+
             return errors, all_logs
         
 
@@ -837,8 +828,66 @@ def exportToExcel(db_path, export_tables, save_path, errors):
     return errors
 
 
-def extractModel(cur_settings_path, run_row, errors):
+def checkVersionInfo():
+    """Tests whether this is up to date with the version info on the server."""
+    
+    from __init__ import __version__
+    version_path = r'P:\04 IT\utils\beta\LogIT\Version_Info\versioninfo.ver'
+    
+    with open(version_path, 'rb') as f:
+        lines = f.readlines()
+        file_version = lines[0].strip()
+        if not file_version == __version__:
+            return False, file_version
+        else:
+            return (True,)
+        
+
+def downloadNewVersion(cur_location, server_dir, download_filename):
+    """Downloads the latest version to the users current install directory.
+    
+    Copies the latest version from the server, unzips it to the directory
+    immediately outside the current directory and copies over users current
+    settings into the new version.
+    
+    Args:
+        cur_location(str): the current location of the executable.
+        download_filename(str): the name of the download file (without extension).
+    
+    Return:
+        Bool - False if failed, True otherwise.
     """
+    
+    download_dir = os.path.join(cur_location, '..', '..')
+    download_file = os.path.join(server_dir, download_filename + '.zip')
+
+    # Download and unzip new version
+    try:
+        shutil.copy(download_file, download_dir)
+    except IOError:
+        logger.error('Unable to download new version')
+        return False
+        
+    zip_ref = zipfile.ZipFile(os.path.join(download_dir, download_filename + '.zip'), 'r')
+    zip_ref.extractall(download_dir)
+    zip_ref.close()
+    
+    # Copy over the current user settings
+    user_file =os.path.join(cur_location, 'settings.logset')
+    exe_location = os.path.join(download_dir, download_filename, 'logit')
+    try:
+        shutil.copy(user_file, exe_location)
+    except IOError:
+        logger.error('Unable to copy user settings file')
+    
+    return True    
+
+
+def extractModel(cur_settings_path, run_row, errors):
+    """Check the details of model location.
+    
+    Checks that the ief and tcf locations extracted from the log database exist
+    and works out which path should be sent to the model extractor form.
     """
     
     ief = run_row['IEF']
@@ -864,7 +913,6 @@ def extractModel(cur_settings_path, run_row, errors):
                     msg_add='\nIef file does not exist - Do you need to update model location?\n' + input_path,
                     msgbox_error=True)
             return errors, None
-#         input_path = os.path.join(ief_dir, ief)
 
     if not tcf == 'None':
         tcf_path = os.path.join(tcf_dir, tcf)
@@ -876,11 +924,8 @@ def extractModel(cur_settings_path, run_row, errors):
                     msg_add='\nTcf file does not exist - Do you need to update model location?\n' + tcf_path,
                     msgbox_error=True)
             return errors, None
-#         input_path = os.path.join(tcf_dir, tcf)
     
     return errors, input_path
-#     errors = ModelExtractor.extractModel(dir_path, tcf_path, ief_path, run_row, 
-#                                          errors)
     
     
     

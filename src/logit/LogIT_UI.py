@@ -1531,6 +1531,8 @@ class Ui_MainWindow(object):
         self.actionReloadDatabase.setObjectName(_fromUtf8("actionReloadDatabase"))
         self.actionCopyLogsToClipboard = QtGui.QAction(MainWindow)
         self.actionCopyLogsToClipboard.setObjectName(_fromUtf8("actionCopyLogsToClipboard"))
+        self.actionCheckForUpdates = QtGui.QAction(MainWindow)
+        self.actionCheckForUpdates.setObjectName(_fromUtf8("actionCheckForUpdates"))
         self.menuExport.addAction(self.actionExportToExcel)
         self.menuFile.addAction(self.actionNewModelLog)
         self.menuFile.addAction(self.actionLoad)
@@ -1549,7 +1551,10 @@ class Ui_MainWindow(object):
         self.menuLoggingLevel.addAction(self.actionLogDebug)
         self.menuSettings.addAction(self.menuTools.menuAction())
         self.menuSettings.addAction(self.menuLoggingLevel.menuAction())
+        self.menuSettings.addSeparator()
         self.menuSettings.addAction(self.actionReloadDatabase)
+        self.menuSettings.addSeparator()
+        self.menuSettings.addAction(self.actionCheckForUpdates)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuSettings.menuAction())
 
@@ -1993,12 +1998,16 @@ class Ui_MainWindow(object):
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Editing Existing Log Entries:</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">It is possible to edit log entries that have already been added to the log database in the View Log tab. However only certain cells are editable.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">To edit a cell: double click the required cell and edit the entry. Once you have completed all required edits for that row you can update the database by right clicking anywhere in the row and selecting Update Row.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">To update multiple rows at once: make all of the required edits, select the rows to update and select Update Multiple Rows from the right-click menu.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">To edit a cell: double click the required cell and edit the entry. Once you have completed all required edits select the rows to update and select Update Row(s) from the right-click menu.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Delete Log Entry:</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Deleting entries from the log database can be done in the View Log tab tables. To delete an entry in any of the log pages right click the row and select Delete Row.</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">It is possible to safely delete an entire log entry (i.e. any associated tgc, etc entries that are not referenced by another run) by selecting Delete Associated entries.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Update Ief Location / Update Tcf Location:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Available on the right-click menu of the RUN table.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">If selected you can update the location of the Ief or Tcf files associated with the selected log entry. This may be useful if you have moved the files somewhere else or the log was built with an older version of LogIT and does not include this information in the table.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The IEF_DIR and TCF_DIR log entries that will be updated are used by some other tools in the software. Certain functionality will require that they exist.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Exporting to Excel:</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Exporting the log databse to Excel format can be done through the File &gt; Export &gt; Excel Menu (Ctrl+E).</p>\n"
@@ -2031,11 +2040,21 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Info will output anything helpful that\'s going on.</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Debug will output obscure errors and lots of rubbish.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Additional Tools</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LogIT includes the following additional tools:</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600; color:#0055ff;\">Model Extractor - </span><span style=\" font-weight:600; font-style:italic; color:#0055ff;\">Beta</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">The Model Extractor can be used to extract the files associated with a particular model into a specified output directory. This is useful if you need to deliver a model to someone. It saves having to go through the model folders and locating associated files, as LogIT does it automatically. All paths within both the ISIS and Tuflow models will be updated to be relative to the output folder, so that the model can be moved anywhere and will still run.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">A model can be loaded from the Browse... button on the Model Extractor tab or by using right-click on the RUN table and selecting Extract Model.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">It is currently still being built and checked so it should be used with care and extracted contents should be quality controlled after running the tool.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Current Limitations</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LogIT does not currently know how to read MapInfo or Shapefile data so it will not find any files referenced within them - like cross section csv data. </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">This will be implemented in a future release.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LogIT uses the TMacToolsLibrary to read and write from Tuflow and ISIS/FMP files. When reading data files, such as materials.csv or boundary conditions.csv files, it expects the format to match that set out in the Tuflow Manual. Tuflow is more forgiving and will allow files to be setup differently if certain headers are given. If these files are not setup as shown in the manual they</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">will not be correctly read. This should cause a warning to be noted, but is worth keeping an eye on.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Common Errors</span></p>\n"
@@ -2099,5 +2118,6 @@ class Ui_MainWindow(object):
         self.actionCopyLogsToClipboard.setText(_translate("MainWindow", "Copy Logs to Clipboard", None))
         self.actionCopyLogsToClipboard.setStatusTip(_translate("MainWindow", "Zip up log files and copy them to clipboard for pasting", None))
         self.actionCopyLogsToClipboard.setWhatsThis(_translate("MainWindow", "Zip up log files and copy them to clipboard for pasting", None))
+        self.actionCheckForUpdates.setText(_translate("MainWindow", "Check for Updates", None))
 
 import LogIT_RC_rc

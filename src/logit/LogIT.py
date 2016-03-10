@@ -161,8 +161,6 @@ class MainGui(QtGui.QMainWindow):
         self.progress_bar.setMaximumSize(200, 20)
         self.ui.statusbar.addPermanentWidget(self.progress_bar)
         self.progress_bar.setValue(0)
-#         self.progress_monitor = ProgressMonitor(self.progress_bar, 
-#                                    self.ui.statusbar)
 
         # Setup a custom QTableWidget for multiple model choice table so that
         # It can be drag and dropped into order
@@ -205,6 +203,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionLogInfo.triggered.connect(self._updateLoggingLevel)
         self.ui.actionReloadDatabase.triggered.connect(self.loadModelLog)
         self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
+        self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdates)
         
         # A couple of keyboard shortcuts...because I'm lazy!
         # Launch the browse for model dialog
@@ -335,7 +334,32 @@ class MainGui(QtGui.QMainWindow):
 
         # Do this here so it account for all the tabs
         self.ui.tabWidget.setCurrentIndex(self.settings.cur_tab)
-         
+    
+    
+    def _checkUpdates(self):     
+        """Check if this is the latest version or not.
+        
+        If it isn't it gives the user the option to download and install the
+        updated version.
+        """
+        
+        is_latest = Controller.checkVersionInfo()
+        if is_latest[0]:
+            msg = 'You have the latest version of LogIT'
+            self.launchQMsgBox('Version Information', msg, 'info')
+        else:
+            msg = 'There is a new version (%s). Would you like to download it?' % (is_latest[1])
+            download_filename = 'Logit_v' + is_latest[1]
+            server_dir = r'P:\04 IT\utils\beta\LogIT'
+            
+            response = self.launchQtQBox('New version available', msg)
+            if not response == False:
+                success = Controller.downloadNewVersion(cur_location,
+                                                        server_dir,
+                                                        download_filename)
+                if not success:
+                    msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + server_dir
+                    self.launchQMsgBox('Update Failure', msg)
     
     
     def _highlightEditRow(self):
@@ -346,8 +370,7 @@ class MainGui(QtGui.QMainWindow):
         item = sender.currentItem()
         if not item is None:
             item.setBackgroundColor(QtGui.QColor(178, 255, 102)) # Light Green
-        
-     
+         
     
     def _updateLoggingLevel(self):
         """Alters to logging level based on the name of the calling action
@@ -1377,8 +1400,10 @@ def main():
      
     # Need to do this so that the icons show up properly
     import ctypes
-    myappid = 'logit.0-4-Beta'
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    from __init__ import __appid__
+    #myappid = __appid__
+    #myappid = 'logit.0-4-Beta'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(__appid__)
     QPlugin = QtCore.QPluginLoader("qico4.dll")
      
     cur_location = os.getcwd()
