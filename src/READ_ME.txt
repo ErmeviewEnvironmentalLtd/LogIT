@@ -6,7 +6,7 @@
 
 
 Name: LogIT (Logger for Isis and Tuflow) 
-Version: 0.4.0-Beta
+Version: 0.4.1-Beta
 Author: Duncan Runnacles
 Copyright: (C) 2015 Duncan Runnacles
 email: duncan.runnacles@thomasmackay.co.uk
@@ -145,6 +145,10 @@ v0.4.0-Beta:
 	- Added progress bar to status bar. Have also removed the multiple model
 	  load progress bar; it uses the status bar version instead.
 	- Updated LogFormatter to v3 to accomodate new rows in the RUN table.
+
+v0.4.1-Beta:
+	- Added app_metrics module to track tool usage.
+	- Added version check and autoinstall feature.
 
 
 LICENSE

@@ -58,6 +58,9 @@
          Added ModelExtractor widget and module code.
          Added progress bar to status bar and removed from multiple load.
          Added load/save widget (tools) functionality.
+    DR - 09/03/2016:
+         Added app_metrics module to track tool usage.
+         Added update check menu item and autoinstall.
 
   TODO:
      
