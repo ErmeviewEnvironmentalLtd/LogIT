@@ -117,6 +117,7 @@ v0.3.2-Beta:
 	  entries". Won't allow this on entries added in an old db version.
 
 v0.4.0-Beta:
+	- Using tmac_tools_lib v0.4_Beta.
 	- New iteration due to major changes in LogBuilder module.
 	- Uses new setup of TmacToolsLibrary, which has had a complete re-write of
 	  the tuflow loader and some significant changes to the isis functionality.
