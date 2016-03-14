@@ -864,9 +864,9 @@ class MainGui(QtGui.QMainWindow):
             self._updateCurrentProgress(0)
             text = errors.formatErrors('Some models could not be logged:')
             self.ui.multiModelLoadErrorTextEdit.setText(text)
-            if errors.msgbox_error:
-                QtGui.QMessageBox.warning(self, 'Logging Error:',
-                            'See Error Logs window for details')
+            message = 'Some files could not be logged.\nSee Error Logs window for details'
+            self.launchQMsgBox('Logging Error', message)
+#             QtGui.QMessageBox.warning(self, 'Logging Error:', message)
         else:
             # Clear the list entries
             self.ui.loadMultiModelTable.setRowCount(0)

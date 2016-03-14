@@ -92,7 +92,7 @@ def loadModel(file_path, log_type):
     
     # Check that the path actually exists before we start.
     if not os.path.exists(file_path):
-        return False
+        return False, 'File does not exist'
     
     # Find out which type of model is being loaded.
     # TODO:
@@ -111,7 +111,7 @@ def loadModel(file_path, log_type):
         
     else:
         logger.error('File: ' + file_path + '\nis not ief or tcf format')
-        return False
+        return False, 'Not a recognised .ief or .tcf file'
 
     tuflow = None
     ief = None
@@ -123,7 +123,7 @@ def loadModel(file_path, log_type):
     model_file = loader.loadFile(file_path)
     if model_file == False:
         logger.error('Unable to load model file at:\n' + file_path)
-        return False
+        return False, 'Unable to load model file'
 
     # If we have an .ief file; load it first.
     if file_type == 'ief' and not log_type == TYPE_ESTRY:
@@ -143,23 +143,26 @@ def loadModel(file_path, log_type):
             if tcf_path == False or not os.path.exists(tcf_path):
                 logger.error('Tcf file referenced by ief does not exist at\n:' +
                               str(tcf_path))
-                return False
+                missing_files.append(tcf_path)
+                return False, 'Tcf file does not exist at: ' + str(tcf_path)
 
             elif not ufunc.checkFileType(tcf_path, ext=['.tcf', '.TCF']):
                 logger.error('2D file referenced in ief is not a tuflow file:\n' +
                               str(tcf_path))
-                return False
+                missing_files.append(tcf_path)
+                return False, '2D file referenced by the ief is not a .tcf file: ' + str(tcf_path)
 
             try:
                 tuflow = loader.loadFile(tcf_path)
                 tcf_dir = os.path.split(tcf_path)[0]
                 missing_files = tuflow.missing_model_files
                 if missing_files:
-                    return False
+                    return False, '\n'.join(missing_files)
                 
             except IOError:
+                missing_files.append(tcf_path)
                 logger.error('Unable to load Tuflow .tcf file at: ' + tcf_path)
-                return False
+                return False, '\n'.join(missing_files)
         
     # Then load the tuflow model if we are looking for one.
     if log_type == TYPE_TUFLOW and not file_type == 'ief':
@@ -167,13 +170,14 @@ def loadModel(file_path, log_type):
         if not ufunc.checkFileType(file_path, ext=['.tcf', '.TCF']):
                 logger.error('File path is not a TUFLOW tcf file:\n' +
                               str(file_path))
-                return False 
+                missing_files.append(tcf_path)
+                return False, '\n'.join(missing_files)
             
         tuflow = model_file
         tcf_dir = os.path.split(file_path)[0]
         missing_files = tuflow.missing_model_files
         if missing_files:
-            return False
+            return False, '\n'.join(missing_files)
 
     # Get the current date
     date_now = datetime.datetime.now()
@@ -209,7 +213,7 @@ def loadModel(file_path, log_type):
     else:
         all_logs = LogClasses.AllLogs(log_pages)
         
-    return all_logs
+    return (all_logs,)
 
 
 def buildRunRowFromModel(cur_date, ief, tuflow, log_type, tcf_dir, ief_dir):
