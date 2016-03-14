@@ -61,6 +61,8 @@
     DR - 09/03/2016:
          Added app_metrics module to track tool usage.
          Added update check menu item and autoinstall.
+    DR - 13/03/2016:
+         Updated version checker to use globalsettings version variables.
 
   TODO:
      

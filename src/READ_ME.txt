@@ -6,7 +6,7 @@
 
 
 Name: LogIT (Logger for Isis and Tuflow) 
-Version: 0.4.1-Beta
+Version: 0.4.2-Beta
 Author: Duncan Runnacles
 Copyright: (C) 2015 Duncan Runnacles
 email: duncan.runnacles@thomasmackay.co.uk
@@ -150,6 +150,10 @@ v0.4.0-Beta:
 v0.4.1-Beta:
 	- Added app_metrics module to track tool usage.
 	- Added version check and autoinstall feature.
+
+v0.4.2-Beta:
+	- Fixed bug in multi model loader error reporting.
+	- Added globalsettings module to store version and download info.
 
 
 LICENSE
