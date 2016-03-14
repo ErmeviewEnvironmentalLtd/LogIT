@@ -356,15 +356,14 @@ class MainGui(QtGui.QMainWindow):
         else:
             msg = 'There is a new version (%s). Would you like to download it?' % (is_latest[1])
             download_filename = gs.__DOWNLOAD_FILENAME__ + is_latest[1]
-#             server_dir = r'P:\04 IT\utils\beta\LogIT'
             
             response = self.launchQtQBox('New version available', msg)
             if not response == False:
                 success = Controller.downloadNewVersion(cur_location,
-                                                        __SERVER_PATH__,
+                                                        gs.__SERVER_PATH__,
                                                         download_filename)
                 if not success:
-                    msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + __SERVER_PATH__
+                    msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + gs.__SERVER_PATH__
                     self.launchQMsgBox('Update Failure', msg)
     
     
@@ -1407,7 +1406,7 @@ def main():
     # Need to do this so that the icons show up properly
     import ctypes
     #myappid = 'logit.0-4-Beta'
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(gs.__APP_ID__)
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(gs.__APPID__)
     QPlugin = QtCore.QPluginLoader("qico4.dll")
      
     cur_location = os.getcwd()

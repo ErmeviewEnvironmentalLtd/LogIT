@@ -832,10 +832,6 @@ def exportToExcel(db_path, export_tables, save_path, errors):
 def checkVersionInfo(version, version_path):
     """Tests whether this is up to date with the version info on the server."""
     
-    #from __init__ import __version__
-#     __version__ = '0.4.1-Beta'
-#     version_path = r'P:\04 IT\utils\beta\LogIT\Version_Info\versioninfo.ver'
-    
     with open(version_path, 'rb') as f:
         lines = f.readlines()
         file_version = lines[0].strip()
@@ -870,9 +866,14 @@ def downloadNewVersion(cur_location, server_dir, download_filename):
         logger.error('Unable to download new version')
         return False
         
-    zip_ref = zipfile.ZipFile(os.path.join(download_dir, download_filename + '.zip'), 'r')
+    zip_file = os.path.join(download_dir, download_filename + '.zip')
+    zip_ref = zipfile.ZipFile(zip_file, 'r')
     zip_ref.extractall(download_dir)
     zip_ref.close()
+    try:
+        os.remove(zip_file)
+    except IOError:
+        logger.warning('Unable to delete zip file')
     
     # Copy over the current user settings
     user_file =os.path.join(cur_location, 'settings.logset')
