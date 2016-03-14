@@ -829,17 +829,17 @@ def exportToExcel(db_path, export_tables, save_path, errors):
     return errors
 
 
-def checkVersionInfo():
+def checkVersionInfo(version, version_path):
     """Tests whether this is up to date with the version info on the server."""
     
     #from __init__ import __version__
-    __version__ = '0.4.1-Beta'
-    version_path = r'P:\04 IT\utils\beta\LogIT\Version_Info\versioninfo.ver'
+#     __version__ = '0.4.1-Beta'
+#     version_path = r'P:\04 IT\utils\beta\LogIT\Version_Info\versioninfo.ver'
     
     with open(version_path, 'rb') as f:
         lines = f.readlines()
         file_version = lines[0].strip()
-        if not file_version == __version__:
+        if not file_version == version:
             return False, file_version
         else:
             return (True,)

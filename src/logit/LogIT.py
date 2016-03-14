@@ -120,6 +120,7 @@ import DatabaseFunctions
 import Exporters
 import Controller
 import GuiStore
+import globalsettings as gs
 from extractmodel import ModelExtractor
 
 
@@ -346,22 +347,22 @@ class MainGui(QtGui.QMainWindow):
         updated version.
         """
         
-        is_latest = Controller.checkVersionInfo()
+        is_latest = Controller.checkVersionInfo(gs.__VERSION__, gs.__VERSION_CHECKPATH__)
         if is_latest[0]:
             msg = 'You have the latest version of LogIT'
             self.launchQMsgBox('Version Information', msg, 'info')
         else:
             msg = 'There is a new version (%s). Would you like to download it?' % (is_latest[1])
-            download_filename = 'Logit_v' + is_latest[1]
-            server_dir = r'P:\04 IT\utils\beta\LogIT'
+            download_filename = gs.__DOWNLOAD_FILENAME__ + is_latest[1]
+#             server_dir = r'P:\04 IT\utils\beta\LogIT'
             
             response = self.launchQtQBox('New version available', msg)
             if not response == False:
                 success = Controller.downloadNewVersion(cur_location,
-                                                        server_dir,
+                                                        __SERVER_PATH__,
                                                         download_filename)
                 if not success:
-                    msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + server_dir
+                    msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + __SERVER_PATH__
                     self.launchQMsgBox('Update Failure', msg)
     
     
@@ -1403,8 +1404,8 @@ def main():
      
     # Need to do this so that the icons show up properly
     import ctypes
-    myappid = 'logit.0-4-Beta'
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    #myappid = 'logit.0-4-Beta'
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(gs.__APP_ID__)
     QPlugin = QtCore.QPluginLoader("qico4.dll")
      
     cur_location = os.getcwd()
