@@ -57,6 +57,7 @@ from tmac_tools_lib.utils import filetools
     
 import  ModelExtractor_Widget as extractwidget
 from app_metrics import utils as applog
+import globalsettings as gs
 
 
 
@@ -237,7 +238,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         finalizeExtraction()
         
         # Log use on the server
-        applog.AppLogger().write('Extractor')
+        if not gs.__DEV_MODE__:
+            applog.AppLogger().write('Extractor')
     
     
     def _displayOutput(self):

@@ -213,7 +213,7 @@ def loadModel(file_path, log_type):
     else:
         all_logs = LogClasses.AllLogs(log_pages)
         
-    return (all_logs,)
+    return all_logs, ''
 
 
 def buildRunRowFromModel(cur_date, ief, tuflow, log_type, tcf_dir, ief_dir):

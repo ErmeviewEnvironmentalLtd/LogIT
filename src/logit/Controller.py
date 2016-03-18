@@ -78,6 +78,7 @@ import Exporters
 import LogClasses
 import ModelExtractor
 from app_metrics import utils as applog
+import globalsettings as gs
 
 import logging
 logger = logging.getLogger(__name__)
@@ -187,7 +188,8 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
         all_logs = logEntryUpdates(db_manager, all_logs,
                                                   check_new_entries)
         # Log use on the server
-        applog.AppLogger().write('Logger')
+        if not gs.__DEV_MODE__:
+            applog.AppLogger().write('Logger')
         
     except IOError:
         logger.error('Unable to access database')

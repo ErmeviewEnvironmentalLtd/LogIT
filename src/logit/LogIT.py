@@ -273,6 +273,18 @@ class MainGui(QtGui.QMainWindow):
         
         # Activate the GUI
         MainGui.show()
+        
+        # Set default logging level if used in release
+        if not gs.__DEV_MODE__:
+            self.ui.actionLogWarning.setChecked(False)
+            self.ui.actionLogDebug.setChecked(False)
+            self.ui.actionLogInfo.setChecked(True)
+
+            logging.getLogger().setLevel(logging.INFO)
+            self.settings.logging_level = logging.INFO
+            logger.info('Logging level set to: INFO')
+            logger.debug('info set check')
+        
         sys.exit(self.app.exec_())
         
     
@@ -398,7 +410,7 @@ class MainGui(QtGui.QMainWindow):
             logger.info('warning set check')
          
         elif call_name == 'actionLogInfo':
-            logging.getLogger(__name__)
+#             logging.getLogger(__name__)
             self.ui.actionLogWarning.setChecked(False)
             self.ui.actionLogDebug.setChecked(False)
             self.ui.actionLogInfo.setChecked(True)
@@ -778,19 +790,28 @@ class MainGui(QtGui.QMainWindow):
             
             self._updateWithUserInputs()
             
-            errors = GuiStore.ErrorHolder()
-            errors, self.all_logs = Controller.updateLog(
-                        self.settings.cur_log_path, self.all_logs, errors) # DEBUG , check_new_entries=True
-            
-            if errors.has_errors:
-                if errors.msgbox_error:
-                    self.launchQMsgBox(errors.msgbox_error.title, 
-                                        errors.msgbox_error.message)
-                del errors
+            try:
+                errors = GuiStore.ErrorHolder()
+                errors, self.all_logs = Controller.updateLog(
+                            self.settings.cur_log_path, self.all_logs, errors) # DEBUG , check_new_entries=True
+                
+                if errors.has_errors:
+                    if errors.msgbox_error:
+                        self.launchQMsgBox(errors.msgbox_error.title, 
+                                            errors.msgbox_error.message)
+                    del errors
+                    return
+                
+                # Add the new entries to the view table as well
+                self.loadModelLog()
+            except:
+                self._updateStatusBar('')
+                msg = ('Critical Error - Failed to load model.\nThis is' +
+                       'likely a software issue and should never happen. Please' +
+                       'contact developer')
+                logger.error(msg)
+                self.launchQMsgBox('Critical Error', msg)
                 return
-            
-            # Add the new entries to the view table as well
-            self.loadModelLog()
             
             # Clear the entry rows and deactivate add new log button
             self.new_entry_tables.clearAll()
@@ -828,38 +849,45 @@ class MainGui(QtGui.QMainWindow):
         prog_count = 1
         self._updateMaxProgress(total)
         
-        # Loop through all of the file paths given
-        for path in model_paths:
-            error_found = False
-            
-            self._updateStatusBar('Loading model %s or %s' % (prog_count, total))
-            self._updateCurrentProgress(prog_count)
-            prog_count += 1
-            
-            errors, all_logs = Controller.fetchAndCheckModel(
-                       self.settings.cur_log_path, path, log_type, 
-                            errors)
-            
-            # Go to next if we find an error
-            if errors.has_local_errors:
-                continue
-            
-#             self._updateCurrentProgress(prog_count)
-#             prog_count += 1
-            
-            # Get the global user supplied log variables
-            all_logs = self._getInputLogVariables(all_logs)
+        try:
+            # Loop through all of the file paths given
+            for path in model_paths:
+                error_found = False
+                
+                self._updateStatusBar('Loading model %s of %s' % (prog_count, total))
+                self._updateCurrentProgress(prog_count)
+                prog_count += 1
+                
+                errors, all_logs = Controller.fetchAndCheckModel(
+                           self.settings.cur_log_path, path, log_type, 
+                                errors)
+                
+                # Go to next if we find an error
+                if errors.has_local_errors:
+                    continue
+                
+                # Get the global user supplied log variables
+                all_logs = self._getInputLogVariables(all_logs)
 
-            # Update the log entries
-            errors, self.all_logs = Controller.updateLog(
-                                self.settings.cur_log_path, all_logs, 
-                                errors, check_new_entries=True)
-            
-            if errors.has_local_errors:
-                errors.has_local_errors = False
-                continue
-            
-        self.loadModelLog()
+                # Update the log entries
+                errors, self.all_logs = Controller.updateLog(
+                                    self.settings.cur_log_path, all_logs, 
+                                    errors, check_new_entries=True)
+                
+                if errors.has_local_errors:
+                    errors.has_local_errors = False
+                    continue
+
+            self.loadModelLog()
+        except:
+            self._updateStatusBar('')
+            self._updateCurrentProgress(0)
+            msg = ('Critical Error - Failed to load model.\nThis is ' +
+                   'likely to be a software issue and should never happen.\n' +
+                   'Please contact the developer')
+            logger.error(msg)
+            self.launchQMsgBox('Critical Error', msg)
+            return
 
         if errors.has_errors:
             self._updateStatusBar('')
@@ -868,13 +896,12 @@ class MainGui(QtGui.QMainWindow):
             self.ui.multiModelLoadErrorTextEdit.setText(text)
             message = 'Some files could not be logged.\nSee Error Logs window for details'
             self.launchQMsgBox('Logging Error', message)
-#             QtGui.QMessageBox.warning(self, 'Logging Error:', message)
+
         else:
             # Clear the list entries
             self.ui.loadMultiModelTable.setRowCount(0)
             logger.info('Log Database updated successfully')
             self.ui.statusbar.showMessage("Log Database successfully updated")
-            self._updateStatusBar('')
             self._updateCurrentProgress(0)
         
     
