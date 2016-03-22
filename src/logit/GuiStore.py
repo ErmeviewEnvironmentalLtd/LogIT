@@ -645,5 +645,73 @@ class ErrorType(object):
             self.message = status_bar
         else:
             self.message = message
+
+
+class VersionInfoDialog(QtGui.QDialog):
+    """Dialog class for showing release information."""
+    
+    def __init__(self, release_dir, version, parent=None):
+        super(VersionInfoDialog, self).__init__(parent)
+        
+        self.release_dir = release_dir + version + '.txt'
+        self.version = version
+
+        self.textBrowser = QtGui.QTextBrowser(self)
+        self.verticalLayout = QtGui.QVBoxLayout(self)
+        self.verticalLayout.addWidget(self.textBrowser)
+        
+        output = []
+        output.append(self.getOpeningRichText())
+        output = self.getReleaseNotes(output)
+        output.append(self.getClosingRichText())
+        output = ''.join(output)
+        self.textBrowser.setText(output)
+    
+
+    def getReleaseNotes(self, output):
+        """
+        """
+        try:
+            with open(self.release_dir, 'rb') as f:
+                lines = f.readlines()
+                for l in lines:
+                    output.append(self.getStandardParagraphIn() + l.rstrip() + self.getStandardParagraphOut())
+        except:
+            self.textBrowser.append('Failed to load release notes from server')
+            return []
+        return output
+    
+    
+    def getStandardParagraphIn(self):
+        """
+        """
+        return '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:10pt;">'
+
+
+    def getStandardParagraphOut(self):
+        """
+        """
+        return '</span></p>'
+    
+
+    def getOpeningRichText(self):
+        """
+        """
+        return '''
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+</style></head><body style=" font-family:'Arial'; font-size:10pt; font-weight:400; font-style:normal;">
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src=":/icons/images/Logit_Logo2_75x75.png" /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:14pt; font-weight:600; color:#0055ff;">LogIT ''' + self.version + '''</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;">Updates in this release</span></p>
+<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600; text-decoration: underline;"><br /></p>
+'''
+        
+    def getClosingRichText(self):
+        """
+        """
+        return '</body></html>'
     
     

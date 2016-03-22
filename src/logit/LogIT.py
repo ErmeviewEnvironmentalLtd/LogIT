@@ -285,6 +285,9 @@ class MainGui(QtGui.QMainWindow):
             logger.info('Logging level set to: INFO')
             logger.debug('info set check')
         
+            # Check if there's a newer version available
+            self._checkUpdates(show_has_latest=False)
+        
         sys.exit(self.app.exec_())
         
     
@@ -354,7 +357,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.tabWidget.setCurrentIndex(self.settings.cur_tab)
     
     
-    def _checkUpdates(self):     
+    def _checkUpdates(self, show_has_latest=True):     
         """Check if this is the latest version or not.
         
         If it isn't it gives the user the option to download and install the
@@ -363,8 +366,10 @@ class MainGui(QtGui.QMainWindow):
         
         is_latest = Controller.checkVersionInfo(gs.__VERSION__, gs.__VERSION_CHECKPATH__)
         if is_latest[0]:
-            msg = 'You have the latest version of LogIT'
-            self.launchQMsgBox('Version Information', msg, 'info')
+            logger.info('Latest version of LogIT (version %s) installed' % (gs.__VERSION__))
+            if show_has_latest:
+                msg = 'You have the latest version of LogIT'
+                self.launchQMsgBox('Version Information', msg, 'info')
         else:
             msg = 'There is a new version (%s). Would you like to download it?' % (is_latest[1])
             download_filename = gs.__DOWNLOAD_FILENAME__ + is_latest[1]
@@ -377,6 +382,17 @@ class MainGui(QtGui.QMainWindow):
                 if not success:
                     msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + gs.__SERVER_PATH__
                     self.launchQMsgBox('Update Failure', msg)
+                else:
+                    # Show dialog with release information summary
+                    version_dialog = GuiStore.VersionInfoDialog(
+                    gs.__RELEASE_NOTES_PATH__,
+                    gs.__VERSION__, parent=self)
+                    version_dialog.resize(400, 400)
+                    version_dialog.setWindowTitle('CATMAT Update Summary')
+                    icon = QtGui.QIcon()
+                    icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+                    version_dialog.setWindowIcon(icon)
+                    version_dialog.exec_()
     
     
     def _highlightEditRow(self):
