@@ -6,7 +6,7 @@
 
 
 Name: LogIT (Logger for Isis and Tuflow) 
-Version: 0.4.3-Beta
+Version: ~VERSION~
 Author: Duncan Runnacles
 Copyright: (C) 2015 Duncan Runnacles
 email: duncan.runnacles@thomasmackay.co.uk
@@ -162,6 +162,13 @@ v0.4.3-Beta:
 	- Added a base level except catch to the loaders that launches a critical
 	  error to user, so they at least know what's going on if it happens.
 
+v0.4.4-Beta:
+    - Some practise text
+    - And a little bit more.
+    - Perhaps some more on more
+      than one line just to see.
+
+##~##
 
 LICENSE
 =============================

@@ -6,6 +6,8 @@
 /.settings
 /src/logit/logs
 backup_creator.sh
+prep_release.py
+send_to_server.py
 
 *.logdb
 *.pyc
