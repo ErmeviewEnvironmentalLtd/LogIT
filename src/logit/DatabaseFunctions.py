@@ -46,6 +46,8 @@
         that class. This is what should be used by almost all calling code now.
         The original module methods have been deleted, except for the 
         database creation, update and delete functionality.
+    DR - 22/03/2016:
+        Updated database version to 6.
 
  TODO:
     The functions almost entirely use string replacement to create the
@@ -66,7 +68,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-DATABASE_VERSION_NO = 5
+DATABASE_VERSION_NO = 6
 DATABASE_VERSION_SAME = 0
 DATABASE_VERSION_LOW = 1
 DATABASE_VERSION_HIGH = 2

@@ -874,6 +874,11 @@ class MainGui(QtGui.QMainWindow):
                                     self.settings.cur_log_path, all_logs, 
                                     errors, check_new_entries=True)
                 
+                # There was an issue updating the database so drop out now and 
+                # launch the error.
+                if errors.msgbox_error and errors.msgbox_error.type == self.DB_UPDATE:
+                    break
+                
                 if errors.has_local_errors:
                     errors.has_local_errors = False
                     continue

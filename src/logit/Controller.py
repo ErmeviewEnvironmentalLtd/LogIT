@@ -185,7 +185,7 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
     # Connect to the database and then update the log entries
     try:
         db_manager = DatabaseFunctions.DatabaseManager(db_path)
-        all_logs = logEntryUpdates(db_manager, all_logs,
+        all_logs, errors = logEntryUpdates(db_manager, all_logs, errors,
                                                   check_new_entries)
         # Log use on the server
         if not gs.__DEV_MODE__:
@@ -205,7 +205,7 @@ def updateLog(db_path, all_logs, errors, check_new_entries=False):
         return errors, all_logs
  
 
-def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
+def logEntryUpdates(db_manager, all_logs, errors, check_new_entries=False):
     """Update the database with the current status of the all_logs object.
     
     This creates a callback function and hands it to loopLogPages method,
@@ -327,18 +327,24 @@ def logEntryUpdates(db_manager, all_logs, check_new_entries=False):
         
         # Add all the new rows to the database
         db_manager.insertQueue(db_q)
-        return all_logs
+        return all_logs, errors
     
     # This acts as a failsafe incase we hit an error after some of the entries
     # were already added to the database. It tries to roll back the entries by
     # deleting them. The exception is still raised to be dealt with by the GUI.
     except:
+        msg = 'Problem updating database: failed to roll back changes! CHECK ENTRIES!'
         logger.error('Problem updating database: attempting to roll back changes')
         logger.debug(traceback.format_exc())
 
         try:
             added_rows.deleteEntries(db_manager)
             logger.warning('Successfully rolled back database')
+            
+            msg = 'Problem updating database: Successfully rolled back changes...phew!'
+            errors.addError(errors.DB_UPDATE, msgbox_error=True, 
+                                        msg_add=(':\n%s' % (msg)))
+            return all_logs, errors
         except:
             logger.error('Unable to roll back database: CHECK ENTRIES!')
             logger.debug(traceback.format_exc())
@@ -858,7 +864,7 @@ def downloadNewVersion(cur_location, server_dir, download_filename):
         Bool - False if failed, True otherwise.
     """
     
-    download_dir = os.path.join(cur_location, '..', '..')
+    download_dir = os.path.join(cur_location, '..')
     download_file = os.path.join(server_dir, download_filename + '.zip')
 
     # Download and unzip new version
