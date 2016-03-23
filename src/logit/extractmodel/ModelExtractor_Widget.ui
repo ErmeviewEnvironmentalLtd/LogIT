@@ -13,20 +13,6 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true">
-QGroupBox {
-	font: 75 9pt &quot;Arial&quot; bold;
-	border: 1px solid rgb(85, 170, 255);
-    border-radius: 5px;
-    margin-top: 0.5em;
-}
-QGroupBox::title { 
-    subcontrol-origin: margin;
-    left: 10px;
-    padding: 0 3px 0 3px;
- } </string>
-  </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QGroupBox" name="groupBox">
@@ -41,9 +27,6 @@ QGroupBox::title {
           <family>Arial</family>
           <pointsize>9</pointsize>
          </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true"/>
         </property>
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -103,12 +86,7 @@ Any issues with exporting the model, including missing files, or files that coul
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="extractOutputTextbox">
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);
-border-color: rgb(180, 180, 180);</string>
-        </property>
-       </widget>
+       <widget class="QLineEdit" name="extractOutputTextbox"/>
       </item>
       <item row="0" column="0">
        <widget class="QLabel" name="extractModelFileLabel">
@@ -124,12 +102,7 @@ border-color: rgb(180, 180, 180);</string>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="extractModelFileTextbox">
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);
-border-color: rgb(180, 180, 180);</string>
-        </property>
-       </widget>
+       <widget class="QLineEdit" name="extractModelFileTextbox"/>
       </item>
       <item row="0" column="2">
        <widget class="QPushButton" name="extractModelFileButton">
@@ -147,7 +120,7 @@ border-color: rgb(180, 180, 180);</string>
       <font>
        <family>Arial 12</family>
        <pointsize>9</pointsize>
-       <weight>9</weight>
+       <weight>50</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -178,10 +151,6 @@ border-color: rgb(180, 180, 180);</string>
           <width>16777215</width>
           <height>600</height>
          </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(255, 255, 255);
-border-color: rgb(180, 180, 180);</string>
         </property>
         <property name="lineWrapMode">
          <enum>QTextEdit::NoWrap</enum>

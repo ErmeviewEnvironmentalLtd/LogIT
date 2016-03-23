@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>905</width>
-    <height>836</height>
+    <width>885</width>
+    <height>714</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,7 +19,7 @@
   <property name="minimumSize">
    <size>
     <width>500</width>
-    <height>530</height>
+    <height>400</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -28,33 +28,12 @@
     <height>16777215</height>
    </size>
   </property>
-  <property name="font">
-   <font>
-    <family>Arial</family>
-    <pointsize>9</pointsize>
-    <weight>75</weight>
-    <bold>true</bold>
-   </font>
-  </property>
   <property name="windowTitle">
    <string>LogIT</string>
   </property>
   <property name="windowIcon">
    <iconset resource="../../../Gui/LogIT_RC.qrc">
     <normaloff>:/icons/images/Logit_Logo2_25x25.png</normaloff>:/icons/images/Logit_Logo2_25x25.png</iconset>
-  </property>
-  <property name="styleSheet">
-   <string notr="true">QGroupBox {
-	font: 75 9pt &quot;Arial&quot; bold;
-	border: 1px solid gray;
-    border-radius: 5px;
-    margin-top: 0.5em;
-}
-QGroupBox::title { 
-    subcontrol-origin: margin;
-    left: 10px;
-    padding: 0 3px 0 3px;
- } </string>
   </property>
   <property name="iconSize">
    <size>
@@ -69,20 +48,11 @@ QGroupBox::title {
       <property name="minimumSize">
        <size>
         <width>500</width>
-        <height>500</height>
+        <height>400</height>
        </size>
-      </property>
-      <property name="font">
-       <font>
-        <family>Arial</family>
-        <pointsize>9</pointsize>
-       </font>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color: rgb(238, 238, 238);</string>
       </property>
       <property name="tabShape">
        <enum>QTabWidget::Rounded</enum>
@@ -103,8 +73,8 @@ QGroupBox::title {
             <height>400</height>
            </size>
           </property>
-          <property name="styleSheet">
-           <string notr="true">border-color: rgb(124, 163, 255);</string>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
           </property>
           <property name="widgetResizable">
            <bool>true</bool>
@@ -114,36 +84,35 @@ QGroupBox::title {
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>860</width>
-             <height>1269</height>
+             <width>826</width>
+             <height>1271</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_19">
             <item>
-             <widget class="QTextBrowser" name="instructionsTextBrowser">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>600</width>
-                <height>250</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>10</pointsize>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">QTextEdit { background-color: rgb(255, 255, 255); }</string>
-              </property>
-              <property name="html">
-               <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+             <layout class="QVBoxLayout" name="verticalLayout_22">
+              <item>
+               <widget class="QTextBrowser" name="instructionsTextBrowser">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>600</width>
+                  <height>250</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>10</pointsize>
+                 </font>
+                </property>
+                <property name="html">
+                 <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Arial'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
@@ -174,410 +143,1799 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:12pt; font-weight:600; color:#aa0000;&quot;&gt;For more information see the Help tab.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'MS Shell Dlg 2'; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="inputVarGroup">
-              <property name="minimumSize">
-               <size>
-                <width>600</width>
-                <height>100</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>600</width>
-                <height>130</height>
-               </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>Arial</family>
-                <pointsize>9</pointsize>
-                <weight>9</weight>
-                <italic>false</italic>
-                <bold>false</bold>
-               </font>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">font: 75 9pt &quot;Arial&quot;;</string>
-              </property>
-              <property name="title">
-               <string>Input Log Variables</string>
-              </property>
-              <widget class="QLineEdit" name="modellerTextbox">
-               <property name="geometry">
-                <rect>
-                 <x>100</x>
-                 <y>30</y>
-                 <width>171</width>
-                 <height>20</height>
-                </rect>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">background-color: rgb(255, 255, 255);
-border-color: rgb(180, 180, 180);</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="modellerLabel">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>30</y>
-                 <width>61</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Modeller</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="eventNameLabel">
-               <property name="geometry">
-                <rect>
-                 <x>10</x>
-                 <y>60</y>
-                 <width>71</width>
-                 <height>16</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Event Name</string>
-               </property>
-              </widget>
-              <widget class="QLineEdit" name="eventNameTextbox">
-               <property name="geometry">
-                <rect>
-                 <x>100</x>
-                 <y>60</y>
-                 <width>171</width>
-                 <height>20</height>
-                </rect>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">background-color: rgb(255, 255, 255);
-border-color: rgb(180, 180, 180);</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="isisVersionLabel">
-               <property name="geometry">
-                <rect>
-                 <x>320</x>
-                 <y>30</y>
-                 <width>71</width>
-                 <height>20</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Isis Version</string>
-               </property>
-              </widget>
-              <widget class="QLineEdit" name="isisVersionTextbox">
-               <property name="geometry">
-                <rect>
-                 <x>412</x>
-                 <y>30</y>
-                 <width>171</width>
-                 <height>20</height>
-                </rect>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">background-color: rgb(255, 255, 255);
-border-color: rgb(180, 180, 180);</string>
-               </property>
-              </widget>
-              <widget class="QLabel" name="tuflowVersionLabel">
-               <property name="geometry">
-                <rect>
-                 <x>320</x>
-                 <y>60</y>
-                 <width>81</width>
-                 <height>20</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Tuflow Version</string>
-               </property>
-              </widget>
-              <widget class="QLineEdit" name="tuflowVersionTextbox">
-               <property name="geometry">
-                <rect>
-                 <x>412</x>
-                 <y>60</y>
-                 <width>171</width>
-                 <height>20</height>
-                </rect>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">background-color: rgb(255, 255, 255);
-border-color: rgb(180, 180, 180);</string>
-               </property>
-              </widget>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTabWidget" name="loadModelTab">
-              <property name="styleSheet">
-               <string notr="true">QTabWidget {
-font: 75 10pt &quot;Arial&quot;; 
-
-}</string>
-              </property>
-              <property name="tabShape">
-               <enum>QTabWidget::Rounded</enum>
-              </property>
-              <property name="currentIndex">
-               <number>1</number>
-              </property>
-              <widget class="QWidget" name="loadSingleModelTab">
-               <attribute name="title">
-                <string>Single Model Load</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_3">
-                <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_3">
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QGroupBox" name="inputVarGroup">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>600</width>
+                  <height>100</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>130</height>
+                 </size>
+                </property>
+                <property name="font">
+                 <font>
+                  <family>Arial</family>
+                  <pointsize>9</pointsize>
+                  <weight>50</weight>
+                  <italic>false</italic>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="title">
+                 <string>Input Log Variables</string>
+                </property>
+                <layout class="QGridLayout" name="gridLayout_4">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="modellerLabel">
+                   <property name="text">
+                    <string>Modeller</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="modellerTextbox">
+                   <property name="maximumSize">
+                    <size>
+                     <width>250</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="2">
+                  <widget class="QLabel" name="isisVersionLabel">
+                   <property name="text">
+                    <string>Isis Version</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="3">
+                  <widget class="QLineEdit" name="isisVersionTextbox">
+                   <property name="maximumSize">
+                    <size>
+                     <width>250</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="4">
+                  <spacer name="horizontalSpacer_3">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>209</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="eventNameLabel">
+                   <property name="text">
+                    <string>Event Name</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="eventNameTextbox">
+                   <property name="maximumSize">
+                    <size>
+                     <width>250</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="2">
+                  <widget class="QLabel" name="tuflowVersionLabel">
+                   <property name="text">
+                    <string>Tuflow Version</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="3">
+                  <widget class="QLineEdit" name="tuflowVersionTextbox">
+                   <property name="maximumSize">
+                    <size>
+                     <width>250</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="4">
+                  <spacer name="horizontalSpacer_4">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>209</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QTabWidget" name="loadModelTab">
+                <property name="tabShape">
+                 <enum>QTabWidget::Rounded</enum>
+                </property>
+                <property name="currentIndex">
+                 <number>0</number>
+                </property>
+                <widget class="QWidget" name="loadSingleModelTab">
+                 <attribute name="title">
+                  <string>Single Model Load</string>
+                 </attribute>
+                 <layout class="QVBoxLayout" name="verticalLayout_3">
                   <item>
-                   <widget class="QGroupBox" name="loadModelGroup">
+                   <layout class="QHBoxLayout" name="horizontalLayout_3">
+                    <item>
+                     <widget class="QGroupBox" name="loadModelGroup">
+                      <property name="minimumSize">
+                       <size>
+                        <width>500</width>
+                        <height>100</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>16777215</width>
+                        <height>100</height>
+                       </size>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <family>Arial 12</family>
+                        <pointsize>9</pointsize>
+                        <weight>9</weight>
+                        <italic>false</italic>
+                        <bold>false</bold>
+                       </font>
+                      </property>
+                      <property name="styleSheet">
+                       <string notr="true"/>
+                      </property>
+                      <property name="title">
+                       <string>Load Model </string>
+                      </property>
+                      <layout class="QGridLayout" name="gridLayout">
+                       <item row="0" column="0">
+                        <widget class="QLabel" name="loadModelComboLabel">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>70</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <pointsize>9</pointsize>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>Model Type </string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="0" column="1">
+                        <widget class="QComboBox" name="loadModelComboBox">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                           <horstretch>0</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>230</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>250</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                         <property name="toolTip">
+                          <string>Type of model to log (default: Tuflow)</string>
+                         </property>
+                         <property name="autoFillBackground">
+                          <bool>false</bool>
+                         </property>
+                         <property name="currentIndex">
+                          <number>0</number>
+                         </property>
+                         <item>
+                          <property name="text">
+                           <string>TUFLOW (With ISIS/ESTRY If Found)</string>
+                          </property>
+                         </item>
+                         <item>
+                          <property name="text">
+                           <string>ISIS Only</string>
+                          </property>
+                         </item>
+                        </widget>
+                       </item>
+                       <item row="0" column="2">
+                        <spacer name="horizontalSpacer">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>131</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                       <item row="1" column="0" colspan="3">
+                        <widget class="QLineEdit" name="loadModelTextbox">
+                         <property name="minimumSize">
+                          <size>
+                           <width>390</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>16777215</width>
+                           <height>16777215</height>
+                          </size>
+                         </property>
+                        </widget>
+                       </item>
+                       <item row="1" column="3">
+                        <widget class="QPushButton" name="loadModelButton">
+                         <property name="sizePolicy">
+                          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                           <horstretch>55</horstretch>
+                           <verstretch>0</verstretch>
+                          </sizepolicy>
+                         </property>
+                         <property name="minimumSize">
+                          <size>
+                           <width>90</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                         <property name="font">
+                          <font>
+                           <weight>50</weight>
+                           <bold>false</bold>
+                          </font>
+                         </property>
+                         <property name="toolTip">
+                          <string>Load an IEF or TCF file (Ctrl-L)</string>
+                         </property>
+                         <property name="text">
+                          <string>Load Model...</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer_2">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeType">
+                       <enum>QSizePolicy::Fixed</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>13</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+                    <item>
+                     <widget class="QGroupBox" name="submitSingleModelGroup">
+                      <property name="enabled">
+                       <bool>false</bool>
+                      </property>
+                      <property name="minimumSize">
+                       <size>
+                        <width>190</width>
+                        <height>0</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>300</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="title">
+                       <string>Submit Model</string>
+                      </property>
+                      <layout class="QVBoxLayout" name="verticalLayout_23">
+                       <item>
+                        <widget class="QLabel" name="submitSingleModelLabel">
+                         <property name="toolTip">
+                          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button will be activated when a model has been loaded.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                         </property>
+                         <property name="text">
+                          <string>Click Button to submit the currently 
+loaded model to the log database.</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="addSingleLogEntryButton">
+                         <property name="minimumSize">
+                          <size>
+                           <width>0</width>
+                           <height>25</height>
+                          </size>
+                         </property>
+                         <property name="maximumSize">
+                          <size>
+                           <width>150</width>
+                           <height>25</height>
+                          </size>
+                         </property>
+                         <property name="sizeIncrement">
+                          <size>
+                           <width>50</width>
+                           <height>30</height>
+                          </size>
+                         </property>
+                         <property name="toolTip">
+                          <string>Add loaded model data to database (Ctrl-A)</string>
+                         </property>
+                         <property name="text">
+                          <string>Add New Log Entry</string>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </widget>
+                    </item>
+                   </layout>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="RunGroup">
                     <property name="minimumSize">
                      <size>
-                      <width>0</width>
+                      <width>400</width>
                       <height>100</height>
                      </size>
                     </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>600</width>
-                      <height>120</height>
-                     </size>
-                    </property>
-                    <property name="font">
-                     <font>
-                      <family>Arial 12</family>
-                      <pointsize>9</pointsize>
-                      <weight>9</weight>
-                      <italic>false</italic>
-                      <bold>false</bold>
-                     </font>
-                    </property>
                     <property name="styleSheet">
-                     <string notr="true"/>
+                     <string notr="true">QGroupBox{
+	border: 0px;
+}
+QTableWidget {
+	margin: 5px;
+}</string>
                     </property>
                     <property name="title">
-                     <string>Load Model </string>
+                     <string>Run Variables</string>
                     </property>
-                    <layout class="QGridLayout" name="gridLayout">
-                     <item row="0" column="0">
-                      <widget class="QFrame" name="loadModelComboFrame">
-                       <property name="minimumSize">
-                        <size>
-                         <width>575</width>
-                         <height>0</height>
-                        </size>
-                       </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_4">
+                     <item>
+                      <widget class="QTableWidget" name="runEntryTable">
                        <property name="maximumSize">
                         <size>
                          <width>16777215</width>
-                         <height>35</height>
+                         <height>75</height>
                         </size>
                        </property>
                        <property name="frameShape">
-                        <enum>QFrame::NoFrame</enum>
+                        <enum>QFrame::WinPanel</enum>
                        </property>
-                       <property name="frameShadow">
-                        <enum>QFrame::Raised</enum>
+                       <property name="sortingEnabled">
+                        <bool>false</bool>
                        </property>
-                       <layout class="QHBoxLayout" name="horizontalLayout">
-                        <item>
-                         <widget class="QLabel" name="loadModelComboLabel">
-                          <property name="font">
-                           <font>
-                            <pointsize>9</pointsize>
-                           </font>
-                          </property>
-                          <property name="text">
-                           <string>Model Type </string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QComboBox" name="loadModelComboBox">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="minimumSize">
-                           <size>
-                            <width>210</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>60</width>
-                            <height>16777215</height>
-                           </size>
-                          </property>
-                          <property name="toolTip">
-                           <string>Type of model to log (default: Tuflow)</string>
-                          </property>
-                          <property name="autoFillBackground">
-                           <bool>false</bool>
-                          </property>
-                          <property name="styleSheet">
-                           <string notr="true">background-color: rgb(255, 255, 255);</string>
-                          </property>
-                          <property name="currentIndex">
-                           <number>0</number>
-                          </property>
-                          <item>
-                           <property name="text">
-                            <string>TUFLOW (With ISIS/ESTRY If Found)</string>
-                           </property>
-                          </item>
-                          <item>
-                           <property name="text">
-                            <string>ISIS Only</string>
-                           </property>
-                          </item>
-                         </widget>
-                        </item>
-                        <item>
-                         <spacer name="horizontalSpacer">
-                          <property name="orientation">
-                           <enum>Qt::Horizontal</enum>
-                          </property>
-                          <property name="sizeHint" stdset="0">
-                           <size>
-                            <width>40</width>
-                            <height>10</height>
-                           </size>
-                          </property>
-                         </spacer>
-                        </item>
-                       </layout>
-                      </widget>
-                     </item>
-                     <item row="1" column="0">
-                      <widget class="QFrame" name="frame_2">
-                       <property name="minimumSize">
-                        <size>
-                         <width>0</width>
-                         <height>0</height>
-                        </size>
-                       </property>
-                       <property name="maximumSize">
-                        <size>
-                         <width>16777215</width>
-                         <height>35</height>
-                        </size>
-                       </property>
-                       <property name="frameShape">
-                        <enum>QFrame::NoFrame</enum>
-                       </property>
-                       <property name="frameShadow">
-                        <enum>QFrame::Raised</enum>
-                       </property>
-                       <layout class="QHBoxLayout" name="horizontalLayout_2">
-                        <item>
-                         <widget class="QLineEdit" name="loadModelTextbox">
-                          <property name="minimumSize">
-                           <size>
-                            <width>390</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                          <property name="maximumSize">
-                           <size>
-                            <width>470</width>
-                            <height>16777215</height>
-                           </size>
-                          </property>
-                          <property name="styleSheet">
-                           <string notr="true">background-color: rgb(255, 255, 255);</string>
-                          </property>
-                         </widget>
-                        </item>
-                        <item>
-                         <widget class="QPushButton" name="loadModelButton">
-                          <property name="sizePolicy">
-                           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                            <horstretch>55</horstretch>
-                            <verstretch>0</verstretch>
-                           </sizepolicy>
-                          </property>
-                          <property name="minimumSize">
-                           <size>
-                            <width>90</width>
-                            <height>20</height>
-                           </size>
-                          </property>
-                          <property name="font">
-                           <font>
-                            <weight>50</weight>
-                            <bold>false</bold>
-                           </font>
-                          </property>
-                          <property name="toolTip">
-                           <string>Load an IEF or TCF file (Ctrl-L)</string>
-                          </property>
-                          <property name="text">
-                           <string>Load Model...</string>
-                          </property>
-                         </widget>
-                        </item>
-                       </layout>
+                       <row>
+                        <property name="text">
+                         <string>1</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>MS Shell Dlg 2</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </row>
+                       <column>
+                        <property name="text">
+                         <string>DATE</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>MODELLER</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>RESULTS_LOCATION_2D</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>RESULTS_LOCATION_1D</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>EVENT_DURATION</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>DESCRIPTION</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>COMMENTS</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>SETUP</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>ISIS_BUILD</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>IEF</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>DAT</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>TUFLOW_BUILD</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>TCF</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>TGC</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>TBC</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>BC_DBASE</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>ECF</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>EVENT_NAME</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>RUN_OPTIONS</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>TCF_DIR</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>IEF_DIR</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>Arial</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <item row="0" column="0">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>MS Shell Dlg 2</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                        <property name="flags">
+                         <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+                        </property>
+                       </item>
+                       <item row="0" column="1">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="2">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="4">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="5">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="6">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="7">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="8">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="11">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="12">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="13">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="15">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="17">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
                       </widget>
                      </item>
                     </layout>
                    </widget>
                   </item>
                   <item>
-                   <spacer name="horizontalSpacer_2">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeType">
-                     <enum>QSizePolicy::Fixed</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
+                   <widget class="QGroupBox" name="tcfGroup">
+                    <property name="minimumSize">
                      <size>
-                      <width>13</width>
-                      <height>20</height>
+                      <width>0</width>
+                      <height>100</height>
                      </size>
                     </property>
-                   </spacer>
+                    <property name="styleSheet">
+                     <string notr="true">QGroupBox{
+	border: 0px;
+}
+QTableWidget {
+	margin: 5px;
+}</string>
+                    </property>
+                    <property name="title">
+                     <string>Tcf Variables</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_14">
+                     <item>
+                      <widget class="QTableWidget" name="tcfEntryTable">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>75</height>
+                        </size>
+                       </property>
+                       <property name="font">
+                        <font>
+                         <family>Arial</family>
+                         <pointsize>7</pointsize>
+                        </font>
+                       </property>
+                       <property name="frameShape">
+                        <enum>QFrame::WinPanel</enum>
+                       </property>
+                       <row>
+                        <property name="text">
+                         <string>1</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>MS Shell Dlg 2</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </row>
+                       <column>
+                        <property name="text">
+                         <string>DATE</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>TCF</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>FILES</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>COMMENTS</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <item row="0" column="0">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="1">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="2">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="3">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
                   </item>
                   <item>
-                   <widget class="QGroupBox" name="submitSingleModelGroup">
+                   <widget class="QGroupBox" name="tgcGroup">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QGroupBox{
+	border: 0px;
+}
+QTableWidget {
+	margin: 5px;
+}</string>
+                    </property>
+                    <property name="title">
+                     <string>Tgc Variables</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_5">
+                     <item>
+                      <widget class="QTableWidget" name="tgcEntryTable">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>75</height>
+                        </size>
+                       </property>
+                       <property name="frameShape">
+                        <enum>QFrame::WinPanel</enum>
+                       </property>
+                       <row>
+                        <property name="text">
+                         <string>1</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>MS Shell Dlg 2</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </row>
+                       <column>
+                        <property name="text">
+                         <string>DATE</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>TGC</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>FILES</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>COMMENTS</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <item row="0" column="0">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="1">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="2">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="3">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="tbcGroup">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QGroupBox{
+	border: 0px;
+}
+QTableWidget {
+	margin: 5px;
+}</string>
+                    </property>
+                    <property name="title">
+                     <string>Tbc Variables</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_6">
+                     <item>
+                      <widget class="QTableWidget" name="tbcEntryTable">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>75</height>
+                        </size>
+                       </property>
+                       <property name="frameShape">
+                        <enum>QFrame::WinPanel</enum>
+                       </property>
+                       <row>
+                        <property name="text">
+                         <string>1</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>MS Shell Dlg 2</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </row>
+                       <column>
+                        <property name="text">
+                         <string>DATE</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>TBC</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>FILES</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>COMMENTS</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <item row="0" column="0">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="1">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="2">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="3">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="datGroup">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QGroupBox{
+	border: 0px;
+}
+QTableWidget {
+	margin: 5px;
+}</string>
+                    </property>
+                    <property name="title">
+                     <string>Dat Variables</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_7">
+                     <item>
+                      <widget class="QTableWidget" name="datEntryTable">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>75</height>
+                        </size>
+                       </property>
+                       <property name="frameShape">
+                        <enum>QFrame::WinPanel</enum>
+                       </property>
+                       <row>
+                        <property name="text">
+                         <string>1</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>MS Shell Dlg 2</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </row>
+                       <column>
+                        <property name="text">
+                         <string>DATE</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>DAT</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>AMENDMENTS</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>COMMENTS</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <item row="0" column="0">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="1">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="3">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="bcGroup">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QGroupBox{
+	border: 0px;
+}
+QTableWidget {
+	margin: 5px;
+}</string>
+                    </property>
+                    <property name="title">
+                     <string>BC DBase Variables</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_8">
+                     <item>
+                      <widget class="QTableWidget" name="bcEntryTable">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>75</height>
+                        </size>
+                       </property>
+                       <property name="frameShape">
+                        <enum>QFrame::WinPanel</enum>
+                       </property>
+                       <property name="frameShadow">
+                        <enum>QFrame::Sunken</enum>
+                       </property>
+                       <row>
+                        <property name="text">
+                         <string>1</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>MS Shell Dlg 2</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </row>
+                       <column>
+                        <property name="text">
+                         <string>DATE</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>BC_DBASE</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>FILES</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>COMMENTS</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <item row="0" column="0">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="1">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="2">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="3">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QGroupBox" name="ecfGroup">
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="styleSheet">
+                     <string notr="true">QGroupBox{
+	border: 0px;
+}
+QTableWidget {
+	margin: 5px;
+}</string>
+                    </property>
+                    <property name="title">
+                     <string>Ecf Variables</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_18">
+                     <item>
+                      <widget class="QTableWidget" name="ecfEntryTable">
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>75</height>
+                        </size>
+                       </property>
+                       <property name="frameShape">
+                        <enum>QFrame::WinPanel</enum>
+                       </property>
+                       <property name="frameShadow">
+                        <enum>QFrame::Sunken</enum>
+                       </property>
+                       <row>
+                        <property name="text">
+                         <string>1</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <family>MS Shell Dlg 2</family>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </row>
+                       <column>
+                        <property name="text">
+                         <string>DATE</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>ECF</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>FILES</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <column>
+                        <property name="text">
+                         <string>COMMENTS</string>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </column>
+                       <item row="0" column="0">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="1">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="2">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                       <item row="0" column="3">
+                        <property name="text">
+                         <string/>
+                        </property>
+                        <property name="font">
+                         <font>
+                          <pointsize>7</pointsize>
+                         </font>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="multiModelLoadTab">
+                 <attribute name="title">
+                  <string>Multiple Model Load</string>
+                 </attribute>
+                 <layout class="QGridLayout" name="gridLayout_2">
+                  <item row="0" column="0">
+                   <widget class="QGroupBox" name="loadMultiModelGroupBox">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimumSize">
+                     <size>
+                      <width>0</width>
+                      <height>70</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>16777215</width>
+                      <height>70</height>
+                     </size>
+                    </property>
+                    <property name="title">
+                     <string>Set Model Type</string>
+                    </property>
+                    <layout class="QHBoxLayout" name="horizontalLayout_4">
+                     <item>
+                      <widget class="QLabel" name="loadMultiModelComboLabel">
+                       <property name="font">
+                        <font>
+                         <pointsize>9</pointsize>
+                        </font>
+                       </property>
+                       <property name="text">
+                        <string>Model Type </string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QComboBox" name="loadMultiModelComboBox">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>210</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>60</width>
+                         <height>16777215</height>
+                        </size>
+                       </property>
+                       <property name="toolTip">
+                        <string>Type of model to log (default: Tuflow)</string>
+                       </property>
+                       <property name="autoFillBackground">
+                        <bool>false</bool>
+                       </property>
+                       <property name="currentIndex">
+                        <number>0</number>
+                       </property>
+                       <item>
+                        <property name="text">
+                         <string>TUFLOW (With ISIS/ESTRY If Found)</string>
+                        </property>
+                       </item>
+                       <item>
+                        <property name="text">
+                         <string>ISIS Only</string>
+                        </property>
+                       </item>
+                      </widget>
+                     </item>
+                     <item>
+                      <spacer name="horizontalSpacer_6">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>40</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="1" column="0" rowspan="2">
+                   <widget class="QGroupBox" name="chooseMultipleModelsGroupBox">
+                    <property name="autoFillBackground">
+                     <bool>false</bool>
+                    </property>
+                    <property name="title">
+                     <string>Select Multiple Models</string>
+                    </property>
+                    <layout class="QGridLayout" name="gridLayout_5">
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="text">
+                        <string>Choose the model type from the drop down box above.
+Select the models that you would like to load into the log database using the list below. Add additional models using the add button (+) and remove models using the delete button (x). You can add and remove multiple models at once by holding Ctrl or Shift while clicking with the mouse.
+When done click the Add All Log Entries button. Any errors will be written to the Error Logs window to the right.</string>
+                       </property>
+                       <property name="textFormat">
+                        <enum>Qt::PlainText</enum>
+                       </property>
+                       <property name="wordWrap">
+                        <bool>true</bool>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <layout class="QHBoxLayout" name="horizontalLayout_5">
+                       <item>
+                        <layout class="QVBoxLayout" name="verticalLayout_21">
+                         <item>
+                          <widget class="QPushButton" name="addMultiModelButton">
+                           <property name="text">
+                            <string/>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="../../../Gui/LogIT_RC.qrc">
+                             <normaloff>:/icons/images/add_icon_25x25.png</normaloff>:/icons/images/add_icon_25x25.png</iconset>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="removeMultiModelButton">
+                           <property name="text">
+                            <string/>
+                           </property>
+                           <property name="icon">
+                            <iconset resource="../../../Gui/LogIT_RC.qrc">
+                             <normaloff>:/icons/images/delete_icon_25x25.png</normaloff>:/icons/images/delete_icon_25x25.png</iconset>
+                           </property>
+                          </widget>
+                         </item>
+                         <item>
+                          <spacer name="verticalSpacer">
+                           <property name="orientation">
+                            <enum>Qt::Vertical</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>20</width>
+                             <height>40</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                        </layout>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QGroupBox" name="submitMultiModelGroup">
                     <property name="enabled">
                      <bool>false</bool>
                     </property>
                     <property name="minimumSize">
                      <size>
-                      <width>190</width>
+                      <width>160</width>
                       <height>0</height>
                      </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>360</width>
+                      <height>100</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button will be activated when a model has been added to the list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                     </property>
                     <property name="title">
                      <string>Submit Model</string>
                     </property>
-                    <layout class="QVBoxLayout" name="verticalLayout_23">
-                     <item>
-                      <widget class="QLabel" name="submitSingleModelLabel">
-                       <property name="toolTip">
-                        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button will be activated when a model has been loaded.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    <layout class="QGridLayout" name="gridLayout_3">
+                     <item row="0" column="0" colspan="2">
+                      <widget class="QLabel" name="submitMultiModelLabel">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
+                         <height>100</height>
+                        </size>
                        </property>
                        <property name="text">
-                        <string>Click Button to submit the currently 
-loaded model to the log database.</string>
+                        <string>Click Button to submit all of the models in the list to the database.</string>
+                       </property>
+                       <property name="wordWrap">
+                        <bool>true</bool>
                        </property>
                       </widget>
                      </item>
-                     <item>
-                      <widget class="QPushButton" name="addSingleLogEntryButton">
+                     <item row="1" column="0">
+                      <widget class="QPushButton" name="addMultiLogEntryButton">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
                        <property name="minimumSize">
                         <size>
                          <width>0</width>
@@ -600,1624 +1958,113 @@ loaded model to the log database.</string>
                         <string>Add loaded model data to database (Ctrl-A)</string>
                        </property>
                        <property name="text">
-                        <string>Add New Log Entry</string>
+                        <string>Add All Log Entries</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <spacer name="horizontalSpacer_7">
+                       <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                       </property>
+                       <property name="sizeHint" stdset="0">
+                        <size>
+                         <width>228</width>
+                         <height>20</height>
+                        </size>
+                       </property>
+                      </spacer>
+                     </item>
+                    </layout>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QGroupBox" name="multiModelLoadErrorGroup">
+                    <property name="maximumSize">
+                     <size>
+                      <width>360</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="title">
+                     <string>Error logs</string>
+                    </property>
+                    <layout class="QVBoxLayout" name="verticalLayout_27">
+                     <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_6">
+                       <item>
+                        <widget class="QPushButton" name="multiModelErrorCopyButton">
+                         <property name="text">
+                          <string>Copy to Clipboard</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QPushButton" name="multiModelErrorClearButton">
+                         <property name="text">
+                          <string>Clear</string>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <spacer name="horizontalSpacer_5">
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="sizeHint" stdset="0">
+                          <size>
+                           <width>40</width>
+                           <height>20</height>
+                          </size>
+                         </property>
+                        </spacer>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <widget class="QTextEdit" name="multiModelLoadErrorTextEdit">
+                       <property name="minimumSize">
+                        <size>
+                         <width>150</width>
+                         <height>250</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>350</width>
+                         <height>16777215</height>
+                        </size>
                        </property>
                       </widget>
                      </item>
                     </layout>
                    </widget>
                   </item>
-                  <item>
-                   <spacer name="horizontalSpacer_3">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
                  </layout>
-                </item>
-                <item>
-                 <widget class="QGroupBox" name="RunGroup">
-                  <property name="minimumSize">
-                   <size>
-                    <width>400</width>
-                    <height>100</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>9</pointsize>
-                    <weight>9</weight>
-                    <italic>false</italic>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">font: 75 9pt &quot;Arial&quot;;</string>
-                  </property>
-                  <property name="title">
-                   <string>Run Variables</string>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_4">
-                   <item>
-                    <widget class="QTableWidget" name="runEntryTable">
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>71</height>
-                      </size>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <family>MS Shell Dlg 2</family>
-                       <pointsize>7</pointsize>
-                       <weight>50</weight>
-                       <italic>false</italic>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::WinPanel</enum>
-                     </property>
-                     <property name="sortingEnabled">
-                      <bool>false</bool>
-                     </property>
-                     <row>
-                      <property name="text">
-                       <string>1</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>MS Shell Dlg 2</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </row>
-                     <column>
-                      <property name="text">
-                       <string>DATE</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>Arial</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>MODELLER</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>RESULTS_LOCATION_2D</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>RESULTS_LOCATION_1D</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>EVENT_DURATION</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>DESCRIPTION</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>COMMENTS</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>SETUP</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>ISIS_BUILD</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>IEF</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>DAT</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>TUFLOW_BUILD</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>TCF</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>TGC</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>TBC</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>BC_DBASE</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>ECF</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>EVENT_NAME</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>RUN_OPTIONS</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>MS Shell Dlg 2</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>TCF_DIR</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>MS Shell Dlg 2</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>IEF_DIR</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <item row="0" column="0">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>MS Shell Dlg 2</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                      <property name="flags">
-                       <set>ItemIsSelectable|ItemIsEditable|ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-                      </property>
-                     </item>
-                     <item row="0" column="1">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="2">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="4">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="5">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="6">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="7">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="8">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="11">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="12">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="13">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="15">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="17">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QGroupBox" name="tcfGroup">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>100</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>9</pointsize>
-                    <weight>9</weight>
-                    <italic>false</italic>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">font: 75 9pt &quot;Arial&quot;;</string>
-                  </property>
-                  <property name="title">
-                   <string>Tcf Variables</string>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_14">
-                   <item>
-                    <widget class="QTableWidget" name="tcfEntryTable">
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>71</height>
-                      </size>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <family>MS Shell Dlg 2</family>
-                       <pointsize>7</pointsize>
-                       <weight>50</weight>
-                       <italic>false</italic>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::WinPanel</enum>
-                     </property>
-                     <row>
-                      <property name="text">
-                       <string>1</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>MS Shell Dlg 2</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </row>
-                     <column>
-                      <property name="text">
-                       <string>DATE</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>TCF</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>FILES</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>COMMENTS</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <item row="0" column="0">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="1">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="2">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="3">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QGroupBox" name="tgcGroup">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>100</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>9</pointsize>
-                    <weight>9</weight>
-                    <italic>false</italic>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">font: 75 9pt &quot;Arial&quot;;</string>
-                  </property>
-                  <property name="title">
-                   <string>Tgc Variables</string>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_5">
-                   <item>
-                    <widget class="QTableWidget" name="tgcEntryTable">
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>71</height>
-                      </size>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <family>MS Shell Dlg 2</family>
-                       <pointsize>7</pointsize>
-                       <weight>50</weight>
-                       <italic>false</italic>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::WinPanel</enum>
-                     </property>
-                     <row>
-                      <property name="text">
-                       <string>1</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>MS Shell Dlg 2</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </row>
-                     <column>
-                      <property name="text">
-                       <string>DATE</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>TGC</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>FILES</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>COMMENTS</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <item row="0" column="0">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="1">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="2">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="3">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QGroupBox" name="tbcGroup">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>100</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>9</pointsize>
-                    <weight>9</weight>
-                    <italic>false</italic>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">font: 75 9pt &quot;Arial&quot;;</string>
-                  </property>
-                  <property name="title">
-                   <string>Tbc Variables</string>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_6">
-                   <item>
-                    <widget class="QTableWidget" name="tbcEntryTable">
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>71</height>
-                      </size>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <family>MS Shell Dlg 2</family>
-                       <pointsize>7</pointsize>
-                       <weight>50</weight>
-                       <italic>false</italic>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::WinPanel</enum>
-                     </property>
-                     <row>
-                      <property name="text">
-                       <string>1</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>MS Shell Dlg 2</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </row>
-                     <column>
-                      <property name="text">
-                       <string>DATE</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>TBC</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>FILES</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>COMMENTS</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <item row="0" column="0">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="1">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="2">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="3">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QGroupBox" name="datGroup">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>100</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>9</pointsize>
-                    <weight>9</weight>
-                    <italic>false</italic>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">font: 75 9pt &quot;Arial&quot;;</string>
-                  </property>
-                  <property name="title">
-                   <string>Dat Variables</string>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_7">
-                   <item>
-                    <widget class="QTableWidget" name="datEntryTable">
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>71</height>
-                      </size>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <family>MS Shell Dlg 2</family>
-                       <pointsize>7</pointsize>
-                       <weight>50</weight>
-                       <italic>false</italic>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::WinPanel</enum>
-                     </property>
-                     <row>
-                      <property name="text">
-                       <string>1</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>MS Shell Dlg 2</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </row>
-                     <column>
-                      <property name="text">
-                       <string>DATE</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>DAT</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>AMENDMENTS</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>COMMENTS</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <item row="0" column="0">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="1">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="3">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QGroupBox" name="bcGroup">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>100</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>9</pointsize>
-                    <weight>9</weight>
-                    <italic>false</italic>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">font: 75 9pt &quot;Arial&quot;;</string>
-                  </property>
-                  <property name="title">
-                   <string>BC DBase Variables</string>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_8">
-                   <item>
-                    <widget class="QTableWidget" name="bcEntryTable">
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>71</height>
-                      </size>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <family>MS Shell Dlg 2</family>
-                       <pointsize>7</pointsize>
-                       <weight>50</weight>
-                       <italic>false</italic>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::WinPanel</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Sunken</enum>
-                     </property>
-                     <row>
-                      <property name="text">
-                       <string>1</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>MS Shell Dlg 2</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </row>
-                     <column>
-                      <property name="text">
-                       <string>DATE</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>BC_DBASE</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>FILES</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>COMMENTS</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <item row="0" column="0">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="1">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="2">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="3">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QGroupBox" name="ecfGroup">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>100</height>
-                   </size>
-                  </property>
-                  <property name="font">
-                   <font>
-                    <family>Arial</family>
-                    <pointsize>9</pointsize>
-                    <weight>9</weight>
-                    <italic>false</italic>
-                    <bold>false</bold>
-                   </font>
-                  </property>
-                  <property name="styleSheet">
-                   <string notr="true">font: 75 9pt &quot;Arial&quot;;</string>
-                  </property>
-                  <property name="title">
-                   <string>Ecf Variables</string>
-                  </property>
-                  <layout class="QVBoxLayout" name="verticalLayout_18">
-                   <item>
-                    <widget class="QTableWidget" name="ecfEntryTable">
-                     <property name="maximumSize">
-                      <size>
-                       <width>16777215</width>
-                       <height>71</height>
-                      </size>
-                     </property>
-                     <property name="font">
-                      <font>
-                       <family>MS Shell Dlg 2</family>
-                       <pointsize>7</pointsize>
-                       <weight>50</weight>
-                       <italic>false</italic>
-                       <bold>false</bold>
-                      </font>
-                     </property>
-                     <property name="styleSheet">
-                      <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-                     </property>
-                     <property name="frameShape">
-                      <enum>QFrame::WinPanel</enum>
-                     </property>
-                     <property name="frameShadow">
-                      <enum>QFrame::Sunken</enum>
-                     </property>
-                     <row>
-                      <property name="text">
-                       <string>1</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <family>MS Shell Dlg 2</family>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </row>
-                     <column>
-                      <property name="text">
-                       <string>DATE</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>ECF</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>FILES</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <column>
-                      <property name="text">
-                       <string>COMMENTS</string>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </column>
-                     <item row="0" column="0">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="1">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="2">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                     <item row="0" column="3">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <pointsize>7</pointsize>
-                       </font>
-                      </property>
-                     </item>
-                    </widget>
-                   </item>
-                  </layout>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="multiModelLoadTab">
-               <attribute name="title">
-                <string>Multiple Model Load</string>
-               </attribute>
-               <widget class="QGroupBox" name="loadMultiModelGroupBox">
-                <property name="geometry">
-                 <rect>
-                  <x>10</x>
-                  <y>10</y>
-                  <width>591</width>
-                  <height>71</height>
-                 </rect>
-                </property>
-                <property name="title">
-                 <string>Set Model Type</string>
-                </property>
-                <widget class="QFrame" name="loadMultiModelComboFrame">
-                 <property name="geometry">
-                  <rect>
-                   <x>10</x>
-                   <y>20</y>
-                   <width>575</width>
-                   <height>34</height>
-                  </rect>
-                 </property>
-                 <property name="minimumSize">
-                  <size>
-                   <width>575</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="maximumSize">
-                  <size>
-                   <width>16777215</width>
-                   <height>35</height>
-                  </size>
-                 </property>
-                 <property name="frameShape">
-                  <enum>QFrame::NoFrame</enum>
-                 </property>
-                 <property name="frameShadow">
-                  <enum>QFrame::Raised</enum>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_4">
-                  <item>
-                   <widget class="QLabel" name="loadMultiModelComboLabel">
-                    <property name="font">
-                     <font>
-                      <pointsize>9</pointsize>
-                     </font>
-                    </property>
-                    <property name="text">
-                     <string>Model Type </string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QComboBox" name="loadMultiModelComboBox">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="minimumSize">
-                     <size>
-                      <width>210</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                    <property name="maximumSize">
-                     <size>
-                      <width>60</width>
-                      <height>16777215</height>
-                     </size>
-                    </property>
-                    <property name="toolTip">
-                     <string>Type of model to log (default: Tuflow)</string>
-                    </property>
-                    <property name="autoFillBackground">
-                     <bool>false</bool>
-                    </property>
-                    <property name="styleSheet">
-                     <string notr="true">background-color: rgb(255, 255, 255);</string>
-                    </property>
-                    <property name="currentIndex">
-                     <number>0</number>
-                    </property>
-                    <item>
-                     <property name="text">
-                      <string>TUFLOW (With ISIS/ESTRY If Found)</string>
-                     </property>
-                    </item>
-                    <item>
-                     <property name="text">
-                      <string>ISIS Only</string>
-                     </property>
-                    </item>
-                   </widget>
-                  </item>
-                  <item>
-                   <spacer name="horizontalSpacer_4">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>10</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
-                 </layout>
+                 <zorder>loadMultiModelGroupBox</zorder>
+                 <zorder>chooseMultipleModelsGroupBox</zorder>
+                 <zorder>horizontalSpacer_6</zorder>
+                 <zorder>addMultiLogEntryButton</zorder>
+                 <zorder>submitMultiModelLabel</zorder>
+                 <zorder>multiModelLoadErrorGroup</zorder>
+                 <zorder>submitMultiModelGroup</zorder>
                 </widget>
                </widget>
-               <widget class="QGroupBox" name="chooseMultipleModelsGroupBox">
-                <property name="geometry">
-                 <rect>
-                  <x>10</x>
-                  <y>90</y>
-                  <width>591</width>
-                  <height>621</height>
-                 </rect>
-                </property>
-                <property name="autoFillBackground">
-                 <bool>false</bool>
-                </property>
-                <property name="title">
-                 <string>Select Multiple Models</string>
-                </property>
-                <widget class="QLabel" name="label">
-                 <property name="geometry">
-                  <rect>
-                   <x>20</x>
-                   <y>30</y>
-                   <width>481</width>
-                   <height>81</height>
-                  </rect>
-                 </property>
-                 <property name="text">
-                  <string>Choose the model type from the drop down box above.
-Select the models that you would like to load into the log database using the list below. 
-Add additional models using the add button (+) and remove models using the delete button (x).
-You can add and remove multiple models at once by holding Ctrl or Shift while clicking with the mouse.
-When done click the Add All Log Entries button.
-Any errors will be written to the Error Logs window to the right.</string>
-                 </property>
-                 <property name="textFormat">
-                  <enum>Qt::PlainText</enum>
-                 </property>
-                </widget>
-                <widget class="QWidget" name="horizontalLayoutWidget">
-                 <property name="geometry">
-                  <rect>
-                   <x>20</x>
-                   <y>120</y>
-                   <width>518</width>
-                   <height>492</height>
-                  </rect>
-                 </property>
-                 <layout class="QHBoxLayout" name="horizontalLayout_5">
-                  <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_21">
-                    <item>
-                     <widget class="QPushButton" name="addMultiModelButton">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="../../../Gui/LogIT_RC.qrc">
-                        <normaloff>:/icons/images/add_icon_25x25.png</normaloff>:/icons/images/add_icon_25x25.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="removeMultiModelButton">
-                      <property name="text">
-                       <string/>
-                      </property>
-                      <property name="icon">
-                       <iconset resource="../../../Gui/LogIT_RC.qrc">
-                        <normaloff>:/icons/images/delete_icon_25x25.png</normaloff>:/icons/images/delete_icon_25x25.png</iconset>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="verticalSpacer">
-                      <property name="orientation">
-                       <enum>Qt::Vertical</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>20</width>
-                        <height>40</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
-                </widget>
-               </widget>
-               <widget class="QGroupBox" name="submitMultiModelGroup">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="geometry">
-                 <rect>
-                  <x>610</x>
-                  <y>90</y>
-                  <width>211</width>
-                  <height>101</height>
-                 </rect>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>160</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="toolTip">
-                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button will be activated when a model has been added to the list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-                </property>
-                <property name="title">
-                 <string>Submit Model</string>
-                </property>
-                <layout class="QVBoxLayout" name="verticalLayout_24">
-                 <item>
-                  <widget class="QLabel" name="submitMultiModelLabel">
-                   <property name="text">
-                    <string>Click Button to submit all of the models 
-in the list to the database.</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <widget class="QPushButton" name="addMultiLogEntryButton">
-                   <property name="minimumSize">
-                    <size>
-                     <width>0</width>
-                     <height>25</height>
-                    </size>
-                   </property>
-                   <property name="maximumSize">
-                    <size>
-                     <width>150</width>
-                     <height>25</height>
-                    </size>
-                   </property>
-                   <property name="sizeIncrement">
-                    <size>
-                     <width>50</width>
-                     <height>30</height>
-                    </size>
-                   </property>
-                   <property name="toolTip">
-                    <string>Add loaded model data to database (Ctrl-A)</string>
-                   </property>
-                   <property name="text">
-                    <string>Add All Log Entries</string>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </widget>
-               <widget class="QGroupBox" name="multiModelLoadErrorGroup">
-                <property name="geometry">
-                 <rect>
-                  <x>610</x>
-                  <y>200</y>
-                  <width>211</width>
-                  <height>511</height>
-                 </rect>
-                </property>
-                <property name="title">
-                 <string>Error logs</string>
-                </property>
-                <widget class="QPushButton" name="multiModelErrorClearButton">
-                 <property name="geometry">
-                  <rect>
-                   <x>140</x>
-                   <y>20</y>
-                   <width>51</width>
-                   <height>23</height>
-                  </rect>
-                 </property>
-                 <property name="text">
-                  <string>Clear</string>
-                 </property>
-                </widget>
-                <widget class="QPushButton" name="multiModelErrorCopyButton">
-                 <property name="geometry">
-                  <rect>
-                   <x>20</x>
-                   <y>20</y>
-                   <width>101</width>
-                   <height>23</height>
-                  </rect>
-                 </property>
-                 <property name="text">
-                  <string>Copy to Clipboard</string>
-                 </property>
-                </widget>
-                <widget class="QTextEdit" name="multiModelLoadErrorTextEdit">
-                 <property name="geometry">
-                  <rect>
-                   <x>10</x>
-                   <y>50</y>
-                   <width>191</width>
-                   <height>451</height>
-                  </rect>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">background-color: rgb(255, 255, 255);</string>
-                 </property>
-                </widget>
-               </widget>
-              </widget>
-             </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </widget>
          </widget>
         </item>
        </layout>
+       <zorder>scrollArea</zorder>
+       <zorder>loadModelTab</zorder>
+       <zorder>instructionsTextBrowser</zorder>
+       <zorder>inputVarGroup</zorder>
+       <zorder>loadModelTab</zorder>
+       <zorder>instructionsTextBrowser</zorder>
+       <zorder>inputVarGroup</zorder>
       </widget>
       <widget class="QWidget" name="viewLogTab">
        <attribute name="title">
@@ -2278,18 +2125,15 @@ in the list to the database.</string>
               <property name="accessibleName">
                <string>runViewEntryTable</string>
               </property>
-              <property name="styleSheet">
-               <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::WinPanel</enum>
-              </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
               <column>
                <property name="text">
                 <string>ID</string>
@@ -2548,18 +2392,15 @@ in the list to the database.</string>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
-              <property name="styleSheet">
-               <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::WinPanel</enum>
-              </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
               <column>
                <property name="text">
                 <string>ID</string>
@@ -2655,18 +2496,15 @@ in the list to the database.</string>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
-              <property name="styleSheet">
-               <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::WinPanel</enum>
-              </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
               <column>
                <property name="text">
                 <string>ID</string>
@@ -2762,18 +2600,15 @@ in the list to the database.</string>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
-              <property name="styleSheet">
-               <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::WinPanel</enum>
-              </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
               <column>
                <property name="text">
                 <string>ID</string>
@@ -2869,18 +2704,15 @@ in the list to the database.</string>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
-              <property name="styleSheet">
-               <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::WinPanel</enum>
-              </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
               <column>
                <property name="text">
                 <string>ID</string>
@@ -2976,18 +2808,15 @@ in the list to the database.</string>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
-              <property name="styleSheet">
-               <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::WinPanel</enum>
-              </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
               <column>
                <property name="text">
                 <string>ID</string>
@@ -3073,18 +2902,15 @@ in the list to the database.</string>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
-              <property name="styleSheet">
-               <string notr="true">font: 7pt &quot;MS Shell Dlg 2&quot;;</string>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::WinPanel</enum>
-              </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
               <column>
                <property name="text">
                 <string>ID</string>
@@ -3165,9 +2991,6 @@ in the list to the database.</string>
             <family>Arial</family>
             <pointsize>10</pointsize>
            </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QTextEdit{ background-color: rgb(255, 255, 255);}</string>
           </property>
           <property name="readOnly">
            <bool>true</bool>
@@ -3314,7 +3137,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>905</width>
+     <width>885</width>
      <height>21</height>
     </rect>
    </property>
@@ -3554,9 +3377,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>isisVersionTextbox</tabstop>
   <tabstop>eventNameTextbox</tabstop>
   <tabstop>tuflowVersionTextbox</tabstop>
-  <tabstop>loadModelTab</tabstop>
-  <tabstop>loadModelComboBox</tabstop>
-  <tabstop>loadModelButton</tabstop>
   <tabstop>runEntryTable</tabstop>
   <tabstop>tcfEntryTable</tabstop>
   <tabstop>tgcEntryTable</tabstop>
@@ -3565,16 +3385,12 @@ p, li { white-space: pre-wrap; }
   <tabstop>bcEntryTable</tabstop>
   <tabstop>ecfEntryTable</tabstop>
   <tabstop>addSingleLogEntryButton</tabstop>
-  <tabstop>loadMultiModelComboBox</tabstop>
   <tabstop>scrollArea</tabstop>
   <tabstop>addMultiModelButton</tabstop>
   <tabstop>removeMultiModelButton</tabstop>
-  <tabstop>addMultiLogEntryButton</tabstop>
   <tabstop>multiModelErrorCopyButton</tabstop>
   <tabstop>multiModelErrorClearButton</tabstop>
   <tabstop>multiModelLoadErrorTextEdit</tabstop>
-  <tabstop>loadModelTextbox</tabstop>
-  <tabstop>instructionsTextBrowser</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>logViewTab</tabstop>
   <tabstop>runEntryViewTable</tabstop>

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'ModelExtractor_Widget.ui'
+# Form implementation generated from reading ui file '.\extractmodel\ModelExtractor_Widget.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -26,18 +26,6 @@ class Ui_ExtractModelWidget(object):
     def setupUi(self, ExtractModelWidget):
         ExtractModelWidget.setObjectName(_fromUtf8("ExtractModelWidget"))
         ExtractModelWidget.resize(753, 624)
-        ExtractModelWidget.setStyleSheet(_fromUtf8("\n"
-"QGroupBox {\n"
-"    font: 75 9pt \"Arial\" bold;\n"
-"    border: 1px solid rgb(85, 170, 255);\n"
-"    border-radius: 5px;\n"
-"    margin-top: 0.5em;\n"
-"}\n"
-"QGroupBox::title { \n"
-"    subcontrol-origin: margin;\n"
-"    left: 10px;\n"
-"    padding: 0 3px 0 3px;\n"
-" } "))
         self.verticalLayout_2 = QtGui.QVBoxLayout(ExtractModelWidget)
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.groupBox = QtGui.QGroupBox(ExtractModelWidget)
@@ -49,7 +37,6 @@ class Ui_ExtractModelWidget(object):
         font.setFamily(_fromUtf8("Arial"))
         font.setPointSize(9)
         self.label.setFont(font)
-        self.label.setStyleSheet(_fromUtf8(""))
         self.label.setFrameShape(QtGui.QFrame.NoFrame)
         self.label.setFrameShadow(QtGui.QFrame.Raised)
         self.label.setTextFormat(QtCore.Qt.PlainText)
@@ -71,8 +58,6 @@ class Ui_ExtractModelWidget(object):
         self.extractOutputLabel.setObjectName(_fromUtf8("extractOutputLabel"))
         self.gridLayout.addWidget(self.extractOutputLabel, 1, 0, 1, 1)
         self.extractOutputTextbox = QtGui.QLineEdit(self.inputBox)
-        self.extractOutputTextbox.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);\n"
-"border-color: rgb(180, 180, 180);"))
         self.extractOutputTextbox.setObjectName(_fromUtf8("extractOutputTextbox"))
         self.gridLayout.addWidget(self.extractOutputTextbox, 1, 1, 1, 1)
         self.extractModelFileLabel = QtGui.QLabel(self.inputBox)
@@ -80,8 +65,6 @@ class Ui_ExtractModelWidget(object):
         self.extractModelFileLabel.setObjectName(_fromUtf8("extractModelFileLabel"))
         self.gridLayout.addWidget(self.extractModelFileLabel, 0, 0, 1, 1)
         self.extractModelFileTextbox = QtGui.QLineEdit(self.inputBox)
-        self.extractModelFileTextbox.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);\n"
-"border-color: rgb(180, 180, 180);"))
         self.extractModelFileTextbox.setObjectName(_fromUtf8("extractModelFileTextbox"))
         self.gridLayout.addWidget(self.extractModelFileTextbox, 0, 1, 1, 1)
         self.extractModelFileButton = QtGui.QPushButton(self.inputBox)
@@ -94,7 +77,7 @@ class Ui_ExtractModelWidget(object):
         font.setPointSize(9)
         font.setBold(False)
         font.setItalic(False)
-        font.setWeight(9)
+        font.setWeight(50)
         self.modelExtractorGroup.setFont(font)
         self.modelExtractorGroup.setObjectName(_fromUtf8("modelExtractorGroup"))
         self.gridLayout_2 = QtGui.QGridLayout(self.modelExtractorGroup)
@@ -108,8 +91,6 @@ class Ui_ExtractModelWidget(object):
         self.extractOutputTextArea.setSizePolicy(sizePolicy)
         self.extractOutputTextArea.setMinimumSize(QtCore.QSize(0, 250))
         self.extractOutputTextArea.setMaximumSize(QtCore.QSize(16777215, 600))
-        self.extractOutputTextArea.setStyleSheet(_fromUtf8("background-color: rgb(255, 255, 255);\n"
-"border-color: rgb(180, 180, 180);"))
         self.extractOutputTextArea.setLineWrapMode(QtGui.QTextEdit.NoWrap)
         self.extractOutputTextArea.setObjectName(_fromUtf8("extractOutputTextArea"))
         self.gridLayout_2.addWidget(self.extractOutputTextArea, 1, 0, 1, 2)
