@@ -218,6 +218,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionReloadDatabase.triggered.connect(self.loadModelLog)
         self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
         self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdates)
+        self.ui.loadModelTab.currentChanged.connect(self._loadTabChanged)
         
         # A couple of keyboard shortcuts...because I'm lazy!
         # Launch the browse for model dialog
@@ -282,6 +283,8 @@ class MainGui(QtGui.QMainWindow):
         # Activate the GUI
         MainGui.show()
         
+        self._showReleaseNotes()
+        
         # Set default logging level if used in release
         if not gs.__DEV_MODE__:
             self.ui.actionLogWarning.setChecked(False)
@@ -295,6 +298,7 @@ class MainGui(QtGui.QMainWindow):
         
             # Check if there's a newer version available
             self._checkUpdates(show_has_latest=False)
+        
         
         sys.exit(self.app.exec_())
         
@@ -361,7 +365,7 @@ class MainGui(QtGui.QMainWindow):
             except:
                 logger.info('No loadSettings() found for %s' % (w.tool_name))
 
-        # Do this here so it account for all the tabs
+        # Do this here so it accounts for all the tabs
         self.ui.tabWidget.setCurrentIndex(self.settings.cur_tab)
     
     
@@ -370,8 +374,7 @@ class MainGui(QtGui.QMainWindow):
         
         If it isn't it gives the user the option to download and install the
         updated version.
-        """
-        
+        """        
         is_latest = Controller.checkVersionInfo(gs.__VERSION__, gs.__VERSION_CHECKPATH__)
         if is_latest[0]:
             logger.info('Latest version of LogIT (version %s) installed' % (gs.__VERSION__))
@@ -390,17 +393,6 @@ class MainGui(QtGui.QMainWindow):
                 if not success:
                     msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + gs.__SERVER_PATH__
                     self.launchQMsgBox('Update Failure', msg)
-                else:
-                    # Show dialog with release information summary
-                    version_dialog = GuiStore.VersionInfoDialog(
-                    gs.__RELEASE_NOTES_PATH__,
-                    gs.__VERSION__, parent=self)
-                    version_dialog.resize(400, 400)
-                    version_dialog.setWindowTitle('CATMAT Update Summary')
-                    icon = QtGui.QIcon()
-                    icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-                    version_dialog.setWindowIcon(icon)
-                    version_dialog.exec_()
     
     
     def _highlightEditRow(self):
@@ -523,9 +515,7 @@ class MainGui(QtGui.QMainWindow):
         elif call_name == 'removeMultiModelButton':
 
             # Get the selected rows, reverse them and remove them
-            #rows = self.ui.loadMultiModelTable.selectionModel().selectedRows()
             rows = self.ui.loadMultiModelTable.rowCount()
-#             rows = sorted(rows, reverse=True)
             for r in range(rows-1, -1, -1):
                 cbox = self.ui.loadMultiModelTable.item(r, 0)
                 if cbox.checkState() == QtCore.Qt.Checked:
@@ -974,6 +964,7 @@ class MainGui(QtGui.QMainWindow):
             self.ui.isisVersionTextbox.setText(self.settings.isis_version)
             self.ui.eventNameTextbox.setText(self.settings.event_name)
             self.ui.loadModelComboBox.setCurrentIndex(int(self.settings.cur_model_type))
+            self.ui.loadModelTab.setCurrentIndex(int(self.settings.cur_load_tab))
             
             if self.settings.logging_level == logging.WARNING:
                 self.ui.actionLogWarning.setChecked(True)
@@ -1347,6 +1338,33 @@ class MainGui(QtGui.QMainWindow):
             for i in range(0, count):
                 if key in self.settings.column_widths.keys():
                     table.ref.setColumnWidth(i, self.settings.column_widths[key][i])
+    
+    
+    def _loadTabChanged(self):
+        """The current tab in loadModelTab has changed."""
+        self.settings.cur_load_tab = self.ui.loadModelTab.currentIndex()
+    
+    
+    def _showReleaseNotes(self):
+        """Show the release notes for this version to the user."""
+        if self.settings.release_notes_version == gs.__VERSION__: return
+        
+        self.settings.release_notes_version = gs.__VERSION__
+        
+        try:
+            version_dialog = GuiStore.VersionInfoDialog(
+                        gs.__RELEASE_NOTES_PATH__,
+                        gs.__VERSION__, parent=self)
+            version_dialog.resize(400, 400)
+            version_dialog.setWindowTitle('CATMAT Update Summary')
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            version_dialog.setWindowIcon(icon)
+            version_dialog.exec_()
+        
+        except Exception, err:
+            logger.error('Could not show release notes' + str(err))
+            self.settings.release_notes_version = ''
         
     
     ''' 
@@ -1467,6 +1485,8 @@ class LogitSettings(object):
         self.column_widths = {}
         self.tool_settings = {}
         self.cur_tab = 0
+        self.cur_load_tab = 0
+        self.release_notes_version = ''
                              
         
         

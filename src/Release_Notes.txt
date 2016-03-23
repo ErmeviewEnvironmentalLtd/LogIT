@@ -1,4 +1,17 @@
-- Some practise text
-- And a little bit more.
-- Perhaps some more on more
-  than one line just to see.
+- Updated to latest release of TmacToolsLibrary. This fixes a couple
+  of small bugs but doesn't have a big impact.
+- Updated the look and feel and fixed some issues with the layouts.
+- Fixed bug in database versioning that meant an older version of the 
+  database didn't realised it needed to update.
+  THIS MEANS THAT LOG DATABASES WILL NEED UPDATING.
+- Fixed bug in multiple model loader file list. When dragging more
+  than one file it was deleting items in the row. Multiple selection
+  is now disabled. To remove multiple entries a checkbox can be
+  selected.
+- Added release notes dialog on startup after new version installed. 
+  Launches a dialog to show version updates to user.
+- Added feature to automatically check for new version on startup.
+- Added current model load tab to settings. It will now remember if
+  you were using the single or multiple model load tab last time.
+- Fixed a few more things in the way error handling is dealt with.
+  This still needs some work though. Sorry :(

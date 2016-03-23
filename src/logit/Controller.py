@@ -866,8 +866,12 @@ def downloadNewVersion(cur_location, server_dir, download_filename):
     Return:
         Bool - False if failed, True otherwise.
     """
-    
-    download_dir = os.path.join(cur_location, '..')
+    download_dir = os.path.join(cur_location, '..', download_filename)
+    try:
+        os.mkdir(download_dir)
+    except:
+        logger.error('Unable to create download directory')
+        return False
     download_file = os.path.join(server_dir, download_filename + '.zip')
 
     # Download and unzip new version

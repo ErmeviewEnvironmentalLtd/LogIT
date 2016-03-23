@@ -11,7 +11,7 @@
 __VERSION__ = 'v0.4.4-Beta'
 __APPID__ = 'LogIT.0-4-Beta'
 __SERVER_PATH__ = r'P:\04 IT\utils\beta\LogIT'
-__DOWNLOAD_FILENAME__ = 'Logit_v'
+__DOWNLOAD_FILENAME__ = 'Logit_'
 __VERSION_CHECKPATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\versioninfo.ver'
 __RELEASE_NOTES_PATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\Release_Notes_'
 

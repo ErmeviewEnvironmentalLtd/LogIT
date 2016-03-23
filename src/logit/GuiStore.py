@@ -78,34 +78,8 @@ class TableWidgetDragRows(QtGui.QTableWidget):
         self.setSortingEnabled(False)
         
     
-    def dragMoveEvent(self, event):
-        '''There seems to be a bug in trying to move more than one
-        row at a time. It leads to deleting some of the items in the
-        row. It possible only happens when selecting non-adjacent rows?
-        Hard to reproduce consistently.
-        '''
-        preSelRows = self.getSelectedRowsFast()
-        if len(preSelRows) > 1: 
-            msg = 'Cannot reorder multiple rows at once.'
-            QtGui.QMessageBox.warning(self, 'UI Error', msg)
-            return 
-         
-        QtGui.QAbstractItemView.dragMoveEvent(self, event)
-            
-    
     def dropEvent(self, event):
         if event.source() == self and (event.dropAction() == QtCore.Qt.MoveAction or self.dragDropMode() == QtGui.QAbstractItemView.InternalMove):
-            
-#             '''There seems to be a bug in trying to move more than one
-#             row at a time. It leads to deleting some of the items in the
-#             row. It possible only happens when selecting non-adjacent rows?
-#             Hard to reproduce consistently.
-#             '''
-#             preSelRows = self.getSelectedRowsFast()
-#             if len(preSelRows) > 1: 
-#                 msg = 'Cannot reorder multiple rows at once.'
-#                 QtGui.QMessageBox.warning(self, 'UI Error', msg)
-#                 return  
             
             success, row, col, topIndex = self.dropOn(event)
             if success:             
@@ -688,36 +662,50 @@ class VersionInfoDialog(QtGui.QDialog):
         
         output = []
         output.append(self.getOpeningRichText())
-        output = self.getReleaseNotes(output)
+        output.extend(self.getReleaseNotes())
         output.append(self.getClosingRichText())
         output = ''.join(output)
         self.textBrowser.setText(output)
     
 
-    def getReleaseNotes(self, output):
+    def getReleaseNotes(self):
         """
         """
+        out = []
+        input = []
         try:
             with open(self.release_dir, 'rb') as f:
                 lines = f.readlines()
                 for l in lines:
-                    output.append(self.getStandardParagraphIn() + l.rstrip() + self.getStandardParagraphOut())
+                    input.append(l.strip())
+#                     output.append(self.getStandardParagraphIn() + l.rstrip() + self.getStandardParagraphOut())
         except:
             self.textBrowser.append('Failed to load release notes from server')
-            return []
-        return output
+            out.append('\nFailed to load release notes from server')
+            return out
+        
+        input = ' '.join(input)
+        input = input.split('-')
+        for i in input:
+            out.append(self.getStandardParagraphIn() + i.rstrip() + self.getStandardParagraphOut())
+        
+        return out
     
     
     def getStandardParagraphIn(self):
         """
         """
-        return '<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:10pt;">'
+        return '''
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">
+<span style=" font-size:10pt;">
+<li>
+'''
 
 
     def getStandardParagraphOut(self):
         """
         """
-        return '</span></p>'
+        return '</li></span></p>'
     
 
     def getOpeningRichText(self):
@@ -731,13 +719,13 @@ p, li { white-space: pre-wrap; }
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><img src=":/icons/images/Logit_Logo2_75x75.png" /></p>
 <p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:14pt; font-weight:600; color:#0055ff;">LogIT ''' + self.version + '''</span></p>
 <p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;"><br /></p>
-<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;">Updates in this release</span></p>
-<p style="-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:11pt; font-weight:600; text-decoration: underline;"><br /></p>
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; font-weight:600; text-decoration: underline;">Updates in this release</span></p>
+<ul>
 '''
         
     def getClosingRichText(self):
         """
         """
-        return '</body></html>'
+        return '</ul></body></html>'
     
     
