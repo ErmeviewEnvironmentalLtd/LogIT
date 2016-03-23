@@ -52,8 +52,8 @@
 
 from PyQt4 import QtCore, QtGui
 
-from tmac_tools_lib.utils.qtclasses import MyFileDialogs
-from tmac_tools_lib.utils.qtclasses import QNumericSortTableWidgetItem
+from tmactools.utils.qtclasses import MyFileDialogs
+from tmactools.utils.qtclasses import QNumericSortTableWidgetItem
 
 import logging
 logger = logging.getLogger(__name__)
@@ -71,19 +71,45 @@ class TableWidgetDragRows(QtGui.QTableWidget):
         self.setDragDropOverwriteMode(False)
         self.setDropIndicatorShown(True)
 
-        self.setSelectionMode(QtGui.QAbstractItemView.ExtendedSelection) 
+        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
         self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
         self.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
         self.setDragEnabled(True)  
         self.setSortingEnabled(False)
         
-
+    
+    def dragMoveEvent(self, event):
+        '''There seems to be a bug in trying to move more than one
+        row at a time. It leads to deleting some of the items in the
+        row. It possible only happens when selecting non-adjacent rows?
+        Hard to reproduce consistently.
+        '''
+        preSelRows = self.getSelectedRowsFast()
+        if len(preSelRows) > 1: 
+            msg = 'Cannot reorder multiple rows at once.'
+            QtGui.QMessageBox.warning(self, 'UI Error', msg)
+            return 
+         
+        QtGui.QAbstractItemView.dragMoveEvent(self, event)
+            
+    
     def dropEvent(self, event):
         if event.source() == self and (event.dropAction() == QtCore.Qt.MoveAction or self.dragDropMode() == QtGui.QAbstractItemView.InternalMove):
             
+#             '''There seems to be a bug in trying to move more than one
+#             row at a time. It leads to deleting some of the items in the
+#             row. It possible only happens when selecting non-adjacent rows?
+#             Hard to reproduce consistently.
+#             '''
+#             preSelRows = self.getSelectedRowsFast()
+#             if len(preSelRows) > 1: 
+#                 msg = 'Cannot reorder multiple rows at once.'
+#                 QtGui.QMessageBox.warning(self, 'UI Error', msg)
+#                 return  
+            
             success, row, col, topIndex = self.dropOn(event)
             if success:             
-                selRows = self.getSelectedRowsFast()                        
+                selRows = self.getSelectedRowsFast()
 
                 top = selRows[0]
                 dropRow = row

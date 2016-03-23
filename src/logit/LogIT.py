@@ -103,11 +103,11 @@ except:
 
 from _sqlite3 import Error
 
-# Fetch the tmac_tools_lib library   
+# Fetch the tmactools library   
 try:
-    from tmac_tools_lib.utils.qtclasses import MyFileDialogs
+    from tmactools.utils.qtclasses import MyFileDialogs
 except:
-    logger.error('Cannot load tmac_tools_lib (Is it installed?)')
+    logger.error('Cannot load tmactools (Is it installed?)')
  
 # Have to import PyQt4 like this or it won't compile into an .exe
 try:
@@ -171,19 +171,27 @@ class MainGui(QtGui.QMainWindow):
         # Setup a custom QTableWidget for multiple model choice table so that
         # It can be drag and dropped into order
         self.ui.horizontalLayout_5.removeItem(self.ui.verticalLayout_21)
-        self.ui.loadMultiModelTable = GuiStore.TableWidgetDragRows(0, 2, self)
-        self.ui.loadMultiModelTable.setHorizontalHeaderLabels(['File name', 'Abs Path'])
+        self.ui.loadMultiModelTable = GuiStore.TableWidgetDragRows(0, 3, self)
+        #self.ui.loadMultiModelTable.setHorizontalHeaderLabels(['Check', 'File name', 'Abs Path'])
         item = QtGui.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.ui.loadMultiModelTable.setHorizontalHeaderItem(0, item)
-        item.setText("TCF / IEF File Name")
+        item.setText('')
+        
         item = QtGui.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.ui.loadMultiModelTable.setHorizontalHeaderItem(1, item)
+        item.setText("TCF / IEF File Name")
+        
+        item = QtGui.QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
+        self.ui.loadMultiModelTable.setHorizontalHeaderItem(2, item)
         item.setText("Absolute Path")
-        self.ui.loadMultiModelTable.horizontalHeader().setDefaultSectionSize(350)
-        self.ui.loadMultiModelTable.horizontalHeader().setMinimumSectionSize(350)
+        
+        self.ui.loadMultiModelTable.horizontalHeader().setDefaultSectionSize(300)
+        self.ui.loadMultiModelTable.horizontalHeader().setMinimumSectionSize(300)
         self.ui.loadMultiModelTable.horizontalHeader().setStretchLastSection(True)
+        self.ui.loadMultiModelTable.setColumnWidth(0, 30)
         self.ui.loadMultiModelTable.setStyleSheet('QTableWidget {background-color: rgb(255, 255, 255);}')
         self.ui.loadMultiModelTable.setSortingEnabled(True)
         self.ui.horizontalLayout_5.addWidget(self.ui.loadMultiModelTable)
@@ -485,6 +493,7 @@ class MainGui(QtGui.QMainWindow):
             if open_paths == False:
                 return
             
+            self.ui.loadMultiModelTable.setSortingEnabled(False)
             row_count = self.ui.loadMultiModelTable.rowCount()
             for p in open_paths:
                 
@@ -496,9 +505,13 @@ class MainGui(QtGui.QMainWindow):
                 self.settings.last_model_directory = d
                 
                 # Create a couple of items and add to the table
-                self.ui.loadMultiModelTable.setItem(row_count, 0, 
-                                        Controller.createQtTableItem(fname, drag_enabled=True))
+                cbox = QtGui.QTableWidgetItem()
+                cbox.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled)
+                cbox.setCheckState(QtCore.Qt.Unchecked)
+                self.ui.loadMultiModelTable.setItem(row_count, 0, cbox)
                 self.ui.loadMultiModelTable.setItem(row_count, 1, 
+                                        Controller.createQtTableItem(fname, drag_enabled=True))
+                self.ui.loadMultiModelTable.setItem(row_count, 2, 
                                         Controller.createQtTableItem(p, drag_enabled=True))
                 
             # Set the sumbit button to enabled
@@ -510,10 +523,13 @@ class MainGui(QtGui.QMainWindow):
         elif call_name == 'removeMultiModelButton':
 
             # Get the selected rows, reverse them and remove them
-            rows = self.ui.loadMultiModelTable.selectionModel().selectedRows()
-            rows = sorted(rows, reverse=True)
-            for r in rows:
-                self.ui.loadMultiModelTable.removeRow(r.row())
+            #rows = self.ui.loadMultiModelTable.selectionModel().selectedRows()
+            rows = self.ui.loadMultiModelTable.rowCount()
+#             rows = sorted(rows, reverse=True)
+            for r in range(rows-1, -1, -1):
+                cbox = self.ui.loadMultiModelTable.item(r, 0)
+                if cbox.checkState() == QtCore.Qt.Checked:
+                    self.ui.loadMultiModelTable.removeRow(r)
             
             # Deactivate the log button if there's no rows left
             if self.ui.loadMultiModelTable.rowCount() < 1:
@@ -850,8 +866,16 @@ class MainGui(QtGui.QMainWindow):
         # Get all of the file paths from the list
         model_paths = []
         allRows = self.ui.loadMultiModelTable.rowCount()
-        for row in xrange(0,allRows):
-            model_paths.append(str(self.ui.loadMultiModelTable.item(row,1).text()))
+        
+        try:
+            for row in xrange(0,allRows):
+                model_paths.append(str(self.ui.loadMultiModelTable.item(row,1).text()))
+        except AttributeError, err:
+            logger.error('Blank entries in load table: ' + str(err))
+            self.launchQMsgBox('Corrupted Inputs', 
+                               ('Somehow the input table has been corrupted. ' +
+                                'Please reload files and try again'))
+            return
         
         # Get the type of log to build
         log_type = self.ui.loadMultiModelComboBox.currentIndex()
@@ -900,13 +924,13 @@ class MainGui(QtGui.QMainWindow):
                     continue
 
             self.loadModelLog()
-        except:
+        except Exception, err:
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
             msg = ('Critical Error - Failed to load model.\nThis is ' +
                    'likely to be a software issue and should never happen.\n' +
                    'Please contact the developer')
-            logger.error(msg)
+            logger.error(msg + str(err))
             self.launchQMsgBox('Critical Error', msg)
             return
 

@@ -88,7 +88,7 @@ QGroupBox::title {
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="newEntryTab">
        <attribute name="title">
@@ -328,7 +328,7 @@ font: 75 10pt &quot;Arial&quot;;
                <enum>QTabWidget::Rounded</enum>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="loadSingleModelTab">
                <attribute name="title">

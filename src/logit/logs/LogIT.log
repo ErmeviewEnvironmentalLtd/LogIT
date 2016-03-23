@@ -15,7 +15,7 @@
 2014-11-19 17:00:13,865 __main__                                           line:20   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
 2014-11-19 17:15:13,352 __main__                                           line:20   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
 2014-11-19 17:18:25,392 __main__                                           line:66   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
-2014-11-19 17:18:41,861 tmac_tools_lib.utils.qtclasses                     line:82   INFO     Saving file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/log.logdb
+2014-11-19 17:18:41,861 tmactools.utils.qtclasses                     line:82   INFO     Saving file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/log.logdb
 2014-11-19 17:18:43,950 DatabaseFunctions                                  line:372  WARNING  Database already exists - Resetting to new
 2014-11-19 17:18:44,125 DatabaseFunctions                                  line:382  INFO     Run table created
 2014-11-19 17:18:44,154 DatabaseFunctions                                  line:385  INFO     Tgc table created
@@ -24,17 +24,17 @@
 2014-11-19 17:18:44,255 DatabaseFunctions                                  line:394  INFO     Tgc Files table created
 2014-11-19 17:18:44,263 DatabaseFunctions                                  line:397  INFO     Tbc Files table created
 2014-11-19 17:18:44,293 DatabaseFunctions                                  line:400  INFO     BC Database Files table created
-2014-11-19 17:19:08,141 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.6.ief
+2014-11-19 17:19:08,141 tmactools.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.6.ief
 2014-11-19 17:19:08,141 LogBuilder                                         line:88   INFO     loading model at filepath: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.6.ief
-2014-11-19 17:19:08,142 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
-2014-11-19 17:19:08,142 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
-2014-11-19 17:19:08,142 tmac_tools_lib.utils.fileloaders.IefLoader         line:179  INFO     loading File: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.6.ief
-2014-11-19 17:19:08,144 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
-2014-11-19 17:19:08,144 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:72   INFO     Loading Tuflow model
-2014-11-19 17:19:08,144 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
-2014-11-19 17:19:08,144 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tcf file
-2014-11-19 17:19:08,145 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tgc file
-2014-11-19 17:19:08,147 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tbc file
+2014-11-19 17:19:08,142 tmactools.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
+2014-11-19 17:19:08,142 tmactools.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
+2014-11-19 17:19:08,142 tmactools.utils.fileloaders.IefLoader         line:179  INFO     loading File: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.6.ief
+2014-11-19 17:19:08,144 tmactools.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
+2014-11-19 17:19:08,144 tmactools.utils.fileloaders.TuflowLoader      line:72   INFO     Loading Tuflow model
+2014-11-19 17:19:08,144 tmactools.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
+2014-11-19 17:19:08,144 tmactools.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tcf file
+2014-11-19 17:19:08,145 tmactools.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tgc file
+2014-11-19 17:19:08,147 tmactools.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tbc file
 2014-11-19 17:19:08,157 DatabaseFunctions                                  line:275  INFO     TGC file does not yet exist in database
 2014-11-19 17:19:08,157 DatabaseFunctions                                  line:275  INFO     TBC file does not yet exist in database
 2014-11-19 17:19:08,158 DatabaseFunctions                                  line:275  INFO     DAT file does not yet exist in database
@@ -52,7 +52,7 @@
 2014-11-19 17:33:36,552 LogIT                                              line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
 2014-11-19 17:34:41,062 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
 2014-11-19 17:34:44,776 __main__                                           line:849  ERROR    No log database found. Load or create one from File menu
-2014-11-19 17:35:05,471 tmac_tools_lib.utils.qtclasses                     line:82   INFO     Saving file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/log.logdb
+2014-11-19 17:35:05,471 tmactools.utils.qtclasses                     line:82   INFO     Saving file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/log.logdb
 2014-11-19 17:35:05,828 DatabaseFunctions                                  line:372  WARNING  Database already exists - Resetting to new
 2014-11-19 17:35:05,947 DatabaseFunctions                                  line:382  INFO     Run table created
 2014-11-19 17:35:05,951 DatabaseFunctions                                  line:385  INFO     Tgc table created
@@ -61,13 +61,13 @@
 2014-11-19 17:35:06,036 DatabaseFunctions                                  line:394  INFO     Tgc Files table created
 2014-11-19 17:35:06,042 DatabaseFunctions                                  line:397  INFO     Tbc Files table created
 2014-11-19 17:35:06,046 DatabaseFunctions                                  line:400  INFO     BC Database Files table created
-2014-11-19 17:35:28,183 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.4.1.ief
+2014-11-19 17:35:28,183 tmactools.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.4.1.ief
 2014-11-19 17:35:28,183 LogBuilder                                         line:88   INFO     loading model at filepath: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.4.1.ief
-2014-11-19 17:35:28,184 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
-2014-11-19 17:35:28,184 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
-2014-11-19 17:35:28,184 tmac_tools_lib.utils.fileloaders.IefLoader         line:179  INFO     loading File: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.4.1.ief
-2014-11-19 17:35:28,184 tmac_tools_lib.modelfiles.Ief                      line:159  INFO     No 2DFile key found in ief
-2014-11-19 17:35:28,184 tmac_tools_lib.modelfiles.Ief                      line:159  INFO     No 2DFile key found in ief
+2014-11-19 17:35:28,184 tmactools.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
+2014-11-19 17:35:28,184 tmactools.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .ief
+2014-11-19 17:35:28,184 tmactools.utils.fileloaders.IefLoader         line:179  INFO     loading File: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/Model/isis/iefs/Kennford_v1.4.1.ief
+2014-11-19 17:35:28,184 tmactools.modelfiles.Ief                      line:159  INFO     No 2DFile key found in ief
+2014-11-19 17:35:28,184 tmactools.modelfiles.Ief                      line:159  INFO     No 2DFile key found in ief
 2014-11-19 17:36:58,171 __main__                                           line:725  INFO     Closing program
 2014-11-19 17:36:58,173 __main__                                           line:726  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
 2014-11-19 17:37:07,345 __main__                                           line:69   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
@@ -197,7 +197,7 @@
 2014-11-24 14:47:21,019 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
 2014-11-24 14:47:21,158 LogIT                                              line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
 2014-11-24 14:47:47,569 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
-2014-11-24 14:47:58,709 tmac_tools_lib.utils.qtclasses                     line:82   INFO     Saving file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:47:58,709 tmactools.utils.qtclasses                     line:82   INFO     Saving file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
 2014-11-24 14:47:58,719 __main__                                           line:734  INFO     Closing program
 2014-11-24 14:47:58,719 __main__                                           line:735  INFO     Saving user settings to: C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
 2014-11-24 14:48:00,079 __main__                                           line:734  INFO     Closing program
@@ -212,14 +212,14 @@
 2014-11-24 14:48:19,694 __main__                                           line:734  INFO     Closing program
 2014-11-24 14:48:19,694 __main__                                           line:735  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
 2014-11-24 14:52:49,775 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
-2014-11-24 14:53:05,335 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:53:05,335 tmactools.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
 2014-11-24 14:53:08,799 __main__                                           line:734  INFO     Closing program
 2014-11-24 14:53:08,799 __main__                                           line:735  INFO     Saving user settings to: C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
 2014-11-24 14:53:16,651 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
 2014-11-24 14:53:24,766 __main__                                           line:734  INFO     Closing program
 2014-11-24 14:53:24,766 __main__                                           line:735  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
 2014-11-24 14:54:12,482 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
-2014-11-24 14:54:33,372 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:54:33,372 tmactools.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
 2014-11-24 14:54:36,540 __main__                                           line:735  INFO     Closing program
 2014-11-24 14:54:36,540 __main__                                           line:736  INFO     Saving user settings to: C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
 2014-11-24 14:54:41,721 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
@@ -227,7 +227,7 @@
 2014-11-24 14:54:56,048 __main__                                           line:736  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
 2014-11-24 14:55:29,884 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
 2014-11-24 14:58:31,947 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
-2014-11-24 14:58:45,690 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 14:58:45,690 tmactools.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
 2014-11-24 14:58:52,259 __main__                                           line:735  INFO     Closing program
 2014-11-24 14:58:52,259 __main__                                           line:736  INFO     Saving user settings to: C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
 2014-11-24 14:59:18,683 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
@@ -237,7 +237,7 @@
 2014-11-24 14:59:37,436 __main__                                           line:735  INFO     Closing program
 2014-11-24 14:59:37,451 __main__                                           line:736  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
 2014-11-24 15:00:57,750 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
-2014-11-24 15:01:07,346 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
+2014-11-24 15:01:07,346 tmactools.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/tuflow_logger/my_settings_1.logset
 2014-11-24 15:01:08,595 __main__                                           line:735  INFO     Closing program
 2014-11-24 15:01:08,611 __main__                                           line:736  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
 2014-11-24 15:01:10,671 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
@@ -245,16 +245,16 @@
 2014-11-24 15:01:12,232 __main__                                           line:736  INFO     Saving user settings to: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\settings.logset
 2014-11-24 15:04:02,875 __main__                                           line:71   INFO     Logs will be written to file at: C:\Users\duncan\Documents\program\tuflow_logger\workspace\LogIT\src\logit\logs
 2014-11-24 15:04:14,918 __main__                                           line:316  INFO     Row ID=3 updated successfully
-2014-11-24 15:04:26,295 tmac_tools_lib.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/arup_test/Tuflow/runs/2670_WS_EA_SPdef_0100yr_2-75hr.tcf
+2014-11-24 15:04:26,295 tmactools.utils.qtclasses                     line:64   INFO     Opening file: Filename = C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/arup_test/Tuflow/runs/2670_WS_EA_SPdef_0100yr_2-75hr.tcf
 2014-11-24 15:04:26,295 LogBuilder                                         line:92   INFO     loading model at filepath: C:/Users/duncan/Documents/program/Test_Space/Tmac_Tools/arup_test/Tuflow/runs/2670_WS_EA_SPdef_0100yr_2-75hr.tcf
-2014-11-24 15:04:26,295 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
-2014-11-24 15:04:26,295 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
-2014-11-24 15:04:26,295 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:72   INFO     Loading Tuflow model
-2014-11-24 15:04:26,295 tmac_tools_lib.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
-2014-11-24 15:04:26,311 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tcf file
-2014-11-24 15:04:26,326 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: trd file
-2014-11-24 15:04:26,342 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tgc file
-2014-11-24 15:04:26,342 tmac_tools_lib.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tbc file
+2014-11-24 15:04:26,295 tmactools.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
+2014-11-24 15:04:26,295 tmactools.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
+2014-11-24 15:04:26,295 tmactools.utils.fileloaders.TuflowLoader      line:72   INFO     Loading Tuflow model
+2014-11-24 15:04:26,295 tmactools.utils.UniversalUtilityFunctions     line:25   INFO     File ext = .tcf
+2014-11-24 15:04:26,311 tmactools.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tcf file
+2014-11-24 15:04:26,326 tmactools.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: trd file
+2014-11-24 15:04:26,342 tmactools.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tgc file
+2014-11-24 15:04:26,342 tmactools.utils.fileloaders.TuflowLoader      line:242  INFO     Creating model files for: tbc file
 2014-11-24 15:04:26,358 DatabaseFunctions                                  line:282  INFO     TGC file does not yet exist in database
 2014-11-24 15:04:26,358 DatabaseFunctions                                  line:282  INFO     TBC file does not yet exist in database
 2014-11-24 15:04:33,099 __main__                                           line:735  INFO     Closing program

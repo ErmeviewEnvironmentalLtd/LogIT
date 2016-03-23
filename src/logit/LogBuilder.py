@@ -30,7 +30,7 @@
  Summary:
     Created the initial log_pages dictionary that is used by the application
     to update the GUI and the database.
-    Uses the tmac_tools_lib package to read the ief and tuflow files and
+    Uses the tmactools package to read the ief and tuflow files and
     retrieve all the necessary data from the files. This data is then used to
     populate the different pages of the log. The log is split into pages 
     according to the required outputs (Run, Tgc, Tbc, Dat, BC DBase).
@@ -43,7 +43,7 @@
     DR - 13/12/2015:
         Now returns logs as an AllLogs object rather than as a dictionary.
     DR - 29/02/2016:
-        Major re-write of module to use updated version of the tmac_tools_lib.
+        Major re-write of module to use updated version of the tmactools.
 
  TODO:
 
@@ -58,15 +58,15 @@ from operator import attrgetter
 import logging
 logger = logging.getLogger(__name__)
 
-# Import tmac_tools_lib modules
+# Import tmactools modules
 try:
-    from tmac_tools_lib.utils.fileloaders.fileloader import FileLoader
-    from tmac_tools_lib.utils import utilfunctions as ufunc
-    from tmac_tools_lib.utils import filetools
-    from tmac_tools_lib.tuflow.data_files import datafileloader
+    from tmactools.utils.fileloaders.fileloader import FileLoader
+    from tmactools.utils import utilfunctions as ufunc
+    from tmactools.utils import filetools
+    from tmactools.tuflow.data_files import datafileloader
     
 except:
-    logger.error('Cannot load tmac_tools_lib: Is it installed?')
+    logger.error('Cannot load tmactools: Is it installed?')
     
 import LogClasses
 
@@ -80,7 +80,7 @@ missing_files = []
 def loadModel(file_path, log_type):
     """Load the model at the given file path.
     The path given can be for either an .ief file or a .tcf file. It will use
-    the tmac_tools_lib to load the model file references and collect them into
+    the tmactools to load the model file references and collect them into
     dictionaries for the different pages of the log file.
     
     :param file_path: the path to either an .ief or .tcf file.
@@ -222,7 +222,7 @@ def buildRunRowFromModel(cur_date, ief, tuflow, log_type, tcf_dir, ief_dir):
     
     TODO:
         At the moment the event duration is only found if there is an .ief file.
-        This is because the tmac_tools_lib doesn't currently try and find the
+        This is because the tmactools doesn't currently try and find the
         event duration from the .tcf file. When it does this will be supported.
     
     :param ief_file: the Ief object loaded from file.

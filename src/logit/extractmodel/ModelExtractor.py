@@ -49,11 +49,11 @@ logger = logging.getLogger(__name__)
 
 from PyQt4 import QtCore, QtGui
 
-from tmac_tools_lib.utils.filetools import MyFileDialogs
-from tmac_tools_lib.utils.fileloaders.fileloader import FileLoader
-from tmac_tools_lib.tuflow.tuflowfilepart import SomeFile
-from tmac_tools_lib.tuflow.data_files import datafileloader
-from tmac_tools_lib.utils import filetools
+from tmactools.utils.filetools import MyFileDialogs
+from tmactools.utils.fileloaders.fileloader import FileLoader
+from tmactools.tuflow.tuflowfilepart import SomeFile
+from tmactools.tuflow.data_files import datafileloader
+from tmactools.utils import filetools
     
 import  ModelExtractor_Widget as extractwidget
 from app_metrics import utils as applog

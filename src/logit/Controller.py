@@ -69,14 +69,14 @@ import zipfile
 
 from PyQt4 import QtCore, QtGui
 
-from tmac_tools_lib.utils.qtclasses import MyFileDialogs
+from tmactools.utils.qtclasses import MyFileDialogs
 
 # Local modules
 import DatabaseFunctions
 import LogBuilder
 import Exporters
 import LogClasses
-import ModelExtractor
+from extractmodel import ModelExtractor
 from app_metrics import utils as applog
 import globalsettings as gs
 
@@ -502,14 +502,17 @@ def insertIntoModelFileTable(db_manager, table_name, col_name, model_file,
         return new_files, ids
     
     
-def createQtTableItem(name, is_editable=False, drag_enabled=False):
+def createQtTableItem(value, is_editable=False, drag_enabled=False, is_str=True):
     """Create a QTableWidgetItem and return
     TODO: Check if this can be dealt with meaningfully in the Table classes.
           Currently only used by the multiModelLoad path list.
     :param is_editable=False: Set editable flag.
     :return: QTableWidgetItem
     """
-    item = QtGui.QTableWidgetItem(str(name))
+    if is_str:
+        item = QtGui.QTableWidgetItem(str(value))
+    else:
+        item = QtGui.QTableWidgetItem(value)
     
     if is_editable:
         if drag_enabled:

@@ -1559,8 +1559,8 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuSettings.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(2)
-        self.loadModelTab.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(0)
+        self.loadModelTab.setCurrentIndex(1)
         self.loadModelComboBox.setCurrentIndex(0)
         self.loadMultiModelComboBox.setCurrentIndex(0)
         self.logViewTab.setCurrentIndex(0)
