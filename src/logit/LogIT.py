@@ -217,7 +217,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionLogInfo.triggered.connect(self._updateLoggingLevel)
         self.ui.actionReloadDatabase.triggered.connect(self.loadModelLog)
         self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
-        self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdates)
+        self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdatesTrue)
         self.ui.loadModelTab.currentChanged.connect(self._loadTabChanged)
         
         # A couple of keyboard shortcuts...because I'm lazy!
@@ -297,7 +297,7 @@ class MainGui(QtGui.QMainWindow):
             logger.debug('info set check')
         
             # Check if there's a newer version available
-            self._checkUpdates(show_has_latest=False)
+            self._checkUpdatesFalse()
         
         
         sys.exit(self.app.exec_())
@@ -369,7 +369,11 @@ class MainGui(QtGui.QMainWindow):
         self.ui.tabWidget.setCurrentIndex(self.settings.cur_tab)
     
     
-    def _checkUpdates(self, show_has_latest=True):     
+    def _checkUpdatesFalse(self):
+        self._checkUpdates(False)
+    def _checkUpdatesTrue(self):
+        self._checkUpdates(True)
+    def _checkUpdates(self,  show_has_latest=True):     
         """Check if this is the latest version or not.
         
         If it isn't it gives the user the option to download and install the
@@ -1356,7 +1360,7 @@ class MainGui(QtGui.QMainWindow):
                         gs.__RELEASE_NOTES_PATH__,
                         gs.__VERSION__, parent=self)
             version_dialog.resize(400, 400)
-            version_dialog.setWindowTitle('CATMAT Update Summary')
+            version_dialog.setWindowTitle('LogIT Update Summary')
             icon = QtGui.QIcon()
             icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             version_dialog.setWindowIcon(icon)

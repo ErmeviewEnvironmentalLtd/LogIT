@@ -979,6 +979,9 @@ QTableWidget {
                        <property name="frameShape">
                         <enum>QFrame::WinPanel</enum>
                        </property>
+                       <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
                        <row>
                         <property name="text">
                          <string>1</string>
@@ -1106,6 +1109,9 @@ QTableWidget {
                        <property name="frameShape">
                         <enum>QFrame::WinPanel</enum>
                        </property>
+                       <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
                        <row>
                         <property name="text">
                          <string>1</string>
@@ -1233,6 +1239,9 @@ QTableWidget {
                        <property name="frameShape">
                         <enum>QFrame::WinPanel</enum>
                        </property>
+                       <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
                        <row>
                         <property name="text">
                          <string>1</string>
@@ -1360,6 +1369,9 @@ QTableWidget {
                        <property name="frameShape">
                         <enum>QFrame::WinPanel</enum>
                        </property>
+                       <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
                        <row>
                         <property name="text">
                          <string>1</string>
@@ -1480,6 +1492,9 @@ QTableWidget {
                        <property name="frameShadow">
                         <enum>QFrame::Sunken</enum>
                        </property>
+                       <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
                        <row>
                         <property name="text">
                          <string>1</string>
@@ -1610,6 +1625,9 @@ QTableWidget {
                        <property name="frameShadow">
                         <enum>QFrame::Sunken</enum>
                        </property>
+                       <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
                        <row>
                         <property name="text">
                          <string>1</string>

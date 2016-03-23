@@ -197,6 +197,8 @@ v0.4.4-Beta:
     - Added feature to automatically check for new version on startup.
     - Added current model load tab to settings. It will now remember if
       you were using the single or multiple model load tab last time.
+    - Fixed an issue with reading results and check files with the 
+      model extractor tool. Now deals with absolute paths.
     - Fixed a few more things in the way error handling is dealt with.
       This still needs some work though. Sorry :(
 

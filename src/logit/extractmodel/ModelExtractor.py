@@ -115,6 +115,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         if open_path == 'False' or open_path == False:
             return
         
+        open_path = str(open_path)
         self.extractModelFileTextbox.setText(open_path)
         self.settings.cur_model_path = open_path
         
@@ -307,7 +308,14 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                         
                         os.chdir(d)
                         self.emit(QtCore.SIGNAL("updateProgress"), i)
-                        shutil.copy(f, p[1])
+                        
+                        extstuff = os.path.splitext(f)
+                        if len(extstuff) > 1 and (extstuff[1] == '.asc' or extstuff[1] == '.txt'): 
+                            self.emit(QtCore.SIGNAL("statusUpdate"), 'Copying Grid file, this may take a while...')
+                            shutil.copy(f, p[1])
+                            self.emit(QtCore.SIGNAL("statusUpdate"), 'Copying model files...')
+                        else:
+                            shutil.copy(f, p[1])
                 except IOError:
                     self._extractVars.missing_model_files.append(p[0])
 
@@ -432,16 +440,35 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             
             elif part.command.upper() == 'LOG FOLDER':
                 new_root = r'logs'
-
-            p = os.path.join(part.root, part.parent_relative_root, part.relative_root)
+            
+#             if part.has_own_root:
+#                 if part.file_name == '':
+#                     self._extractVars.results_files.append(
+#                                 [os.path.join(part.alternate_root, run_name),
+#                                  os.path.join(self._extractVars.out_dir, 
+#                                               new_root, run_name)
+#                                 ])
+#                 else:
+#                     self._extractVars.results_files.append(
+#                                 [os.path.join(part.alternate_root, part.file_name),
+#                                  os.path.join(self._extractVars.out_dir, 
+#                                               new_root, part.file_name)
+#                                 ])
+#             else: 
+            p = os.path.join(part.root, part.parent_relative_root, 
+                             part.relative_root)
             if part.file_name == '':
-                self._extractVars.results_files.append([os.path.join(p, run_name),
-                                          os.path.join(self._extractVars.out_dir, new_root, run_name)
-                                         ])
+                self._extractVars.results_files.append(
+                            [os.path.join(p, run_name),
+                             os.path.join(self._extractVars.out_dir, 
+                                          new_root, run_name)
+                            ])
             else:
-                self._extractVars.results_files.append([os.path.join(p, part.file_name),
-                                          os.path.join(self._extractVars.out_dir, new_root, part.file_name)
-                                         ])
+                self._extractVars.results_files.append(
+                            [os.path.join(p, part.file_name),
+                            os.path.join(self._extractVars.out_dir, 
+                                         new_root, part.file_name)
+                            ])
 
             part.relative_root = new_root
             part.parent_relative_root = rel_root
@@ -509,6 +536,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         subfiles_in = []
         subfiles_out = []
         try:
+            logger.debug('Datafile = ' + str(data_file.file_name))
             dobj = datafileloader.loadDataFile(data_file)
 
             try:
