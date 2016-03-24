@@ -29,17 +29,21 @@ INSTALLING
 
 No installation process is required for the software. It should run without any
 problems from wherever you place the folder.
-To run the program double-click on the "LogIT.exe" executable and two windows
-should be launched; a console window and the application interface. I recommend
-that you create a shortcut to "LogIT.exe" and place it somewhere away from all
-the other files to avoid accidentally corrupting them.
+To run the program double-click on the "LogIT.exe" executable and the application
+should be launched. I recommend that you create a shortcut to "LogIT.exe" and 
+place it somewhere away from all the other files to avoid accidentally 
+corrupting them. Don't move or change the name of any of the files or folders
+within the distibution or LogIT will not work.
 
 If the software does not launch as expected it is likely to be an issue with
 your virus software. LogIT requires a couple of windows system files in order
 to run which may not be on your computer. These files are included in the 
 distribution. Virus software doesn't like programs it doesn't know playing with
 system files. If this happens just tell your virus software to allow the
-program access and it should work fine. LogIT WILL NOT change any files or 
+program access and it should work fine. If you wish you can exclude the folder
+that you place logit it from the huersistics checks of your antivirus. This 
+will stop it from automatially deleting any updates that you recieve, but still
+allow it to be scanned like normal. LogIT WILL NOT change any files or 
 settings on your computer except: creating a logs folder and a settings file in
 the folder containing the executable and creating the databases and excel files
 that you request.
@@ -162,25 +166,6 @@ v0.4.3-Beta:
 	- Added a base level except catch to the loaders that launches a critical
 	  error to user, so they at least know what's going on if it happens.
 
-0.4.4-Beta:
-    - Updated to latest release of TmacToolsLibrary. This fixes a couple
-      of small bugs but doesn't have a big impact.
-    - Updated the look and feel and fixed some issues with the layouts.
-    - Fixed bug in database versioning that meant an older version of the 
-      database didn't realised it needed to update.
-      THIS MEANS THAT LOG DATABASES WILL NEED UPDATING.
-    - Fixed bug in multiple model loader file list. When dragging more
-      than one file it was deleting items in the row. Multiple selection
-      is now disabled. To remove multiple entries a checkbox can be
-      selected.
-    - Added release notes dialog on startup after new version installed. 
-      Launches a dialog to show version updates to user.
-    - Added feature to automatically check for new version on startup.
-    - Added current model load tab to settings. It will now remember if
-      you were using the single or multiple model load tab last time.
-    - Fixed a few more things in the way error handling is dealt with.
-      This still needs some work though. Sorry :(
-
 v0.4.4-Beta:
     - Updated to latest release of TmacToolsLibrary. This fixes a couple
       of small bugs but doesn't have a big impact.
@@ -199,6 +184,12 @@ v0.4.4-Beta:
       you were using the single or multiple model load tab last time.
     - Fixed an issue with reading results and check files with the 
       model extractor tool. Now deals with absolute paths.
+      This has also been applied to the logger. It will now record the 
+      absolute path of the results location in the log if different
+      from the main model directory.
+    - Improved path display in model extractor input/output textboxes and
+      the summary output display. They are now normalised for the OS and
+      can be copied and pasted directly into Explorer.
     - Fixed a few more things in the way error handling is dealt with.
       This still needs some work though. Sorry :(
 

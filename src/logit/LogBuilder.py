@@ -351,7 +351,12 @@ def buildTuflowRun(has_ief_file, tuflow, run_cols):
     # Use the global_order variable same as for the duration calls
     result = max(result, key=attrgetter('global_order'))
     if result.file_name == '':
-        if not result.getRelativePath() :
+        if result.has_own_root:
+            if result.file_name == '':
+                result = os.path.join(result.root, tcf_paths[0])
+            else:
+                result = os.path.join(result.root, result.file_name)
+        elif not result.getRelativePath() :
             result = tcf_paths[0]
         else:
             result = os.path.join(result.getRelativePath(), tcf_paths[0])
@@ -372,7 +377,7 @@ def buildModelFileRow(cur_date, tuflow, model_file):
     names = tuflow.getModelFiles(model_type=model_file.lower(), name_only=True, with_extension=True)
     if len(names) > 0:
         for n in names:
-            files = tuflow.getFilesFromModelFile(model_file.lower(), model_filename=n)
+            files = tuflow.getFilesFromModelFile(model_file.lower(), model_filename=n, with_extension=True)
             
             # Get rid of any emtpty strings
             files = [x for x in files if x]

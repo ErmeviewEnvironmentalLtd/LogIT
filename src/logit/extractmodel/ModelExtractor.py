@@ -115,7 +115,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         if open_path == 'False' or open_path == False:
             return
         
-        open_path = str(open_path)
+        open_path = os.path.normpath(str(open_path))
         self.extractModelFileTextbox.setText(open_path)
         self.settings.cur_model_path = open_path
         
@@ -141,6 +141,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 if response == False:
                     return
         
+        dir_path = os.path.normpath(str(dir_path))
         self.extractOutputTextbox.setText(dir_path)
         self.settings.cur_output_dir = dir_path
         
@@ -235,7 +236,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             for path, contents in tuflow_files.iteritems():
                 filetools.writeFile(contents, path, add_newline=False)
         
-        self._displayOutput()
+        self._displayOutput(in_path, out_dir)
         finalizeExtraction()
         
         # Log use on the server
@@ -243,11 +244,13 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             applog.AppLogger().write('Extractor')
     
     
-    def _displayOutput(self):
+    def _displayOutput(self, infile, outdir):
         """
         """
         output = []
         output.append('\n Model extraction complete.')
+        output.append('  Input file: ' + os.path.normpath(infile))
+        output.append('  Output directory: ' + os.path.normpath(outdir))
         
         if self._extractVars.failed_data_files:
             output.append('\n\nUnable to load some datafiles - These may contain references to other files which have not been found.')
@@ -259,13 +262,13 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             output.append('\n\nCould not copy some model files - check that they exist.')
             output.append('The following files could not be copied:\n')
             for m in self._extractVars.missing_model_files:
-                output.append(m) 
+                output.append(os.path.normpath(m)) 
         
         if self._extractVars.missing_results_files:
             output.append('\n\nCould not copy some results files - check that they exist.')
             output.append('The following files could not be copied:\n')
             for r in self._extractVars.missing_results_files:
-                output.append(r) 
+                output.append(os.path.normpath(r)) 
                 
         output = '\n'.join(output)
         self.extractOutputTextArea.setText(output)
@@ -377,6 +380,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             
             if not os.path.exists(old_p):
                 logger.warning('Could not copy results from: ' + old_p)
+                self._extractVars.missing_results_files.append('Could not read results from: ' + old_p)
                 continue
             
             file_list = os.listdir(old_p)

@@ -863,7 +863,7 @@ class MainGui(QtGui.QMainWindow):
         
         try:
             for row in xrange(0,allRows):
-                model_paths.append(str(self.ui.loadMultiModelTable.item(row,1).text()))
+                model_paths.append(str(self.ui.loadMultiModelTable.item(row,2).text()))
         except AttributeError, err:
             logger.error('Blank entries in load table: ' + str(err))
             self.launchQMsgBox('Corrupted Inputs', 

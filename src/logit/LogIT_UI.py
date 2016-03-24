@@ -25,7 +25,7 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(885, 714)
+        MainWindow.resize(808, 656)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -56,7 +56,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
         self.scrollAreaWidgetContents = QtGui.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 826, 1271))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 761, 1271))
         self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
         self.verticalLayout_19 = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_19.setObjectName(_fromUtf8("verticalLayout_19"))
@@ -143,7 +143,7 @@ class Ui_MainWindow(object):
         font.setPointSize(9)
         font.setBold(False)
         font.setItalic(False)
-        font.setWeight(9)
+        font.setWeight(50)
         self.loadModelGroup.setFont(font)
         self.loadModelGroup.setStyleSheet(_fromUtf8(""))
         self.loadModelGroup.setObjectName(_fromUtf8("loadModelGroup"))
@@ -229,6 +229,7 @@ class Ui_MainWindow(object):
         self.runEntryTable = QtGui.QTableWidget(self.RunGroup)
         self.runEntryTable.setMaximumSize(QtCore.QSize(16777215, 75))
         self.runEntryTable.setFrameShape(QtGui.QFrame.WinPanel)
+        self.runEntryTable.setTextElideMode(QtCore.Qt.ElideMiddle)
         self.runEntryTable.setObjectName(_fromUtf8("runEntryTable"))
         self.runEntryTable.setColumnCount(21)
         self.runEntryTable.setRowCount(1)
@@ -431,6 +432,7 @@ class Ui_MainWindow(object):
         font.setPointSize(7)
         item.setFont(font)
         self.runEntryTable.setItem(0, 17, item)
+        self.runEntryTable.verticalHeader().setStretchLastSection(True)
         self.verticalLayout_4.addWidget(self.runEntryTable)
         self.verticalLayout_3.addWidget(self.RunGroup)
         self.tcfGroup = QtGui.QGroupBox(self.loadSingleModelTab)
@@ -446,10 +448,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_14.setObjectName(_fromUtf8("verticalLayout_14"))
         self.tcfEntryTable = QtGui.QTableWidget(self.tcfGroup)
         self.tcfEntryTable.setMaximumSize(QtCore.QSize(16777215, 75))
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("Arial"))
-        font.setPointSize(7)
-        self.tcfEntryTable.setFont(font)
         self.tcfEntryTable.setFrameShape(QtGui.QFrame.WinPanel)
         self.tcfEntryTable.setObjectName(_fromUtf8("tcfEntryTable"))
         self.tcfEntryTable.setColumnCount(4)
@@ -501,6 +499,7 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.tcfEntryTable.setItem(0, 3, item)
         self.tcfEntryTable.horizontalHeader().setStretchLastSection(True)
+        self.tcfEntryTable.verticalHeader().setStretchLastSection(True)
         self.verticalLayout_14.addWidget(self.tcfEntryTable)
         self.verticalLayout_3.addWidget(self.tcfGroup)
         self.tgcGroup = QtGui.QGroupBox(self.loadSingleModelTab)
@@ -567,6 +566,7 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.tgcEntryTable.setItem(0, 3, item)
         self.tgcEntryTable.horizontalHeader().setStretchLastSection(True)
+        self.tgcEntryTable.verticalHeader().setStretchLastSection(True)
         self.verticalLayout_5.addWidget(self.tgcEntryTable)
         self.verticalLayout_3.addWidget(self.tgcGroup)
         self.tbcGroup = QtGui.QGroupBox(self.loadSingleModelTab)
@@ -633,6 +633,7 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.tbcEntryTable.setItem(0, 3, item)
         self.tbcEntryTable.horizontalHeader().setStretchLastSection(True)
+        self.tbcEntryTable.verticalHeader().setStretchLastSection(True)
         self.verticalLayout_6.addWidget(self.tbcEntryTable)
         self.verticalLayout_3.addWidget(self.tbcGroup)
         self.datGroup = QtGui.QGroupBox(self.loadSingleModelTab)
@@ -694,6 +695,7 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.datEntryTable.setItem(0, 3, item)
         self.datEntryTable.horizontalHeader().setStretchLastSection(True)
+        self.datEntryTable.verticalHeader().setStretchLastSection(True)
         self.verticalLayout_7.addWidget(self.datEntryTable)
         self.verticalLayout_3.addWidget(self.datGroup)
         self.bcGroup = QtGui.QGroupBox(self.loadSingleModelTab)
@@ -761,6 +763,7 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.bcEntryTable.setItem(0, 3, item)
         self.bcEntryTable.horizontalHeader().setStretchLastSection(True)
+        self.bcEntryTable.verticalHeader().setStretchLastSection(True)
         self.verticalLayout_8.addWidget(self.bcEntryTable)
         self.verticalLayout_3.addWidget(self.bcGroup)
         self.ecfGroup = QtGui.QGroupBox(self.loadSingleModelTab)
@@ -828,6 +831,7 @@ class Ui_MainWindow(object):
         item.setFont(font)
         self.ecfEntryTable.setItem(0, 3, item)
         self.ecfEntryTable.horizontalHeader().setStretchLastSection(True)
+        self.ecfEntryTable.verticalHeader().setStretchLastSection(True)
         self.verticalLayout_18.addWidget(self.ecfEntryTable)
         self.verticalLayout_3.addWidget(self.ecfGroup)
         self.loadModelTab.addTab(self.loadSingleModelTab, _fromUtf8(""))
@@ -961,8 +965,6 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addWidget(self.multiModelLoadErrorGroup, 2, 1, 1, 1)
         self.loadMultiModelGroupBox.raise_()
         self.chooseMultipleModelsGroupBox.raise_()
-        self.addMultiLogEntryButton.raise_()
-        self.submitMultiModelLabel.raise_()
         self.multiModelLoadErrorGroup.raise_()
         self.submitMultiModelGroup.raise_()
         self.loadModelTab.addTab(self.multiModelLoadTab, _fromUtf8(""))
@@ -970,13 +972,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_19.addLayout(self.verticalLayout_22)
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         self.verticalLayout.addWidget(self.scrollArea)
-        self.scrollArea.raise_()
-        self.loadModelTab.raise_()
-        self.instructionsTextBrowser.raise_()
-        self.inputVarGroup.raise_()
-        self.loadModelTab.raise_()
-        self.instructionsTextBrowser.raise_()
-        self.inputVarGroup.raise_()
         self.tabWidget.addTab(self.newEntryTab, _fromUtf8(""))
         self.viewLogTab = QtGui.QWidget()
         self.viewLogTab.setObjectName(_fromUtf8("viewLogTab"))
@@ -995,13 +990,6 @@ class Ui_MainWindow(object):
         self.runEntryViewTable = QtGui.QTableWidget(self.runViewTab)
         self.runEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.runEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.runEntryViewTable.setFont(font)
         self.runEntryViewTable.setAlternatingRowColors(True)
         self.runEntryViewTable.setObjectName(_fromUtf8("runEntryViewTable"))
         self.runEntryViewTable.setColumnCount(22)
@@ -1129,13 +1117,6 @@ class Ui_MainWindow(object):
         self.tcfEntryViewTable = QtGui.QTableWidget(self.tcfViewTab)
         self.tcfEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.tcfEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.tcfEntryViewTable.setFont(font)
         self.tcfEntryViewTable.setAlternatingRowColors(True)
         self.tcfEntryViewTable.setObjectName(_fromUtf8("tcfEntryViewTable"))
         self.tcfEntryViewTable.setColumnCount(6)
@@ -1180,13 +1161,6 @@ class Ui_MainWindow(object):
         self.ecfEntryViewTable = QtGui.QTableWidget(self.ecfViewTab)
         self.ecfEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.ecfEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.ecfEntryViewTable.setFont(font)
         self.ecfEntryViewTable.setAlternatingRowColors(True)
         self.ecfEntryViewTable.setObjectName(_fromUtf8("ecfEntryViewTable"))
         self.ecfEntryViewTable.setColumnCount(6)
@@ -1231,13 +1205,6 @@ class Ui_MainWindow(object):
         self.tgcEntryViewTable = QtGui.QTableWidget(self.TgcViewTab)
         self.tgcEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.tgcEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.tgcEntryViewTable.setFont(font)
         self.tgcEntryViewTable.setAlternatingRowColors(True)
         self.tgcEntryViewTable.setObjectName(_fromUtf8("tgcEntryViewTable"))
         self.tgcEntryViewTable.setColumnCount(6)
@@ -1282,13 +1249,6 @@ class Ui_MainWindow(object):
         self.tbcEntryViewTable = QtGui.QTableWidget(self.tbcViewTab)
         self.tbcEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.tbcEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.tbcEntryViewTable.setFont(font)
         self.tbcEntryViewTable.setAlternatingRowColors(True)
         self.tbcEntryViewTable.setObjectName(_fromUtf8("tbcEntryViewTable"))
         self.tbcEntryViewTable.setColumnCount(6)
@@ -1333,13 +1293,6 @@ class Ui_MainWindow(object):
         self.datEntryViewTable = QtGui.QTableWidget(self.datViewTab)
         self.datEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.datEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.datEntryViewTable.setFont(font)
         self.datEntryViewTable.setAlternatingRowColors(True)
         self.datEntryViewTable.setObjectName(_fromUtf8("datEntryViewTable"))
         self.datEntryViewTable.setColumnCount(5)
@@ -1379,13 +1332,6 @@ class Ui_MainWindow(object):
         self.bcEntryViewTable = QtGui.QTableWidget(self.bcViewTab)
         self.bcEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.bcEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
-        font = QtGui.QFont()
-        font.setFamily(_fromUtf8("MS Shell Dlg 2"))
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.bcEntryViewTable.setFont(font)
         self.bcEntryViewTable.setAlternatingRowColors(True)
         self.bcEntryViewTable.setObjectName(_fromUtf8("bcEntryViewTable"))
         self.bcEntryViewTable.setColumnCount(6)
@@ -1441,7 +1387,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 885, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 808, 21))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))
@@ -1968,7 +1914,7 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">2) Open the Visual Basic window.</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">3) Right-Click on your log book project.</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">4) Click &quot;Import File...&quot;.</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">5) Find the LogFormatter_v2.bas file in the LogIT folder and open it.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">5) Find the LogFormatter_vX.bas file in the LogIT folder and open it.</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">6) Go back to the Excel Workbook and under developer click &quot;Macros&quot;).</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">7) Depending on whether you have any other Workbooks open or not the Macro </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">   will either be caller &quot;formatLogbook&quot; or &quot;LogFormatter.formatLogbook&quot;.</p>\n"
@@ -1991,6 +1937,11 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Debug will output obscure errors and lots of rubbish.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Updating LogIT</span></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LogIT will automatically tell you if an update is available when it is launched. It will then ask if you would like to download the new version. If you say yes it will download and unzip the new version into a folder adjacent to the current installation. It will also attempt to copy over any settings file that you have in the install directory. If you choose not to install at that time you can launch the process when you want by using the Settings &gt; Check for Updates menu item.</p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
+"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Additional Tools</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LogIT includes the following additional tools:</p>\n"
@@ -2003,8 +1954,7 @@ class Ui_MainWindow(object):
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Current Limitations</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LogIT uses the TMacToolsLibrary to read and write from Tuflow and ISIS/FMP files. When reading data files, such as materials.csv or boundary conditions.csv files, it expects the format to match that set out in the Tuflow Manual. Tuflow is more forgiving and will allow files to be setup differently if certain headers are given. If these files are not setup as shown in the manual they</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">will not be correctly read. This should cause a warning to be noted, but is worth keeping an eye on.</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">LogIT uses the TMacToolsLibrary to read and write from Tuflow and ISIS/FMP files. When reading data files, such as materials.csv or boundary conditions.csv files, it expects the format to match that set out in the Tuflow Manual. Tuflow is more forgiving and will allow files to be setup differently if certain headers are given. If these files are not setup as shown in the manual they will not be correctly read. This should cause a warning to be noted, but is worth keeping an eye on.</p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;\">Common Errors</span></p>\n"

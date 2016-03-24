@@ -15,5 +15,11 @@
   you were using the single or multiple model load tab last time.
 - Fixed an issue with reading results and check files with the 
   model extractor tool. Now deals with absolute paths.
+  This has also been applied to the logger. It will now record the 
+  absolute path of the results location in the log if different
+  from the main model directory.
+- Improved path display in model extractor input/output textboxes and
+  the summary output display. They are now normalised for the OS and
+  can be copied and pasted directly into Explorer.
 - Fixed a few more things in the way error handling is dealt with.
   This still needs some work though. Sorry :(

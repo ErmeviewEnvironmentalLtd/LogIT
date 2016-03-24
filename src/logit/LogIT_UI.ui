@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>885</width>
-    <height>714</height>
+    <width>808</width>
+    <height>656</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -84,7 +84,7 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>826</width>
+             <width>761</width>
              <height>1271</height>
             </rect>
            </property>
@@ -309,7 +309,7 @@ p, li { white-space: pre-wrap; }
                        <font>
                         <family>Arial 12</family>
                         <pointsize>9</pointsize>
-                        <weight>9</weight>
+                        <weight>50</weight>
                         <italic>false</italic>
                         <bold>false</bold>
                        </font>
@@ -558,9 +558,15 @@ QTableWidget {
                        <property name="frameShape">
                         <enum>QFrame::WinPanel</enum>
                        </property>
+                       <property name="textElideMode">
+                        <enum>Qt::ElideMiddle</enum>
+                       </property>
                        <property name="sortingEnabled">
                         <bool>false</bool>
                        </property>
+                       <attribute name="verticalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
                        <row>
                         <property name="text">
                          <string>1</string>
@@ -970,16 +976,13 @@ QTableWidget {
                          <height>75</height>
                         </size>
                        </property>
-                       <property name="font">
-                        <font>
-                         <family>Arial</family>
-                         <pointsize>7</pointsize>
-                        </font>
-                       </property>
                        <property name="frameShape">
                         <enum>QFrame::WinPanel</enum>
                        </property>
                        <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
+                       <attribute name="verticalHeaderStretchLastSection">
                         <bool>true</bool>
                        </attribute>
                        <row>
@@ -1112,6 +1115,9 @@ QTableWidget {
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
                        </attribute>
+                       <attribute name="verticalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
                        <row>
                         <property name="text">
                          <string>1</string>
@@ -1240,6 +1246,9 @@ QTableWidget {
                         <enum>QFrame::WinPanel</enum>
                        </property>
                        <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
+                       <attribute name="verticalHeaderStretchLastSection">
                         <bool>true</bool>
                        </attribute>
                        <row>
@@ -1372,6 +1381,9 @@ QTableWidget {
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
                        </attribute>
+                       <attribute name="verticalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
                        <row>
                         <property name="text">
                          <string>1</string>
@@ -1493,6 +1505,9 @@ QTableWidget {
                         <enum>QFrame::Sunken</enum>
                        </property>
                        <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
+                       <attribute name="verticalHeaderStretchLastSection">
                         <bool>true</bool>
                        </attribute>
                        <row>
@@ -1626,6 +1641,9 @@ QTableWidget {
                         <enum>QFrame::Sunken</enum>
                        </property>
                        <attribute name="horizontalHeaderStretchLastSection">
+                        <bool>true</bool>
+                       </attribute>
+                       <attribute name="verticalHeaderStretchLastSection">
                         <bool>true</bool>
                        </attribute>
                        <row>
@@ -2061,9 +2079,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
                  </layout>
                  <zorder>loadMultiModelGroupBox</zorder>
                  <zorder>chooseMultipleModelsGroupBox</zorder>
-                 <zorder>horizontalSpacer_6</zorder>
-                 <zorder>addMultiLogEntryButton</zorder>
-                 <zorder>submitMultiModelLabel</zorder>
                  <zorder>multiModelLoadErrorGroup</zorder>
                  <zorder>submitMultiModelGroup</zorder>
                 </widget>
@@ -2076,13 +2091,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
          </widget>
         </item>
        </layout>
-       <zorder>scrollArea</zorder>
-       <zorder>loadModelTab</zorder>
-       <zorder>instructionsTextBrowser</zorder>
-       <zorder>inputVarGroup</zorder>
-       <zorder>loadModelTab</zorder>
-       <zorder>instructionsTextBrowser</zorder>
-       <zorder>inputVarGroup</zorder>
       </widget>
       <widget class="QWidget" name="viewLogTab">
        <attribute name="title">
@@ -2127,15 +2135,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
                 <width>16777215</width>
                 <height>16777215</height>
                </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>MS Shell Dlg 2</family>
-                <pointsize>7</pointsize>
-                <weight>50</weight>
-                <italic>false</italic>
-                <bold>false</bold>
-               </font>
               </property>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -2398,15 +2397,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
                 <height>16777215</height>
                </size>
               </property>
-              <property name="font">
-               <font>
-                <family>MS Shell Dlg 2</family>
-                <pointsize>7</pointsize>
-                <weight>50</weight>
-                <italic>false</italic>
-                <bold>false</bold>
-               </font>
-              </property>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
@@ -2501,15 +2491,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
                 <width>16777215</width>
                 <height>16777215</height>
                </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>MS Shell Dlg 2</family>
-                <pointsize>7</pointsize>
-                <weight>50</weight>
-                <italic>false</italic>
-                <bold>false</bold>
-               </font>
               </property>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -2606,15 +2587,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
                 <height>16777215</height>
                </size>
               </property>
-              <property name="font">
-               <font>
-                <family>MS Shell Dlg 2</family>
-                <pointsize>7</pointsize>
-                <weight>50</weight>
-                <italic>false</italic>
-                <bold>false</bold>
-               </font>
-              </property>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
@@ -2709,15 +2681,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
                 <width>16777215</width>
                 <height>16777215</height>
                </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>MS Shell Dlg 2</family>
-                <pointsize>7</pointsize>
-                <weight>50</weight>
-                <italic>false</italic>
-                <bold>false</bold>
-               </font>
               </property>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -2814,15 +2777,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
                 <height>16777215</height>
                </size>
               </property>
-              <property name="font">
-               <font>
-                <family>MS Shell Dlg 2</family>
-                <pointsize>7</pointsize>
-                <weight>50</weight>
-                <italic>false</italic>
-                <bold>false</bold>
-               </font>
-              </property>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
@@ -2907,15 +2861,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
                 <width>16777215</width>
                 <height>16777215</height>
                </size>
-              </property>
-              <property name="font">
-               <font>
-                <family>MS Shell Dlg 2</family>
-                <pointsize>7</pointsize>
-                <weight>50</weight>
-                <italic>false</italic>
-                <bold>false</bold>
-               </font>
               </property>
               <property name="toolTip">
                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -3087,7 +3032,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2) Open the Visual Basic window.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;3) Right-Click on your log book project.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;4) Click &amp;quot;Import File...&amp;quot;.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;5) Find the LogFormatter_v2.bas file in the LogIT folder and open it.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;5) Find the LogFormatter_vX.bas file in the LogIT folder and open it.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;6) Go back to the Excel Workbook and under developer click &amp;quot;Macros&amp;quot;).&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;7) Depending on whether you have any other Workbooks open or not the Macro &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;   will either be caller &amp;quot;formatLogbook&amp;quot; or &amp;quot;LogFormatter.formatLogbook&amp;quot;.&lt;/p&gt;
@@ -3110,6 +3055,11 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Debug will output obscure errors and lots of rubbish.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;&quot;&gt;Updating LogIT&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;LogIT will automatically tell you if an update is available when it is launched. It will then ask if you would like to download the new version. If you say yes it will download and unzip the new version into a folder adjacent to the current installation. It will also attempt to copy over any settings file that you have in the install directory. If you choose not to install at that time you can launch the process when you want by using the Settings &amp;gt; Check for Updates menu item.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;&quot;&gt;Additional Tools&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;LogIT includes the following additional tools:&lt;/p&gt;
@@ -3122,8 +3072,7 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;&quot;&gt;Current Limitations&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;LogIT uses the TMacToolsLibrary to read and write from Tuflow and ISIS/FMP files. When reading data files, such as materials.csv or boundary conditions.csv files, it expects the format to match that set out in the Tuflow Manual. Tuflow is more forgiving and will allow files to be setup differently if certain headers are given. If these files are not setup as shown in the manual they&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;will not be correctly read. This should cause a warning to be noted, but is worth keeping an eye on.&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;LogIT uses the TMacToolsLibrary to read and write from Tuflow and ISIS/FMP files. When reading data files, such as materials.csv or boundary conditions.csv files, it expects the format to match that set out in the Tuflow Manual. Tuflow is more forgiving and will allow files to be setup differently if certain headers are given. If these files are not setup as shown in the manual they will not be correctly read. This should cause a warning to be noted, but is worth keeping an eye on.&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:600; text-decoration: underline; color:#0055ff;&quot;&gt;Common Errors&lt;/span&gt;&lt;/p&gt;
@@ -3155,7 +3104,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>885</width>
+     <width>808</width>
      <height>21</height>
     </rect>
    </property>

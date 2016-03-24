@@ -90,7 +90,7 @@ class Ui_ExtractModelWidget(object):
         sizePolicy.setHeightForWidth(self.extractOutputTextArea.sizePolicy().hasHeightForWidth())
         self.extractOutputTextArea.setSizePolicy(sizePolicy)
         self.extractOutputTextArea.setMinimumSize(QtCore.QSize(0, 250))
-        self.extractOutputTextArea.setMaximumSize(QtCore.QSize(16777215, 600))
+        self.extractOutputTextArea.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.extractOutputTextArea.setLineWrapMode(QtGui.QTextEdit.NoWrap)
         self.extractOutputTextArea.setObjectName(_fromUtf8("extractOutputTextArea"))
         self.gridLayout_2.addWidget(self.extractOutputTextArea, 1, 0, 1, 2)
@@ -101,8 +101,6 @@ class Ui_ExtractModelWidget(object):
         spacerItem = QtGui.QSpacerItem(490, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.gridLayout_2.addItem(spacerItem, 0, 1, 1, 1)
         self.verticalLayout_2.addWidget(self.modelExtractorGroup)
-        spacerItem1 = QtGui.QSpacerItem(20, 3, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
-        self.verticalLayout_2.addItem(spacerItem1)
 
         self.retranslateUi(ExtractModelWidget)
         QtCore.QMetaObject.connectSlotsByName(ExtractModelWidget)
