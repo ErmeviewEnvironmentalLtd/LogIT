@@ -122,6 +122,7 @@ import DatabaseFunctions
 import Exporters
 import Controller
 import GuiStore
+import IefResolver
 import globalsettings as gs
 from extractmodel import ModelExtractor
 
@@ -218,6 +219,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionReloadDatabase.triggered.connect(self.loadModelLog)
         self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
         self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdatesTrue)
+        self.ui.actionResolveIefFiles.triggered.connect(self._resolveIefs)
         self.ui.loadModelTab.currentChanged.connect(self._loadTabChanged)
         
         # A couple of keyboard shortcuts...because I'm lazy!
@@ -1262,6 +1264,23 @@ class MainGui(QtGui.QMainWindow):
                     self.ui.statusbar.showMessage('Loaded model at: %s' % open_path)
                     self._fillEntryTables(all_logs)
                     self.ui.submitSingleModelGroup.setEnabled(True) 
+
+
+    def _resolveIefs(self):
+        """
+        """
+        ief_paths = self._getModelFileDialog(multi_paths=True)
+        missing_types, folder = IefResolver.resolveIefs(ief_paths)
+        self.launchQMsgBox('Ief Resolver', output) 
+        
+        d = MyFileDialogs()
+        found_folders = {'.DAT': '', '.TCF': '', '.IED': '', 'results': ''} 
+        for k, m in missing_types.iteritems():
+            if m == False:
+                found_folders[k] = str(d.dirFileDialog(folder)) 
+        
+        success, missing_types = IefResolver.resolveUnfoundPaths(found_folders)
+        
 
 
     def launchQtQBox(self, title, message):
