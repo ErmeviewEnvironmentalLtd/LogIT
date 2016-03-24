@@ -129,7 +129,7 @@ def loadModel(file_path, log_type):
     if file_type == 'ief' and not log_type == TYPE_ESTRY:
         
         ief = model_file
-        ief_dir = os.path.split(file_path)[0]
+        ief_dir = str(os.path.split(file_path)[0])
         
         # Get the ief filepaths (this returns a tuple of main paths, ied paths 
         # and snapshot paths, but we only want the main ones)
@@ -349,17 +349,17 @@ def buildTuflowRun(has_ief_file, tuflow, run_cols):
             result.append(r)
 
     # Use the global_order variable same as for the duration calls
-    result = max(result, key=attrgetter('global_order'))
-    if result.file_name == '':
-        if result.has_own_root:
-            if result.file_name == '':
-                result = os.path.join(result.root, tcf_paths[0])
-            else:
-                result = os.path.join(result.root, result.file_name)
-        elif not result.getRelativePath() :
-            result = tcf_paths[0]
+    result_obj = max(result, key=attrgetter('global_order'))
+    result = ''
+    if result_obj.has_own_root:
+        if result_obj.file_name == '':
+            result = os.path.join(result_obj.root, tcf_paths[0])
         else:
-            result = os.path.join(result.getRelativePath(), tcf_paths[0])
+            result = os.path.join(result_obj.root, result_obj.file_name)
+    elif not result_obj.getRelativePath() :
+        result = tcf_paths[0]
+    else:
+        result = os.path.join(result_obj.getRelativePath(), tcf_paths[0])
     run_cols['RESULTS_LOCATION_2D'] = result
         
     return run_cols

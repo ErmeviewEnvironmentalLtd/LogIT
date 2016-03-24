@@ -1,3 +1,5 @@
+- Mostly same as last release but with a big fix for a problem in
+  loading the results.
 - Updated to latest release of TmacToolsLibrary. This fixes a couple
   of small bugs but doesn't have a big impact.
 - Updated the look and feel and fixed some issues with the layouts.
