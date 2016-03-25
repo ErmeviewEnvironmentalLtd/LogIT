@@ -923,9 +923,10 @@ class MainGui(QtGui.QMainWindow):
         except Exception, err:
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
-            msg = ('Critical Error - Failed to load model.\nThis is ' +
-                   'likely to be a software issue and should never happen.\n' +
-                   'Please contact the developer')
+            msg = ("Critical Error - Oooohhh  Ssshhhhiiiiiiiii-----.\nThis has " +
+                   "all gone terribly wrong. I want my mum.\n" +
+                   "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
+                   "Game over man, I'm outta here ((+_+))")
             logger.error(msg + str(err))
             self.launchQMsgBox('Critical Error', msg)
             return
