@@ -56,7 +56,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
         self.scrollAreaWidgetContents = QtGui.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 761, 1271))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -402, 761, 1271))
         self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
         self.verticalLayout_19 = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_19.setObjectName(_fromUtf8("verticalLayout_19"))
@@ -1440,6 +1440,8 @@ class Ui_MainWindow(object):
         self.actionCopyLogsToClipboard.setObjectName(_fromUtf8("actionCopyLogsToClipboard"))
         self.actionCheckForUpdates = QtGui.QAction(MainWindow)
         self.actionCheckForUpdates.setObjectName(_fromUtf8("actionCheckForUpdates"))
+        self.actionResolveIefFiles = QtGui.QAction(MainWindow)
+        self.actionResolveIefFiles.setObjectName(_fromUtf8("actionResolveIefFiles"))
         self.menuExport.addAction(self.actionExportToExcel)
         self.menuFile.addAction(self.actionNewModelLog)
         self.menuFile.addAction(self.actionLoad)
@@ -1453,6 +1455,7 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
         self.menuTools.addAction(self.actionUpdateDatabaseSchema)
+        self.menuTools.addAction(self.actionResolveIefFiles)
         self.menuLoggingLevel.addAction(self.actionLogWarning)
         self.menuLoggingLevel.addAction(self.actionLogInfo)
         self.menuLoggingLevel.addAction(self.actionLogDebug)
@@ -2019,5 +2022,6 @@ class Ui_MainWindow(object):
         self.actionCopyLogsToClipboard.setStatusTip(_translate("MainWindow", "Zip up log files and copy them to clipboard for pasting", None))
         self.actionCopyLogsToClipboard.setWhatsThis(_translate("MainWindow", "Zip up log files and copy them to clipboard for pasting", None))
         self.actionCheckForUpdates.setText(_translate("MainWindow", "Check for Updates", None))
+        self.actionResolveIefFiles.setText(_translate("MainWindow", "Resolve Ief Files", None))
 
 import LogIT_RC_rc

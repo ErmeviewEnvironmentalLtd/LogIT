@@ -1270,17 +1270,55 @@ class MainGui(QtGui.QMainWindow):
     def _resolveIefs(self):
         """
         """
-        ief_paths = self._getModelFileDialog(multi_paths=True)
-        missing_types, folder = IefResolver.resolveIefs(ief_paths)
-        self.launchQMsgBox('Ief Resolver', output) 
+#         ief_paths = self._getModelFileDialog(multi_paths=True)
+#         list_items = []
+#         for i in ief_paths:
+#             list_items.append(str(i))
+        temp = [r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief']
+        success, ief_holders = IefResolver.autoResolveIefs(temp)
+        if not success:
+            return
         
-        d = MyFileDialogs()
-        found_folders = {'.DAT': '', '.TCF': '', '.IED': '', 'results': ''} 
-        for k, m in missing_types.iteritems():
-            if m == False:
-                found_folders[k] = str(d.dirFileDialog(folder)) 
+        missing_keys = []
+        for ief_holder in ief_holders:
+            miss = ief_holder.getMissingFileKeys()
+            if miss:
+                for m in miss:
+                    if not m in missing_keys:
+                        missing_keys.append(m)
+
+        if missing_keys:
+            ief_holders, required_search = IefResolver.resolveUnfoundPaths(found_folders, ief_holders)
+            i=0
         
-        success, missing_types = IefResolver.resolveUnfoundPaths(found_folders)
+        ief_objs = IefResolver.updateIefObjects(ief_holders)
+            
+#         if missing_file_keys:
+#             msg = 'Some file locations could not be found.\nPlease locate the following file folders (see dialog title for type)'
+#             self.launchQMsgBox('File Not Found', msg)
+#             d = MyFileDialogs()
+#             found_folders = {}
+#             for m in missing_file_keys:
+#                 folder = d.dirFileDialog(folder) 
+#                 if folder == False: return
+#                 found_folders[m] = str(folder) 
+            
+            
+
+        
+        i=0
+        
+#         ief_paths = self._getModelFileDialog(multi_paths=True)
+#         missing_types, folder = IefResolver.resolveIefs(ief_paths)
+#         self.launchQMsgBox('Ief Resolver', output) 
+#         
+#         d = MyFileDialogs()
+#         found_folders = {'.DAT': '', '.TCF': '', '.IED': '', 'results': ''} 
+#         for k, m in missing_types.iteritems():
+#             if m == False:
+#                 found_folders[k] = str(d.dirFileDialog(folder)) 
+#         
+#         success, missing_types = IefResolver.resolveUnfoundPaths(found_folders)
         
 
 
