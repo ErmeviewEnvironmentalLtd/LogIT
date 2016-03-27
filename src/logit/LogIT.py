@@ -1276,22 +1276,26 @@ class MainGui(QtGui.QMainWindow):
         """
         
         def finalize():
+            """Set status update back to default."""
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
             
-#         ief_paths = self._getModelFileDialog(multi_paths=True)
-#         file_list = []
-#         for i in ief_paths:
-#             file_list.append(str(i))
-        file_list = [r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief',
-                 r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18_dsbd-20%.ief',
-                 r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\Kennford_1%AEP_FINAL_v5.18_ExeRd_b25%.ief'
-                ]
+        ief_paths = self._getModelFileDialog(multi_paths=True)
+        file_list = []
+        for i in ief_paths:
+            file_list.append(str(i))
+        # DEBUG
+#         file_list = [r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief',
+#                  r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18_dsbd-20%.ief',
+#                  r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\Kennford_1%AEP_FINAL_v5.18_ExeRd_b25%.ief'
+#                 ]
         
         self._updateStatusBar('Attempting to automatically resolve ief file...')
         self._updateMaxProgress(4)
         self._updateCurrentProgress(1)
         success, ief_holders = IefResolver.autoResolveIefs(file_list)
+        
+        # If we couldn't find the reference file
         if not success:
             msg = ('Could not locate intial reference file. This means that\n' +
                    'it will not be possible to automated the update of these ' +
@@ -1300,6 +1304,7 @@ class MainGui(QtGui.QMainWindow):
             finalize()
             return
         
+        # check if there were any files that couldn't be found on first attempt
         missing_keys = []
         for ief_holder in ief_holders:
             miss = ief_holder.getMissingFileKeys()
@@ -1308,6 +1313,7 @@ class MainGui(QtGui.QMainWindow):
                     if not m in missing_keys:
                         missing_keys.append(m)
 
+        # If there were then use the secondary method to try and get them
         if missing_keys:
             self._updateStatusBar('Attempting to find missing paths (this may take a while) ...')
             self._updateCurrentProgress(2)
@@ -1315,6 +1321,7 @@ class MainGui(QtGui.QMainWindow):
             
             i=0
         
+        # Write out the updated files
         self._updateStatusBar('Updating Ief files and writing to file...')
         self._updateCurrentProgress(3)
         ief_objs = IefResolver.updateIefObjects(ief_holders)
@@ -1328,6 +1335,7 @@ class MainGui(QtGui.QMainWindow):
             finalize()
             return
         
+        # Output a summary of any difficulties with the file update
         if missing_keys:
             ief_dialog = IefResolver.IefResolverDialog(required_search, parent=self)
             ief_dialog.resize(600, 400)
@@ -1336,9 +1344,11 @@ class MainGui(QtGui.QMainWindow):
             icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             ief_dialog.setWindowIcon(icon)
             ief_dialog.exec_()
+        # Or just tell the user that all was alright
+        else:
+            self.launchQMsgBox('Ief Resolver', 'Ief Files successfully updated.')
            
         finalize() 
-        i=0
         
 
     def launchQtQBox(self, title, message):
