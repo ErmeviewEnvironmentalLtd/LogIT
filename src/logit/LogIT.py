@@ -924,9 +924,9 @@ class MainGui(QtGui.QMainWindow):
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
             msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
-                   "all gone terribly wrong. You're on your own now.\n" +
+                   "all gone terribly wrong. You're on your own dude.\n" +
                    "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
-                   "Game over man, I'm outta here ((+_+))")
+                   "Game over man, I'm outta here <-((+_+))->")
             logger.error(msg + str(err))
             self.launchQMsgBox('Critical Error', msg)
             return
@@ -1279,14 +1279,14 @@ class MainGui(QtGui.QMainWindow):
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
             
-        ief_paths = self._getModelFileDialog(multi_paths=True)
-        file_list = []
-        for i in ief_paths:
-            file_list.append(str(i))
-#         temp = [r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief',
-#                  r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18_dsbd-20%.ief',
-#                  r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\Kennford_1%AEP_FINAL_v5.18_ExeRd_b25%.ief'
-#                 ]
+#         ief_paths = self._getModelFileDialog(multi_paths=True)
+#         file_list = []
+#         for i in ief_paths:
+#             file_list.append(str(i))
+        file_list = [r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief',
+                 r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18_dsbd-20%.ief',
+                 r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\Kennford_1%AEP_FINAL_v5.18_ExeRd_b25%.ief'
+                ]
         
         self._updateStatusBar('Attempting to automatically resolve ief file...')
         self._updateMaxProgress(4)

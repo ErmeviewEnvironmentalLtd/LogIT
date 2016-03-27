@@ -1,3 +1,46 @@
+"""
+##############################################################################
+  Name: LogIT (Logger for Isis and Tuflow) 
+  Author: Duncan Runnacles
+  Copyright: (C) 2016 Duncan Runnacles
+  email: duncan.runnacles@thomasmackay.co.uk
+  License: GPL v2 - Available at: http://www.gnu.org/licenses/gpl-2.0.html
+ 
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+ 
+  This program is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+ 
+  You should have received a copy of the GNU General Public License along
+  with this program; if not, write to the Free Software Foundation, Inc.,
+  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ 
+ 
+  Module:          logit.py
+  Date:            28/03/2016
+  Author:          Duncan Runnacles
+  Since-Version:   0.5
+  
+  Summary:
+      Tools for resolving .ief file filepaths. Contains functions for 
+      attempting to automate the update of file paths from their original
+      location to the location that the model has been moved to. These include
+      an initial attempt at automating the process and a secondary approach at
+      trying to find the files by walking the directories. If the second 
+      approach is used it may not find the correct version of the file.
+ 
+  UPDATES:
+
+  TODO:
+     
+############################################################################## 
+"""
+
 import os
 import sys
 import shutil
@@ -8,7 +51,6 @@ from PyQt4 import QtGui
 from tmactools.utils.fileloaders import fileloader as fl
 from tmactools.utils.qtclasses import MyFileDialogs
 from tmactools.utils import filetools as ft
-
 
 
 class IefResolverDialog(QtGui.QDialog):
@@ -102,6 +144,7 @@ class IefHolder(object):
         self.original_path = ief_obj.path_holder.getAbsPath()
         self.root_folder_old = ''
         self.root_folder_new = ''
+        self.result_name = ''
         self.single_types = {'.dat': {'in': '', 'out': ''}, 
                              '.tcf': {'in': '', 'out': ''},
                              'result': {'in': '', 'out': ''}
@@ -131,7 +174,7 @@ class IefHolder(object):
                 self.ief_obj.event_details['2DFile'] = v['out']            
             if k == 'result':
                 if v['out'] == '': continue
-                self.ief_obj.event_header['Results'] = v['out']            
+                self.ief_obj.event_header['Results'] = os.path.join(v['out'], self.result_name)            
         
         for i, ied_out in enumerate(self.ieds_list_types['out']):
             if ied_out == '': continue
@@ -267,7 +310,7 @@ def resolveUnfoundPaths(ief_holders):
                 file_out = False
                 
                 # If it's a .dat or .tcf file
-                if k in ief_holder.single_types.keys():
+                if k in ief_holder.single_types.keys() and not k == 'result':
                     infile = ief_holder.single_types[k]['in']
                     filename = os.path.split(infile)[1]
                     file_out = findFile(infile, filename)
@@ -291,9 +334,11 @@ def resolveUnfoundPaths(ief_holders):
                     filename = os.path.split(infile)[1]
                     file_out = findFile(infile, filename)
                     in_out_list['in'].append(infile)
-                    in_out_list['out'].append(file_out)
                     if not file_out == False:
+                        in_out_list['out'].append(os.path.join(file_out, ief_holder.result_name))
                         ief_holder.addFile(file_out, 'out', False)
+                    else:
+                        in_out_list['out'].append(file_out)
                 
         had_to_search[ief_holder.original_path] = in_out_list
     
@@ -402,7 +447,6 @@ def autoResolvePath(ief_path, search_folder_depth=4):
     
     # Get the location of the ief file we just loaded
     cur_ief_location = os.path.split(ief_path)[0]
-#     print '\n\n\n\nIef location: ' + cur_ief_location
     
     # Get the dat and results paths from ief object
     ief_files_refs = ief_obj.getFilePaths()[0]
@@ -410,14 +454,16 @@ def autoResolvePath(ief_path, search_folder_depth=4):
     ief_holder.addFile(ief_datafile, 'in', test_exists=False)
 
     # Don't get the placeholder filename for the results
-    ief_resultsfile = os.path.split(ief_files_refs['results'])[0]
+    ief_resultsfile, result_name = os.path.split(ief_files_refs['results'])
     ief_holder.addFile(ief_resultsfile, 'in', test_exists=False)
+    ief_holder.result_name = result_name
     in_paths = [ief_datafile, ief_resultsfile]
     
-    # If there's a 2d file then set it as the reference file. The reference
-    # file is the one we use to define the most 'upstream' folder. I.e. the
-    # root of all the model files. Use 2d if it's available because it will
-    # most likely define a more upstream folder location.
+    '''If there's a 2d file then set it as the reference file. The reference
+    file is the one we use to define the most 'upstream' folder. I.e. the
+    root of all the model files. Use 2d if it's available because it will
+    most likely define a more upstream folder location.
+    '''
     if 'twodfile' in ief_files_refs.keys():
         reference_file = ief_files_refs['twodfile']
         ief_holder.addFile(reference_file, 'in', test_exists=False)
@@ -433,9 +479,8 @@ def autoResolvePath(ief_path, search_folder_depth=4):
     
     # Walk from given folder point upstream until we find the
     # reference file.
-    reference_location = findFile(ief_path, reference_file_file, search_folder_depth) #ref_ext)
+    reference_location = findFile(ief_path, reference_file_file, search_folder_depth) 
     if reference_location == False:
-#         print '\n\nError - Unable to find reference file'
         return False, ief_holders
     
     # Find the place where the ief file and the found file meet
@@ -449,16 +494,16 @@ def autoResolvePath(ief_path, search_folder_depth=4):
     # location
     ief_holder.root_folder_old = prefix_old = reference_file.split(temp)[0]
 
-    # Loop through the files in the ief and use prefix_old as a mask
-    # to find the part of the filename after the matching root folder.
-    # This can then be joined to the new root and we've updated the 
-    # file names to the new location.
+    '''Loop through the files in the ief and use prefix_old as a mask
+    to find the part of the filename after the matching root folder.
+    This can then be joined to the new root and we've updated the 
+    file names to the new location.
+    '''
     updated_paths = []
     for p in in_paths:    
         match_results = p.split(prefix_old)
         if len(match_results) > 1:
             rmatch = os.path.join(prefix, match_results[1])
-#             print '\nFound Match: ' + str(rmatch)
             updated_paths.append(rmatch)
             ief_holder.addFile(rmatch, 'out', test_exists=True)
     
@@ -487,6 +532,9 @@ def longestCommonPrefix(file1, file2):
     
 def longestCommonSuffix(file1, file2):
     """Find the matching parts of two filenames starting from Right.
+    
+    Used the longestCommonPrefix() function by passing in reversed versions of
+    the filepaths.
     
     Args:
         file1(str): first file name to compare.
