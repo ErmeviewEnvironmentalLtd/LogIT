@@ -923,8 +923,8 @@ class MainGui(QtGui.QMainWindow):
         except Exception, err:
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
-            msg = ("Critical Error - Oooohhh  Ssshhhhiiiiiiiii-----.\nThis has " +
-                   "all gone terribly wrong. I want my mum.\n" +
+            msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
+                   "all gone terribly wrong. You're on your own now.\n" +
                    "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
                    "Game over man, I'm outta here ((+_+))")
             logger.error(msg + str(err))

@@ -561,6 +561,12 @@ QTableWidget {
                        <property name="textElideMode">
                         <enum>Qt::ElideMiddle</enum>
                        </property>
+                       <property name="verticalScrollMode">
+                        <enum>QAbstractItemView::ScrollPerItem</enum>
+                       </property>
+                       <property name="horizontalScrollMode">
+                        <enum>QAbstractItemView::ScrollPerPixel</enum>
+                       </property>
                        <property name="sortingEnabled">
                         <bool>false</bool>
                        </property>
@@ -979,6 +985,9 @@ QTableWidget {
                        <property name="frameShape">
                         <enum>QFrame::WinPanel</enum>
                        </property>
+                       <property name="horizontalScrollMode">
+                        <enum>QAbstractItemView::ScrollPerPixel</enum>
+                       </property>
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
                        </attribute>
@@ -1111,6 +1120,9 @@ QTableWidget {
                        </property>
                        <property name="frameShape">
                         <enum>QFrame::WinPanel</enum>
+                       </property>
+                       <property name="horizontalScrollMode">
+                        <enum>QAbstractItemView::ScrollPerPixel</enum>
                        </property>
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
@@ -1245,6 +1257,9 @@ QTableWidget {
                        <property name="frameShape">
                         <enum>QFrame::WinPanel</enum>
                        </property>
+                       <property name="horizontalScrollMode">
+                        <enum>QAbstractItemView::ScrollPerPixel</enum>
+                       </property>
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
                        </attribute>
@@ -1378,6 +1393,9 @@ QTableWidget {
                        <property name="frameShape">
                         <enum>QFrame::WinPanel</enum>
                        </property>
+                       <property name="horizontalScrollMode">
+                        <enum>QAbstractItemView::ScrollPerPixel</enum>
+                       </property>
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
                        </attribute>
@@ -1503,6 +1521,9 @@ QTableWidget {
                        </property>
                        <property name="frameShadow">
                         <enum>QFrame::Sunken</enum>
+                       </property>
+                       <property name="horizontalScrollMode">
+                        <enum>QAbstractItemView::ScrollPerPixel</enum>
                        </property>
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
@@ -1639,6 +1660,9 @@ QTableWidget {
                        </property>
                        <property name="frameShadow">
                         <enum>QFrame::Sunken</enum>
+                       </property>
+                       <property name="horizontalScrollMode">
+                        <enum>QAbstractItemView::ScrollPerPixel</enum>
                        </property>
                        <attribute name="horizontalHeaderStretchLastSection">
                         <bool>true</bool>
@@ -2145,6 +2169,9 @@ When done click the Add All Log Entries button. Any errors will be written to th
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
+              </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
@@ -2403,6 +2430,9 @@ When done click the Add All Log Entries button. Any errors will be written to th
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
+              </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
@@ -2497,6 +2527,9 @@ When done click the Add All Log Entries button. Any errors will be written to th
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
+              </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
               </property>
               <property name="sortingEnabled">
                <bool>true</bool>
@@ -2593,6 +2626,9 @@ When done click the Add All Log Entries button. Any errors will be written to th
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
+              </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
@@ -2687,6 +2723,9 @@ When done click the Add All Log Entries button. Any errors will be written to th
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
+              </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
               </property>
               <property name="sortingEnabled">
                <bool>true</bool>
@@ -2783,6 +2822,9 @@ When done click the Add All Log Entries button. Any errors will be written to th
               <property name="alternatingRowColors">
                <bool>true</bool>
               </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
+              </property>
               <property name="sortingEnabled">
                <bool>true</bool>
               </property>
@@ -2867,6 +2909,9 @@ When done click the Add All Log Entries button. Any errors will be written to th
               </property>
               <property name="alternatingRowColors">
                <bool>true</bool>
+              </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
               </property>
               <property name="sortingEnabled">
                <bool>true</bool>

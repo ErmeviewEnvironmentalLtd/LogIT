@@ -1,5 +1,18 @@
-- Mostly same as last release but with a big fix for a problem in
-  loading the results.
+- Added IefResolver module. This can now be found under the Tools menu. It
+  tries to automatically convert the paths in an .ief file from it's old
+  location to the new one. It may not work if the folder structure has been
+  changed since the ief file has been setup. It works by updating the root
+  folder for the paths to match the new location.
+  E.g. if the model folders are now placed in C:\consultancy\mymodels\projectname\model
+  and the paths have O:\something\oldplace\model the IefResolver will change
+  the portion of the path before model to match the new location. It's a bit
+  cleverer than that, but you get it. 
+- Bug fix for a problem in loading the results caused by an edge case that
+  was returning an instance of SomeFile instead of the results path string.
+- Made horizontal scrolling in tables a bit easier to use by allowing by
+  pixel movement instead of by item.
+-
+- Summary of old release (0.4.4) for those that didn't get it.
 - Updated to latest release of TmacToolsLibrary. This fixes a couple
   of small bugs but doesn't have a big impact.
 - Updated the look and feel and fixed some issues with the layouts.
