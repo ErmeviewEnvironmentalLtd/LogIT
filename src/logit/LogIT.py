@@ -1330,7 +1330,7 @@ class MainGui(QtGui.QMainWindow):
         
         if missing_keys:
             ief_dialog = IefResolver.IefResolverDialog(required_search, parent=self)
-            ief_dialog.resize(400, 600)
+            ief_dialog.resize(600, 400)
             ief_dialog.setWindowTitle('Ief Resolver Search Summary')
             icon = QtGui.QIcon()
             icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)

@@ -83,7 +83,7 @@
            <property name="geometry">
             <rect>
              <x>0</x>
-             <y>-402</y>
+             <y>0</y>
              <width>761</width>
              <height>1271</height>
             </rect>
@@ -3148,7 +3148,6 @@ p, li { white-space: pre-wrap; }
       <string>Tools</string>
      </property>
      <addaction name="actionUpdateDatabaseSchema"/>
-     <addaction name="actionResolveIefFiles"/>
     </widget>
     <widget class="QMenu" name="menuLoggingLevel">
      <property name="toolTip">
@@ -3168,8 +3167,15 @@ p, li { white-space: pre-wrap; }
     <addaction name="separator"/>
     <addaction name="actionCheckForUpdates"/>
    </widget>
+   <widget class="QMenu" name="menuTools_2">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionResolveIefFiles"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSettings"/>
+   <addaction name="menuTools_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar">
    <property name="font">
@@ -3339,9 +3345,14 @@ p, li { white-space: pre-wrap; }
     <string>Check for Updates</string>
    </property>
   </action>
-  <action name="actionResolveIefFiles">
+  <action name="actionResolveIefddFiles">
    <property name="text">
     <string>Resolve Ief Files</string>
+   </property>
+  </action>
+  <action name="actionResolveIefFiles">
+   <property name="text">
+    <string>Ief Path Resolver</string>
    </property>
   </action>
  </widget>

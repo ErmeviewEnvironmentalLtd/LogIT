@@ -12,43 +12,86 @@ from tmactools.utils import filetools as ft
 
 
 class IefResolverDialog(QtGui.QDialog):
-    """Dialog class for showing release information."""
+    """Dialog class for showing ief resolver summary information."""
     
-    def __init__(self, output, parent=None):
+    def __init__(self, input, parent=None):
         super(IefResolverDialog, self).__init__(parent)
         
         self.textBrowser = QtGui.QTextBrowser(self)
         self.verticalLayout = QtGui.QVBoxLayout(self)
         self.verticalLayout.addWidget(self.textBrowser)
         
-        output = self.formatOutput(output)
+        output = []
+        output.append(self.getOpeningRichText())
+        output.extend(self.formatOutput(input))
+        output.append(self.getClosingRichText())
+        output = ''.join(output)
         self.textBrowser.setText(output)
     
     
-    def formatOutput(self, output):
-        """
-        """
+    def formatOutput(self, input):
+        """Get the input dict and format for display."""
         formatted = []
-        formatted.append("I've managed to update most of your files but some " +
-                         "of them needed to be searched for. This can lead to " +
-                         "incorrectly updated files.\nWhere an updated file is " +
-                         "shown as 'False' it could not be found and must be " +
-                         "manually updated. \nYou should check the " +
-                         "updates. There is a summary below.\n\n\n")
-        for k, v in output.iteritems():
+        msg = ("I've managed to update most of your files but some " +
+                 "of them needed to be searched for. This can lead to " +
+                 "incorrectly updated files.<br />Where an updated file is " +
+                 "shown as 'False' it could not be found and must be " +
+                 "manually updated. <br />You should check the " +
+                 "updates. There is a summary below.\n\n\n")
+        formatted.append(self.getSpaceParagraphIn() + msg + self.getStandardParagraphOut())
+        for k, v in input.iteritems():
             
             if len(v['in']) < 1: continue
-            formatted.append('Some paths required guessing for file: ' + k)
-            formatted.append('\nYou should check that these are correct.\n')
+            formatted.append(self.getStandardParagraphIn() + '<em style="font-weight: bold">Some paths required guessing for file</em>: ' + k + self.getStandardParagraphOut())
+            inner_msg = ("You should check that these are correct. It " +
+                             "may be that the files don't exist or are " +
+                             "outside the searched folders.")
+            formatted.append(self.getSpaceParagraphIn() + inner_msg + self.getStandardParagraphOut())
             for i, p in enumerate(v['in']):
-                formatted.append('\nOriginal: ' + p)
-                formatted.append('\nUpdated: ' + str(v['out'][i]))
+                formatted.append(self.getStandardParagraphIn() + '<em style="font-weight: bold">Original:</em> ' + p + self.getStandardParagraphOut())
+                formatted.append(self.getStandardParagraphIn() + '<em style="font-weight: bold">Updated:</em> ' + str(v['out'][i]) + self.getStandardParagraphOut())
             
-            formatted.append('\n\n\n')
+            formatted.append('<br /><br />')
         
-        formatted = ''.join(formatted)
         return formatted
-#         self.textBrowser.setText(formatted)
+
+    
+    def getStandardParagraphIn(self):
+        """Standard display paragraph."""
+        return '''
+<p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">
+<span style=" font-size:10pt;">
+'''
+        
+
+    def getSpaceParagraphIn(self):
+        """Standard display paragraph but with space at the bottom."""
+        return '''
+<p style=" margin-top:0px; margin-bottom:15px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">
+<span style=" font-size:10pt;">
+'''
+
+
+    def getStandardParagraphOut(self):
+        """Close standard paragraph elements."""
+        return '</span></p>'
+    
+    
+    def getOpeningRichText(self):
+        """Opening headers etc for using rich text."""
+        return '''
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html><head><meta name="qrichtext" content="1" /><style type="text/css">
+p, li { white-space: pre-wrap; }
+</style></head><body style=" font-family:'Arial'; font-size:10pt; font-weight:400; font-style:normal;">
+<p style=" margin-top:0px; margin-bottom:20px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; font-weight:600; text-decoration: underline;">Ief Resolver Summary</span></p>
+<ul>
+'''
+        
+
+    def getClosingRichText(self):
+        """Closes tags for the opening elements."""
+        return '</ul></body></html>'
 
 
 
@@ -327,8 +370,31 @@ def autoResolveIefs(iefs):
     return True, ief_holders
     
     
-def autoResolvePath(ief_path, search_folder_depth=3):
-    """Change the file name in an ief to match it's new location.
+def autoResolvePath(ief_path, search_folder_depth=4):
+    """Change the file names in an ief to match it's new location.
+    
+    Attempts to find a reference file to base the path prefix update on. The
+    path prefix is the section of the old and new paths that is the same for
+    all files referenced by the ief. This means that it expects all files to
+    be under the same directory, which is usually the case when a model has
+    been moved somewhere.
+    
+    Tries to find the reference file (2D if there is one, as this is likely 
+    further from the ief file, of .dat if not) by walking the tree from the
+    number of folders above the ief depicted by the search_folder_depth.
+    
+    Then udpates the file paths in the ief by matching and masking the old and
+    new prefixes. It then checks if these guessed locations exist. If they 
+    don't it will mark them as not found in the IefHolder instance.
+    
+    Args:
+        ief_path(str): path to an ief file.
+        seatch_folder_depth=4(int): number of directories to move up from the
+            ief file before walking to find the reference file.
+    
+    Return:
+        Tuple(Bool, IefHolder): False if reference file could not be found.
+            IefHolder instance containing the status of the file updates.
     """
     loader = fl.FileLoader()
     ief_obj = loader.loadFile(ief_path)

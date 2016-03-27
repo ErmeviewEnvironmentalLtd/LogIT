@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'LogIT_UI.ui'
+# Form implementation generated from reading ui file '.\LogIT_UI.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -56,7 +56,7 @@ class Ui_MainWindow(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName(_fromUtf8("scrollArea"))
         self.scrollAreaWidgetContents = QtGui.QWidget()
-        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, -402, 761, 1271))
+        self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 761, 1271))
         self.scrollAreaWidgetContents.setObjectName(_fromUtf8("scrollAreaWidgetContents"))
         self.verticalLayout_19 = QtGui.QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_19.setObjectName(_fromUtf8("verticalLayout_19"))
@@ -1402,6 +1402,8 @@ class Ui_MainWindow(object):
         self.menuTools.setObjectName(_fromUtf8("menuTools"))
         self.menuLoggingLevel = QtGui.QMenu(self.menuSettings)
         self.menuLoggingLevel.setObjectName(_fromUtf8("menuLoggingLevel"))
+        self.menuTools_2 = QtGui.QMenu(self.menubar)
+        self.menuTools_2.setObjectName(_fromUtf8("menuTools_2"))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         font = QtGui.QFont()
@@ -1440,6 +1442,8 @@ class Ui_MainWindow(object):
         self.actionCopyLogsToClipboard.setObjectName(_fromUtf8("actionCopyLogsToClipboard"))
         self.actionCheckForUpdates = QtGui.QAction(MainWindow)
         self.actionCheckForUpdates.setObjectName(_fromUtf8("actionCheckForUpdates"))
+        self.actionResolveIefddFiles = QtGui.QAction(MainWindow)
+        self.actionResolveIefddFiles.setObjectName(_fromUtf8("actionResolveIefddFiles"))
         self.actionResolveIefFiles = QtGui.QAction(MainWindow)
         self.actionResolveIefFiles.setObjectName(_fromUtf8("actionResolveIefFiles"))
         self.menuExport.addAction(self.actionExportToExcel)
@@ -1455,7 +1459,6 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
         self.menuTools.addAction(self.actionUpdateDatabaseSchema)
-        self.menuTools.addAction(self.actionResolveIefFiles)
         self.menuLoggingLevel.addAction(self.actionLogWarning)
         self.menuLoggingLevel.addAction(self.actionLogInfo)
         self.menuLoggingLevel.addAction(self.actionLogDebug)
@@ -1465,8 +1468,10 @@ class Ui_MainWindow(object):
         self.menuSettings.addAction(self.actionReloadDatabase)
         self.menuSettings.addSeparator()
         self.menuSettings.addAction(self.actionCheckForUpdates)
+        self.menuTools_2.addAction(self.actionResolveIefFiles)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuSettings.menuAction())
+        self.menubar.addAction(self.menuTools_2.menuAction())
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(0)
@@ -1982,6 +1987,7 @@ class Ui_MainWindow(object):
         self.menuTools.setTitle(_translate("MainWindow", "Tools", None))
         self.menuLoggingLevel.setToolTip(_translate("MainWindow", "<html><head/><body><p>Set the logging output level for the console.</p></body></html>", None))
         self.menuLoggingLevel.setTitle(_translate("MainWindow", "Set Logging Level", None))
+        self.menuTools_2.setTitle(_translate("MainWindow", "Tools", None))
         self.actionExportToExcel.setText(_translate("MainWindow", "Excel", None))
         self.actionExportToExcel.setToolTip(_translate("MainWindow", "Export model log database to Excel (*.xls) Workbook", None))
         self.actionExportToExcel.setStatusTip(_translate("MainWindow", "Export model log database to Excel (*.xls) Workbook", None))
@@ -2022,6 +2028,7 @@ class Ui_MainWindow(object):
         self.actionCopyLogsToClipboard.setStatusTip(_translate("MainWindow", "Zip up log files and copy them to clipboard for pasting", None))
         self.actionCopyLogsToClipboard.setWhatsThis(_translate("MainWindow", "Zip up log files and copy them to clipboard for pasting", None))
         self.actionCheckForUpdates.setText(_translate("MainWindow", "Check for Updates", None))
-        self.actionResolveIefFiles.setText(_translate("MainWindow", "Resolve Ief Files", None))
+        self.actionResolveIefddFiles.setText(_translate("MainWindow", "Resolve Ief Files", None))
+        self.actionResolveIefFiles.setText(_translate("MainWindow", "Ief Path Resolver", None))
 
 import LogIT_RC_rc
