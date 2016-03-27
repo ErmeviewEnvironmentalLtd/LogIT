@@ -1268,15 +1268,36 @@ class MainGui(QtGui.QMainWindow):
 
 
     def _resolveIefs(self):
+        """Attempt to automatically update ief files references to current dir.
+        
+        When .ief files are moved to a new location they retain the old paths
+        from the build location. This tool attempts to convert the paths from
+        the old location to the new location.
         """
-        """
-#         ief_paths = self._getModelFileDialog(multi_paths=True)
-#         list_items = []
-#         for i in ief_paths:
-#             list_items.append(str(i))
-        temp = [r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief']
-        success, ief_holders = IefResolver.autoResolveIefs(temp)
+        
+        def finalize():
+            self._updateStatusBar('')
+            self._updateCurrentProgress(0)
+            
+        ief_paths = self._getModelFileDialog(multi_paths=True)
+        file_list = []
+        for i in ief_paths:
+            file_list.append(str(i))
+#         temp = [r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief',
+#                  r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18_dsbd-20%.ief',
+#                  r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\Kennford_1%AEP_FINAL_v5.18_ExeRd_b25%.ief'
+#                 ]
+        
+        self._updateStatusBar('Attempting to automatically resolve ief file...')
+        self._updateMaxProgress(4)
+        self._updateCurrentProgress(1)
+        success, ief_holders = IefResolver.autoResolveIefs(file_list)
         if not success:
+            msg = ('Could not locate intial reference file. This means that\n' +
+                   'it will not be possible to automated the update of these ' +
+                   'iefs.')
+            self.launchQMsgBox('Ief Update Error', msg)
+            finalize()
             return
         
         missing_keys = []
@@ -1288,39 +1309,37 @@ class MainGui(QtGui.QMainWindow):
                         missing_keys.append(m)
 
         if missing_keys:
-            ief_holders, required_search = IefResolver.resolveUnfoundPaths(found_folders, ief_holders)
+            self._updateStatusBar('Attempting to find missing paths (this may take a while) ...')
+            self._updateCurrentProgress(2)
+            ief_holders, required_search = IefResolver.resolveUnfoundPaths(ief_holders)
+            
             i=0
         
+        self._updateStatusBar('Updating Ief files and writing to file...')
+        self._updateCurrentProgress(3)
         ief_objs = IefResolver.updateIefObjects(ief_holders)
-            
-#         if missing_file_keys:
-#             msg = 'Some file locations could not be found.\nPlease locate the following file folders (see dialog title for type)'
-#             self.launchQMsgBox('File Not Found', msg)
-#             d = MyFileDialogs()
-#             found_folders = {}
-#             for m in missing_file_keys:
-#                 folder = d.dirFileDialog(folder) 
-#                 if folder == False: return
-#                 found_folders[m] = str(folder) 
-            
-            
-
+        success = IefResolver.writeUpdatedFiles(ief_objs)
         
+        self._updateStatusBar('')
+        self._updateCurrentProgress(4)
+        if not success:
+            msg = 'There was an error when writing the updated ief files to disk.'
+            self.launchQMsgBox('Ief Write Error', msg)
+            finalize()
+            return
+        
+        if missing_keys:
+            ief_dialog = IefResolver.IefResolverDialog(required_search, parent=self)
+            ief_dialog.resize(400, 600)
+            ief_dialog.setWindowTitle('Ief Resolver Search Summary')
+            icon = QtGui.QIcon()
+            icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            ief_dialog.setWindowIcon(icon)
+            ief_dialog.exec_()
+           
+        finalize() 
         i=0
         
-#         ief_paths = self._getModelFileDialog(multi_paths=True)
-#         missing_types, folder = IefResolver.resolveIefs(ief_paths)
-#         self.launchQMsgBox('Ief Resolver', output) 
-#         
-#         d = MyFileDialogs()
-#         found_folders = {'.DAT': '', '.TCF': '', '.IED': '', 'results': ''} 
-#         for k, m in missing_types.iteritems():
-#             if m == False:
-#                 found_folders[k] = str(d.dirFileDialog(folder)) 
-#         
-#         success, missing_types = IefResolver.resolveUnfoundPaths(found_folders)
-        
-
 
     def launchQtQBox(self, title, message):
         """Launch QtQMessageBox.

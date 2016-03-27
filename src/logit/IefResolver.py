@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 sys.path.append("TMacTools-0.4.1.dev0-py2.7.egg")
 
 from PyQt4 import QtGui
@@ -8,10 +9,54 @@ from tmactools.utils.fileloaders import fileloader as fl
 from tmactools.utils.qtclasses import MyFileDialogs
 from tmactools.utils import filetools as ft
 
+
+
+class IefResolverDialog(QtGui.QDialog):
+    """Dialog class for showing release information."""
+    
+    def __init__(self, output, parent=None):
+        super(IefResolverDialog, self).__init__(parent)
+        
+        self.textBrowser = QtGui.QTextBrowser(self)
+        self.verticalLayout = QtGui.QVBoxLayout(self)
+        self.verticalLayout.addWidget(self.textBrowser)
+        
+        output = self.formatOutput(output)
+        self.textBrowser.setText(output)
+    
+    
+    def formatOutput(self, output):
+        """
+        """
+        formatted = []
+        formatted.append("I've managed to update most of your files but some " +
+                         "of them needed to be searched for. This can lead to " +
+                         "incorrectly updated files.\nWhere an updated file is " +
+                         "shown as 'False' it could not be found and must be " +
+                         "manually updated. \nYou should check the " +
+                         "updates. There is a summary below.\n\n\n")
+        for k, v in output.iteritems():
+            
+            if len(v['in']) < 1: continue
+            formatted.append('Some paths required guessing for file: ' + k)
+            formatted.append('\nYou should check that these are correct.\n')
+            for i, p in enumerate(v['in']):
+                formatted.append('\nOriginal: ' + p)
+                formatted.append('\nUpdated: ' + str(v['out'][i]))
+            
+            formatted.append('\n\n\n')
+        
+        formatted = ''.join(formatted)
+        return formatted
+#         self.textBrowser.setText(formatted)
+
+
+
 class IefHolder(object):
     
     def __init__(self, ief_obj):
         self.ief_obj = ief_obj
+        self.original_path = ief_obj.path_holder.getAbsPath()
         self.root_folder_old = ''
         self.root_folder_new = ''
         self.single_types = {'.dat': {'in': '', 'out': ''}, 
@@ -25,7 +70,10 @@ class IefHolder(object):
     
     
     def getUpdatedIefObj(self):
-        """
+        """Update the Ief object with the setup held by this class.
+        
+        Return:
+            Ief - updated with the path variables held by this class.
         """
         p, e = os.path.splitext(self.ief_obj.path_holder.getAbsPath())
         p = p + '_LOGIT' + e
@@ -60,7 +108,6 @@ class IefHolder(object):
             ext = ''
         else:
             ext = extstuff[1].lower()
-#         if len(extstuff) < 2 or extstuff[1] == '' or (not extstuff[1] in self.single_types.keys() and not extstuff[1] in self.ieds_list_types.keys()):
         if not ext in self.single_types.keys() and not ext == '.ied':
             if not os.path.exists(new_file): return False
             if in_or_out == 'out': 
@@ -89,7 +136,10 @@ class IefHolder(object):
  
  
     def getMissingFileKeys(self):
-        """
+        """Get a list of the keys that contain no output file data.
+        
+        Return:
+            list - keys of the file types that couldn't be set.
         """
         missing = []
         for k, v in self.missing_types.iteritems():
@@ -100,44 +150,88 @@ class IefHolder(object):
 
 
 def updateIefObjects(ief_holders):
-    """
+    """Update the Ief objects held by the ief_holders in the list.
+    
+    Calls the update function on each of the IefHolder objects held by the
+    list and returns the updated  Ief classes.
+    
+    Args:
+        ief_holders(list): IefHolder objects to update.
+    
+    Return:
+        list - Ief objects with updated file variables.
     """
     ief_objs = []
-    for ief_holder in ief_holders:
+    for ief_holder in ief_holders:        
         ief_objs.append(ief_holder.getUpdatedIefObj())
     
     return ief_objs
 
 
-def writeUpdatedFile(ief_objs):
-    """
-    """
+def writeUpdatedFiles(ief_objs):
+    """Write out Ief objects to file.
+    
+    Uses the path variable held by the PathHolder object of the Ief. No check
+    is made to see if the file already exists. If it does it will be overwritten.
+    
+    Args:
+        ief_objs(list): containing Ief instances.
+    
+    Raises:
+        IOError - when there's a problem writing to file.
+    """    
     for ief in ief_objs:
         contents = ief.getPrintableContents()
         try:
             ft.writeFile(contents, ief.path_holder.getAbsPath())
         except IOError:
             logger.error('Could nto write new ief file at:\n' + ief.path_holder.getAbsPath())
+            return False
+    return True
     
 
 def resolveUnfoundPaths(ief_holders):
-    """
+    """Try to locate any files that couldn't be found with the initial approach.
+    
+    This is a last ditch attempt at trying to find any files that are missing.
+    It walks through all of the nearby folders, starting four folders up from
+    the location of the ief file to see if it can find a file with that name.
+    
+    It should be noted that if there are additional folders (backups or old
+    runs for instance) that contain the file it may find one of those instead.
+    That's why this is a last ditch attempt rather than the initial approach.
+    
+    A dictionary containing the original (in) and new (out) file lists will be
+    returned alongside the IefHolder's list. This can be used to review 
+    whether the 
+    
+    Args:
+        ief_holders(list): IefHolder instance with files to search for.
+    
+    Return:
+        Tuple(list, dict): list of updated IefHolder instances. Dict of lists
+            containing the original and updated file names of any files that
+            had to be looked for with this method.
     """
     had_to_search = {}
     for ief_holder in ief_holders:
 
         in_out_list = {'in': [], 'out': []}
-        for k, v in ief_holder.missing_types:
+        for k, v in ief_holder.missing_types.iteritems():
+            
+            # If it's a missing file
             if ief_holder.has_types[k] == True and v == True:
                 file_out = False
-                if k in self.ief_holder.single_file_types.keys():
-                    infile = ief_holder.ief_obj.single_types[k]['in']
+                
+                # If it's a .dat or .tcf file
+                if k in ief_holder.single_types.keys():
+                    infile = ief_holder.single_types[k]['in']
                     filename = os.path.split(infile)[1]
                     file_out = findFile(infile, filename)
                     in_out_list['in'].append(infile)
                     in_out_list['out'].append(file_out)
                     if not file_out == False:
-                        ief_holder.ief_obj.addFile(file_out, 'out', False)
+                        ief_holder.addFile(file_out, 'out', False)
                 
                 elif k == '.ied':
                     for ied in ief_holder.ieds_list_types:
@@ -146,18 +240,19 @@ def resolveUnfoundPaths(ief_holders):
                         in_out_list['in'].append(infile)
                         in_out_list['out'].append(file_out)
                         if not file_out == False:
-                            ief_holder.ief_obj.addFile(file_out, 'out', False)
+                            ief_holder.addFile(file_out, 'out', False)
                 
+                # Otherwise it can only be a result file
                 else:
-                    infile = ief_holder.ief_obj.single_types['result']['in']
+                    infile = ief_holder.single_types['result']['in']
                     filename = os.path.split(infile)[1]
                     file_out = findFile(infile, filename)
                     in_out_list['in'].append(infile)
                     in_out_list['out'].append(file_out)
                     if not file_out == False:
-                        ief_holder.ief_obj.addFile(file_out, 'out', False)
+                        ief_holder.addFile(file_out, 'out', False)
                 
-        had_to_search[ief_holder.ief_obj.getAbsPath()] = in_out_list
+        had_to_search[ief_holder.original_path] = in_out_list
     
     return ief_holders, had_to_search
 
@@ -166,9 +261,11 @@ def findFile(start_location, file_to_find, search_folder_depth=3):
     """Walk the folder structure until you find the file or fun out of files.
     
     Args:
-        start_folder(str): path to the folder to start walking from.
-        extension(str): file extension to find. Stop if we find a file with
-            this extension.
+        start_location(str): path to the file or folder to start walking from.
+        file_to_find(str): the name and extension of the file to look for.
+        search_folder_depth=3(int): the number of folder to go up from the 
+            start_location before walking down the directories.
+
     
     Return:
         String - normalised absolute path of the file if found. Or False if 
@@ -193,11 +290,35 @@ def findFile(start_location, file_to_find, search_folder_depth=3):
 
 
 def autoResolveIefs(iefs):
-    """
+    """Attempt to automatically update the file paths in the given ief files.
+    
+    Tries to automatically update the file paths in a given ief file to work
+    at the local directory. These may be ief files that have been moved from
+    somewhere else and now need new absolute paths.
+    
+    First checks whether there is a 2D file referenced by the ief if there is
+    that is set as the reference file, if not the .dat file is set as the
+    reference file. The directories are walked to find this file at the number
+    of folders above the ief file denoted by search_folder_depth. If this file
+    cannot be found return False as it means any attempt at automating this is
+    pretty much done. If it's found we derive a common path prefix for both
+    the new location and the old location and use them to work out the new
+    file paths by comparison and path masking.
+    
+    If any of the new paths created are found not to exist they are added to
+    the missing files in the IefHolder and can be checked on return by calling
+    the IefHolder's getMissingKeys() function.
+    
+    Args:
+        iefs(list): filepaths to the ief files to be updated.
+    
+    Return:
+        Tuple(Bool, list): True if Successful or False otherwise. List of
+            IefHolder objects.
     """
     ief_holders = []
     for ief in iefs:
-        success, new_holder = autoResolvePath(ief)
+        success, new_holder = autoResolvePath(ief, search_folder_depth=4)
         if success:
             ief_holders.append(new_holder)
         else:
