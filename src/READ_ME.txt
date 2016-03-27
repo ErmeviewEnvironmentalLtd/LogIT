@@ -222,6 +222,48 @@ v0.4.5-Beta:
     - Fixed a few more things in the way error handling is dealt with.
       This still needs some work though. Sorry :(
 
+v0.5.0-Beta:
+    - Added IefResolver module. This can now be found under the Tools menu. It
+      tries to automatically convert the paths in an .ief file from it's old
+      location to the new one. It may not work if the folder structure has been
+      changed since the ief file has been setup. It works by updating the root
+      folder for the paths to match the new location.
+      E.g. if the model folders are now placed in C:\consultancy\mymodels\projectname\model
+      and the paths have O:\something\oldplace\model the IefResolver will change
+      the portion of the path before model to match the new location. It's a bit
+      cleverer than that, but you get it. 
+    - Bug fix for a problem in loading the results caused by an edge case that
+      was returning an instance of SomeFile instead of the results path string.
+    - Made horizontal scrolling in tables a bit easier to use by allowing by
+      pixel movement instead of by item.
+    -
+    - Summary of old release (0.4.4) for those that didn't get it.
+    - Updated to latest release of TmacToolsLibrary. This fixes a couple
+      of small bugs but doesn't have a big impact.
+    - Updated the look and feel and fixed some issues with the layouts.
+    - Fixed bug in database versioning that meant an older version of the 
+      database didn't realised it needed to update.
+      THIS MEANS THAT LOG DATABASES WILL NEED UPDATING.
+    - Fixed bug in multiple model loader file list. When dragging more
+      than one file it was deleting items in the row. Multiple selection
+      is now disabled. To remove multiple entries a checkbox can be
+      selected.
+    - Added release notes dialog on startup after new version installed. 
+      Launches a dialog to show version updates to user.
+    - Added feature to automatically check for new version on startup.
+    - Added current model load tab to settings. It will now remember if
+      you were using the single or multiple model load tab last time.
+    - Fixed an issue with reading results and check files with the 
+      model extractor tool. Now deals with absolute paths.
+      This has also been applied to the logger. It will now record the 
+      absolute path of the results location in the log if different
+      from the main model directory.
+    - Improved path display in model extractor input/output textboxes and
+      the summary output display. They are now normalised for the OS and
+      can be copied and pasted directly into Explorer.
+    - Fixed a few more things in the way error handling is dealt with.
+      This still needs some work though. Sorry :(
+
 ##~##
 
 LICENSE
