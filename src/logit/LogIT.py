@@ -63,6 +63,9 @@
          Added update check menu item and autoinstall.
     DR - 13/03/2016:
          Updated version checker to use globalsettings version variables.
+    DR - 05/04/2016:
+         Removed log_type and selection combo box from interface. This is no
+         longer needed because the loader accepts any type of model file.
 
   TODO:
      
@@ -873,9 +876,6 @@ class MainGui(QtGui.QMainWindow):
                                 'Please reload files and try again'))
             return
         
-        # Get the type of log to build
-        log_type = self.ui.loadMultiModelComboBox.currentIndex()
-        
         # Load all of the models into a list
         model_logs = []
         errors = GuiStore.ErrorHolder()
@@ -895,8 +895,7 @@ class MainGui(QtGui.QMainWindow):
                 prog_count += 1
                 
                 errors, all_logs = Controller.fetchAndCheckModel(
-                           self.settings.cur_log_path, path, log_type, 
-                                errors)
+                           self.settings.cur_log_path, path, errors)
                 
                 # Go to next if we find an error
                 if errors.has_local_errors:
@@ -970,7 +969,7 @@ class MainGui(QtGui.QMainWindow):
             self.ui.tuflowVersionTextbox.setText(self.settings.tuflow_version)
             self.ui.isisVersionTextbox.setText(self.settings.isis_version)
             self.ui.eventNameTextbox.setText(self.settings.event_name)
-            self.ui.loadModelComboBox.setCurrentIndex(int(self.settings.cur_model_type))
+#             self.ui.loadModelComboBox.setCurrentIndex(int(self.settings.cur_model_type))
             self.ui.loadModelTab.setCurrentIndex(int(self.settings.cur_load_tab))
             
             if self.settings.logging_level == logging.WARNING:
@@ -1015,7 +1014,7 @@ class MainGui(QtGui.QMainWindow):
             self.settings.tuflow_version = str(self.ui.tuflowVersionTextbox.text())
             self.settings.isis_version = str(self.ui.isisVersionTextbox.text())
             self.settings.event_name = str(self.ui.eventNameTextbox.text())
-            self.settings.cur_model_type = str(self.ui.loadModelComboBox.currentIndex())
+#             self.settings.cur_model_type = str(self.ui.loadModelComboBox.currentIndex())
             self.settings.cur_tab = self.ui.tabWidget.currentIndex()
             self._getColumnWidths()
             _writeWidgetSettings()
@@ -1250,17 +1249,13 @@ class MainGui(QtGui.QMainWindow):
                 self.ui.loadModelTextbox.setText(open_path)
                 self.settings.last_model_directory = os.path.split(str(open_path))[0]
                 
-                # Get the log type index
-                log_type = self.ui.loadModelComboBox.currentIndex()
-                
                 errors = GuiStore.ErrorHolder()
-                errors, all_logs = Controller.fetchAndCheckModel(self.settings.cur_log_path, open_path, log_type, errors)
+                errors, all_logs = Controller.fetchAndCheckModel(self.settings.cur_log_path, open_path, errors)
     
                 if errors.has_errors:
-                    if errors.msgbox_error:
-                        self.launchQMsgBox(errors.msgbox_error.title, 
-                                           errors.msgbox_error.message)
-                        self.ui.statusbar.showMessage(errors.msgbox_error.status_bar)
+                    self.launchQMsgBox("Load Error", 
+                                       errors.formatErrors())
+                    self.ui.statusbar.showMessage('Failed to load model at: %s' % open_path)
                 else:
                     self.ui.statusbar.showMessage('Loaded model at: %s' % open_path)
                     self._fillEntryTables(all_logs)

@@ -77,7 +77,7 @@ TYPE_ESTRY = 2
 
 missing_files = []
 
-def loadModel(file_path, log_type):
+def loadModel(file_path): 
     """Load the model at the given file path.
     The path given can be for either an .ief file or a .tcf file. It will use
     the tmactools to load the model file references and collect them into
@@ -101,9 +101,11 @@ def loadModel(file_path, log_type):
     file_type = None
     if ufunc.checkFileType(file_path, ext=['.ief', '.IEF']):
         file_type = 'ief'
+        log_type = TYPE_ISIS
         
     elif ufunc.checkFileType(file_path, ext=['.tcf', '.TCF']):
         file_type = 'tcf'
+        log_type = TYPE_TUFLOW
         
     elif ufunc.checkFileType(file_path, ext=['.ecf', '.ECF']):
         file_type = 'ecf'
@@ -126,7 +128,7 @@ def loadModel(file_path, log_type):
         return False, 'Unable to load model file'
 
     # If we have an .ief file; load it first.
-    if file_type == 'ief' and not log_type == TYPE_ESTRY:
+    if file_type == 'ief': 
         
         ief = model_file
         ief_dir = str(os.path.split(file_path)[0])
@@ -139,7 +141,8 @@ def loadModel(file_path, log_type):
         # If the path that the ief uses to reach the tcf file doesn't exist it
         # means that the ief paths haven't been updated on the local machine, so
         # we return False and log the error.
-        if log_type == TYPE_TUFLOW:
+        if not tcf_path == False: 
+            log_type = TYPE_TUFLOW
             if tcf_path == False or not os.path.exists(tcf_path):
                 logger.error('Tcf file referenced by ief does not exist at\n:' +
                               str(tcf_path))
@@ -189,11 +192,11 @@ def loadModel(file_path, log_type):
                                             tcf_dir, ief_dir)
     
     if log_type == TYPE_ISIS:
-        log_pages['TGC'] = None
-        log_pages['TBC'] = None
-        log_pages['ECF'] = None
-        log_pages['TCF'] = None
-        log_pages['BC_DBASE'] = None
+        log_pages['TGC'] = [None]
+        log_pages['TBC'] = [None]
+        log_pages['ECF'] = [None]
+        log_pages['TCF'] = [None]
+        log_pages['BC_DBASE'] = [None]
     else:
         log_pages['ECF'] = buildModelFileRow(cur_date, tuflow, 'ecf')
         log_pages['TCF'] = buildModelFileRow(cur_date, tuflow, 'tcf')
@@ -211,7 +214,7 @@ def loadModel(file_path, log_type):
     if log_type == TYPE_TUFLOW:
         all_logs = LogClasses.AllLogs(log_pages, tcf_dir, ief_dir)
     else:
-        all_logs = LogClasses.AllLogs(log_pages)
+        all_logs = LogClasses.AllLogs(log_pages, ief_dir=ief_dir)
         
     return all_logs, ''
 

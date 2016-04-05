@@ -688,7 +688,7 @@ def fetchTableValues(db_path, table_list, errors):
         return entries, errors
  
 
-def fetchAndCheckModel(db_path, open_path, log_type, errors):
+def fetchAndCheckModel(db_path, open_path, errors):
     """Loads a model and makes a few conditional checks on it.
     Loads model from the given .tcf/.ief file and checks that the .ief, 
     .tcf and ISIS results don't already exist in the DB and then returns
@@ -696,7 +696,6 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors):
     
     :param db_path: path to the database on file.
     :param open_path: the .ief or .tcf file path.
-    :param log_type: the model type to load (tuflow or ISIS only).
     :return: tuple containing AllLogs (which could be the loaded log
              pages or False if the load failed and a dictionary containing
              the load status and messages for status bars and errors.
@@ -713,7 +712,7 @@ def fetchAndCheckModel(db_path, open_path, log_type, errors):
         
     
     # Load the model at the chosen path.
-    all_logs, error_msg = LogBuilder.loadModel(open_path, log_type)
+    all_logs, error_msg = LogBuilder.loadModel(open_path)
     if all_logs == False:
         msg_add=(':\n%s\nCould not find the following files:\n%s'  % (open_path, error_msg))
         errors.addError(errors.MODEL_LOAD, msg_add=msg_add, msgbox_error=False)
