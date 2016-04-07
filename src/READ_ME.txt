@@ -264,6 +264,12 @@ v0.5.0-Beta:
     - Fixed a few more things in the way error handling is dealt with.
       This still needs some work though. Sorry :(
 
+v0.5.1-Beta:
+    - Fixed bug in ISIS only model loader. Could not load ISIS only models because
+      of a change in the way the LogBuilder class works.
+    - Removed selection box for loading models. LogIT will now work out whether 
+      you are trying to load a 1D only 2D only or 1D/2D model automatically.
+
 ##~##
 
 LICENSE
