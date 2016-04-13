@@ -273,7 +273,7 @@ def buildIsisRun(ief_file, run_cols):
     else:
         run_cols['EVENT_DURATION'] = 'None'
         
-    options = None
+    options = 'None'
     if ief_file.event_details.has_key('2DOptions'):
         options = ief_file.event_details['2DOptions']
     

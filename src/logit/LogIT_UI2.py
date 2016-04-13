@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'LogIT_UI.ui'
+# Form implementation generated from reading ui file 'LogIT_UI2.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #

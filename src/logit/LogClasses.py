@@ -102,6 +102,16 @@ class AllLogs(object):
             out_check[page.name] = page.update_check
         
         return out_check
+    
+    
+    def updateSubLog(self, log, log_key):
+        """
+        """
+        for i, l in enumerate(log, 0):
+            for key, val in l.iteritems():
+                if key in self.editing_allowed:
+                    self.log_pages[log_key].updateValue(val, i, key)
+    
         
 
 class SubLog(object):
@@ -157,6 +167,12 @@ class SubLog(object):
         return True
     
     
+    def updateValue(self, value, index, key):
+        """
+        """
+        self.contents[index][key] = value
+    
+    
     def updateValues(self, row, index):
         '''
         '''
@@ -175,6 +191,9 @@ class SubLog(object):
         '''Deletes an item (i.e. a row) from the contents.
         '''
         del self.contents[index]
+        
+    
+        
         
         
 
