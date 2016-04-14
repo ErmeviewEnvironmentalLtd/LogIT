@@ -881,12 +881,12 @@ def downloadNewVersion(cur_location, server_dir, download_filename):
         logger.warning('Unable to delete zip file')
     
     # Copy over the current user settings
-    user_file =os.path.join(cur_location, 'settings.logset')
-    exe_location = os.path.join(download_dir, download_filename, 'logit')
+    userfile_old = os.path.join(cur_location, 'settings.logset')
+    userfile_new = download_dir 
     try:
-        shutil.copy(user_file, exe_location)
+        shutil.copy(userfile_old, userfile_new)
     except IOError:
-        logger.error('Unable to copy user settings file')
+        logger.error('Unable to copy user settings file\n from: %s \nto: %s' % (user_file, exe_location))
     
     return True    
 

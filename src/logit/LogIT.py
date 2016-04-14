@@ -357,6 +357,11 @@ class MainGui(QtGui.QMainWindow):
                 if not success:
                     msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + gs.__SERVER_PATH__
                     self.launchQMsgBox('Update Failure', msg)
+                else:
+                    msg = ('Download complete.\nYou can close this version ' +
+                           'and launch the new one.\n' +
+                           'This version can be deleted if you want.')
+                    self.launchQMsgBox('Update Success', msg)
     
     
     def _highlightEditRow(self):

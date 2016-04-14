@@ -270,6 +270,18 @@ v0.5.1-Beta:
     - Removed selection box for loading models. LogIT will now work out whether 
       you are trying to load a 1D only 2D only or 1D/2D model automatically.
 
+v0.6.0-Beta:
+    - Big change to single model load user interface. Got rid of all of the 
+      ugly tables and replaced it with a navigable tree. Same colour schemes
+      etc still apply.
+    - Moved New Entry tab into a separate widget to attempt to reduce the amount
+      of code in the LogIT.py.
+    - Fixed bug in new version downloader copy settings process. It should now
+      copy settings across properly.
+    - Added additional message to new version downloader to let the user know if
+      it has been successfull and instruct on what to do next.
+
+
 ##~##
 
 LICENSE
