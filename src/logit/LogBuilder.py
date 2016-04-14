@@ -30,7 +30,7 @@
  Summary:
     Created the initial log_pages dictionary that is used by the application
     to update the GUI and the database.
-    Uses the tmactools package to read the ief and tuflow files and
+    Uses the ship package to read the ief and tuflow files and
     retrieve all the necessary data from the files. This data is then used to
     populate the different pages of the log. The log is split into pages 
     according to the required outputs (Run, Tgc, Tbc, Dat, BC DBase).
@@ -43,7 +43,7 @@
     DR - 13/12/2015:
         Now returns logs as an AllLogs object rather than as a dictionary.
     DR - 29/02/2016:
-        Major re-write of module to use updated version of the tmactools.
+        Major re-write of module to use updated version of the ship.
 
  TODO:
 
@@ -58,15 +58,16 @@ from operator import attrgetter
 import logging
 logger = logging.getLogger(__name__)
 
-# Import tmactools modules
+# Import ship modules
 try:
-    from tmactools.utils.fileloaders.fileloader import FileLoader
-    from tmactools.utils import utilfunctions as ufunc
-    from tmactools.utils import filetools
-    from tmactools.tuflow.data_files import datafileloader
+    from ship.utils.fileloaders.fileloader import FileLoader
+    from ship.utils import utilfunctions as ufunc
+    from ship.utils import filetools
+    from ship.tuflow.data_files import datafileloader
+    from ship.tuflow.tuflowmodel import FilesFilter as filter
     
 except:
-    logger.error('Cannot load tmactools: Is it installed?')
+    logger.error('Cannot load ship: Is it installed?')
     
 import LogClasses
 
@@ -80,7 +81,7 @@ missing_files = []
 def loadModel(file_path): 
     """Load the model at the given file path.
     The path given can be for either an .ief file or a .tcf file. It will use
-    the tmactools to load the model file references and collect them into
+    the ship to load the model file references and collect them into
     dictionaries for the different pages of the log file.
     
     :param file_path: the path to either an .ief or .tcf file.
@@ -135,8 +136,8 @@ def loadModel(file_path):
         
         # Get the ief filepaths (this returns a tuple of main paths, ied paths 
         # and snapshot paths, but we only want the main ones)
-        ief_paths = ief.getFilePaths()[0]
-        tcf_path = ief_paths['twodfile']
+#         ief_paths = ief.getFilePaths()[0]
+        tcf_path = ief.getValue('2DFile')
         
         # If the path that the ief uses to reach the tcf file doesn't exist it
         # means that the ief paths haven't been updated on the local machine, so
@@ -225,7 +226,7 @@ def buildRunRowFromModel(cur_date, ief, tuflow, log_type, tcf_dir, ief_dir):
     
     TODO:
         At the moment the event duration is only found if there is an .ief file.
-        This is because the tmactools doesn't currently try and find the
+        This is because the ship doesn't currently try and find the
         event duration from the .tcf file. When it does this will be supported.
     
     :param ief_file: the Ief object loaded from file.
@@ -261,10 +262,10 @@ def buildIsisRun(ief_file, run_cols):
     :param run_cols: the log data dictionary to fill.
     :return: the updated log_files dictionary.
     """    
-    ief_paths = ief_file.getFilePaths()[0]
+#     ief_paths = ief_file.getFilePaths()[0]
     run_cols['IEF'] = ief_file.path_holder.getFileNameAndExtension()
-    run_cols['DAT'] = filetools.getFileName(ief_paths['datafile'], True)
-    run_cols['RESULTS_LOCATION_1D'] = ief_paths['results']
+    run_cols['DAT'] = filetools.getFileName(ief_file.getValue('Datafile'), True)
+    run_cols['RESULTS_LOCATION_1D'] = ief_file.getValue('Results')
     
     if ief_file.event_details.has_key('Finish'):    
         start = ief_file.event_details['Start']
@@ -295,7 +296,10 @@ def buildTuflowRun(has_ief_file, tuflow, run_cols):
     :return: the updated log_files dictionary.
     """    
     # Fetch the main tcf file and the list of .trd files referenced by it.
-    tcf_paths = tuflow.getModelFiles('tcf', name_only=True, with_extension=True)
+#     tcf_paths = tuflow.getModelFiles('tcf', name_only=True, with_extension=True)
+    tcf_paths = tuflow.getFileNames(filter(content_type=tuflow.MODEL,
+                                           in_model_order=True), 
+                                    extensions=['tcf'])
 
     run_cols['TCF'] = "[" + ", ".join(tcf_paths) + "]"
 
@@ -322,9 +326,10 @@ def buildTuflowRun(has_ief_file, tuflow, run_cols):
         
     
     # Get the tgc and tbc file details.
-    tgc_paths = tuflow.getModelFiles('tgc', name_only=True, with_extension=True)
-    tbc_paths = tuflow.getModelFiles('tbc', name_only=True, with_extension=True)
-    ecf_paths = tuflow.getModelFiles('ecf', name_only=True, with_extension=True)
+    tgc_paths = tuflow.getFileNames(filter(content_type=tuflow.MODEL), extensions=['tgc'])
+    tbc_paths = tuflow.getFileNames(filter(content_type=tuflow.MODEL), extensions=['tbc'])
+    ecf_paths = tuflow.getFileNames(filter(content_type=tuflow.MODEL), extensions=['ecf']) 
+    #tuflow.getFileNames(filter(modelfile_type=['ecf']))
 
     if not len(tgc_paths) < 1:
         run_cols['TGC'] = "[" + ", ".join(tgc_paths) + "]"
@@ -334,10 +339,10 @@ def buildTuflowRun(has_ief_file, tuflow, run_cols):
         run_cols['ECF'] = "[" + ", ".join(ecf_paths) + "]"
 
     # Get the BC Database file references
-    data = tuflow.getContents(tuflow.DATA)
+    data = tuflow.getContents(content_type=tuflow.DATA, no_duplicates=True)
     bc_paths = []
     for d in data:
-        if d.command == 'BC Database':
+        if d.command.upper() == 'BC DATABASE':
             bc_paths.append(d.getFileNameAndExtension())
     
     # Get them into a single string
@@ -346,23 +351,26 @@ def buildTuflowRun(has_ief_file, tuflow, run_cols):
     
     # Get the results and check for the result output command
     result = []
-    in_results = tuflow.getContents(tuflow.RESULT)
+    in_results = tuflow.getContents(content_type=tuflow.RESULT, modelfile_type=['tcf'])
     for r in in_results:
-        if r.command == 'Output Folder':
+        if r.command.upper() == 'OUTPUT FOLDER':
             result.append(r)
 
     # Use the global_order variable same as for the duration calls
     result_obj = max(result, key=attrgetter('global_order'))
     result = ''
+    main_tcf = tuflow.getModelFilesByType(filter(modelfile_type='main',
+                                                 filename_only=True))
+    main_tcf = os.path.splitext(main_tcf[0])[0]
     if result_obj.has_own_root:
         if result_obj.file_name == '':
-            result = os.path.join(result_obj.root, tcf_paths[0])
+            result = os.path.join(result_obj.root, main_tcf)
         else:
             result = os.path.join(result_obj.root, result_obj.file_name)
     elif not result_obj.getRelativePath() :
-        result = tcf_paths[0]
+        result = main_tcf
     else:
-        result = os.path.join(result_obj.getRelativePath(), tcf_paths[0])
+        result = os.path.join(result_obj.getRelativePath(), main_tcf)
     run_cols['RESULTS_LOCATION_2D'] = result
         
     return run_cols
@@ -377,15 +385,15 @@ def buildModelFileRow(cur_date, tuflow, model_file):
     out_list = []
     cur_date = str(cur_date)
 
-    names = tuflow.getModelFiles(model_type=model_file.lower(), name_only=True, with_extension=True)
-    if len(names) > 0:
-        for n in names:
-            files = tuflow.getFilesFromModelFile(model_file.lower(), model_filename=n, with_extension=True)
+    model_types = tuflow.getModelFilesByType(filter(modelfile_type=[model_file.lower()]))
+    if len(model_types) > 0:
+        for m in model_types:
+            files = tuflow.getFileNamesFromModelFile(m)
             
             # Get rid of any emtpty strings
             files = [x for x in files if x]
             
-            out_list.append({'DATE': cur_date, model_file.upper(): n, 
+            out_list.append({'DATE': cur_date, model_file.upper(): tuflow.getNameFromModelFile(m), 
                              'FILES': files, 'COMMENTS': 'None'})
     else:
         out_list.append(cols) 

@@ -108,11 +108,11 @@ except:
 
 from _sqlite3 import Error
 
-# Fetch the tmactools library   
+# Fetch the ship library   
 try:
-    from tmactools.utils.qtclasses import MyFileDialogs
+    from ship.utils.qtclasses import MyFileDialogs
 except:
-    logger.error('Cannot load tmactools (Is it installed?)')
+    logger.error('Cannot load ship (Is it installed?)')
  
 # Have to import PyQt4 like this or it won't compile into an .exe
 try:

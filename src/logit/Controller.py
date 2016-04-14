@@ -69,7 +69,7 @@ import zipfile
 
 from PyQt4 import QtCore, QtGui
 
-from tmactools.utils.qtclasses import MyFileDialogs
+from ship.utils.qtclasses import MyFileDialogs
 
 # Local modules
 import DatabaseFunctions

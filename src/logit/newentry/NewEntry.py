@@ -55,11 +55,11 @@ logger = logging.getLogger(__name__)
 
 from PyQt4 import QtCore, QtGui
 
-from tmactools.utils.filetools import MyFileDialogs
-from tmactools.utils.fileloaders.fileloader import FileLoader
-from tmactools.tuflow.tuflowfilepart import SomeFile
-from tmactools.tuflow.data_files import datafileloader
-from tmactools.utils import filetools
+from ship.utils.filetools import MyFileDialogs
+from ship.utils.fileloaders.fileloader import FileLoader
+from ship.tuflow.tuflowfilepart import SomeFile
+from ship.tuflow.data_files import datafileloader
+from ship.utils import filetools
     
 import GuiStore
 import Controller

@@ -44,13 +44,12 @@
 import os
 import sys
 import shutil
-sys.path.append("TMacTools-0.4.1.dev0-py2.7.egg")
 
 from PyQt4 import QtGui
 
-from tmactools.utils.fileloaders import fileloader as fl
-from tmactools.utils.qtclasses import MyFileDialogs
-from tmactools.utils import filetools as ft
+from ship.utils.fileloaders import fileloader as fl
+from ship.utils.qtclasses import MyFileDialogs
+from ship.utils import filetools as ft
 
 
 class IefResolverDialog(QtGui.QDialog):

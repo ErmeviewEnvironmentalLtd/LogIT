@@ -52,8 +52,8 @@
 
 from PyQt4 import QtCore, QtGui
 
-from tmactools.utils.qtclasses import MyFileDialogs
-from tmactools.utils.qtclasses import QNumericSortTableWidgetItem
+from ship.utils.qtclasses import MyFileDialogs
+from ship.utils.qtclasses import QNumericSortTableWidgetItem
 
 import logging
 logger = logging.getLogger(__name__)
