@@ -280,6 +280,10 @@ v0.6.0-Beta:
       copy settings across properly.
     - Added additional message to new version downloader to let the user know if
       it has been successfull and instruct on what to do next.
+    - Some more work on fixing result/check/log paths so that they load properly. 
+      There is probably still some work to do here.
+    - Update Model Extractor tool. Now copes much better with the different 
+      formats for check file paths.
 
 
 ##~##

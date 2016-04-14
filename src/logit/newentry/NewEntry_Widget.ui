@@ -427,7 +427,14 @@ loaded model to the log database.</string>
               </layout>
              </item>
              <item>
-              <widget class="QTreeView" name="modelEntryTreeView"/>
+              <widget class="QTreeView" name="modelEntryTreeView">
+               <property name="alternatingRowColors">
+                <bool>true</bool>
+               </property>
+               <property name="headerHidden">
+                <bool>true</bool>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>

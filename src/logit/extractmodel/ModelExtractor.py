@@ -53,6 +53,7 @@ from ship.utils.filetools import MyFileDialogs
 from ship.utils.fileloaders.fileloader import FileLoader
 from ship.tuflow.tuflowfilepart import SomeFile
 from ship.tuflow.data_files import datafileloader
+from ship.tuflow.tuflowmodel import FilesFilter as filter
 from ship.utils import filetools
     
 import  ModelExtractor_Widget as extractwidget
@@ -224,12 +225,12 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         
         if not self._extractVars.ief == None:
             contents = self._extractVars.ief.getPrintableContents()
-            p = self._extractVars.ief.path_holder.getAbsPath()
+            p = self._extractVars.ief.path_holder.getAbsolutePath()
             d = os.path.split(p)[0]
             if not os.path.exists(d):
                 os.makedirs(d, 0777)
             filetools.writeFile(contents, 
-                                self._extractVars.ief.path_holder.getAbsPath(), 
+                                self._extractVars.ief.path_holder.getAbsolutePath(), 
                                 add_newline=True)
         
         if not self._extractVars.tcf_path == None:
@@ -338,32 +339,35 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             
             It can be a bit complicated so there are probably some issues here,
             but at the moment it seems to do ok.
-            If there is only an extensino after the known name, or the rest 
+            If there is only an extension after the known name, or the rest 
             before the extension matches a known ending it will return True.
             """
             
-            # If it's a projection file
-            if file_to_check == 'Projection.prj': return True
-            
-            parts = file_to_check.split(filename)
-            
-            # If it's only the filename matched exactly
-            if len(parts) < 2:
-                return False
-            # If second part is the start of the extension
-            if parts[1].startswith('.'):
-                return True
-            
-            subparts = parts[1].split('.')
-            if len(subparts) < 2:
-                return False
-            # If the extra bit before extension is an '_' followed by three
-            # numbers (matches isis run output .bmp's)
-            if re.match(r'[_]\d{3}', subparts[0]):
-                return True
-            # If bit before extension is in the known check/result file endings
-            if subparts[0] in self.check_list or subparts[0] in self.result_list:
-                return True
+            try:
+                # If it's a projection file
+                if file_to_check == 'Projection.prj': return True
+                
+                parts = file_to_check.split(filename)
+                
+                # If it's only the filename matched exactly
+                if len(parts) < 2:
+                    return False
+                # If second part is the start of the extension
+                if parts[1].startswith('.'):
+                    return True
+                
+                subparts = parts[1].split('.')
+                if len(subparts) < 2:
+                    return False
+                # If the extra bit before extension is an '_' followed by three
+                # numbers (matches isis run output .bmp's)
+                if re.match(r'[_]\d{3}', subparts[0]):
+                    return True
+                # If bit before extension is in the known check/result file endings
+                if subparts[0] in self.check_list or subparts[0] in self.result_list:
+                    return True
+            except:
+                pass
             
             return False
             
@@ -374,7 +378,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         
         no_results_folders = len(self._extractVars.results_files)
         for i, r in enumerate(self._extractVars.results_files, 1):
-            self.emit(QtCore.SIGNAL("statusUpdate"), 'Copying output folder %s of %s' % (i, no_results_folders))
+            self.emit(QtCore.SIGNAL("statusUpdate"), 
+                      ('Copying output folder %s of %s (Some results can take a while)' % (i, no_results_folders)))
             old_p, old_n = os.path.split(r[0])
             new_p, new_n = os.path.split(r[1])
             
@@ -431,7 +436,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         """
         result_hashes = model_file.getHashCategory(self._extractVars.tuflow.RESULT)
         for r in result_hashes:
-            part = self._extractVars.tuflow.file_parts[r]
+            part = self._extractVars.tuflow.file_parts[r].filepart
             
             if part.command.upper() == 'OUTPUT FOLDER':
                 if model_file.TYPE == 'tcf':
@@ -445,38 +450,29 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             elif part.command.upper() == 'LOG FOLDER':
                 new_root = r'logs'
             
-#             if part.has_own_root:
-#                 if part.file_name == '':
-#                     self._extractVars.results_files.append(
-#                                 [os.path.join(part.alternate_root, run_name),
-#                                  os.path.join(self._extractVars.out_dir, 
-#                                               new_root, run_name)
-#                                 ])
-#                 else:
-#                     self._extractVars.results_files.append(
-#                                 [os.path.join(part.alternate_root, part.file_name),
-#                                  os.path.join(self._extractVars.out_dir, 
-#                                               new_root, part.file_name)
-#                                 ])
-#             else: 
-            p = os.path.join(part.root, part.parent_relative_root, 
-                             part.relative_root)
-            if part.file_name == '':
-                self._extractVars.results_files.append(
-                            [os.path.join(p, run_name),
-                             os.path.join(self._extractVars.out_dir, 
-                                          new_root, run_name)
-                            ])
+            # Update the file paths. Check files are treated differently
+            # because they can have a prefix as part of the file name
+            if part.command.upper() == 'WRITE CHECK FILES':
+                in_name = os.path.join(part.root, part.parent_relative_root,
+                                       part.relative_root)
+                out_name = os.path.join(self._extractVars.out_dir, 
+                                          new_root)
+                if part.file_name_is_prefix:
+                    in_name = os.path.join(in_name, part.file_name)
+                    out_name = os.path.join(out_name, part.file_name)
+                else:
+                    in_name = os.path.join(in_name, run_name)
+                    out_name = os.path.join(out_name, run_name)
             else:
-                self._extractVars.results_files.append(
-                            [os.path.join(p, part.file_name),
-                            os.path.join(self._extractVars.out_dir, 
-                                         new_root, part.file_name)
-                            ])
-
+                in_name = os.path.join(part.root, part.parent_relative_root,
+                                       part.relative_root, run_name)
+                out_name = os.path.join(self._extractVars.out_dir, 
+                                          new_root, run_name)
+            
+            self._extractVars.results_files.append([in_name, out_name])
             part.relative_root = new_root
             part.parent_relative_root = rel_root
-            self._extractVars.tuflow.file_parts[part.hex_hash] = part
+            self._extractVars.tuflow.file_parts[part.hex_hash].filepart = part
         
 
     def _fetchDataFiles(self, model_file, source_root, rel_root, model_root): 
@@ -495,8 +491,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         """
         data_hashes = model_file.getHashCategory(self._extractVars.tuflow.DATA)
         for d in data_hashes:
-            part = self._extractVars.tuflow.file_parts[d]
-            self._extractVars.in_files.extend(part.getAbsPath(all_types=True))
+            part = self._extractVars.tuflow.file_parts[d].filepart
+            self._extractVars.in_files.extend(part.getAbsolutePath(all_types=True))
             
             subfiles_in = []
             subfiles_out = []
@@ -505,7 +501,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 success, subfiles_in, subfiles_out = self._getSourceFiles(part, 
                                         r'..\bc_dbase', model_root, rel_root)
                 if not success:
-                    self._extractVars.failed_data_files.append(part.getAbsPath()) 
+                    self._extractVars.failed_data_files.append(part.getAbsolutePath()) 
 
             part.parent_relative_root = rel_root
             part.root = self._extractVars.out_dir
@@ -517,8 +513,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 part.relative_root = model_root
             
             
-            self._extractVars.tuflow.file_parts[part.hex_hash] = part
-            self._extractVars.out_files.extend(part.getAbsPath(all_types=True))
+            self._extractVars.tuflow.file_parts[part.hex_hash].filepart = part
+            self._extractVars.out_files.extend(part.getAbsolutePath(all_types=True))
             self._extractVars.in_files.extend(subfiles_in)
             self._extractVars.out_files.extend(subfiles_out)
 
@@ -553,14 +549,14 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 # Create a path holder
                 f = filetools.PathHolder(s, data_file.root)
                 f.relative_root = data_file.relative_root
-                subfiles_in.append(f.getAbsPath())
+                subfiles_in.append(f.getAbsolutePath())
                 
                 f.relative_root = os.path.join(model_root, source_root)
                 f.parent_relative_root = rel_root
                 f.root = self._extractVars.out_dir
-                subfiles_out.append(f.getAbsPath())
+                subfiles_out.append(f.getAbsolutePath())
                 
-        except IOError:
+        except (IOError, IndexError, AttributeError):
             return False, [], []
         
         return True, subfiles_in, subfiles_out
@@ -584,8 +580,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         """
         hashes = model_file.getHashCategory(self._extractVars.tuflow.GIS)
         for h in hashes:
-            part = self._extractVars.tuflow.file_parts[h]
-            self._extractVars.in_files.extend(part.getAbsPath(all_types=True))
+            part = self._extractVars.tuflow.file_parts[h].filepart
+            self._extractVars.in_files.extend(part.getAbsolutePath(all_types=True))
             
             subfiles_in = []
             subfiles_out = []
@@ -594,7 +590,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                 success, subfiles_in, subfiles_out = self._getSourceFiles(part, 
                                                     'xs', model_root, rel_root)
                 if not success:
-                    self._extractVars.failed_data_files.append(part.getAbsPath()) 
+                    self._extractVars.failed_data_files.append(part.getAbsolutePath()) 
 
                 part.relative_root = os.path.join(model_root, source_root)
 
@@ -607,8 +603,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             part.parent_relative_root = rel_root
 
             part.root = self._extractVars.out_dir
-            self._extractVars.tuflow.file_parts[part.hex_hash] = part
-            self._extractVars.out_files.extend(part.getAbsPath(all_types=True))
+            self._extractVars.tuflow.file_parts[part.hex_hash].filepart = part
+            self._extractVars.out_files.extend(part.getAbsolutePath(all_types=True))
             self._extractVars.in_files.extend(subfiles_in)
             self._extractVars.out_files.extend(subfiles_out)
 
@@ -623,21 +619,18 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         """
         out_name_check = []
         in_name_check = []
-        
-        models = self._extractVars.tuflow.getModelFiles()
-        tcfs = self._extractVars.tuflow.getModelFiles('tcf')
-        ecfs = self._extractVars.tuflow.getModelFiles('ecf')
-        tbcs = self._extractVars.tuflow.getModelFiles('tbc')
-        tgcs = self._extractVars.tuflow.getModelFiles('tgc')
-        models = tcfs + ecfs + tbcs + tgcs
+        model_files = model_files = self._extractVars.tuflow.getModelFilesByAllTypes(
+                                            filter(filename_only=False))
         
         try:
-            for m in models:
-                in_name_check.append(self._extractVars.tuflow.file_parts[m.hex_hash].root)
-                m.parent_relative_root = r''
-                m.root = self._extractVars.out_dir
-                self._extractVars.tuflow.file_parts[m.hex_hash] = m
-                out_name_check.append(self._extractVars.tuflow.file_parts[m.hex_hash].root) 
+            for key, models in model_files.iteritems():
+                for m in models:
+                    part = self._extractVars.tuflow.file_parts[m.hex_hash].filepart
+                    in_name_check.append(part.root)
+                    part.parent_relative_root = r''
+                    part.root = self._extractVars.out_dir
+                    self._extractVars.tuflow.file_parts[m.hex_hash].filepart = part
+                    out_name_check.append(self._extractVars.tuflow.file_parts[m.hex_hash].filepart.root) 
         except:
             logger.error('Problem changing paths - aborting to avoid overwriting file!')
             return False
@@ -676,31 +669,23 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         contain a files (gis files, data files, results files, etc). The 
         functions called updated the path variables on all of these files.
         """
-        
-        # Get only the path name of the main file.
-        run_name = self._extractVars.tuflow.getModelFiles('main', name_only=True)[0]
-        
-        # Get the ATuflowModelFile reference of all of the others.
-        tcfs = self._extractVars.tuflow.getModelFiles('tcf', tuflowmodelfile=True)
-        ecfs = self._extractVars.tuflow.getModelFiles('ecf', tuflowmodelfile=True)
-        tbcs = self._extractVars.tuflow.getModelFiles('tbc', tuflowmodelfile=True)
-        tgcs = self._extractVars.tuflow.getModelFiles('tgc', tuflowmodelfile=True)
-        model_files = tcfs + ecfs + tbcs + tgcs
+        run_name = self._extractVars.tuflow.getModelFilesByType(filter(modelfile_type='main',
+                                                                       filename_only=True))[0]
+        run_name = os.path.splitext(run_name)[0]
+        model_files = self._extractVars.tuflow.getModelFilesByAllTypes(filter())
 
-        for m in model_files:
-            category = m.TYPE
-            if category == 'tcf' or category == 'ecf':
-                model_root = r'..\model'
-                rel_root = r''
-            else:
-                model_root = r''
-                rel_root = r'..\model'
-            
-            self._fetchGisFiles(m, 'xs', 'gis', rel_root, model_root)
-
-            self._fetchDataFiles(m, r'..\bc_dbase', rel_root, model_root)
-            
-            self._fetchResultsFiles(m, rel_root, model_root, run_name)
+        for key, model_list in model_files.iteritems():
+            for m in model_list:
+                if  key == 'tcf' or key == 'ecf':
+                    model_root = r'..\model'
+                    rel_root = r''
+                else:
+                    model_root = r''
+                    rel_root = r'..\model'
+                
+                self._fetchGisFiles(m, 'xs', 'gis', rel_root, model_root)
+                self._fetchDataFiles(m, r'..\bc_dbase', rel_root, model_root)
+                self._fetchResultsFiles(m, rel_root, model_root, run_name)
             
     
     def _getIsisFiles(self): 
