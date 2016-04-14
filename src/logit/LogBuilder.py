@@ -363,10 +363,7 @@ def buildTuflowRun(has_ief_file, tuflow, run_cols):
                                                  filename_only=True))
     main_tcf = os.path.splitext(main_tcf[0])[0]
     if result_obj.has_own_root:
-        if result_obj.file_name == '':
-            result = os.path.join(result_obj.root, main_tcf)
-        else:
-            result = os.path.join(result_obj.root, result_obj.file_name)
+        result = os.path.join(result_obj.root, main_tcf)
     elif not result_obj.getRelativePath() :
         result = main_tcf
     else:
