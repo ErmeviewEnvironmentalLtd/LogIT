@@ -1,0 +1,5 @@
+- Big change to single model load user interface. Got rid of all of the 
+  ugly tables and replaced it with a navigable tree. Same colour schemes
+  etc still apply.
+- Moved New Entry tab into a separate widget to attempt to reduce the amount
+  of code in the LogIT.py.

@@ -449,15 +449,12 @@ def findNewLogEntries(db_manager, all_logs, entry_dict):
                                                         }
         return page, callback_args
     
-    display_data = []
-    
     # Get the logs in object format
     callback_args = {'entry_dict': entry_dict}
     
     # Call the looping function, handing it our callback
     all_logs, callback_args = loopLogPages(db_manager, all_logs, callbackFunc, 
                                                             callback_args)
-#     display_data = callback_args['display_data']
     return all_logs, callback_args['entry_dict']
     
 
@@ -550,8 +547,6 @@ def editDatabaseRow(db_path, table_name, id, values, errors):
         logger.error('Unable to access database - see log for details')
         errors.addError(errors.DB_EDIT, msgbox_error=True)
         return errors
-
-    
 
 
 def deleteDatabaseRow(db_path, table_name, id, errors, all_entry=False):
