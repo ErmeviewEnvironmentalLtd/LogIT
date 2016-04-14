@@ -468,9 +468,9 @@ When done click the Add All Log Entries button. Any errors will be written to th
                  </widget>
                 </item>
                 <item row="1" column="0">
-                 <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <layout class="QHBoxLayout" name="multipleModelLayoutH">
                   <item>
-                   <layout class="QVBoxLayout" name="verticalLayout_21">
+                   <layout class="QVBoxLayout" name="multipleModelLayoutV">
                     <item>
                      <widget class="QPushButton" name="addMultiModelButton">
                       <property name="text">

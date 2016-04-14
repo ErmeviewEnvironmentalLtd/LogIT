@@ -385,7 +385,7 @@ def loopLogPages(db_manager, all_logs, callback, callback_args):
     return all_logs, callback_args
     
 
-def loadEntrysWithStatus(db_path, all_logs, table_list, errors):
+def loadEntrysWithStatus(db_path, all_logs, entry_dict, errors):
     """Loads the database and checks if the new entries exist.
     
     Builds a new list that stores the SubLog entry for each row as well as
@@ -395,7 +395,7 @@ def loadEntrysWithStatus(db_path, all_logs, table_list, errors):
     
     :param db_path: path to a database on file.
     :param all_logs: the all_logs object containing loaded model variables.
-    :param table_list: a list of all of the keys for accessing thetables in the 
+    :param entry_dict: a dict of all of the keys for accessing the tables in the 
            'New log Entry' page of the GUI and the associated db tables.
     :return: list containing sub-lists of all of the rows to be displayed on
              the New log entry page tables.
@@ -406,7 +406,7 @@ def loadEntrysWithStatus(db_path, all_logs, table_list, errors):
     db_manager = DatabaseFunctions.DatabaseManager(db_path)
     try:
         entries = []
-        all_logs, entries = findNewLogEntries(db_manager, all_logs, table_list)
+        all_logs, entries = findNewLogEntries(db_manager, all_logs, entry_dict)
         
     except IOError:
         logger.error('IOError - Unable to access database')
@@ -420,7 +420,7 @@ def loadEntrysWithStatus(db_path, all_logs, table_list, errors):
         return entries, errors
 
 
-def findNewLogEntries(db_manager, all_logs, table_list):
+def findNewLogEntries(db_manager, all_logs, entry_dict):
     """Checks entries against database to see if they're new or already exist.
     """
     def callbackFunc(db_manager, i, max_id, values, page, callback_args):
@@ -433,36 +433,32 @@ def findNewLogEntries(db_manager, all_logs, table_list):
         has_entry = db_manager.findEntry(page.name, page.name, 
                                                 page.contents[i][page.name])
     
-        table_dict = callback_args['table_dict']
-           
         # Append the contents row, ui table name, row no., and whether it 
         # should be added to the table or not to the display_data list.
         # If it'a already in the database then we remove it from the log
         # dictionary to avoid entering it again. (see debug comment below)
         if has_entry:
-            callback_args['display_data'].append([page.contents[i], 
-                                            table_dict[page.name], i, False])
+            callback_args['entry_dict'][page.name][page.contents[i][page.name]] = { 
+                                                        'Order': i,
+                                                        'Do Update': False
+                                                        }
         else:
-            callback_args['display_data'].append([page.contents[i], 
-                                            table_dict[page.name], i, True])
-        
+            callback_args['entry_dict'][page.name][page.contents[i][page.name]] = { 
+                                                        'Order': i,
+                                                        'Do Update': True
+                                                        }
         return page, callback_args
     
     display_data = []
     
-    # DEBUG - Deal with this earlier as it should be unnecessary here.
-    table_keys, table_names = zip(*table_list)
-    combo = zip(table_keys, table_names)
-    table_dict = dict(combo)
-    
     # Get the logs in object format
-    callback_args = {'table_dict': table_dict, 'display_data': []}
+    callback_args = {'entry_dict': entry_dict}
     
     # Call the looping function, handing it our callback
     all_logs, callback_args = loopLogPages(db_manager, all_logs, callbackFunc, 
                                                             callback_args)
-    display_data = callback_args['display_data']
-    return all_logs, display_data
+#     display_data = callback_args['display_data']
+    return all_logs, callback_args['entry_dict']
     
 
 def insertIntoModelFileTable(db_manager, table_name, col_name, model_file, 

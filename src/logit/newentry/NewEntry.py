@@ -28,6 +28,13 @@
  Since-Version:   0.6
  
  Summary:
+     Used for loading models into either a single model entry table, that can
+     be updated prior to entering into the database, or a multiple model load
+     table which will be added as is.
+     
+     This module doesn't actually add anything to the database. It leaves that
+     up to the main gui callers. It contains two methods for getting the
+     data in the single and multiple model load tables.
 
  UPDATES:
     
@@ -75,13 +82,13 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         
         self.setupUi(self)
         
-    
-        
+        '''
+            Multiple model load table setup.
+        '''
         # Setup a custom QTableWidget for multiple model choice table so that
         # It can be drag and dropped into order
-        self.horizontalLayout_5.removeItem(self.verticalLayout_21)
+        self.multipleModelLayoutH.removeItem(self.multipleModelLayoutV)
         self.loadMultiModelTable = GuiStore.TableWidgetDragRows(0, 3, self)
-        #self.ui.loadMultiModelTable.setHorizontalHeaderLabels(['Check', 'File name', 'Abs Path'])
         item = QtGui.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.loadMultiModelTable.setHorizontalHeaderItem(0, item)
@@ -103,8 +110,11 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         self.loadMultiModelTable.setColumnWidth(0, 30)
         self.loadMultiModelTable.setStyleSheet('QTableWidget {background-color: rgb(255, 255, 255);}')
         self.loadMultiModelTable.setSortingEnabled(True)
-        self.horizontalLayout_5.addWidget(self.loadMultiModelTable)
-        self.horizontalLayout_5.addItem(self.verticalLayout_21)
+        self.multipleModelLayoutH.addWidget(self.loadMultiModelTable)
+        self.multipleModelLayoutH.addItem(self.multipleModelLayoutV)
+        '''
+            End of Multiple model load table setup.
+        '''
         
         # Connect the slots
         self.loadModelButton.clicked.connect(self._loadSingleLogEntry)
@@ -114,26 +124,45 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         self.multiModelErrorCopyButton.clicked.connect(self._copyToClipboard)
         
     
-    
-    def getInputVars(self, all_logs):
-        """
-        """
-        run = all_logs.getLogEntryContents('RUN', 0)
-        run['MODELLER'] = str(self.modellerTextbox.text())
-        run['TUFLOW_BUILD'] = str(self.tuflowVersionTextbox.text())
-        run['ISIS_BUILD'] = str(self.isisVersionTextbox.text())
-        run['EVENT_NAME'] = str(self.eventNameTextbox.text())
+    def getInputVars(self):
+        """Get the main user supplied variables from the input boxes.
         
-        return all_logs
+        Return:
+            dict - containing an entry for each variable with the key set as
+                the standard access name for that variable in the RUN table.
+        """
+        input_vars = {'MODELLER': str(self.modellerTextbox.text()),
+                      'TUFLOW_BUILD': str(self.tuflowVersionTextbox.text()),
+                      'ISIS_BUILD': str(self.isisVersionTextbox.text()),
+                      'EVENT_NAME': str(self.eventNameTextbox.text())
+                     }
+        return input_vars
     
     
-    def _updateNewEntryTree(self, model_log):
-        """
-        """
-        # DEBUG
-#         model_log.log_pages['TGC'].update_check = True
-        model_log = self.getInputVars(model_log)
+    def clearSingleModelTable(self):
+        """Removes all entries from the single model selection table."""
+        self.tree_model.clear()
+    
+    
+    def clearMultipleModelTable(self):
+        """Removes all entries from the multiple model selection table."""
+        self.loadMultiModelTable.setRowCount(0)
         
+    
+    def _updateNewEntryTree(self, entry_status):
+        """Update the single entry TreeView with the contents of all_logs.
+        
+        Creates a TreeView separated by the different log types and the names
+        of the files under that type. Under the file name is the list of 
+        variables loaded for that model. The variables are color coded and 
+        made editable if they can be changed. If one of the files already
+        exists in the database the filename is colored red.
+        
+        Args:
+            entry_status (dict): containing a status flag for each of the loaded
+                files, indicating whether they are new or already exist in the
+                database. 
+        """
         brush_green = QtGui.QBrush(QtGui.QColor(204, 255, 153)) # Light green
         brush_red = QtGui.QBrush(QtGui.QColor(255, 204, 204)) # Light red
 
@@ -142,7 +171,7 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         self.tree_model.setHorizontalHeaderLabels(['Item', 'Value'])
 
         # Create an entry for each log type that exist in the model
-        for key, log_type in model_log.log_pages.iteritems():
+        for key, log_type in self.all_logs.log_pages.iteritems():
             if not log_type.has_contents: continue
 
             top = []
@@ -162,7 +191,7 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
                 
                 # Mark red if it won't be loaded into database. This is 
                 # because that file is already in there
-                if log_type.update_check:
+                if not log_type.name == 'RUN' and not entry_status[log_type.name][entry[log_type.name]]['Do Update']:
                     entry_item.setBackground(brush_red)
                     do_update = False
                 top_item.appendRow(entry_item)
@@ -176,7 +205,7 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
 
                     # If the entry is editable by user mark it so and color
                     # it green
-                    if do_update and data_key in model_log.editing_allowed:
+                    if do_update and data_key in self.all_logs.editing_allowed:
                         item1.setBackground(brush_green)
                     else:
                         item2.setFlags(QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
@@ -192,11 +221,15 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
     
     
     def _loadSingleLogEntry(self):
-        """
-        """
-#         open_path = r'P:\00 Project Files\13059 EA SW Consultancy Support\Technical\Kennford_model\model\hydraulics\Final_Model\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
-#         open_path = r'C:\Users\duncan.runnacles\Documents\Programming\Python\TMacTools\Code\TmacTools\src\tests\testinputdata\Model\tuflow\runs\Option1aPlus_ilo3_Cul6_Grange_T100D5CC_CWI_Run3_F_MHWS_v1-01 - Copy.tcf'
+        """Loads a model and checkes the contents against the database.
         
+        Calls LogBuilder to load the model from file. Then checks the loaded
+        filenames against those in the database and flags them if they already
+        exist.
+        
+        Finally gets the user entered main variables and calls the 
+        updateNewTree method to display the data to the user.
+        """
         # Launch dialog and get a file
         chosen_path = self.settings.cur_location
         if not self.settings.cur_model_path == '':
@@ -212,7 +245,6 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
                 self.launchQMsgBox('No Database', 'Please load a log database first')
                 return
             
-            
             open_path = str(open_path)
             self.loadModelTextbox.setText(open_path)
             self.settings.cur_model_path = open_path
@@ -220,24 +252,21 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
             errors = GuiStore.ErrorHolder()
             errors, self.all_logs = Controller.fetchAndCheckModel(self.cur_log_path, open_path, errors)
             
-            if not error.has_errors:
-                # Create a list of all of the available tables and their names
-                table_list = []
-                for log_key, log in self.all_logs.log_pages: #self.new_entry_tables.tables.values():
-                    for entry_key, entry in log[0]:
-                        if log_key == 'RUN': continue
-                        table_list.append([table.key, table.name])
-                 
-                # Update RUN seperately as it's treated in a different way to others
-                self.new_entry_tables.tables['RUN'].addRowValues(
-                                                    all_logs.getLogEntryContents('RUN', 0)) 
-                self.new_entry_tables.tables['RUN'].setEditColors(0)
+            # Init a dict to hold the exists/not exists status of the data
+            # being loaded
+            if not errors.has_errors:
+                entry_dict = {}
+                for log_key, log in self.all_logs.log_pages.iteritems(): 
+                    if log_key == 'RUN': continue
+                    entry_dict[log_key] = {}
+                    for item in log.contents:
+                        entry_dict[log_key][item[log_key]] = {}
                  
                 # check the new entries against the database and return them with
                 # flags set for whether they are new entries or already exist
                 errors = GuiStore.ErrorHolder()
-                entries, errors = Controller.loadEntrysWithStatus(
-                        self.settings.cur_log_path, self.all_logs, table_list, errors)
+                entry_status, errors = Controller.loadEntrysWithStatus(
+                        self.cur_log_path, self.all_logs, entry_dict, errors)
 
             if errors.has_errors:
                 self.launchQMsgBox("Load Error", 
@@ -245,12 +274,21 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
 #                 self.ui.statusbar.showMessage('Failed to load model at: %s' % open_path)
             else:
 #                 self.ui.statusbar.showMessage('Loaded model at: %s' % open_path)
-                self._updateNewEntryTree(self.all_logs)
+                input_vars = self.getInputVars()
+                run = self.all_logs.getLogEntryContents('RUN', 0)
+                run['MODELLER'] = input_vars['MODELLER']
+                run['TUFLOW_BUILD'] = input_vars['TUFLOW_BUILD'] 
+                run['ISIS_BUILD'] = input_vars['ISIS_BUILD'] 
+                run['EVENT_NAME'] = input_vars['EVENT_NAME'] 
+                self._updateNewEntryTree(entry_status)
                 self.submitSingleModelGroup.setEnabled(True) 
     
     
     def getSingleLogEntry(self):
-        """
+        """Get the data loaded into the single log entry tab.
+        
+        Return:
+            AllLogs - containing the loaded log data and any user updates.
         """
         if self.all_logs is None: return None
         
@@ -284,13 +322,17 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
             self.all_logs.updateSubLog(log, log_key)
         
         # Reset the tree
-        self.tree_model.clear()
+        self.clearSingleModelTable()
+        self.addSingleLogEntryButton.setEnabled(False)
         
         return self.all_logs
         
     
     def getMultipleModelPaths(self):
-        """
+        """Get the model paths in the multiple model loader table.
+        
+        Return:
+            list - absolute paths added to the table.
         """
         
         # Get all of the file paths from the list
@@ -333,10 +375,11 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
                 return
             
             self.loadMultiModelTable.setSortingEnabled(False)
-            row_count = self.loadMultiModelTable.rowCount()
             for p in open_paths:
+                self.settings.cur_model_path = str(p)
                 
                 # Insert a new row first if needed
+                row_count = self.loadMultiModelTable.rowCount()
                 self.loadMultiModelTable.insertRow(row_count)
                 
                 # Get the filename
@@ -438,22 +481,6 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         return self.settings
     
     
-#     def _getModelFileDialog(self, multi_paths=False):
-#         """Launches an open file dialog to get .ief or .tcf files.
-#         
-#         :param multi_paths=False: if set to True it will return a list of all
-#                the user selected paths, otherwise a single string path.
-#         :return: The chosen file path, a list of paths or false if the user 
-#                  cancelled.
-#         """
-#         
-#         open_path = d.openFileDialog(path=chosen_path, 
-#                 file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)',
-#                 multi_file=True)
-#         
-#         return open_path
-    
-        
         
 class ToolSettings(object):
     """Store the settings used by this class."""

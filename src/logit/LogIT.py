@@ -66,6 +66,8 @@
     DR - 05/04/2016:
          Removed log_type and selection combo box from interface. This is no
          longer needed because the loader accepts any type of model file.
+    DR - 14/04/2016:
+         Moved the new entry tab into a seperate widget.
 
   TODO:
      
@@ -148,10 +150,6 @@ class MainGui(QtGui.QMainWindow):
         self.settings.cur_settings_path = cur_settings_path
         
         self.model_log = None
-        # Columns that are editable by the user
-        self.editing_allowed = ['COMMENTS', 'MODELLER', 'SETUP', 'DESCRIPTION',
-                                'EVENT_NAME', 'EVENT_DURATION', 'ISIS_BUILD',
-                                'TUFLOW_BUILD', 'AMENDMENTS', 'RUN_OPTIONS']
         
         # Database tables that should be exported to Excel
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 'BC_DBASE']
@@ -173,43 +171,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.statusbar.addPermanentWidget(self.progress_bar)
         self.progress_bar.setValue(0)
 
-#         # Setup a custom QTableWidget for multiple model choice table so that
-#         # It can be drag and dropped into order
-#         self.ui.horizontalLayout_5.removeItem(self.ui.verticalLayout_21)
-#         self.ui.loadMultiModelTable = GuiStore.TableWidgetDragRows(0, 3, self)
-#         #self.ui.loadMultiModelTable.setHorizontalHeaderLabels(['Check', 'File name', 'Abs Path'])
-#         item = QtGui.QTableWidgetItem()
-#         item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-#         self.ui.loadMultiModelTable.setHorizontalHeaderItem(0, item)
-#         item.setText('')
-#         
-#         item = QtGui.QTableWidgetItem()
-#         item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-#         self.ui.loadMultiModelTable.setHorizontalHeaderItem(1, item)
-#         item.setText("TCF / IEF File Name")
-#         
-#         item = QtGui.QTableWidgetItem()
-#         item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
-#         self.ui.loadMultiModelTable.setHorizontalHeaderItem(2, item)
-#         item.setText("Absolute Path")
-#         
-#         self.ui.loadMultiModelTable.horizontalHeader().setDefaultSectionSize(300)
-#         self.ui.loadMultiModelTable.horizontalHeader().setMinimumSectionSize(300)
-#         self.ui.loadMultiModelTable.horizontalHeader().setStretchLastSection(True)
-#         self.ui.loadMultiModelTable.setColumnWidth(0, 30)
-#         self.ui.loadMultiModelTable.setStyleSheet('QTableWidget {background-color: rgb(255, 255, 255);}')
-#         self.ui.loadMultiModelTable.setSortingEnabled(True)
-#         self.ui.horizontalLayout_5.addWidget(self.ui.loadMultiModelTable)
-#         self.ui.horizontalLayout_5.addItem(self.ui.verticalLayout_21)
-
         # Connect the slots
-#         self.ui.loadModelButton.clicked.connect(self._loadFileActions)
-#         self.ui.addSingleLogEntryButton.clicked.connect(self._createLogEntry)
-#         self.ui.addMultiLogEntryButton.clicked.connect(self._createMultipleLogEntry)
-#         self.ui.addMultiModelButton.clicked.connect(self._updateMultipleLogSelection)
-#         self.ui.removeMultiModelButton.clicked.connect(self._updateMultipleLogSelection)
-#         self.ui.multiModelErrorClearButton.clicked.connect(self._clearMultiErrorText)
-#         self.ui.multiModelErrorCopyButton.clicked.connect(self._copyToClipboard)
         self.ui.actionLoad.triggered.connect(self.fileMenuActions)
         self.ui.actionExportToExcel.triggered.connect(self.fileMenuActions)
         self.ui.actionNewModelLog.triggered.connect(self.fileMenuActions)
@@ -312,23 +274,6 @@ class MainGui(QtGui.QMainWindow):
     def _setupUiContainer(self):
         """Create a convenient holding object for the gui inputs.
         """
-        
-#         self.new_entry_tables = GuiStore.TableHolder(GuiStore.TableHolder.NEW_LOG)
-#         self.new_entry_tables.addTable(GuiStore.TableWidget('RUN', 
-#                                     'runEntryTable', self.ui.runEntryTable))
-#         self.new_entry_tables.addTable(GuiStore.TableWidget('TCF', 
-#                                     'tcfEntryTable', self.ui.tcfEntryTable))
-#         self.new_entry_tables.addTable(GuiStore.TableWidget('ECF', 
-#                                     'ecfEntryTable', self.ui.ecfEntryTable))
-#         self.new_entry_tables.addTable(GuiStore.TableWidget('TGC', 
-#                                     'tgcEntryTable', self.ui.tgcEntryTable))
-#         self.new_entry_tables.addTable(GuiStore.TableWidget('TBC', 
-#                                     'tbcEntryTable', self.ui.tbcEntryTable))
-#         self.new_entry_tables.addTable(GuiStore.TableWidget('BC_DBASE', 
-#                                     'bcEntryTable', self.ui.bcEntryTable))
-#         self.new_entry_tables.addTable(GuiStore.TableWidget('DAT', 
-#                                     'datEntryTable', self.ui.datEntryTable))
-        
         self.view_tables = GuiStore.TableHolder(GuiStore.TableHolder.VIEW_LOG)
         self.view_tables.addTable(GuiStore.TableWidget('RUN', 
                             'runEntryViewTable', self.ui.runEntryViewTable))
@@ -415,8 +360,7 @@ class MainGui(QtGui.QMainWindow):
     
     
     def _highlightEditRow(self):
-        """
-        """
+        """Highlightes the calling cell in the View Tables."""
         sender = self.sender()
         s_name = str(sender.objectName())
         item = sender.currentItem()
@@ -445,7 +389,6 @@ class MainGui(QtGui.QMainWindow):
             logger.info('warning set check')
          
         elif call_name == 'actionLogInfo':
-#             logging.getLogger(__name__)
             self.ui.actionLogWarning.setChecked(False)
             self.ui.actionLogDebug.setChecked(False)
             self.ui.actionLogInfo.setChecked(True)
@@ -466,26 +409,12 @@ class MainGui(QtGui.QMainWindow):
             logger.debug('Debug set test')
             
         
-    def _clearMultiErrorText(self):
-        """Clears the error outputs in multi model load error textbox.
-        """
-        self.ui.multiModelLoadErrorTextEdit.clear()
-    
-    
     def _copyToClipboard(self):
         """Copies the contents of a textbox to clipboard.
         Textbox to copy is based on the calling action name.
         """
         caller = self.sender()
         call_name = caller.objectName()
-        
-#         if call_name == 'multiModelErrorCopyButton':
-#             text = self.ui.multiModelLoadErrorTextEdit.toPlainText()
-#         
-#             clipboard = QtGui.QApplication.clipboard()
-#             clipboard.setText(text)
-#             event = QtCore.QEvent(QtCore.QEvent.Clipboard)
-#             self.app.sendEvent(clipboard, event)
         
     
     def _updateMultipleLogSelection(self):
@@ -749,7 +678,6 @@ class MainGui(QtGui.QMainWindow):
             
             self.view_tables.clearAll()
             self.all_logs = None
-#             self._setupUiContainer()
              
             # load each of the tables from the database
             table_list = []
@@ -773,54 +701,6 @@ class MainGui(QtGui.QMainWindow):
                     table.addRows(entry[4], 0)
             
 
-#     def _fillEntryTables(self, all_logs):
-#         """Add the log pages data to the log entry tables that will be
-#         displayed to the user for amending prior to updating the database.
-#         
-#         :param log_pages: the log pages dictionary loaded from the model.
-#         """
-#         # Reset the tables first
-#         self.new_entry_tables.clearAll()
-#         
-#         self.all_logs = self._getInputLogVariables(all_logs)
-#         
-#         # Create a list of all of the available tables and their names
-#         table_list = []
-#         for table in self.new_entry_tables.tables.values():
-#             if table.key == 'RUN': continue
-#             table_list.append([table.key, table.name])
-#         
-#         # Update RUN seperately as it's treated in a different way to others
-#         self.new_entry_tables.tables['RUN'].addRowValues(
-#                                             all_logs.getLogEntryContents('RUN', 0)) 
-#         self.new_entry_tables.tables['RUN'].setEditColors(0)
-#         
-#         # check the new entries against the database and return them with
-#         # flags set for whether they are new entries or already exist
-#         errors = GuiStore.ErrorHolder()
-#         entries, errors = Controller.loadEntrysWithStatus(
-#                 self.settings.cur_log_path, self.all_logs, table_list, errors)
-#         
-#         # Add the entries to the gui tables with editable status set
-#         for entry in entries:
-#             table = self.new_entry_tables.getTable(name=entry[1])
-#             table.addRowValues(entry[0], entry[2])
-#             table.setEditColors(entry[2], entry[3])
-
-    
-#     def _getInputLogVariables(self, all_logs):
-#         """Put the variables entered by the user in the Input log variables
-#         group into the all_logs object.
-#         """
-#         run = all_logs.getLogEntryContents('RUN', 0)
-#         run['MODELLER'] = str(self.ui.modellerTextbox.text())
-#         run['TUFLOW_BUILD'] = str(self.ui.tuflowVersionTextbox.text())
-#         run['ISIS_BUILD'] = str(self.ui.isisVersionTextbox.text())
-#         run['EVENT_NAME'] = str(self.ui.eventNameTextbox.text())
-#         
-#         return all_logs
-        
-        
     def _createLogEntry(self):
         """Take the updated data in the provisional table and load it into the
         model log.
@@ -831,12 +711,10 @@ class MainGui(QtGui.QMainWindow):
         all_logs = self.widgets['New Entry'].getSingleLogEntry()
         if not all_logs == None:
             
-#             self._updateWithUserInputs()
-            
             try:
                 errors = GuiStore.ErrorHolder()
                 errors, all_logs = Controller.updateLog(
-                            self.settings.cur_log_path, all_logs, errors) # DEBUG , check_new_entries=True
+                            self.settings.cur_log_path, all_logs, errors) 
                 
                 if errors.has_errors:
                     if errors.msgbox_error:
@@ -849,16 +727,13 @@ class MainGui(QtGui.QMainWindow):
                 self.loadModelLog()
             except:
                 self._updateStatusBar('')
-                msg = ('Critical Error - Failed to load model.\nThis is' +
-                       'likely a software issue and should never happen. Please' +
-                       'contact developer')
+                msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
+                       "all gone terribly wrong. You're on your own dude.\n" +
+                       "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
+                       "Game over man, I'm outta here <-((+_+))->")
                 logger.error(msg)
                 self.launchQMsgBox('Critical Error', msg)
                 return
-            
-            # Clear the entry rows and deactivate add new log button
-#             self.new_entry_tables.clearAll()
-#             self.ui.submitSingleModelGroup.setEnabled(False)
             
             # Update the status bar message
             self.ui.statusbar.showMessage("Log Database successfully updated")
@@ -870,25 +745,12 @@ class MainGui(QtGui.QMainWindow):
         """Takes all the files in the multiple model list, load them and add
         them to the database.        
         """
-            
         # Check that we have a database
         if not self.checkDbLoaded(): return
         
         # Get all of the file paths from the list
         model_paths = self.widgets['New Entry'].getMultipleModelPaths()
         if not model_paths: return
-#         model_paths = []
-#         allRows = self.ui.loadMultiModelTable.rowCount()
-#         
-#         try:
-#             for row in xrange(0,allRows):
-#                 model_paths.append(str(self.ui.loadMultiModelTable.item(row,2).text()))
-#         except AttributeError, err:
-#             logger.error('Blank entries in load table: ' + str(err))
-#             self.launchQMsgBox('Corrupted Inputs', 
-#                                ('Somehow the input table has been corrupted. ' +
-#                                 'Please reload files and try again'))
-#             return
         
         # Load all of the models into a list
         model_logs = []
@@ -898,6 +760,9 @@ class MainGui(QtGui.QMainWindow):
         total = len(model_paths)
         prog_count = 1
         self._updateMaxProgress(total)
+        
+        # Get the global user supplied log variables
+        input_vars = self.widgets['New Entry'].getInputVars()
         
         try:
             # Loop through all of the file paths given
@@ -915,8 +780,11 @@ class MainGui(QtGui.QMainWindow):
                 if errors.has_local_errors:
                     continue
                 
-                # Get the global user supplied log variables
-                all_logs = self._getInputLogVariables(all_logs)
+                run = all_logs.getLogEntryContents('RUN', 0)
+                run['MODELLER'] = input_vars['MODELLER']
+                run['TUFLOW_BUILD'] = input_vars['TUFLOW_BUILD'] 
+                run['ISIS_BUILD'] = input_vars['ISIS_BUILD'] 
+                run['EVENT_NAME'] = input_vars['EVENT_NAME'] 
 
                 # Update the log entries
                 errors, all_logs = Controller.updateLog(
@@ -948,43 +816,24 @@ class MainGui(QtGui.QMainWindow):
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
             text = errors.formatErrors('Some models could not be logged:')
-            self.ui.multiModelLoadErrorTextEdit.setText(text)
+            self.widgets['New Entry'].multiModelLoadErrorTextEdit.setText(text)
             message = 'Some files could not be logged.\nSee Error Logs window for details'
             self.launchQMsgBox('Logging Error', message)
 
         else:
-            # Clear the list entries
-            self.ui.loadMultiModelTable.setRowCount(0)
             logger.info('Log Database updated successfully')
             self.ui.statusbar.showMessage("Log Database successfully updated")
             self._updateCurrentProgress(0)
         
-    
-#     def _updateWithUserInputs(self):
-#         """Get the variables that we want to allow the user to be able to update.
-#         """
-#         for log in self.all_logs.log_pages.values():
-#             if not log.has_contents: 
-#                 continue
-#             
-#             for i, row in enumerate(log.contents, 1):
-#                 table_row = self.new_entry_tables.tables[log.name].getValues(i)
-# 
-#                 for key, entry in table_row.iteritems():
-#                     row[key] = entry
-        
+        # Clear the list entries
+        self.widgets['New Entry'].clearMultipleModelTable()
 
+    
     def _loadSettings(self):
         """Get the settings loaded from file if they exist.
         """
         try:
             self.ui.statusbar.showMessage("Current log: " + str(self.settings.cur_log_path))
-#             self.ui.modellerTextbox.setText(self.settings.modeller)
-#             self.ui.tuflowVersionTextbox.setText(self.settings.tuflow_version)
-#             self.ui.isisVersionTextbox.setText(self.settings.isis_version)
-#             self.ui.eventNameTextbox.setText(self.settings.event_name)
-#             self.ui.loadModelComboBox.setCurrentIndex(int(self.settings.cur_model_type))
-#             self.ui.loadModelTab.setCurrentIndex(int(self.settings.cur_load_tab))
             
             if self.settings.logging_level == logging.WARNING:
                 self.ui.actionLogWarning.setChecked(True)
@@ -1001,8 +850,6 @@ class MainGui(QtGui.QMainWindow):
                 else:
                     self.settings.last_model_directory = os.path.split(self.settings.cur_log_path)[0]
        
-#             self.ui.loadModelTextbox.setText(self.settings.last_model_directory)
-        
         except:
             logger.warning('Was unable to retrieve previous settings - Has LogIT been updated?')
         
@@ -1024,11 +871,6 @@ class MainGui(QtGui.QMainWindow):
         logger.info('Closing program')
         logger.info('Saving user settings to: ' + save_path)
         try:
-#             self.settings.modeller = str(self.ui.modellerTextbox.text())
-#             self.settings.tuflow_version = str(self.ui.tuflowVersionTextbox.text())
-#             self.settings.isis_version = str(self.ui.isisVersionTextbox.text())
-#             self.settings.event_name = str(self.ui.eventNameTextbox.text())
-#             self.settings.cur_model_type = str(self.ui.loadModelComboBox.currentIndex())
             self.settings.cur_tab = self.ui.tabWidget.currentIndex()
             self._getColumnWidths()
             _writeWidgetSettings()
@@ -1117,6 +959,7 @@ class MainGui(QtGui.QMainWindow):
                 try:
                     self.loadModelLog()
                     self.ui.statusbar.showMessage("Current log: " + open_path)
+                    self.widgets['New Entry'].cur_log_path = open_path
                 except:
                     logger.error('Cannot load database: see log for details')
                     self.launchQMsgBox(errors.types[errors.DB_UPDATE].title, 
@@ -1132,20 +975,19 @@ class MainGui(QtGui.QMainWindow):
         else:
             p = self.settings.cur_settings_path
             
-        #self.settings.cur_settings_path)[0]
         d = MyFileDialogs()
         save_path = d.saveFileDialog(path=p, file_types='LogIT database(*.logdb)')
         
         if not save_path == False:
             self.settings.cur_log_path = str(save_path)
             self.widgets['New Entry'].cur_log_path = str(save_path)
-#             self.new_entry_tables.clearAll()
             self.view_tables.clearAll()
             self.ui.statusbar.showMessage('Building new log database...')
             self.ui.centralwidget.setEnabled(False)
             DatabaseFunctions.createNewLogDatabase(str(save_path))
             self.ui.centralwidget.setEnabled(True)
             self.ui.statusbar.showMessage("Current log: " + save_path)
+            self.widgets['New Entry'].cur_log_path = str(save_path)
     
     
     def _loadDatabaseFromUser(self):
@@ -1166,7 +1008,7 @@ class MainGui(QtGui.QMainWindow):
             self.settings = LogitSettings()
         
         self.settings.cur_log_path = open_path
-        self.widgets['New Entry'].cur_log_path = str(save_path)
+        self.widgets['New Entry'].cur_log_path = str(open_path)
         
         try:
             self.loadModelLog()
@@ -1246,38 +1088,6 @@ class MainGui(QtGui.QMainWindow):
         return open_path
     
           
-#     def _loadFileActions(self, shortcut=None):
-#         """Respond to the user clicking a button that loads a file.
-#         """
-#         caller = self.sender()
-#         call_name = caller.objectName()
-#         logger.debug('Caller = ' + call_name)
-#         
-#         # Trying to load a model to add to the log
-#         if call_name == 'loadModelButton' or shortcut == 'loadmodel':
-#                 
-#             # Launch dialog and get a file
-#             open_path = self._getModelFileDialog()
-#             
-#             # If the user doesn't cancel
-#             if not open_path == False:
-#                 open_path = str(open_path)
-#                 self.ui.loadModelTextbox.setText(open_path)
-#                 self.settings.last_model_directory = os.path.split(str(open_path))[0]
-#                 
-#                 errors = GuiStore.ErrorHolder()
-#                 errors, all_logs = Controller.fetchAndCheckModel(self.settings.cur_log_path, open_path, errors)
-#     
-#                 if errors.has_errors:
-#                     self.launchQMsgBox("Load Error", 
-#                                        errors.formatErrors())
-#                     self.ui.statusbar.showMessage('Failed to load model at: %s' % open_path)
-#                 else:
-#                     self.ui.statusbar.showMessage('Loaded model at: %s' % open_path)
-#                     self._fillEntryTables(all_logs)
-#                     self.ui.submitSingleModelGroup.setEnabled(True) 
-
-
     def _resolveIefs(self):
         """Attempt to automatically update ief files references to current dir.
         
@@ -1488,83 +1298,6 @@ class MainGui(QtGui.QMainWindow):
         self.progress_bar.setValue(value)
         self.app.processEvents()
     
-
-# class ProgressMonitor(object):
-#     """Convenience class for updating progress bars and text.
-#     
-#     This stays in this module becuase it sort of breaks the encapsulation of
-#     the MainGui class by updating its progress bar and text label. It's better
-#     than having to little progress update code all over the place though.
-#     """
-#      
-#     def __init__(self, progbar_ui, statustext_ui=None):
-#         self.progbar_ui = progbar_ui
-#         self.statustext_ui = statustext_ui
-#         self.prog_cur = 0
-#         self.text_cur = 0
-#     
-#     def setRanges(self, prog_up, text_down=None, text_up=None, textform='%d of %d'): 
-#         """Set the range to operate on.
-#         :param prog_up: max progress bar value.
-#         :param text_down=None: lowest text counter value.
-#         :param text_up=None: max text counter value.
-#         :param textform=None: format to dislplay text counter in.
-#         """
-#         self.prog_up = prog_up
-#         self.text_up = text_up
-#         self.text_current = self.text_down = text_down
-#         self.textform = textform
-#         self.progbar_ui.setRange(0, prog_up)
-#         self.setToStart()
-#     
-#     def setToStart(self):
-#         """Set progress counters to start point.
-#         """
-#         self.progbar_ui.setValue(0)
-#         if not self.statustext_ui == None and not self.text_cur == None and not self.text_up == None:
-#             text_out = self.textform % (self.text_cur, self.text_up)
-#             self.statustext_ui.showMessage(text_out)
-#     
-#     def reset(self, text=None):
-#         """Reset the progress bar to normal state.
-#         :param text=None: text to display in text label.
-#         """
-#         self.setToStart()
-#         if text == None: text = ''
-#         self.statustext_ui.showMessage(text)
-#     
-#     def update(self, do_bar=True, do_text=False):
-#         """Update progress.
-#         :param bar_only=False: don't update the progress bar.
-#         :param text_only=False: don't update the text counter.
-#         """
-#         if do_bar:
-#             self.updateBarProgress()
-#         if do_text:
-#             self.updateTextProgress()
-#         QtGui.QApplication.processEvents()
-#     
-#     def updateBarProgress(self):
-#         """Iterate and update progress bar
-#         """
-#         self.prog_cur += 1
-#         self.progbar_ui.setValue(self.prog_cur)
-#     
-#     
-#     def updateStatus(self, status_text):
-#         """Update the status text."""
-#         self.statustext_ui.showMessage(status_text)
-#         
-#     
-#     def updateTextProgress(self):
-#         """Iterate and update text counter label.
-#         """
-#         if self.statustext_ui == None:
-#             return
-#         else:
-#             self.text_cur += 1
-#             text_out = self.textform % (self.text_cur, self.text_up)
-#             self.statustext_ui.showMessage(text_out)
 
 
 class LogitSettings(object):
