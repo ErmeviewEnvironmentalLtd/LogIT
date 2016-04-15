@@ -181,7 +181,6 @@ class Ui_NewEntryWidget(object):
         self.verticalLayout_2.addLayout(self.horizontalLayout_3)
         self.modelEntryTreeView = QtGui.QTreeView(self.loadSingleModelTab)
         self.modelEntryTreeView.setAlternatingRowColors(True)
-        self.modelEntryTreeView.setHeaderHidden(True)
         self.modelEntryTreeView.setObjectName(_fromUtf8("modelEntryTreeView"))
         self.verticalLayout_2.addWidget(self.modelEntryTreeView)
         self.loadModelTab.addTab(self.loadSingleModelTab, _fromUtf8(""))

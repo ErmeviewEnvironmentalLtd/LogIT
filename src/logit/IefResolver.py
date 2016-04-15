@@ -140,7 +140,7 @@ class IefHolder(object):
     
     def __init__(self, ief_obj):
         self.ief_obj = ief_obj
-        self.original_path = ief_obj.path_holder.getAbsPath()
+        self.original_path = ief_obj.path_holder.getAbsolutePath()
         self.root_folder_old = ''
         self.root_folder_new = ''
         self.result_name = ''
@@ -160,7 +160,7 @@ class IefHolder(object):
         Return:
             Ief - updated with the path variables held by this class.
         """
-        p, e = os.path.splitext(self.ief_obj.path_holder.getAbsPath())
+        p, e = os.path.splitext(self.ief_obj.path_holder.getAbsolutePath())
         p = p + '_LOGIT' + e
         self.ief_obj.path_holder.setPathsWithAbsolutePath(p)
         
@@ -268,9 +268,9 @@ def writeUpdatedFiles(ief_objs):
     for ief in ief_objs:
         contents = ief.getPrintableContents()
         try:
-            ft.writeFile(contents, ief.path_holder.getAbsPath())
+            ft.writeFile(contents, ief.path_holder.getAbsolutePath())
         except IOError:
-            logger.error('Could nto write new ief file at:\n' + ief.path_holder.getAbsPath())
+            logger.error('Could nto write new ief file at:\n' + ief.path_holder.getAbsolutePath())
             return False
     return True
     
@@ -448,12 +448,13 @@ def autoResolvePath(ief_path, search_folder_depth=4):
     cur_ief_location = os.path.split(ief_path)[0]
     
     # Get the dat and results paths from ief object
-    ief_files_refs = ief_obj.getFilePaths()[0]
-    ief_datafile = ief_files_refs['datafile']
+#     ief_files_refs = ief_obj.getFilePaths()[0]
+    ief_files_refs = ief_obj.getFilePaths()
+    ief_datafile = ief_files_refs['Datafile']
     ief_holder.addFile(ief_datafile, 'in', test_exists=False)
 
     # Don't get the placeholder filename for the results
-    ief_resultsfile, result_name = os.path.split(ief_files_refs['results'])
+    ief_resultsfile, result_name = os.path.split(ief_files_refs['Results'])
     ief_holder.addFile(ief_resultsfile, 'in', test_exists=False)
     ief_holder.result_name = result_name
     in_paths = [ief_datafile, ief_resultsfile]
@@ -463,12 +464,12 @@ def autoResolvePath(ief_path, search_folder_depth=4):
     root of all the model files. Use 2d if it's available because it will
     most likely define a more upstream folder location.
     '''
-    if 'twodfile' in ief_files_refs.keys():
-        reference_file = ief_files_refs['twodfile']
+    if ief_files_refs['2DFile'] is not None:
+        reference_file = ief_files_refs['2DFile']
         ief_holder.addFile(reference_file, 'in', test_exists=False)
-        in_paths.append(ief_files_refs['twodfile'])
+        in_paths.append(ief_files_refs['2DFile'])
     else:
-        reference_file = ief_files_refs['datafile']
+        reference_file = ief_files_refs['Datafile']
     ref_ext = os.path.splitext(reference_file)[1]
 
     # Get the folder of the reference file without the file name

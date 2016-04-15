@@ -168,7 +168,7 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
 
         self.tree_model = QtGui.QStandardItemModel()
         self.tree_model.setColumnCount(2)
-        self.tree_model.setHorizontalHeaderLabels(['Item', 'Value'])
+        self.tree_model.setHorizontalHeaderLabels(['Log Type', 'Variables'])
 
         # Create an entry for each log type that exist in the model
         for key, log_type in self.all_logs.log_pages.iteritems():
@@ -230,6 +230,10 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         Finally gets the user entered main variables and calls the 
         updateNewTree method to display the data to the user.
         """
+        if not os.path.exists(self.cur_log_path):
+            self.launchQMsgBox('No log Database', 'There is no log database loaded.\n Please load one first.')
+            return
+        
         # Launch dialog and get a file
         chosen_path = self.settings.cur_location
         if not self.settings.cur_model_path == '':

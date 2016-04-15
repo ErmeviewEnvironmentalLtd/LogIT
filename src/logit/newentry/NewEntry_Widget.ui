@@ -431,9 +431,6 @@ loaded model to the log database.</string>
                <property name="alternatingRowColors">
                 <bool>true</bool>
                </property>
-               <property name="headerHidden">
-                <bool>true</bool>
-               </property>
               </widget>
              </item>
             </layout>

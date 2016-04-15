@@ -1,3 +1,6 @@
+- Bugfix for Ief Resolver and Model loader.
+-
+- Main release notes available below:
 - Big change to single model load user interface. Got rid of all of the 
   ugly tables and replaced it with a navigable tree. Same colour schemes
   etc still apply.
