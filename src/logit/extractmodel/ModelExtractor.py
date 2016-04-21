@@ -148,22 +148,13 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         
     
     def _extractModel(self):
+        """Extract the given model.
+        
+        Calls two functions to setup and find the file and then to write them
+        to the new location.
         """
-        """
-        
-        def finalizeExtraction():
-            """
-            """
-            self.emit(QtCore.SIGNAL("updateProgress"), 0)
-            self.emit(QtCore.SIGNAL("statusUpdate"), '')
-            
-        
-        self._extractVars = ExtractVars()
-        self.extractOutputTextArea.clear()
-        
         in_path = str(self.extractModelFileTextbox.text())
         out_dir = str(self.extractOutputTextbox.text())
-         
         if not os.path.exists(in_path):
             logger.error('Model file does not exist')
             QtGui.QMessageBox.warning(self, "File not found",
@@ -176,6 +167,23 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                                       "Output directory does not exist")
             return
 
+        success, tuflow_files = self._extractModelSetup(in_path, out_dir)
+        if success:
+            success = self._extractModelWrite(tuflow_files)
+
+        self._displayOutput(in_path, out_dir)
+        self.emit(QtCore.SIGNAL("updateProgress"), 0)
+        self.emit(QtCore.SIGNAL("statusUpdate"), '')
+        
+        # Log use on the server
+        if not gs.__DEV_MODE__:
+            applog.AppLogger().write('Extractor')
+    
+    def _extractModelSetup(self, in_path, out_dir):
+        """Finds all the files and re-writes the file path variables."""
+
+        self._extractVars = ExtractVars()
+        self.extractOutputTextArea.clear()
         self._extractVars.out_dir = out_dir
         
         # Check if we're dealing with an ief or a tcf
@@ -199,8 +207,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             
             success = self._updateModelFilePaths() 
             if not success:
-                finalizeExtraction()
-                return
+                return False, None
 
             tuflow_files = self._extractVars.tuflow.getPrintableContents()
         
@@ -208,9 +215,12 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             logger.error('Model has found tcf but tcf_path is None')
             QtGui.QMessageBox.warning(self, "Tcf is None",
                                       "Model has found tcf but tcf_path is None")
-            finalizeExtraction()
-            return 
+            return False, None
+        
+        return True, tuflow_files
             
+    def _extractModelWrite(self, tuflow_files):
+        """Writes out all the updated files to the new location."""
         
         # Get the input and output files together and copy everything
         combo_files = self._mergeFiles() 
@@ -220,8 +230,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             logger.error('File paths have corrupted in load')
             QtGui.QMessageBox.warning(self, "File path corruption",
                                       "Some in-filenames do not mach out-filenames.\nThis has corrupted the copy attempt")
-            finalizeExtraction()
-            return 
+            return False
         
         if not self._extractVars.ief == None:
             contents = self._extractVars.ief.getPrintableContents()
@@ -237,13 +246,8 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             for path, contents in tuflow_files.iteritems():
                 filetools.writeFile(contents, path, add_newline=False)
         
-        self._displayOutput(in_path, out_dir)
-        finalizeExtraction()
+        return True
         
-        # Log use on the server
-        if not gs.__DEV_MODE__:
-            applog.AppLogger().write('Extractor')
-    
     
     def _displayOutput(self, infile, outdir):
         """
@@ -693,8 +697,6 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         
         Any reference to any file components in the ief is stored.
         """
-        dat_name = ''
-        
         loader = FileLoader()
         self._extractVars.ief = loader.loadFile(self._extractVars.ief_path)
         
@@ -725,7 +727,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             self._extractVars.results_files.append([os.path.join(d, f),
                                os.path.join(self._extractVars.out_dir, r'fmp\results', f)
                               ])
-            self._extractVars.ief.event_header['Results'] = r'..\results'
+            self._extractVars.ief.event_header['Results'] = os.path.join(r'..\results', f)
         
         for i, ied in enumerate(self._extractVars.ief.ied_data):
             ied_in = ied['file']
