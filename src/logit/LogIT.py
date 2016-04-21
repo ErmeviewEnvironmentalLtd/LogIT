@@ -137,7 +137,7 @@ class MainGui(QtGui.QMainWindow):
     """Main GUI application window for the PysisTools software.
     """
      
-    def __init__(self, cur_settings, cur_settings_path, test_mode=False, parent=None):
+    def __init__(self, cur_settings, cur_settings_path, parent=None):
         """Constructor.
         :param parent: Reference to the calling class.
         """        
@@ -155,15 +155,16 @@ class MainGui(QtGui.QMainWindow):
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 'BC_DBASE']
             
         # Start the application and initialise the GUI
-        self.app = QtGui.QApplication(sys.argv)
+#         self.app = QtGui.QApplication(sys.argv) # ~
         
-        #icon_path = os.path.join(cur_settings_path, 'Logit_Logo.ico')
+        icon_path = os.path.join(cur_settings_path, 'Logit_Logo.ico')
         #self.app.setWindowIcon(QtGui.QIcon(':images/Logit_Logo.png'))
-        self.app.aboutToQuit.connect(self._customClose)
-        MainGui = QtGui.QMainWindow()
+
+#         self.app.aboutToQuit.connect(self._customClose) # ~
+#         MainGui = QtGui.QMainWindow()
         QtGui.QMainWindow.__init__(self, parent)
-        self.ui = Ui_MainWindow()
-        self.ui.setupUi(MainGui)
+        self.ui = Ui_MainWindow() # ~
+        self.ui.setupUi(self)
         
         # Add a progress bar to the status bar
         self.progress_bar = QtGui.QProgressBar(self.ui.statusbar)
@@ -175,7 +176,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionLoad.triggered.connect(self.fileMenuActions)
         self.ui.actionExportToExcel.triggered.connect(self.fileMenuActions)
         self.ui.actionNewModelLog.triggered.connect(self.fileMenuActions)
-        self.ui.actionExit.triggered.connect(self._customClose)
+#         self.ui.actionExit.triggered.connect(self._customClose) # ~
         self.ui.actionUpdateDatabaseSchema.triggered.connect(self._updateDatabaseVersion)
         self.ui.actionSaveSetupAs.triggered.connect(self._saveSetup)
         self.ui.actionLoadSetup.triggered.connect(self._loadSetup)
@@ -246,11 +247,10 @@ class MainGui(QtGui.QMainWindow):
         self.loadModelLog()
         self.all_logs = None
         
-        self.setWindowIcon(QtGui.QIcon(':Logit_Logo2_25x25.png'))
+#         self.setWindowIcon(QtGui.QIcon(':Logit_Logo2_25x25.png'))
         
         # Activate the GUI
-        if not test_mode:
-            MainGui.show()
+#         MainGui.show() # ~
         
         self._showReleaseNotes()
         
@@ -269,7 +269,7 @@ class MainGui(QtGui.QMainWindow):
             self._checkUpdatesFalse()
         
         
-        sys.exit(self.app.exec_())
+#         sys.exit(self.app.exec_()) # ~
         
     
     def _setupUiContainer(self):
@@ -926,7 +926,8 @@ class MainGui(QtGui.QMainWindow):
             self._loadSettings()
         
     
-    def _customClose(self):
+#     def _customClose(self):
+    def closeEvent(self, event):
         """Do the things that need doing before closing window.
         """
         save_path = self.settings.cur_settings_path
@@ -1237,7 +1238,8 @@ class MainGui(QtGui.QMainWindow):
         data = QtCore.QMimeData()
         url = QtCore.QUrl.fromLocalFile(zip_log)
         data.setUrls([url])
-        self.app.clipboard().setMimeData(data)
+#         self.app.clipboard().setMimeData(data)
+        QtGui.QApplication.clipboard().setMimeData(data)
     
     
     def _getColumnWidths(self):
@@ -1293,7 +1295,8 @@ class MainGui(QtGui.QMainWindow):
     def _updateStatusBar(self, string): 
         self.ui.statusbar.showMessage(string)
         logger.debug('updating status bar: ' + string)
-        self.app.processEvents()
+#         self.app.processEvents()
+        QtGui.QApplication.processEvents()
         
     def _updateMaxProgress(self, value):
         """"""
@@ -1302,7 +1305,8 @@ class MainGui(QtGui.QMainWindow):
     def _updateCurrentProgress(self, value):
         """"""
         self.progress_bar.setValue(value)
-        self.app.processEvents()
+#         self.app.processEvents()
+        QtGui.QApplication.processEvents()
     
 
 
@@ -1366,7 +1370,14 @@ def main():
         print 'Unable to load user defined settings'
          
     # Launch the user interface.
-    MainGui(cur_settings, settings_path)
+    app = QtGui.QApplication(sys.argv)
+    myapp = MainGui(cur_settings, settings_path)
+    icon_path = os.path.join(settings_path, 'Logit_Logo.ico')
+    app.setWindowIcon(QtGui.QIcon(':images/Logit_Logo.png'))
+    myapp.show()
+    sys.exit(app.exec_())
+
+#     MainGui(cur_settings, settings_path)
  
  
 if __name__ == '__main__': main()

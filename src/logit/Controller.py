@@ -400,7 +400,7 @@ def loadEntrysWithStatus(db_path, all_logs, entry_dict, errors):
     :return: list containing sub-lists of all of the rows to be displayed on
              the New log entry page tables.
     """
-     # We need to find if the TGC and TBC files have been registered with the
+    # We need to find if the TGC and TBC files have been registered with the
     # database before. If they have then we don't need to register them 
     # again.
     db_manager = DatabaseFunctions.DatabaseManager(db_path)
@@ -715,7 +715,7 @@ def fetchAndCheckModel(db_path, open_path, errors):
         # allowed.
         main_ief = all_logs.getLogEntryContents('RUN', 0)['IEF'] 
         main_tcf = all_logs.getLogEntryContents('RUN', 0)['TCF'] 
-        tcf_results = all_logs.getLogEntryContents('RUN', 0)['RESULTS_LOCATION_2D'] 
+#         tcf_results = all_logs.getLogEntryContents('RUN', 0)['RESULTS_LOCATION_2D'] 
         
         indb = False
         
@@ -729,22 +729,22 @@ def fetchAndCheckModel(db_path, open_path, errors):
                 
                 # Check if the .ief file has already been logged
                 if indb:
-                    logger.error('Log entry already exists for :\n%s' % (main_ief))
+                    logger.warning('Log entry already exists for :\n%s' % (main_ief))
                     errors.addError(errors.LOG_EXISTS, 
                                         msg_add=(':\nfile = %s' % (open_path)),
                                                             msgbox_error=True)
                     return errors, all_logs
 
                 # Check if results file has already been logged
-                else:                    
-                    indb = db_manager.findEntry('RUN', 'RESULTS_LOCATION_1D', 
-                                            tcf_results,column_only=True)
-                    if indb:
-                        logger.error('Model results alreads exist for :\n%s' % (main_ief))
-                        errors.addError(errors.RESULTS_EXIST, 
-                                        msg_add=('in:\n%s' % (main_ief)), 
-                                                        msgbox_error=True)
-                        return errors, all_logs
+#                 else:                    
+#                     indb = db_manager.findEntry('RUN', 'RESULTS_LOCATION_1D', 
+#                                             tcf_results,column_only=True)
+#                     if indb:
+#                         logger.warning('Model results alreads exist for :\n%s' % (main_ief))
+#                         errors.addError(errors.RESULTS_EXIST, 
+#                                         msg_add=('in:\n%s' % (main_ief)), 
+#                                                         msgbox_error=True)
+#                         return errors, all_logs
                     
             # Do the whole lot again for the tuflow run
             if not main_tcf == 'None':
@@ -752,9 +752,9 @@ def fetchAndCheckModel(db_path, open_path, errors):
                                             main_tcf,column_only=True)
             
                 if indb:
-                    logger.error('Log entry already exists for :\n%s' % (open_path))
+                    logger.error('Log entry already exists for :%s\nIn file:%s' % (main_tcf, open_path))
                     errors.addError(errors.LOG_EXISTS, 
-                                            msg_add=(':\nfile = %s' % (open_path)),
+                                            msg_add=(':\nfile = %s' % (main_tcf)),
                                                                 msgbox_error=True)
             return errors, all_logs
                     
@@ -886,7 +886,7 @@ def downloadNewVersion(cur_location, server_dir, download_filename):
     try:
         shutil.copy(userfile_old, userfile_new)
     except IOError:
-        logger.error('Unable to copy user settings file\n from: %s \nto: %s' % (user_file, exe_location))
+        logger.error('Unable to copy user settings file\n from: %s \nto: %s' % (userfile_old, userfile_new))
     
     return True    
 

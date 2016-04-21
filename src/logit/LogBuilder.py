@@ -134,15 +134,14 @@ def loadModel(file_path):
         ief = model_file
         ief_dir = str(os.path.split(file_path)[0])
         
-        # Get the ief filepaths (this returns a tuple of main paths, ied paths 
-        # and snapshot paths, but we only want the main ones)
-#         ief_paths = ief.getFilePaths()[0]
+        # Get the tcf and the 2D Scheme details
         tcf_path = ief.getValue('2DFile')
+        scheme = ief.getValue('2DScheme')
         
         # If the path that the ief uses to reach the tcf file doesn't exist it
         # means that the ief paths haven't been updated on the local machine, so
         # we return False and log the error.
-        if not tcf_path == False: 
+        if scheme == 'TUFLOW' and tcf_path is not None: 
             log_type = TYPE_TUFLOW
             if tcf_path == False or not os.path.exists(tcf_path):
                 logger.error('Tcf file referenced by ief does not exist at\n:' +

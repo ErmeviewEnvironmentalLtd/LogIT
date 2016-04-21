@@ -79,6 +79,7 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         self.settings.cur_location = cwd
         self.cur_log_path = cur_log_path
         self.all_logs = None
+        self._TEST_MODE = False
         
         self.setupUi(self)
         
@@ -220,7 +221,7 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         self.modelEntryTreeView.expandAll()
     
     
-    def _loadSingleLogEntry(self):
+    def _loadSingleLogEntry(self, testpath=''):
         """Loads a model and checkes the contents against the database.
         
         Calls LogBuilder to load the model from file. Then checks the loaded
@@ -230,18 +231,21 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         Finally gets the user entered main variables and calls the 
         updateNewTree method to display the data to the user.
         """
-        if not os.path.exists(self.cur_log_path):
-            self.launchQMsgBox('No log Database', 'There is no log database loaded.\n Please load one first.')
-            return
-        
-        # Launch dialog and get a file
-        chosen_path = self.settings.cur_location
-        if not self.settings.cur_model_path == '':
-            chosen_path = self.settings.cur_model_path
-        d = MyFileDialogs()
-        open_path = d.openFileDialog(path=chosen_path, 
-                                     file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)', 
-                                     multi_file=False)
+        if self._TEST_MODE:
+            open_path = testpath
+        else:
+            if not os.path.exists(self.cur_log_path):
+                self.launchQMsgBox('No log Database', 'There is no log database loaded.\n Please load one first.')
+                return
+            
+            # Launch dialog and get a file
+            chosen_path = self.settings.cur_location
+            if not self.settings.cur_model_path == '':
+                chosen_path = self.settings.cur_model_path
+            d = MyFileDialogs()
+            open_path = d.openFileDialog(path=chosen_path, 
+                                         file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)', 
+                                         multi_file=False)
         
         # If the user doesn't cancel
         if not open_path == False:
@@ -261,7 +265,7 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
             if not errors.has_errors:
                 entry_dict = {}
                 for log_key, log in self.all_logs.log_pages.iteritems(): 
-                    if log_key == 'RUN': continue
+                    if log_key == 'RUN' or log.has_contents == False: continue
                     entry_dict[log_key] = {}
                     for item in log.contents:
                         entry_dict[log_key][item[log_key]] = {}
@@ -327,7 +331,7 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         
         # Reset the tree
         self.clearSingleModelTable()
-        self.addSingleLogEntryButton.setEnabled(False)
+        self.submitSingleModelGroup.setEnabled(False)
         
         return self.all_logs
         
