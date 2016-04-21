@@ -1,16 +1,12 @@
-- Bugfix for Ief Resolver and Model loader.
--
-- Main release notes available below:
-- Big change to single model load user interface. Got rid of all of the 
-  ugly tables and replaced it with a navigable tree. Same colour schemes
-  etc still apply.
-- Moved New Entry tab into a separate widget to attempt to reduce the amount
-  of code in the LogIT.py.
-- Fixed bug in new version downloader copy settings process. It should now
-  copy settings across properly.
-- Added additional message to new version downloader to let the user know if
-  it has been successfull and instruct on what to do next.
-- Some more work on fixing result/check/log paths so that they load properly. 
-  There is probably still some work to do here.
-- Update Model Extractor tool. Now copes much better with the different 
-  formats for check file paths.
+- Bugfix for loading a 1D only model when 2D scheme is set to None. Previously
+  this wasn't checked and if a tcf file was found in the ief file it was loaded
+  into the database. This was happening even if the use of 2d was deactivated.
+  The active status is now checked and only 1D components are loaded if it is
+  not active.
+- Set 2d results location back to being the folder only and not folder plus
+  the tcf filename. This is because results locations can hold additional
+  sub area outputs etc as well.
+- Started to implement some unit tests to try and get better at catching
+  a few of the regression that seem to be prevailant in the last few releases.
+  This will also help to identify and solve some of the problems with the
+  slightly unhelpful error messages that are being launched.

@@ -252,8 +252,6 @@ class MainGui(QtGui.QMainWindow):
         # Activate the GUI
 #         MainGui.show() # ~
         
-        self._showReleaseNotes()
-        
         # Set default logging level if used in release
         if not gs.__DEV_MODE__:
             self.ui.actionLogWarning.setChecked(False)
@@ -265,11 +263,16 @@ class MainGui(QtGui.QMainWindow):
             logger.info('Logging level set to: INFO')
             logger.debug('info set check')
         
-            # Check if there's a newer version available
-            self._checkUpdatesFalse()
-        
         
 #         sys.exit(self.app.exec_()) # ~
+    
+    
+    def startupChecks(self):
+        """
+        """
+        self._showReleaseNotes()
+        # Check if there's a newer version available
+        self._checkUpdatesFalse()
         
     
     def _setupUiContainer(self):
@@ -797,7 +800,7 @@ class MainGui(QtGui.QMainWindow):
                                     self.settings.cur_log_path, all_logs, 
                                     errors, check_new_entries=True)
                 
-                # There was an issue updating the database so drop out now and 
+                # If there was an issue updating the database drop out now and 
                 # launch the error.
                 if errors.msgbox_error and errors.msgbox_error.type == self.DB_UPDATE:
                     break
@@ -1375,6 +1378,9 @@ def main():
     icon_path = os.path.join(settings_path, 'Logit_Logo.ico')
     app.setWindowIcon(QtGui.QIcon(':images/Logit_Logo.png'))
     myapp.show()
+    if not gs.__DEV_MODE__:
+        myapp.startupChecks()
+    
     sys.exit(app.exec_())
 
 #     MainGui(cur_settings, settings_path)

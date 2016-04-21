@@ -305,6 +305,20 @@ v0.6.1-Beta:
       formats for check file paths.
 
 
+v0.6.2-Beta:
+    - Bugfix for loading a 1D only model when 2D scheme is set to None. Previously
+      this wasn't checked and if a tcf file was found in the ief file it was loaded
+      into the database. This was happening even if the use of 2d was deactivated.
+      The active status is now checked and only 1D components are loaded if it is
+      not active.
+    - Set 2d results location back to being the folder only and not folder plus
+      the tcf filename. This is because results locations can hold additional
+      sub area outputs etc as well.
+    - Started to implement some unit tests to try and get better at catching
+      a few of the regression that seem to be prevailant in the last few releases.
+      This will also help to identify and solve some of the problems with the
+      slightly unhelpful error messages that are being launched.
+
 ##~##
 
 LICENSE

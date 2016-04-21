@@ -362,11 +362,12 @@ def buildTuflowRun(has_ief_file, tuflow, run_cols):
                                                  filename_only=True))
     main_tcf = os.path.splitext(main_tcf[0])[0]
     if result_obj.has_own_root:
-        result = os.path.join(result_obj.root, main_tcf)
-    elif not result_obj.getRelativePath() :
-        result = main_tcf
+#         result = os.path.join(result_obj.root, main_tcf)
+        result = result_obj.root
+    elif not result_obj.getRelativePath():
+        result = ''
     else:
-        result = os.path.join(result_obj.getRelativePath(), main_tcf)
+        result = result_obj.getRelativePath()
     run_cols['RESULTS_LOCATION_2D'] = result
         
     return run_cols
@@ -387,7 +388,9 @@ def buildModelFileRow(cur_date, tuflow, model_file):
             files = tuflow.getFileNamesFromModelFile(m)
             
             # Get rid of any emtpty strings
-            files = [x for x in files if x]
+            # The '.' catch is a fudge until a better way of catching check file
+            # prefixes is implemented
+            files = [x for x in files if x and not x[-1] == '.']
             
             out_list.append({'DATE': cur_date, model_file.upper(): tuflow.getNameFromModelFile(m), 
                              'FILES': files, 'COMMENTS': 'None'})
