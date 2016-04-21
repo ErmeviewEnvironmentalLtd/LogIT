@@ -137,7 +137,7 @@ class MainGui(QtGui.QMainWindow):
     """Main GUI application window for the PysisTools software.
     """
      
-    def __init__(self, cur_settings, cur_settings_path, parent = None):
+    def __init__(self, cur_settings, cur_settings_path, test_mode=False, parent=None):
         """Constructor.
         :param parent: Reference to the calling class.
         """        
@@ -249,7 +249,8 @@ class MainGui(QtGui.QMainWindow):
         self.setWindowIcon(QtGui.QIcon(':Logit_Logo2_25x25.png'))
         
         # Activate the GUI
-        MainGui.show()
+        if not test_mode:
+            MainGui.show()
         
         self._showReleaseNotes()
         
@@ -918,7 +919,7 @@ class MainGui(QtGui.QMainWindow):
             if errors.has_errors:
                 if errors.msgbox_error:
                     QtGui.QMessageBox.warning(self, errors.msgbox_error.title, 
-                                                error.msgbox_error.message)
+                                                errors.msgbox_error.message)
             return
         else:
             self.settings = settings
