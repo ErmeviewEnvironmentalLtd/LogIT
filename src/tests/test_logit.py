@@ -56,6 +56,22 @@ class ControllerTest(unittest.TestCase):
         errors = self.form._createMultipleLogEntry()
         self.assertFalse(errors.has_errors, 'Blank DB has_error fail')
         
+        # Check what happens when we try to load a model with an error
+        error_path = [r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\GoS\tuflow\runs\Option1aPlus_ilo3_Cul6_Grange_T100D5CC_CWI_Run3_F_MHWS_v1-01_MissingTgc.tcf']
+        self.new_entry._updateMultipleLogSelection('addMultiModelButton', error_path)
+        model_paths = self.new_entry.getMultipleModelPaths()
+        self.assertListEqual(error_path, model_paths, 'Input output error_path equailty fail')
+        errors = self.form._createMultipleLogEntry()
+        self.assertTrue(errors.has_errors, 'error_path has error fail')
+        error_title = 'Model Load Error'
+        error_msg = ('Unable to load model log from file  at:\nC:\\Users\\' +
+                     'duncan.runnacles\\Documents\\Programming\\Python\\' +
+                     'LogITApp\\Regression_Test_Data\\Loader\\model\\GoS\\' +
+                     'tuflow\\runs\\Option1aPlus_ilo3_Cul6_Grange_T100D5CC_CWI_Run3_F_MHWS_v1-01_MissingTgc.tcf' +
+                     '\n\nThe following tuflow model files could not be loaded:\nGrange_baseline_Option1A_v1-00_Fake.tgc')
+        self.assertEqual(error_title, errors.log[0].title, 'error_path errors title fail')
+        self.assertEqual(error_msg, errors.log[0].message, 'error_path errors message fail')
+        
         # Set to the non blank database
         self.new_entry._updateMultipleLogSelection('addMultiModelButton', test_paths)
         model_paths = self.new_entry.getMultipleModelPaths()

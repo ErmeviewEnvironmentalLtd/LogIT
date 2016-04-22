@@ -696,9 +696,8 @@ def fetchAndCheckModel(db_path, open_path, errors):
         """
         # Check if it's because model files are missing
         message = ' at:\n%s' % (open_path)
-        if LogBuilder.missing_files:
-            file_str = 'The following tuflow model files could not be loaded:\n' + '\n'.join(missing_files)
-            message = ' at:\n%s\n\n%s' % (open_path, file_str)
+        file_str = 'The following tuflow model files could not be loaded:\n' + '\n'.join(missing_files)
+        message = ' at:\n%s\n\n%s' % (open_path, file_str)
         return message
         
     
