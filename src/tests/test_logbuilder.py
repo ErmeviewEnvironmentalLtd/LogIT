@@ -38,6 +38,14 @@ class LogBuilderTest(unittest.TestCase):
         self.assertFalse(all_logs, 'all_logs fake path load fail')
         self.assertEqual(model_loader.error, 'File does not exist')
 
+        # Check that we can find missing files correctly
+        gos_path = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\GoS\tuflow\runs\Option1aPlus_ilo3_Cul6_Grange_T100D5CC_CWI_Run3_F_MHWS_v1-01_MissingTgc.tcf'
+        model_loader = ModelLoader()
+        all_logs = model_loader.loadModel(gos_path)
+        self.assertFalse(all_logs, 'all_logs load fail')
+        self.assertEqual(model_loader.error, 'Some key model files could not be found during load')
+        self.assertListEqual(model_loader.missing_files, ['Grange_baseline_Option1A_v1-00_Fake.tgc'], 'GoS missing_model_files fail')
+
 
         '''
             KENNFORD MODEL
@@ -78,7 +86,7 @@ class LogBuilderTest(unittest.TestCase):
         all_logs = model_loader.loadModel(gos_path)
         self.assertIsNot(all_logs, False, 'all_logs load fail')
         self.assertTrue(isinstance(all_logs, LogClasses.AllLogs), 'all_logs instance fail')
-        self.assertListEqual(model_loader.missing_files, [], 'missing_model_files fail')
+        self.assertListEqual(model_loader.missing_files, [], 'GoS missing_model_files fail')
         
         # Convert all the dates to the ones in the test data
         for k, v in all_logs.log_pages.iteritems():
