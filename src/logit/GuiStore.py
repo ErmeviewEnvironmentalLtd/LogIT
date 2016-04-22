@@ -439,7 +439,7 @@ def getModelFileLocation(multi_paths, last_model_directory,
     if not last_model_directory == '' and \
                     not last_model_directory == False:
         chosen_path = last_model_directory
-    elif not cur_log_path == ''  and not self.settings.cur_log_path == False:
+    elif not cur_log_path == ''  and not cur_log_path == False:
         chosen_path = cur_log_path
     else:
         chosen_path = cur_settings_path

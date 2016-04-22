@@ -691,22 +691,27 @@ def fetchAndCheckModel(db_path, open_path, errors):
              pages or False if the load failed and a dictionary containing
              the load status and messages for status bars and errors.
     """   
-    def checkMissingFiles(open_path):
+    def getMissingFiles(open_path, missing_files):
         """
         """
         # Check if it's because model files are missing
         message = ' at:\n%s' % (open_path)
         if LogBuilder.missing_files:
-            file_str = 'The following tuflow model files could not be loaded:\n' + '\n'.join(LogBuilder.missing_files)
+            file_str = 'The following tuflow model files could not be loaded:\n' + '\n'.join(missing_files)
             message = ' at:\n%s\n\n%s' % (open_path, file_str)
         return message
         
     
-    # Load the model at the chosen path.
-    all_logs, error_msg = LogBuilder.loadModel(open_path)
+    loader = LogBuilder.ModelLoader()
+    all_logs = loader.loadModel(open_path)
     if all_logs == False:
         logger.warning('Unable to load file:\n%s\nDoes it exist?' % (open_path))
-        msg_add=(':\n%s\nCould not find the following files:\n%s'  % (open_path, error_msg))
+        
+        if loader.missing_files:
+            msg_add = getMissingFiles(open_path, loader.missing_files)
+        else:
+            msg_add = (':\n%s\nCould not find the following files:\n%s'  % (open_path, loader.error))
+
         errors.addError(errors.MODEL_LOAD, msg_add=msg_add, msgbox_error=True)
         return errors, all_logs
 
@@ -719,24 +724,23 @@ def fetchAndCheckModel(db_path, open_path, errors):
 #         tcf_results = all_logs.getLogEntryContents('RUN', 0)['RESULTS_LOCATION_2D'] 
         
         indb = False
-        
-        try:
-            db_manager = DatabaseFunctions.DatabaseManager(db_path)
-            # If we have an ief get the ief name to see if we already
-            # recorded a run using that model
-            if not main_ief == 'None':
-                indb = db_manager.findEntry('RUN', 'IEF', main_ief,
-                                                    column_only=True)
-                
-                # Check if the .ief file has already been logged
-                if indb:
-                    logger.warning('Log entry already exists for :\n%s' % (main_ief))
-                    errors.addError(errors.LOG_EXISTS, 
-                                        msg_add=(':\nfile = %s' % (open_path)),
-                                                            msgbox_error=True)
-                    return errors, all_logs
+#         try:
+        db_manager = DatabaseFunctions.DatabaseManager(db_path)
+        # If we have an ief get the ief name to see if we already
+        # recorded a run using that model
+        if not main_ief == 'None':
+            indb = db_manager.findEntry('RUN', 'IEF', main_ief,
+                                                column_only=True)
+            
+            # Check if the .ief file has already been logged
+            if indb:
+                logger.warning('Log entry already exists for :\n%s' % (main_ief))
+                errors.addError(errors.LOG_EXISTS, 
+                                    msg_add=(':\nfile = %s' % (open_path)),
+                                                        msgbox_error=True)
+                return errors, all_logs
 
-                # Check if results file has already been logged
+            # Check if results file has already been logged
 #                 else:                    
 #                     indb = db_manager.findEntry('RUN', 'RESULTS_LOCATION_1D', 
 #                                             tcf_results,column_only=True)
@@ -746,31 +750,31 @@ def fetchAndCheckModel(db_path, open_path, errors):
 #                                         msg_add=('in:\n%s' % (main_ief)), 
 #                                                         msgbox_error=True)
 #                         return errors, all_logs
+                
+        # Do the whole lot again for the tuflow run
+        if not main_tcf == 'None':
+            indb = db_manager.findEntry('RUN', 'TCF', 
+                                        main_tcf,column_only=True)
+        
+            if indb:
+                logger.error('Log entry already exists for :%s\nIn file:%s' % (main_tcf, open_path))
+                errors.addError(errors.LOG_EXISTS, 
+                                        msg_add=(':\nfile = %s' % (main_tcf)),
+                                                            msgbox_error=True)
+        return errors, all_logs
                     
-            # Do the whole lot again for the tuflow run
-            if not main_tcf == 'None':
-                indb = db_manager.findEntry('RUN', 'TCF', 
-                                            main_tcf,column_only=True)
-            
-                if indb:
-                    logger.error('Log entry already exists for :%s\nIn file:%s' % (main_tcf, open_path))
-                    errors.addError(errors.LOG_EXISTS, 
-                                            msg_add=(':\nfile = %s' % (main_tcf)),
-                                                                msgbox_error=True)
-            return errors, all_logs
-                    
-        except IOError:
-            msg = checkMissingFiles(open_path)
-            logger.error(msg)
-            errors.addError(errors.IO_ERROR, msg_add=(msg), msgbox_error=True)
-            return errors, all_logs
-
-        except:
-            msg = checkMissingFiles(open_path)
-            logger.error(msg)
-            errors.addError(errors.IO_ERROR, msg_add=(msg), msgbox_error=True)
-
-            return errors, all_logs
+#         except IOError:
+#             msg = checkMissingFiles(open_path)
+#             logger.error(msg)
+#             errors.addError(errors.IO_ERROR, msg_add=(msg), msgbox_error=True)
+#             return errors, all_logs
+# 
+#         except:
+#             msg = checkMissingFiles(open_path)
+#             logger.error(msg)
+#             errors.addError(errors.IO_ERROR, msg_add=(msg), msgbox_error=True)
+# 
+#             return errors, all_logs
         
 
 def updateDatabaseVersion(db_path, errors):

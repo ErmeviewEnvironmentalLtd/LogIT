@@ -756,6 +756,14 @@ class MainGui(QtGui.QMainWindow):
         """
         # Check that we have a database
         if not self.checkDbLoaded(): return
+        errors = GuiStore.ErrorHolder()
+        errors = Controller.checkDatabaseVersion(
+                                        self.settings.cur_log_path, errors)
+        if errors.has_errors:
+            if errors.msgbox_error:
+                self.launchQMsgBox(errors.msgbox_error.title,
+                                            errors.msgbox_error.message)
+            return
         
         # Get all of the file paths from the list
         model_paths = self.widgets['New Entry'].getMultipleModelPaths()
@@ -763,7 +771,6 @@ class MainGui(QtGui.QMainWindow):
         
         # Load all of the models into a list
         model_logs = []
-        errors = GuiStore.ErrorHolder()
         
         # Setup the progress monitor. It updates prgress bars etc
         total = len(model_paths)

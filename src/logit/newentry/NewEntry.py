@@ -279,9 +279,8 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
             if errors.has_errors:
                 self.launchQMsgBox("Load Error", 
                                    errors.formatErrors())
-#                 self.ui.statusbar.showMessage('Failed to load model at: %s' % open_path)
             else:
-#                 self.ui.statusbar.showMessage('Loaded model at: %s' % open_path)
+                self.emit(QtCore.SIGNAL("statusUpdate"), 'Loaded model at: %s' % (open_path))
                 input_vars = self.getInputVars()
                 run = self.all_logs.getLogEntryContents('RUN', 0)
                 run['MODELLER'] = input_vars['MODELLER']
