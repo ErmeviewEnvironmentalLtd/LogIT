@@ -51,7 +51,7 @@ from PyQt4 import QtCore, QtGui
 
 from ship.utils.filetools import MyFileDialogs
 from ship.utils.fileloaders.fileloader import FileLoader
-from ship.tuflow.tuflowfilepart import SomeFile
+from ship.tuflow.tuflowfilepart import TuflowFile
 from ship.tuflow.data_files import datafileloader
 from ship.tuflow.tuflowmodel import FilesFilter as filter
 from ship.utils import filetools
@@ -526,12 +526,12 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
     def _getSourceFiles(self, data_file, source_root, model_root, rel_root): 
         """Get all of the sub files contained by a data file.
         
-        Loads the given SomeFile reference and checks to see if it contains
+        Loads the given TuflowFile reference and checks to see if it contains
         any references to other files. If it does it gets/sets the in/out file
         locations.
         
         Args:
-            data_file(SomeFile): the ATuflowFilePart.
+            data_file(TuflowFile): the ATuflowFilePart.
             source_root(str): location to set for the out file.
             rel_root(str): the relative path to set for the files.
             model_root(str): the relative path of the model file to set.
