@@ -24,7 +24,7 @@ class ControllerTest(unittest.TestCase):
     def test_fetchAndCheckModel(self):
         """
         """
-        testpath = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
+        testpath = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
         fakepath = r'C:\Fake\Path\to\Nonexistant\model.ief'
         blank_db = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\databases\Blank_DB.logdb'
         kennford_db = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\databases\Kennford_entry.logdb'

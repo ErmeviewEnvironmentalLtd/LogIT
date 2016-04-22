@@ -142,13 +142,13 @@ class MainGui(QtGui.QMainWindow):
         :param parent: Reference to the calling class.
         """        
         # Setup some variables
+        self._TEST_MODE = False
         if not cur_settings == False:
             self.settings = cur_settings
         else:
             self.settings = LogitSettings()
         
         self.settings.cur_settings_path = cur_settings_path
-        
         self.model_log = None
         
         # Database tables that should be exported to Excel
@@ -760,7 +760,7 @@ class MainGui(QtGui.QMainWindow):
         errors = Controller.checkDatabaseVersion(
                                         self.settings.cur_log_path, errors)
         if errors.has_errors:
-            if errors.msgbox_error:
+            if errors.msgbox_error and not self._TEST_MODE:
                 self.launchQMsgBox(errors.msgbox_error.title,
                                             errors.msgbox_error.message)
             return
@@ -810,8 +810,9 @@ class MainGui(QtGui.QMainWindow):
                 # If there was an issue updating the database drop out now and 
                 # launch the error.
                 if errors.msgbox_error and errors.msgbox_error.type == self.DB_UPDATE:
-                    self.launchQMsgBox(errors.msgbox_error.title, 
-                                            errors.msgbox_error.message)
+                    if not self._TEST_MODE:
+                        self.launchQMsgBox(errors.msgbox_error.title, 
+                                                errors.msgbox_error.message)
                     break
                 
                 if errors.has_local_errors:
@@ -827,8 +828,12 @@ class MainGui(QtGui.QMainWindow):
                    "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
                    "Game over man, I'm outta here <-((+_+))->")
             logger.error(msg + str(err))
-            self.launchQMsgBox('Critical Error', msg)
-            return
+            
+            if self._TEST_MODE:
+                return errors
+            else:
+                self.launchQMsgBox('Critical Error', msg)
+                return
 
         if errors.has_errors:
             self._updateStatusBar('')
@@ -836,7 +841,7 @@ class MainGui(QtGui.QMainWindow):
             text = errors.formatErrors('Some models could not be logged:')
             self.widgets['New Entry'].multiModelLoadErrorTextEdit.setText(text)
             message = 'Some files could not be logged.\nSee Error Logs window for details'
-            self.launchQMsgBox('Logging Error', message)
+            if not self._TEST_MODE: self.launchQMsgBox('Logging Error', message)
 
         else:
             logger.info('Log Database updated successfully')
@@ -845,6 +850,9 @@ class MainGui(QtGui.QMainWindow):
         
         # Clear the list entries
         self.widgets['New Entry'].clearMultipleModelTable()
+
+        if self._TEST_MODE:
+            return errors
 
     
     def _loadSettings(self):

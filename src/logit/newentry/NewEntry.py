@@ -358,28 +358,35 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         return model_paths
     
         
-    def _updateMultipleLogSelection(self):
+    def _updateMultipleLogSelection(self, test_callname='', test_paths=[]):
         """Updates the contents of the loadMultiModelListView.
         Called by both the add and remove buttons. It will open a multiple
         choice file dialog by the former or remove the selected items by the
         latter.
         """
-        caller = self.sender()
-        call_name = caller.objectName()
-        logger.debug('Caller = ' + call_name)
+        if not self._TEST_MODE:
+            caller = self.sender()
+            call_name = caller.objectName()
+            logger.debug('Caller = ' + call_name)
+        else:
+            call_name = test_callname
         
         # Add a new file
         if call_name == 'addMultiModelButton':
-            chosen_path = self.settings.cur_location
-            if not self.settings.cur_model_path == '':
-                chosen_path = self.settings.cur_model_path
             
-            d = MyFileDialogs()
-            open_paths = d.openFileDialog(path=chosen_path, 
-                file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)',
-                multi_file=True)
-            if open_paths == False:
-                return
+            if not self._TEST_MODE:
+                chosen_path = self.settings.cur_location
+                if not self.settings.cur_model_path == '':
+                    chosen_path = self.settings.cur_model_path
+                
+                d = MyFileDialogs()
+                open_paths = d.openFileDialog(path=chosen_path, 
+                    file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)',
+                    multi_file=True)
+                if open_paths == False:
+                    return
+            else:
+                open_paths = test_paths
             
             self.loadMultiModelTable.setSortingEnabled(False)
             for p in open_paths:
