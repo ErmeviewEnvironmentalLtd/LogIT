@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'LogIT_UI.ui'
+# Form implementation generated from reading ui file '..\LogIt\src\logit\LogIT_UI.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -25,13 +25,13 @@ except AttributeError:
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName(_fromUtf8("MainWindow"))
-        MainWindow.resize(795, 724)
+        MainWindow.resize(608, 594)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setMinimumSize(QtCore.QSize(500, 400))
+        MainWindow.setMinimumSize(QtCore.QSize(450, 550))
         MainWindow.setMaximumSize(QtCore.QSize(16777215, 16777215))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/images/Logit_Logo2_25x25.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
@@ -42,7 +42,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2 = QtGui.QVBoxLayout(self.centralwidget)
         self.verticalLayout_2.setObjectName(_fromUtf8("verticalLayout_2"))
         self.tabWidget = QtGui.QTabWidget(self.centralwidget)
-        self.tabWidget.setMinimumSize(QtCore.QSize(500, 400))
+        self.tabWidget.setMinimumSize(QtCore.QSize(0, 0))
         self.tabWidget.setAutoFillBackground(False)
         self.tabWidget.setTabShape(QtGui.QTabWidget.Rounded)
         self.tabWidget.setObjectName(_fromUtf8("tabWidget"))
@@ -64,7 +64,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_10 = QtGui.QVBoxLayout(self.viewLogTab)
         self.verticalLayout_10.setObjectName(_fromUtf8("verticalLayout_10"))
         self.logViewTab = QtGui.QTabWidget(self.viewLogTab)
-        self.logViewTab.setMinimumSize(QtCore.QSize(380, 330))
         self.logViewTab.setToolTip(_fromUtf8(""))
         self.logViewTab.setTabPosition(QtGui.QTabWidget.North)
         self.logViewTab.setDocumentMode(False)
@@ -74,7 +73,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_20 = QtGui.QVBoxLayout(self.runViewTab)
         self.verticalLayout_20.setObjectName(_fromUtf8("verticalLayout_20"))
         self.runEntryViewTable = QtGui.QTableWidget(self.runViewTab)
-        self.runEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
+        self.runEntryViewTable.setMinimumSize(QtCore.QSize(0, 0))
         self.runEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.runEntryViewTable.setAlternatingRowColors(True)
         self.runEntryViewTable.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
@@ -202,7 +201,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_16 = QtGui.QVBoxLayout(self.tcfViewTab)
         self.verticalLayout_16.setObjectName(_fromUtf8("verticalLayout_16"))
         self.tcfEntryViewTable = QtGui.QTableWidget(self.tcfViewTab)
-        self.tcfEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
+        self.tcfEntryViewTable.setMinimumSize(QtCore.QSize(0, 0))
         self.tcfEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.tcfEntryViewTable.setAlternatingRowColors(True)
         self.tcfEntryViewTable.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
@@ -247,7 +246,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_17 = QtGui.QVBoxLayout(self.ecfViewTab)
         self.verticalLayout_17.setObjectName(_fromUtf8("verticalLayout_17"))
         self.ecfEntryViewTable = QtGui.QTableWidget(self.ecfViewTab)
-        self.ecfEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.ecfEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.ecfEntryViewTable.setAlternatingRowColors(True)
         self.ecfEntryViewTable.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
@@ -292,7 +290,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_9 = QtGui.QVBoxLayout(self.TgcViewTab)
         self.verticalLayout_9.setObjectName(_fromUtf8("verticalLayout_9"))
         self.tgcEntryViewTable = QtGui.QTableWidget(self.TgcViewTab)
-        self.tgcEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.tgcEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.tgcEntryViewTable.setAlternatingRowColors(True)
         self.tgcEntryViewTable.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
@@ -337,7 +334,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_11 = QtGui.QVBoxLayout(self.tbcViewTab)
         self.verticalLayout_11.setObjectName(_fromUtf8("verticalLayout_11"))
         self.tbcEntryViewTable = QtGui.QTableWidget(self.tbcViewTab)
-        self.tbcEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.tbcEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.tbcEntryViewTable.setAlternatingRowColors(True)
         self.tbcEntryViewTable.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
@@ -382,7 +378,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_12 = QtGui.QVBoxLayout(self.datViewTab)
         self.verticalLayout_12.setObjectName(_fromUtf8("verticalLayout_12"))
         self.datEntryViewTable = QtGui.QTableWidget(self.datViewTab)
-        self.datEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.datEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.datEntryViewTable.setAlternatingRowColors(True)
         self.datEntryViewTable.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
@@ -422,7 +417,6 @@ class Ui_MainWindow(object):
         self.verticalLayout_13 = QtGui.QVBoxLayout(self.bcViewTab)
         self.verticalLayout_13.setObjectName(_fromUtf8("verticalLayout_13"))
         self.bcEntryViewTable = QtGui.QTableWidget(self.bcViewTab)
-        self.bcEntryViewTable.setMinimumSize(QtCore.QSize(350, 300))
         self.bcEntryViewTable.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.bcEntryViewTable.setAlternatingRowColors(True)
         self.bcEntryViewTable.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
@@ -467,7 +461,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2.addWidget(self.tabWidget)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtGui.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 795, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 608, 21))
         self.menubar.setObjectName(_fromUtf8("menubar"))
         self.menuFile = QtGui.QMenu(self.menubar)
         self.menuFile.setObjectName(_fromUtf8("menuFile"))

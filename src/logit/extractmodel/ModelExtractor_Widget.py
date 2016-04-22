@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\extractmodel\ModelExtractor_Widget.ui'
+# Form implementation generated from reading ui file '..\LogIt\src\logit\extractmodel\ModelExtractor_Widget.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -89,7 +89,6 @@ class Ui_ExtractModelWidget(object):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.extractOutputTextArea.sizePolicy().hasHeightForWidth())
         self.extractOutputTextArea.setSizePolicy(sizePolicy)
-        self.extractOutputTextArea.setMinimumSize(QtCore.QSize(0, 250))
         self.extractOutputTextArea.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.extractOutputTextArea.setLineWrapMode(QtGui.QTextEdit.NoWrap)
         self.extractOutputTextArea.setObjectName(_fromUtf8("extractOutputTextArea"))

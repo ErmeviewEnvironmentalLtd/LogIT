@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>795</width>
-    <height>724</height>
+    <width>608</width>
+    <height>594</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,8 +18,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>500</width>
-    <height>400</height>
+    <width>450</width>
+    <height>550</height>
    </size>
   </property>
   <property name="maximumSize">
@@ -47,8 +47,8 @@
      <widget class="QTabWidget" name="tabWidget">
       <property name="minimumSize">
        <size>
-        <width>500</width>
-        <height>400</height>
+        <width>0</width>
+        <height>0</height>
        </size>
       </property>
       <property name="autoFillBackground">
@@ -225,12 +225,6 @@ p, li { white-space: pre-wrap; }
        <layout class="QVBoxLayout" name="verticalLayout_10">
         <item>
          <widget class="QTabWidget" name="logViewTab">
-          <property name="minimumSize">
-           <size>
-            <width>380</width>
-            <height>330</height>
-           </size>
-          </property>
           <property name="toolTip">
            <string/>
           </property>
@@ -252,8 +246,8 @@ p, li { white-space: pre-wrap; }
              <widget class="QTableWidget" name="runEntryViewTable">
               <property name="minimumSize">
                <size>
-                <width>350</width>
-                <height>300</height>
+                <width>0</width>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -516,8 +510,8 @@ p, li { white-space: pre-wrap; }
              <widget class="QTableWidget" name="tcfEntryViewTable">
               <property name="minimumSize">
                <size>
-                <width>350</width>
-                <height>300</height>
+                <width>0</width>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
@@ -612,12 +606,6 @@ p, li { white-space: pre-wrap; }
            <layout class="QVBoxLayout" name="verticalLayout_17">
             <item>
              <widget class="QTableWidget" name="ecfEntryViewTable">
-              <property name="minimumSize">
-               <size>
-                <width>350</width>
-                <height>300</height>
-               </size>
-              </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
@@ -710,12 +698,6 @@ p, li { white-space: pre-wrap; }
            <layout class="QVBoxLayout" name="verticalLayout_9">
             <item>
              <widget class="QTableWidget" name="tgcEntryViewTable">
-              <property name="minimumSize">
-               <size>
-                <width>350</width>
-                <height>300</height>
-               </size>
-              </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
@@ -808,12 +790,6 @@ p, li { white-space: pre-wrap; }
            <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
              <widget class="QTableWidget" name="tbcEntryViewTable">
-              <property name="minimumSize">
-               <size>
-                <width>350</width>
-                <height>300</height>
-               </size>
-              </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
@@ -906,12 +882,6 @@ p, li { white-space: pre-wrap; }
            <layout class="QVBoxLayout" name="verticalLayout_12">
             <item>
              <widget class="QTableWidget" name="datEntryViewTable">
-              <property name="minimumSize">
-               <size>
-                <width>350</width>
-                <height>300</height>
-               </size>
-              </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
@@ -994,12 +964,6 @@ p, li { white-space: pre-wrap; }
            <layout class="QVBoxLayout" name="verticalLayout_13">
             <item>
              <widget class="QTableWidget" name="bcEntryViewTable">
-              <property name="minimumSize">
-               <size>
-                <width>350</width>
-                <height>300</height>
-               </size>
-              </property>
               <property name="maximumSize">
                <size>
                 <width>16777215</width>
@@ -1098,7 +1062,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>795</width>
+     <width>608</width>
      <height>21</height>
     </rect>
    </property>
