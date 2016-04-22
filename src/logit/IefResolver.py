@@ -51,6 +51,9 @@ from ship.utils.fileloaders import fileloader as fl
 from ship.utils.qtclasses import MyFileDialogs
 from ship.utils import filetools as ft
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 class IefResolverDialog(QtGui.QDialog):
     """Dialog class for showing ief resolver summary information."""
@@ -481,7 +484,7 @@ def autoResolvePath(ief_path, search_folder_depth=4):
     # reference file.
     reference_location = findFile(ief_path, reference_file_file, search_folder_depth) 
     if reference_location == False:
-        return False, ief_holders
+        return False, ief_holder
     
     # Find the place where the ief file and the found file meet
     ief_holder.root_folder_new = prefix = longestCommonPrefix(ief_path, reference_location)
