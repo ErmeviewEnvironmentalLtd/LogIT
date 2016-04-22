@@ -334,48 +334,47 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         return True
     
     
+    def checkIfRightFile(self, filename, file_to_check):
+        """Check to see if we have a result file that we need.
+        
+        It can be a bit complicated so there are probably some issues here,
+        but at the moment it seems to do ok.
+        If there is only an extension after the known name, or the rest 
+        before the extension matches a known ending it will return True.
+        """
+        
+        try:
+            # If it's a projection file
+            if file_to_check == 'Projection.prj': return True
+            
+            parts = file_to_check.split(filename)
+            
+            # If it's only the filename matched exactly
+            if len(parts) < 2:
+                return False
+            # If second part is the start of the extension
+            if parts[1].startswith('.'):
+                return True
+            
+            subparts = parts[1].split('.')
+            if len(subparts) < 2:
+                return False
+            # If the extra bit before extension is an '_' followed by three
+            # numbers (matches isis run output .bmp's)
+            if re.match(r'[_]\d{3}', subparts[0]):
+                return True
+            # If bit before extension is in the known check/result file endings
+            if subparts[0] in self.check_list or subparts[0] in self.result_list:
+                return True
+        except:
+            pass
+        
+        return False
+    
+    
     def _writeOutResultsFiles(self): 
         """Copy the result files into the new directory.
         """
-        
-        def checkIfRightFile(filename, file_to_check):
-            """Check to see if we have a result file that we need.
-            
-            It can be a bit complicated so there are probably some issues here,
-            but at the moment it seems to do ok.
-            If there is only an extension after the known name, or the rest 
-            before the extension matches a known ending it will return True.
-            """
-            
-            try:
-                # If it's a projection file
-                if file_to_check == 'Projection.prj': return True
-                
-                parts = file_to_check.split(filename)
-                
-                # If it's only the filename matched exactly
-                if len(parts) < 2:
-                    return False
-                # If second part is the start of the extension
-                if parts[1].startswith('.'):
-                    return True
-                
-                subparts = parts[1].split('.')
-                if len(subparts) < 2:
-                    return False
-                # If the extra bit before extension is an '_' followed by three
-                # numbers (matches isis run output .bmp's)
-                if re.match(r'[_]\d{3}', subparts[0]):
-                    return True
-                # If bit before extension is in the known check/result file endings
-                if subparts[0] in self.check_list or subparts[0] in self.result_list:
-                    return True
-            except:
-                pass
-            
-            return False
-            
-        
         curd = os.getcwd()
         results_names_in = []
         results_names_out = []
@@ -413,7 +412,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
                starts with the same string.
             '''
             for j, f in enumerate(file_list, 1):
-                if checkIfRightFile(old_n.upper(), f.upper()):
+                if self.checkIfRightFile(old_n.upper(), f.upper()):
                     found_file = True
                     try:
                         self.emit(QtCore.SIGNAL("updateProgress"), j)
