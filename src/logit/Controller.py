@@ -705,8 +705,9 @@ def fetchAndCheckModel(db_path, open_path, errors):
     # Load the model at the chosen path.
     all_logs, error_msg = LogBuilder.loadModel(open_path)
     if all_logs == False:
+        logger.warning('Unable to load file:\n%s\nDoes it exist?' % (open_path))
         msg_add=(':\n%s\nCould not find the following files:\n%s'  % (open_path, error_msg))
-        errors.addError(errors.MODEL_LOAD, msg_add=msg_add, msgbox_error=False)
+        errors.addError(errors.MODEL_LOAD, msg_add=msg_add, msgbox_error=True)
         return errors, all_logs
 
     else:

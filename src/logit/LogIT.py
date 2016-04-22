@@ -803,6 +803,8 @@ class MainGui(QtGui.QMainWindow):
                 # If there was an issue updating the database drop out now and 
                 # launch the error.
                 if errors.msgbox_error and errors.msgbox_error.type == self.DB_UPDATE:
+                    self.launchQMsgBox(errors.msgbox_error.title, 
+                                            errors.msgbox_error.message)
                     break
                 
                 if errors.has_local_errors:

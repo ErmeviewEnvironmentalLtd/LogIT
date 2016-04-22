@@ -6,28 +6,45 @@ from PyQt4.QtTest import QTest
 from PyQt4.QtCore import Qt
 
 import LogIT
-from extractmodel import ModelExtractor
+from LogBuilder import ModelLoader
+import LogClasses
 
 # Need to call this here to avoid some weird behaviour
 app = QApplication(sys.argv)
 
 
-class SingleModelLoaderTest(unittest.TestCase):
+class LogBuilderTest(unittest.TestCase):
     
     def setUp(self):
         """
         """
-        self.form = LogIT.MainGui(False, os.path.join(os.getcwd(), 'settings.logset'))
-        self.form.widgets['New Entry'].cur_log_path = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\databases\Blank_DB.logdb'
-        self.form.widgets['New Entry']._TEST_MODE = True
+        pass
 
-    def test_loadSingleModel(self):
+
+    def test_loadModel(self):
         """
         """
+        # Make sure it reports lack of ecf file handling properly
+        fake_ecfpath = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\tuflow\runs\fake_ECF.ecf'
+        model_loader = ModelLoader()
+        all_logs = model_loader.loadModel(fake_ecfpath)
+        self.assertFalse(all_logs, 'all_logs ecf load fail')
+        self.assertEqual(model_loader.error, 'Cannot currently load an ecf file as the main file')
+        
+        # Check we handle non existant files properly
+        fakepath = r'C:\Some\fake\file\path.tcf'
+        model_loader = ModelLoader()
+        all_logs = model_loader.loadModel(fakepath)
+        self.assertFalse(all_logs, 'all_logs fake path load fail')
+        self.assertEqual(model_loader.error, 'File does not exist')
+
+        # Check we can load an actual model properly 
         testpath = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
-        self.form.widgets['New Entry'].loadModelTextbox.setText(testpath)
-        self.form.widgets['New Entry']._loadSingleLogEntry(testpath)
-        all_logs = self.form.widgets['New Entry'].all_logs 
+        model_loader = ModelLoader()
+        all_logs = model_loader.loadModel(testpath)
+        self.assertIsNot(all_logs, False, 'all_logs load fail')
+        self.assertTrue(isinstance(all_logs, LogClasses.AllLogs), 'all_logs instance fail')
+        self.assertListEqual(model_loader.missing_files, [], 'missing_model_files fail')
         
         # Convert all the dates to the ones in the test data
         for k, v in all_logs.log_pages.iteritems():
@@ -68,11 +85,11 @@ class SingleModelLoaderTest(unittest.TestCase):
                     'DESCRIPTION': 'None',
                     'ECF': 'None',
                     'EVENT_DURATION': '14.0',
-                    'EVENT_NAME': '',
+                    'EVENT_NAME': 'None',
                     'IEF': 'kennford_1%AEP_FINAL_v5.18.ief',
                     'IEF_DIR': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\isis\\iefs',
-                    'ISIS_BUILD': '',
-                    'MODELLER': '',
+                    'ISIS_BUILD': 'None',
+                    'MODELLER': 'None',
                     'RESULTS_LOCATION_1D': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\isis\\results\\kennford_1%AEP_FINAL_v5.18\\KENNFORD_1%AEP_FINAL_V5.18',
                     'RESULTS_LOCATION_2D': '..\\results\\2d\\kennford_1%AEP_FINAL_v5.18\\',
                     'RUN_OPTIONS': 'None',
@@ -81,7 +98,7 @@ class SingleModelLoaderTest(unittest.TestCase):
                     'TCF': '[kennford_1%AEP_FINAL_v5.18.tcf]',
                     'TCF_DIR': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\tuflow\\runs',
                     'TGC': '[kennford_v5.9.tgc]',
-                    'TUFLOW_BUILD': ''}],
+                    'TUFLOW_BUILD': 'None'}],
             'TBC': [{'COMMENTS': 'None',
                     'DATE': '27/03/2016',
                     'FILES': ['kennford_2d_bc_ALL_v4.5.mif'],
