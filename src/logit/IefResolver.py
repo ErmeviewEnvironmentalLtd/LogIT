@@ -347,23 +347,28 @@ def resolveUnfoundPaths(ief_holders):
     return ief_holders, had_to_search
 
         
-def findFile(start_location, file_to_find, search_folder_depth=3):
-    """Walk the folder structure until you find the file or fun out of files.
+def findFile(start_location, file_to_find, search_folder_depth=3,
+             return_first_find=False):
+    """Walk the folder structure until matching files are found.
     
     Args:
         start_location(str): path to the file or folder to start walking from.
         file_to_find(str): the name and extension of the file to look for.
         search_folder_depth=3(int): the number of folder to go up from the 
             start_location before walking down the directories.
-
+        return_first_find=False(bool): if True will return only the first 
+            matching file that it finds (as a list).
     
     Return:
-        String - normalised absolute path of the file if found. Or False if 
-            no match could be found.
+        list - containg the normalised absolute paths of all of the files found.
+            If return_first_find == True the list will only contain the first
+            matching file found. 
+        False - if no match could be found.
     """
     # Set the number of folders to search upwards from the ief file.
     # This will be the point we start walking down the path to find
     # the reference location (the location of the reference file)
+    found_files = []
     folder_up = []
     for s in range(0, search_folder_depth):
         folder_up.append('..')
@@ -374,9 +379,14 @@ def findFile(start_location, file_to_find, search_folder_depth=3):
         for f in files:
             splitted = os.path.split(f)
             if len(splitted) > 1 and splitted[1].lower() == file_to_find.lower():
-                return os.path.normpath(os.path.join(root, f))
+                found_files.append(os.path.normpath(os.path.join(root, f)))
+                if return_first_find:
+                    return found_files
     
-    return False
+    if found_files:
+        return found_files
+    else:
+        return False
 
 
 def autoResolveIefs(iefs):
@@ -451,7 +461,6 @@ def autoResolvePath(ief_path, search_folder_depth=4):
     cur_ief_location = os.path.split(ief_path)[0]
     
     # Get the dat and results paths from ief object
-#     ief_files_refs = ief_obj.getFilePaths()[0]
     ief_files_refs = ief_obj.getFilePaths()
     ief_datafile = ief_files_refs['Datafile']
     ief_holder.addFile(ief_datafile, 'in', test_exists=False)
@@ -481,10 +490,31 @@ def autoResolvePath(ief_path, search_folder_depth=4):
     reference_file_file = os.path.normpath(reference_file_file)
     
     # Walk from given folder point upstream until we find the
-    # reference file.
-    reference_location = findFile(ief_path, reference_file_file, search_folder_depth) 
-    if reference_location == False:
+    # reference files.
+    reference_locations = findFile(ief_path, reference_file_file, 
+                                  search_folder_depth) 
+    
+    # Because there's a chance that multiple files with the same name might 
+    # exist in different locations we need to have a go at working out which
+    # one is the one we want
+    if reference_locations == False:
         return False, ief_holder
+    
+    reference_location = False
+    best_match = {'ref': '', 'length': 0}
+    for ref in reference_locations:
+        lcs = longestCommonSuffix(os.path.dirname(ref), reference_file_folder)
+        
+        # Check that the match isn't just a trailing seperator. Then do a 
+        # comparision to see which one has the longest match and use that.
+        # It's still only a guess, but it's the best guess we can make.
+        if not lcs == '' and not (lcs == '/' or lcs == '\\' or lcs == '\\\\'):
+            if len(lcs) > best_match['length']:
+                reference_location = ref
+                best_match['ref'] = ref
+                best_match['length'] = len(lcs)
+    if reference_location == False:
+        return False, ief_holder 
     
     # Find the place where the ief file and the found file meet
     ief_holder.root_folder_new = prefix = longestCommonPrefix(ief_path, reference_location)

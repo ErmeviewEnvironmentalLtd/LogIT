@@ -78,9 +78,12 @@ class IefResolverTest(unittest.TestCase):
         ief_dir = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Ief_Resolver\model\isis\iefs'
         find_file = 'kennford_1%AEP_FINAL_v5.18.tcf'
         find_file_false = 'kennford_1%AEP_FINAL_v5.19.tcf'
-        result = 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\tuflow\\runs\\kennford_1%AEP_FINAL_v5.18.tcf'
-        
-        self.assertEqual(IefResolver.findFile(ief_dir, find_file), result, 'Find file true fail')
+        result = ['C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\trick_run_location\\kennford_1%AEP_FINAL_v5.18.tcf',
+                  'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\tuflow\\runs\\kennford_1%AEP_FINAL_v5.18.tcf',
+                  'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\kennford_1%AEP_FINAL_v5.18.tcf'
+                 ]
+        temp = IefResolver.findFile(ief_dir, find_file, 4)
+        self.assertEqual(IefResolver.findFile(ief_dir, find_file, 4), result, 'Find file true fail')
         self.assertFalse(IefResolver.findFile(ief_dir, find_file_false), 'Find file false fail')
     
     
