@@ -1095,7 +1095,7 @@ class MainGui(QtGui.QMainWindow):
             self._exportDatabase(call_name)
             
             
-    def _getModelFileDialog(self, multi_paths=False):
+    def _getModelFileDialog(self, multi_paths=False, path=None):
         """Launches an open file dialog to get .ief or .tcf files.
         
         :param multi_paths=False: if set to True it will return a list of all
@@ -1108,9 +1108,12 @@ class MainGui(QtGui.QMainWindow):
         if not self.checkDbLoaded():
             return False          
 
+        p = self.settings.last_model_directory
+        if not path is None: p = path
+            
         open_path = GuiStore.getModelFileLocation(multi_paths,
-            self.settings.last_model_directory, self.settings.cur_log_path,
-                self.settings.cur_settings_path)
+                                                  p, self.settings.cur_log_path,
+                                                  self.settings.cur_settings_path)
         
         return open_path
     
@@ -1127,11 +1130,17 @@ class MainGui(QtGui.QMainWindow):
             """Set status update back to default."""
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
-            
-        ief_paths = self._getModelFileDialog(multi_paths=True)
+        
+        p = cur_location
+        if not self.settings.ief_resolver_path == '':
+            p = self.settings.ief_resolver_path
+        ief_paths = self._getModelFileDialog(multi_paths=True, path=p)
+        if ief_paths == False or ief_paths == 'False' or ief_paths == []:
+            return
         file_list = []
         for i in ief_paths:
             file_list.append(str(i))
+            self.settings.ief_resolver_path = i
         # DEBUG
 #         file_list = [r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief',
 #                  r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18_dsbd-20%.ief',
@@ -1141,11 +1150,11 @@ class MainGui(QtGui.QMainWindow):
         self._updateStatusBar('Attempting to automatically resolve ief file...')
         self._updateMaxProgress(4)
         self._updateCurrentProgress(1)
-        success, ief_holders = IefResolver.autoResolveIefs(file_list)
+        ief_holders, ief_fail = IefResolver.autoResolveIefs(file_list)
         
         # If we couldn't find the reference file
-        if not success:
-            msg = ('Could not locate intial reference file. This means that\n' +
+        if not ief_holders:
+            msg = ('Could not locate intial reference file(s). This means that\n' +
                    'it will not be possible to automated the update of these ' +
                    'iefs.')
             self.launchQMsgBox('Ief Update Error', msg)
@@ -1162,6 +1171,7 @@ class MainGui(QtGui.QMainWindow):
                         missing_keys.append(m)
 
         # If there were then use the secondary method to try and get them
+        required_search = None
         if missing_keys:
             self._updateStatusBar('Attempting to find missing paths (this may take a while) ...')
             self._updateCurrentProgress(2)
@@ -1184,17 +1194,17 @@ class MainGui(QtGui.QMainWindow):
             return
         
         # Output a summary of any difficulties with the file update
-        if missing_keys:
-            ief_dialog = IefResolver.IefResolverDialog(required_search, parent=self)
-            ief_dialog.resize(600, 400)
-            ief_dialog.setWindowTitle('Ief Resolver Search Summary')
-            icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-            ief_dialog.setWindowIcon(icon)
-            ief_dialog.exec_()
+        summary = IefResolver.getUpdateSummary(ief_objs)
+        ief_dialog = IefResolver.IefResolverDialog(summary, ief_fail, required_search, parent=self)
+        ief_dialog.resize(600, 400)
+        ief_dialog.setWindowTitle('Ief Resolver Search Summary')
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        ief_dialog.setWindowIcon(icon)
+        ief_dialog.exec_()
         # Or just tell the user that all was alright
-        else:
-            self.launchQMsgBox('Ief Resolver', 'Ief Files successfully updated.')
+#         else:
+#             self.launchQMsgBox('Ief Resolver', 'Ief Files successfully updated.')
            
         finalize() 
         
@@ -1347,6 +1357,7 @@ class LogitSettings(object):
         self.event_name = ''
         self.log_path = ''
         self.log_export_path = ''
+        self.ief_resolver_path = ''
         self.cur_model_type = 0
         self.logging_level = 0
         self.column_widths = {}

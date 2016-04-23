@@ -58,7 +58,7 @@ logger = logging.getLogger(__name__)
 class IefResolverDialog(QtGui.QDialog):
     """Dialog class for showing ief resolver summary information."""
     
-    def __init__(self, input, parent=None):
+    def __init__(self, summary, ief_fail, required_search=None, parent=None):
         super(IefResolverDialog, self).__init__(parent)
         
         self.textBrowser = QtGui.QTextBrowser(self)
@@ -67,23 +67,80 @@ class IefResolverDialog(QtGui.QDialog):
         
         output = []
         output.append(self.getOpeningRichText())
-        output.extend(self.formatOutput(input))
+        if ief_fail:
+            output.extend(self.formatFailures(ief_fail))
+        if not required_search is None:
+            output.extend(self.formatWarning(required_search))
+        output.extend(self.formatSummary(summary))
         output.append(self.getClosingRichText())
         output = ''.join(output)
         self.textBrowser.setText(output)
     
     
-    def formatOutput(self, input):
-        """Get the input dict and format for display."""
+    def formatSummary(self, summary):
+        """Ouput a summary of the updated files.
+        
+        Args:
+            summary(dict): containing details of the updated files.
+        """
         formatted = []
+        title = 'Updated Files'
+        formatted.append(self.getTitleParagraphIn() + title + self.getStandardParagraphOut())
+        
+        for k, v in summary.iteritems():
+            formatted.append(self.getStandardParagraphIn() + '<em style="font-weight: bold">Ief file: ' + k + '</em>: ' + self.getStandardParagraphOut())
+            for i, p in v.iteritems():
+                if i == 'Ied':
+                    for ied in p:
+                        formatted.append(self.getStandardParagraphIn() + i + ': ' + ied + self.getStandardParagraphOut())
+                        
+                else:
+                    formatted.append(self.getStandardParagraphIn() + i + ': ' + p + self.getStandardParagraphOut())
+                
+            formatted.append('<br />')
+
+        formatted.append('<br />')
+        return formatted
+    
+    
+    def formatFailures(self, ief_fail):
+        """Warn user about any ief files that failed completely."""
+        formatted = []
+        title = 'Failed Updates'
+        formatted.append(self.getTitleParagraphIn() + title + self.getStandardParagraphOut())
+        
+        msg = ("The following ief files could not be resolved by any method.\n" +
+               "You will need to review and update these manually.")
+        formatted.append(self.getSpaceParagraphIn() + msg + self.getStandardParagraphOut())
+        
+        for ief in ief_fail:
+            formatted.append(self.getStandardParagraphIn() + 'Ief file: ' + ief + self.getStandardParagraphOut())
+
+        formatted.append('<br />')
+        return formatted
+        
+        
+    def formatWarning(self, required_search):
+        """Get the required_search dict analscriptname.
+
+        This is used when there were some issues updated the ief's and we need
+        to identify them and warn the user.
+        
+        Args:
+            required_search(dict): details of files that needed additional searching.
+        """
+        formatted = []
+        title = 'Possible Issues'
+        formatted.append(self.getTitleParagraphIn() + title + self.getStandardParagraphOut())
         msg = ("I've managed to update most of your files but some " +
                  "of them needed to be searched for. This can lead to " +
                  "incorrectly updated files.<br />Where an updated file is " +
                  "shown as 'False' it could not be found and must be " +
                  "manually updated. <br />You should check the " +
-                 "updates. There is a summary below.\n\n\n")
+                 "updates. These are outlined here.\n" +
+                 "There is a full summary of all updated files below\n\n\n")
         formatted.append(self.getSpaceParagraphIn() + msg + self.getStandardParagraphOut())
-        for k, v in input.iteritems():
+        for k, v in required_search.iteritems():
             
             if len(v['in']) < 1: continue
             formatted.append(self.getStandardParagraphIn() + '<em style="font-weight: bold">Some paths required guessing for file</em>: ' + k + self.getStandardParagraphOut())
@@ -99,6 +156,13 @@ class IefResolverDialog(QtGui.QDialog):
         
         return formatted
 
+
+    def getTitleParagraphIn(self):
+        """Title formatted paragraph."""
+        return '''
+<p style=" margin-top:10px; margin-bottom:10px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">
+<span style=" font-size:11pt; font-weight: 600; text-decoration: underline;">
+'''
     
     def getStandardParagraphIn(self):
         """Standard display paragraph."""
@@ -128,7 +192,7 @@ class IefResolverDialog(QtGui.QDialog):
 <html><head><meta name="qrichtext" content="1" /><style type="text/css">
 p, li { white-space: pre-wrap; }
 </style></head><body style=" font-family:'Arial'; font-size:10pt; font-weight:400; font-style:normal;">
-<p style=" margin-top:0px; margin-bottom:20px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:11pt; font-weight:600; text-decoration: underline;">Ief Resolver Summary</span></p>
+<p style=" margin-top:0px; margin-bottom:30px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;"><span style=" font-size:13pt; font-weight:600; text-decoration: underline; color:#0055ff;">Ief Resolver Summary</span></p>
 <ul>
 '''
         
@@ -197,24 +261,24 @@ class IefHolder(object):
         else:
             ext = extstuff[1].lower()
         if not ext in self.single_types.keys() and not ext == '.ied':
-            if not os.path.exists(new_file): return False
             if in_or_out == 'out': 
+                if not os.path.exists(new_file): return False
                 self.missing_types['result'] = False
             else:
                 self.has_types['result'] = True
             self.single_types['result'][in_or_out] = new_file
         
         elif ext == '.ied':
-            if not os.path.exists(new_file): return False
             if in_or_out == 'out': 
+                if not os.path.exists(new_file): return False
                 self.missing_types['.ied'] = False
             else:
                 self.has_types['.ied'] = True
             self.ieds_list_types[in_or_out] = new_file
         
         else:
-            if not os.path.exists(new_file): return False
             if in_or_out == 'out': 
+                if not os.path.exists(new_file): return False
                 self.missing_types[ext] = False
             else:
                 self.has_types[ext] = True
@@ -276,6 +340,31 @@ def writeUpdatedFiles(ief_objs):
             logger.error('Could nto write new ief file at:\n' + ief.path_holder.getAbsolutePath())
             return False
     return True
+
+
+def getUpdateSummary(ief_objs):
+    """Get a summary of the updates made to the ief files.
+    
+    Args:
+        ief_objs(list): containing Ief instances.
+    
+    Return:
+    
+    """
+    summary = {}
+    for ief in ief_objs:
+        dat = ief.getValue('Datafile')
+        result = ief.getValue('Results')
+        twod = ief.getValue('2DFile')
+        ieds = ief.getIedData()
+        if twod is None: twod = ''        
+        summary[ief.path_holder.getFileNameAndExtension()] = {
+                                                             'Datafile': dat,
+                                                             'Results': result,
+                                                             '2DFile': twod,
+                                                             'Ied': ieds 
+                                                             }
+    return summary
     
 
 def resolveUnfoundPaths(ief_holders):
@@ -315,30 +404,30 @@ def resolveUnfoundPaths(ief_holders):
                 if k in ief_holder.single_types.keys() and not k == 'result':
                     infile = ief_holder.single_types[k]['in']
                     filename = os.path.split(infile)[1]
-                    file_out = findFile(infile, filename)
+                    file_out = findFile(ief_holder.original_path, filename, 4, True)
                     in_out_list['in'].append(infile)
                     in_out_list['out'].append(file_out)
                     if not file_out == False:
-                        ief_holder.addFile(file_out, 'out', False)
+                        ief_holder.addFile(file_out[0], 'out', False)
                 
                 elif k == '.ied':
                     for ied in ief_holder.ieds_list_types:
                         filename = os.path.split(ied['in'])[1]
-                        file_out = findFile(ied['in'], filename)
+                        file_out = findFile(ief_holder.original_path, filename, 4, True)
                         in_out_list['in'].append(infile)
                         in_out_list['out'].append(file_out)
                         if not file_out == False:
-                            ief_holder.addFile(file_out, 'out', False)
+                            ief_holder.addFile(file_out[0], 'out', False)
                 
                 # Otherwise it can only be a result file
                 else:
                     infile = ief_holder.single_types['result']['in']
-                    filename = os.path.split(infile)[1]
-                    file_out = findFile(infile, filename)
-                    in_out_list['in'].append(infile)
+                    file_out = findFile(ief_holder.original_path, ief_holder.result_name + '.zzn', 4, True)
+                    in_out_list['in'].append(os.path.join(infile, ief_holder.result_name))
                     if not file_out == False:
-                        in_out_list['out'].append(os.path.join(file_out, ief_holder.result_name))
-                        ief_holder.addFile(file_out, 'out', False)
+                        f_out = os.path.split(file_out[0])[0]
+                        in_out_list['out'].append(os.path.join(f_out, ief_holder.result_name))
+                        ief_holder.addFile(f_out, 'out', False)
                     else:
                         in_out_list['out'].append(file_out)
                 
@@ -348,7 +437,7 @@ def resolveUnfoundPaths(ief_holders):
 
         
 def findFile(start_location, file_to_find, search_folder_depth=3,
-             return_first_find=False):
+             return_first_find=False, no_extension=False):
     """Walk the folder structure until matching files are found.
     
     Args:
@@ -358,6 +447,8 @@ def findFile(start_location, file_to_find, search_folder_depth=3,
             start_location before walking down the directories.
         return_first_find=False(bool): if True will return only the first 
             matching file that it finds (as a list).
+        no_extension=False(bool): Set to True if the file being checked has no
+            file extension and should be checked against name only.
     
     Return:
         list - containg the normalised absolute paths of all of the files found.
@@ -378,10 +469,18 @@ def findFile(start_location, file_to_find, search_folder_depth=3,
     for root, dir, files in os.walk(start_location):
         for f in files:
             splitted = os.path.split(f)
-            if len(splitted) > 1 and splitted[1].lower() == file_to_find.lower():
-                found_files.append(os.path.normpath(os.path.join(root, f)))
-                if return_first_find:
-                    return found_files
+            if len(splitted) > 1:
+                if no_extension:
+                    fname = os.path.splitext(splitted[1])
+                    if len(fname) > 1 and fname[0].lower() == file_to_find.lower():
+                        found_files.append(os.path.normpath(os.path.join(root, fname[0])))
+                        if return_first_find:
+                            return found_files
+                else:
+                    if splitted[1].lower() == file_to_find.lower():
+                        found_files.append(os.path.normpath(os.path.join(root, f)))
+                        if return_first_find:
+                            return found_files
     
     if found_files:
         return found_files
@@ -417,14 +516,16 @@ def autoResolveIefs(iefs):
             IefHolder objects.
     """
     ief_holders = []
+    ief_fail = []
     for ief in iefs:
         success, new_holder = autoResolvePath(ief, search_folder_depth=4)
         if success:
             ief_holders.append(new_holder)
         else:
-            return False, ief_holders
+            ief_fail.append(ief)
+#             return False, ief_holders
     
-    return True, ief_holders
+    return ief_holders, ief_fail
     
     
 def autoResolvePath(ief_path, search_folder_depth=4):
