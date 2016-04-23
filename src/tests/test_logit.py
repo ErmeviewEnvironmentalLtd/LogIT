@@ -14,7 +14,7 @@ import GuiStore
 app = QApplication(sys.argv)
 
 
-class ControllerTest(unittest.TestCase):
+class LogitTest(unittest.TestCase):
     
     def setUp(self):
         """
