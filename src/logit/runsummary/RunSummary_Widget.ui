@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RunSummaryWidget</class>
+ <widget class="QWidget" name="RunSummaryWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>740</width>
+    <height>577</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QGroupBox" name="simGraphGroup">
+     <property name="title">
+      <string>Simulation graph</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="PlotWidget" name="simGraphGraphics"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="runStatusGroup">
+     <property name="font">
+      <font>
+       <family>Arial 12</family>
+       <pointsize>9</pointsize>
+       <weight>50</weight>
+       <italic>false</italic>
+       <bold>false</bold>
+      </font>
+     </property>
+     <property name="title">
+      <string>Run status</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <property name="topMargin">
+       <number>16</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QTableWidget" name="runStatusTable">
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>GUID</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>TCF_NAME</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>COMPLETION</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>MAX_MB</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>MAX_DDV</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>STATUS</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>RUN_OPTIONS</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PlotWidget</class>
+   <extends>QGraphicsView</extends>
+   <header>pyqtgraph.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

@@ -143,7 +143,8 @@ from newentry import NewEntry
 logger.debug('New Entry import complete')
 from extractmodel import ModelExtractor
 logger.debug('Extract Model import complete')
-
+from runsummary import RunSummary
+logger.debug('Run Summary import complete')
 logger.debug('Import modules complete')
 
 
@@ -308,6 +309,11 @@ class MainGui(QtGui.QMainWindow):
         model_extractor = ModelExtractor.ModelExtractor_UI(cur_location)
         self.widgets[model_extractor.tool_name] = model_extractor
         self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), model_extractor, model_extractor.tool_name)
+        
+        # Run Summary
+        run_summary = RunSummary.RunSummary_UI(cur_location) 
+        self.widgets[run_summary.tool_name] = run_summary
+        self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), run_summary, run_summary.tool_name)
         
         # Connect slots and load the settings.
         for w in self.widgets.values():
