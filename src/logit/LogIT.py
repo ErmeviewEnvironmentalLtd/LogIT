@@ -107,6 +107,7 @@ except:
 
 
 from _sqlite3 import Error
+logger.debug('SQLite3 import complete')
 
 # Fetch the ship library   
 try:
@@ -121,16 +122,29 @@ except:
     logger.error('Cannot import PyQt4 is it installed?')
  
 # LogIT specific modules.
+logger.debug('Start of Logit imports')
 from LogIT_UI import Ui_MainWindow
+logger.debug('Main Window import complete')
 import LogBuilder
+logger.debug('LogBuilder import complete')
 import DatabaseFunctions
+logger.debug('Database functions import complete')
 import Exporters
+logger.debug('Exporters import complete')
 import Controller
+logger.debug('Controller import complete')
 import GuiStore
+logger.debug('GuiStore import complete')
 import IefResolver
+logger.debug('Ief Resolver import complete')
 import globalsettings as gs
+logger.debug('Global Settings import complete')
 from newentry import NewEntry
+logger.debug('New Entry import complete')
 from extractmodel import ModelExtractor
+logger.debug('Extract Model import complete')
+
+logger.debug('Import modules complete')
 
 
 class MainGui(QtGui.QMainWindow):
@@ -154,17 +168,11 @@ class MainGui(QtGui.QMainWindow):
         # Database tables that should be exported to Excel
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 'BC_DBASE']
             
-        # Start the application and initialise the GUI
-#         self.app = QtGui.QApplication(sys.argv) # ~
-        
         icon_path = os.path.join(cur_settings_path, 'Logit_Logo.ico')
-        #self.app.setWindowIcon(QtGui.QIcon(':images/Logit_Logo.png'))
-
-#         self.app.aboutToQuit.connect(self._customClose) # ~
-#         MainGui = QtGui.QMainWindow()
         QtGui.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow() # ~
         self.ui.setupUi(self)
+        logger.debug('Setup UI complete')
         
         # Add a progress bar to the status bar
         self.progress_bar = QtGui.QProgressBar(self.ui.statusbar)
@@ -176,7 +184,6 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionLoad.triggered.connect(self.fileMenuActions)
         self.ui.actionExportToExcel.triggered.connect(self.fileMenuActions)
         self.ui.actionNewModelLog.triggered.connect(self.fileMenuActions)
-#         self.ui.actionExit.triggered.connect(self._customClose) # ~
         self.ui.actionUpdateDatabaseSchema.triggered.connect(self._updateDatabaseVersion)
         self.ui.actionSaveSetupAs.triggered.connect(self._saveSetup)
         self.ui.actionLoadSetup.triggered.connect(self._loadSetup)
@@ -187,12 +194,8 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
         self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdatesTrue)
         self.ui.actionResolveIefFiles.triggered.connect(self._resolveIefs)
-#         self.ui.loadModelTab.currentChanged.connect(self._loadTabChanged)
         
         # A couple of keyboard shortcuts...because I'm lazy!
-        # Launch the browse for model dialog
-#         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+L"), self.ui.loadModelButton, 
-#                                 lambda: self._loadFileActions(shortcut='loadmodel'))
 #         # Add log entry
 #         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+A"), self.ui.addSingleLogEntryButton, 
 #                                                         self._createLogEntry)
@@ -231,26 +234,21 @@ class MainGui(QtGui.QMainWindow):
         self.ui.tcfEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tcfEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
         self.ui.tcfEntryViewTable.itemChanged.connect(self._highlightEditRow)
-        
-        # Custom quit function
-        #self.app.aboutToQuit.connect(self._customClose)
+        logger.debug('Slot connection complete')
         
         # Load the user settings from the last time the software was used 
         self._loadSettings()
-        
+        logger.debug('Load settings complete')
         self._setupUiContainer()
-        # Set the column widths
+        logger.debug('Setup UIContainer complete')
         self._setColumnWidths()
+        logger.debug('Set column widths complete')
         
         # Use those settings to get the file path and try and load the last log
         # database that the user had open
         self.loadModelLog()
+        logger.debug('Attempt to laod model log complete')
         self.all_logs = None
-        
-#         self.setWindowIcon(QtGui.QIcon(':Logit_Logo2_25x25.png'))
-        
-        # Activate the GUI
-#         MainGui.show() # ~
         
         # Set default logging level if used in release
         if not gs.__DEV_MODE__:
@@ -263,10 +261,9 @@ class MainGui(QtGui.QMainWindow):
             logger.info('Logging level set to: INFO')
             logger.debug('info set check')
         
+        logger.debug('MainGui construction complete')
+
         
-#         sys.exit(self.app.exec_()) # ~
-    
-    
     def startupChecks(self):
         """
         """
@@ -293,7 +290,6 @@ class MainGui(QtGui.QMainWindow):
                             'bcEntryViewTable', self.ui.bcEntryViewTable))
         self.view_tables.addTable(GuiStore.TableWidget('DAT', 
                             'datEntryViewTable', self.ui.datEntryViewTable))
-        
         self._addWidgets()
         
     
@@ -593,7 +589,6 @@ class MainGui(QtGui.QMainWindow):
                     self.loadModelLog()
                     self.settings.last_model_directory = p
             
-
     
     def _deleteRowFromDatabase(self, table, all_entry):
         """Deletes the row in the database based on the location that the mouse
@@ -946,14 +941,11 @@ class MainGui(QtGui.QMainWindow):
             self._loadSettings()
         
     
-#     def _customClose(self):
     def closeEvent(self, event):
         """Do the things that need doing before closing window.
         """
         save_path = self.settings.cur_settings_path
         self._writeSettings(save_path)
-        # We need sys.exit because otherwise this function will be called twice.
-        #self.app.quit()
         sys.exit()            
 
  
@@ -1114,7 +1106,6 @@ class MainGui(QtGui.QMainWindow):
         open_path = GuiStore.getModelFileLocation(multi_paths,
                                                   p, self.settings.cur_log_path,
                                                   self.settings.cur_settings_path)
-        
         return open_path
     
           
@@ -1202,10 +1193,6 @@ class MainGui(QtGui.QMainWindow):
         icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         ief_dialog.setWindowIcon(icon)
         ief_dialog.exec_()
-        # Or just tell the user that all was alright
-#         else:
-#             self.launchQMsgBox('Ief Resolver', 'Ief Files successfully updated.')
-           
         finalize() 
         
 
@@ -1268,7 +1255,6 @@ class MainGui(QtGui.QMainWindow):
         data = QtCore.QMimeData()
         url = QtCore.QUrl.fromLocalFile(zip_log)
         data.setUrls([url])
-#         self.app.clipboard().setMimeData(data)
         QtGui.QApplication.clipboard().setMimeData(data)
     
     
@@ -1325,7 +1311,6 @@ class MainGui(QtGui.QMainWindow):
     def _updateStatusBar(self, string): 
         self.ui.statusbar.showMessage(string)
         logger.debug('updating status bar: ' + string)
-#         self.app.processEvents()
         QtGui.QApplication.processEvents()
         
     def _updateMaxProgress(self, value):
@@ -1335,7 +1320,6 @@ class MainGui(QtGui.QMainWindow):
     def _updateCurrentProgress(self, value):
         """"""
         self.progress_bar.setValue(value)
-#         self.app.processEvents()
         QtGui.QApplication.processEvents()
     
 
@@ -1369,13 +1353,8 @@ class LogitSettings(object):
         
         
 def main():
-    # Set up the logging module with software specific settings.
-    #import logging.config
-    #import logging
-     
     # Need to do this so that the icons show up properly
     import ctypes
-    #myappid = 'logit.0-4-Beta'
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(gs.__APPID__)
     QPlugin = QtCore.QPluginLoader("qico4.dll")
      
@@ -1397,7 +1376,6 @@ def main():
 
     except:
         cur_settings = False
-        #logging.info('Unable to load user defined settings')
         print 'Unable to load user defined settings'
          
     # Launch the user interface.
@@ -1411,7 +1389,6 @@ def main():
     
     sys.exit(app.exec_())
 
-#     MainGui(cur_settings, settings_path)
  
  
 if __name__ == '__main__': main()

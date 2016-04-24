@@ -1,12 +1,19 @@
-- Bugfix for loading a 1D only model when 2D scheme is set to None. Previously
-  this wasn't checked and if a tcf file was found in the ief file it was loaded
-  into the database. This was happening even if the use of 2d was deactivated.
-  The active status is now checked and only 1D components are loaded if it is
-  not active.
-- Set 2d results location back to being the folder only and not folder plus
-  the tcf filename. This is because results locations can hold additional
-  sub area outputs etc as well.
-- Started to implement some unit tests to try and get better at catching
-  a few of the regression that seem to be prevailant in the last few releases.
-  This will also help to identify and solve some of the problems with the
-  slightly unhelpful error messages that are being launched.
+- Improved reporting of missing model files (.tgc/.tbc, etc) from loading
+  a tuflow model. There was an issue in the SHIP library and in the way logit
+  was trying to report these. They should now be listed when not found.
+- Moved the LogBuilder functionality from module functions to a class to make
+  error handling and reporting of warnings a bit cleaner and easier to maintain.
+- Fixed some bugs in the Ief Resolver. These include an oversight in finding
+  the correct reference file for the .tcf or .dat file used to work out the
+  main containing foler. If there was another file with the same name higher in
+  the directory it would pick this one. It now uses a slightly more clever
+  approach to rank the liklehood of any particular file being the correct one.
+  Improvements also made to the second pass attempt at locating files.
+- Some improvements in error handling in the model logger. These are still not
+  perfect, but they should be a bit better than they were. Tests are in place
+  that can be updated to help improve this when problems are reported.
+- Added a lot more unittests. These now include some checks for the 
+  Ief Resolver and the Model Extractor widgets. Although the coverage is not 
+  perfect at the moment most of the basic functionality of the model loaders
+  and outputs is there. Further tests will be added when bugs are identified. 
+  These should help to avoid as many regressions in the future.

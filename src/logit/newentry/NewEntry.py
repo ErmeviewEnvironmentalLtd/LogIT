@@ -46,9 +46,6 @@
 """
 
 import os
-import time
-import shutil
-import re
 
 import logging
 logger = logging.getLogger(__name__)
@@ -56,16 +53,12 @@ logger = logging.getLogger(__name__)
 from PyQt4 import QtCore, QtGui
 
 from ship.utils.filetools import MyFileDialogs
-from ship.utils.fileloaders.fileloader import FileLoader
-from ship.tuflow.tuflowfilepart import TuflowFile
-from ship.tuflow.data_files import datafileloader
-from ship.utils import filetools
     
 import GuiStore
 import Controller
 import NewEntry_Widget as newentrywidget
-from app_metrics import utils as applog
-import globalsettings as gs
+logger.debug('NewEntry_Widget import complete')
+# from app_metrics import utils as applog
 
 
 class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):

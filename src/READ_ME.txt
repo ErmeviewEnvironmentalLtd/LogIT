@@ -199,28 +199,6 @@ v0.4.5-Beta:
     - Updated to latest release of TmacToolsLibrary. This fixes a couple
       of small bugs but doesn't have a big impact.
     - Updated the look and feel and fixed some issues with the layouts.
-    - Fixed bug in database versioning that meant an older version of the 
-      database didn't realised it needed to update.
-      THIS MEANS THAT LOG DATABASES WILL NEED UPDATING.
-    - Fixed bug in multiple model loader file list. When dragging more
-      than one file it was deleting items in the row. Multiple selection
-      is now disabled. To remove multiple entries a checkbox can be
-      selected.
-    - Added release notes dialog on startup after new version installed. 
-      Launches a dialog to show version updates to user.
-    - Added feature to automatically check for new version on startup.
-    - Added current model load tab to settings. It will now remember if
-      you were using the single or multiple model load tab last time.
-    - Fixed an issue with reading results and check files with the 
-      model extractor tool. Now deals with absolute paths.
-      This has also been applied to the logger. It will now record the 
-      absolute path of the results location in the log if different
-      from the main model directory.
-    - Improved path display in model extractor input/output textboxes and
-      the summary output display. They are now normalised for the OS and
-      can be copied and pasted directly into Explorer.
-    - Fixed a few more things in the way error handling is dealt with.
-      This still needs some work though. Sorry :(
 
 v0.5.0-Beta:
     - Added IefResolver module. This can now be found under the Tools menu. It
@@ -236,33 +214,6 @@ v0.5.0-Beta:
       was returning an instance of SomeFile instead of the results path string.
     - Made horizontal scrolling in tables a bit easier to use by allowing by
       pixel movement instead of by item.
-    -
-    - Summary of old release (0.4.4) for those that didn't get it.
-    - Updated to latest release of TmacToolsLibrary. This fixes a couple
-      of small bugs but doesn't have a big impact.
-    - Updated the look and feel and fixed some issues with the layouts.
-    - Fixed bug in database versioning that meant an older version of the 
-      database didn't realised it needed to update.
-      THIS MEANS THAT LOG DATABASES WILL NEED UPDATING.
-    - Fixed bug in multiple model loader file list. When dragging more
-      than one file it was deleting items in the row. Multiple selection
-      is now disabled. To remove multiple entries a checkbox can be
-      selected.
-    - Added release notes dialog on startup after new version installed. 
-      Launches a dialog to show version updates to user.
-    - Added feature to automatically check for new version on startup.
-    - Added current model load tab to settings. It will now remember if
-      you were using the single or multiple model load tab last time.
-    - Fixed an issue with reading results and check files with the 
-      model extractor tool. Now deals with absolute paths.
-      This has also been applied to the logger. It will now record the 
-      absolute path of the results location in the log if different
-      from the main model directory.
-    - Improved path display in model extractor input/output textboxes and
-      the summary output display. They are now normalised for the OS and
-      can be copied and pasted directly into Explorer.
-    - Fixed a few more things in the way error handling is dealt with.
-      This still needs some work though. Sorry :(
 
 v0.5.1-Beta:
     - Fixed bug in ISIS only model loader. Could not load ISIS only models because
@@ -285,25 +236,8 @@ v0.6.0-Beta:
     - Update Model Extractor tool. Now copes much better with the different 
       formats for check file paths.
 
-
 v0.6.1-Beta:
     - Bugfix for Ief Resolver and Model loader.
-    -
-    - Main release notes available below:
-    - Big change to single model load user interface. Got rid of all of the 
-      ugly tables and replaced it with a navigable tree. Same colour schemes
-      etc still apply.
-    - Moved New Entry tab into a separate widget to attempt to reduce the amount
-      of code in the LogIT.py.
-    - Fixed bug in new version downloader copy settings process. It should now
-      copy settings across properly.
-    - Added additional message to new version downloader to let the user know if
-      it has been successfull and instruct on what to do next.
-    - Some more work on fixing result/check/log paths so that they load properly. 
-      There is probably still some work to do here.
-    - Update Model Extractor tool. Now copes much better with the different 
-      formats for check file paths.
-
 
 v0.6.2-Beta:
     - Bugfix for loading a 1D only model when 2D scheme is set to None. Previously
@@ -318,6 +252,27 @@ v0.6.2-Beta:
       a few of the regression that seem to be prevailant in the last few releases.
       This will also help to identify and solve some of the problems with the
       slightly unhelpful error messages that are being launched.
+
+v0.6.3-Beta:
+    - Improved reporting of missing model files (.tgc/.tbc, etc) from loading
+      a tuflow model. There was an issue in the SHIP library and in the way logit
+      was trying to report these. They should now be listed when not found.
+    - Moved the LogBuilder functionality from module functions to a class to make
+      error handling and reporting of warnings a bit cleaner and easier to maintain.
+    - Fixed some bugs in the Ief Resolver. These include an oversight in finding
+      the correct reference file for the .tcf or .dat file used to work out the
+      main containing foler. If there was another file with the same name higher in
+      the directory it would pick this one. It now uses a slightly more clever
+      approach to rank the liklehood of any particular file being the correct one.
+      Improvements also made to the second pass attempt at locating files.
+    - Some improvements in error handling in the model logger. These are still not
+      perfect, but they should be a bit better than they were. Tests are in place
+      that can be updated to help improve this when problems are reported.
+    - Added a lot more unittests. These now include some checks for the 
+      Ief Resolver and the Model Extractor widgets. Although the coverage is not 
+      perfect at the moment most of the basic functionality of the model loaders
+      and outputs is there. Further tests will be added when bugs are identified. 
+      These should help to avoid as many regressions in the future.
 
 ##~##
 

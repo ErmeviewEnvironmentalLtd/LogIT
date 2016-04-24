@@ -62,26 +62,27 @@
 import os
 import traceback
 import itertools
-import sqlite3
 import cPickle
 import shutil
 import zipfile
 
 from PyQt4 import QtCore, QtGui
 
+import logging
+logger = logging.getLogger(__name__)
+
 from ship.utils.qtclasses import MyFileDialogs
 
 # Local modules
 import DatabaseFunctions
+# logger.debug('Import DatabaseFunctions complete')
 import LogBuilder
+# logger.debug('Import LogBuilder complete')
 import Exporters
-import LogClasses
-from extractmodel import ModelExtractor
+# logger.debug('Import Exporters complete')
 from app_metrics import utils as applog
+logger.debug('Import app_metrics complete')
 import globalsettings as gs
-
-import logging
-logger = logging.getLogger(__name__)
 
 
 def reverse_enumerate(iterable):
