@@ -8,6 +8,9 @@ from PyQt4.QtCore import Qt
 
 import LogIT
 import IefResolver
+from IefResolver import IefHolder
+
+from ship.utils.fileloaders import fileloader as fl
 
 # Need to call this here to avoid some weird behaviour
 app = QApplication(sys.argv)
@@ -51,6 +54,36 @@ class IefResolverTest(unittest.TestCase):
         self.assertDictEqual(ief_holder.single_types, single_types, 'Single types fail')
         
         self.assertEqual(ief_holder.result_name, 'KENNFORD_1%AEP_FINAL_V5.18', 'Result name fail')
+    
+    
+    def test_resolveUnfoundPaths(self):
+        """
+        """
+        ief_path = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Ief_Resolver\model\isis\iefs\kennford_1%AEP_FINAL_v5.20.ief'
+        loader = fl.FileLoader()
+        ief = loader.loadFile(ief_path)
+        holders = [self.getUnsolvedIefHolder(ief)]
+        holders, had_to_search = IefResolver.resolveUnfoundPaths(holders)
+        holder = holders[0]
+        
+        test_hadtosearch = {'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\isis\\iefs\\kennford_1%AEP_FINAL_v5.20.ief': 
+                            {'in': ['P:\\00 Project Files\\13059 EA SW Consultancy Support\\Technical\\Kennford_model\\model\\hydraulics\\Final_Model\\model\\isis\\results\\kennford_1%AEP_FINAL_v5.19\\KENNFORD_1%AEP_FINAL_V5.19'],
+                             'out': ['C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\trick_file_location\\kennford_1%AEP_FINAL_v5.19\\KENNFORD_1%AEP_FINAL_V5.19']
+                            }
+                           }
+        test_missingtypes = {'.tcf': False, '.ied': True, 'result': False, '.dat': False}
+        test_singletypes = {'.dat': {'in': 'P:\\00 Project Files\\13059 EA SW Consultancy Support\\Technical\\Kennford_model\\model\\hydraulics\\Final_Model\\model\\isis\\dat\\kennford_1%AEP_FINAL_v1.17\\kennford_1%AEP_FINAL_v1.17.DAT',
+                                     'out': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\isis\\dat\\kennford_1%AEP_FINAL_v1.17\\kennford_1%AEP_FINAL_v1.17.DAT'},
+                            '.tcf': {'in': 'P:\\00 Project Files\\13059 EA SW Consultancy Support\\Technical\\Kennford_model\\model\\hydraulics\\Final_Model\\model\\tuflow\\runs\\kennford_1%AEP_FINAL_v5.18.tcf',
+                                     'out': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\tuflow\\runs\\kennford_1%AEP_FINAL_v5.18.tcf'},
+                            'result': {'in': 'P:\\00 Project Files\\13059 EA SW Consultancy Support\\Technical\\Kennford_model\\model\\hydraulics\\Final_Model\\model\\isis\\results\\kennford_1%AEP_FINAL_v5.19',
+                                       'out': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\trick_file_location\\kennford_1%AEP_FINAL_v5.19'}}
+        
+        self.assertDictEqual(test_hadtosearch, had_to_search,'had_to_search equality fail')
+        self.assertDictEqual(test_missingtypes, holder.missing_types, 'missing_types equality fail')
+        self.assertDictEqual(test_singletypes, holder.single_types, 'single_types equality fail')
+        
+        i=0
         
     
     def test_updateIedObjects(self):
@@ -78,7 +111,7 @@ class IefResolverTest(unittest.TestCase):
         ief_dir = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Ief_Resolver\model\isis\iefs'
         find_file = 'kennford_1%AEP_FINAL_v5.18.tcf'
         find_file_false = 'kennford_1%AEP_FINAL_v5.19.tcf'
-        result = ['C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\trick_run_location\\kennford_1%AEP_FINAL_v5.18.tcf',
+        result = ['C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\trick_file_location\\kennford_1%AEP_FINAL_v5.18.tcf',
                   'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\tuflow\\runs\\kennford_1%AEP_FINAL_v5.18.tcf',
                   'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\kennford_1%AEP_FINAL_v5.18.tcf'
                  ]
@@ -117,7 +150,23 @@ class IefResolverTest(unittest.TestCase):
         self.assertEqual(IefResolver.longestCommonSuffix(f1, f2), 'f', 'Suffix no result test fail')
         
         
-        
+    def getUnsolvedIefHolder(self, ief):
+        """
+        """
+        holder = IefHolder(ief)
+        holder.has_types = {'.dat': True, '.ied': False, '.tcf': True, 'result': True}
+        holder.missing_types = {'.dat': False, '.ied': True, '.tcf': False, 'result': True}
+        holder.result_name = 'KENNFORD_1%AEP_FINAL_V5.19'
+        holder.root_folder_new = 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\'
+        holder.root_folder_old = 'P:\\00 Project Files\\13059 EA SW Consultancy Support\\Technical\\Kennford_model\\model\\hydraulics\\Final_Model\\model\\'
+        holder.selected_paths = {'.dat': '', '.ied': '', '.tcf': '', 'result': ''}
+        holder.single_types = {'.dat': {'in': 'P:\\00 Project Files\\13059 EA SW Consultancy Support\\Technical\\Kennford_model\\model\\hydraulics\\Final_Model\\model\\isis\\dat\\kennford_1%AEP_FINAL_v1.17\\kennford_1%AEP_FINAL_v1.17.DAT',
+                                        'out': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\isis\\dat\\kennford_1%AEP_FINAL_v1.17\\kennford_1%AEP_FINAL_v1.17.DAT'},
+                               '.tcf': {'in': 'P:\\00 Project Files\\13059 EA SW Consultancy Support\\Technical\\Kennford_model\\model\\hydraulics\\Final_Model\\model\\tuflow\\runs\\kennford_1%AEP_FINAL_v5.18.tcf',
+                                        'out': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Ief_Resolver\\model\\tuflow\\runs\\kennford_1%AEP_FINAL_v5.18.tcf'},
+                               'result': {'in': 'P:\\00 Project Files\\13059 EA SW Consultancy Support\\Technical\\Kennford_model\\model\\hydraulics\\Final_Model\\model\\isis\\results\\kennford_1%AEP_FINAL_v5.19',
+                                          'out': ''}}
+        return holder
         
         
         
