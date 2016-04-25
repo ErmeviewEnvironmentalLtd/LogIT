@@ -11,6 +11,7 @@ send_to_server.py
 /src/logit/local_regression_tests/
 /local_regression_tests/
 src/tests/logs/
+data/
 
 *.log
 *.logset

@@ -15,19 +15,50 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
-    <widget class="QGroupBox" name="simGraphGroup">
-     <property name="title">
-      <string>Simulation graph</string>
+    <widget class="QGroupBox" name="overviewGroup">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="title">
+      <string>Overview</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4">
       <item>
-       <widget class="PlotWidget" name="simGraphGraphics"/>
+       <widget class="QLabel" name="overviewLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Manage your running models by adding them to the Run Status table and viewing progress in the graph display. Key statistics will be displayed in the table, including the current progress of the model simulation. You can also view the main criteria of the model run graphically in the Simulation Graph window below.&lt;/p&gt;&lt;p&gt;Add a new .tlf file by clicking Add Log, update or remove an existing log entry with the right-click context menu, or use the Update All button to update all of the entries at once. Clicking on an entry row in the table will update the graph with the details from that log entry.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item>
     <widget class="QGroupBox" name="runStatusGroup">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>150</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>200</height>
+      </size>
+     </property>
      <property name="font">
       <font>
        <family>Arial 12</family>
@@ -40,50 +71,182 @@
      <property name="title">
       <string>Run status</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <property name="topMargin">
-       <number>16</number>
-      </property>
-      <item row="0" column="0">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QPushButton" name="updateAllStatusButton">
+          <property name="text">
+           <string>Update All</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="tlfAddButton">
+          <property name="minimumSize">
+           <size>
+            <width>80</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Add Log</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
        <widget class="QTableWidget" name="runStatusTable">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>100</number>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>50</number>
+        </attribute>
         <attribute name="horizontalHeaderStretchLastSection">
          <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>20</number>
+        </attribute>
+        <attribute name="verticalHeaderMinimumSectionSize">
+         <number>20</number>
         </attribute>
         <column>
          <property name="text">
           <string>GUID</string>
          </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>TCF_NAME</string>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+          </font>
+         </property>
+         <property name="textAlignment">
+          <set>AlignHCenter|AlignVCenter|AlignCenter</set>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>COMPLETION</string>
+          <string>NAME</string>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+          </font>
+         </property>
+         <property name="textAlignment">
+          <set>AlignHCenter|AlignVCenter|AlignCenter</set>
          </property>
         </column>
         <column>
          <property name="text">
           <string>MAX_MB</string>
          </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+          </font>
+         </property>
+         <property name="textAlignment">
+          <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+         </property>
         </column>
         <column>
          <property name="text">
           <string>MAX_DDV</string>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+          </font>
+         </property>
+         <property name="textAlignment">
+          <set>AlignHCenter|AlignVCenter|AlignCenter</set>
          </property>
         </column>
         <column>
          <property name="text">
           <string>STATUS</string>
          </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+          </font>
+         </property>
+         <property name="textAlignment">
+          <set>AlignHCenter|AlignVCenter|AlignCenter</set>
+         </property>
         </column>
         <column>
          <property name="text">
-          <string>RUN_OPTIONS</string>
+          <string>COMPLETION</string>
+         </property>
+         <property name="font">
+          <font>
+           <family>Arial</family>
+          </font>
+         </property>
+         <property name="textAlignment">
+          <set>AlignHCenter|AlignVCenter|AlignCenter</set>
          </property>
         </column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="simGraphGroup">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>175</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <family>Arial</family>
+       <pointsize>9</pointsize>
+      </font>
+     </property>
+     <property name="title">
+      <string>Simulation graph</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="PlotWidget" name="simGraphGraphics"/>
+      </item>
+      <item>
+       <widget class="QLabel" name="legendLabel">
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#000000;&quot;&gt;Legend:&lt;/span&gt;&lt;span style=&quot; color:#004eeb;&quot;&gt;   Flow In&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;   Flow Out  &lt;/span&gt; DDV   &lt;span style=&quot; color:#4be100;&quot;&gt;MB&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
       </item>
      </layout>
