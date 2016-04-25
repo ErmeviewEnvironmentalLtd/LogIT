@@ -46,6 +46,7 @@ import os
 import uuid
 import datetime
 import cPickle
+import math
 from PyQt4 import QtCore, QtGui
 import pyqtgraph as pg
 
@@ -107,7 +108,6 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         self.p1.scene().addItem(self.p2)
         self.p1.getAxis('right').linkToView(self.p2)
         self.p2.setXLink(self.p1)
-#         self.p3.setAspectLocked(False)
         
         self.updateViews()
         self.p1.vb.sigResized.connect(self.updateViews)
@@ -118,6 +118,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         menu = QtGui.QMenu()
         updateEntryAction = menu.addAction("Update Entry")
         deleteEntryAction = menu.addAction("Remove Entry")
+        reloadRunAction = menu.addAction("Reload Run")
 
         # Find who called us and get the object that the name refers to.
         sender = self.sender()
@@ -143,14 +144,34 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                     entry_i = i
                     break
             if not entry_i == -1: del self.settings.log_summarys[entry_i]
-            os.remove(entry.stored_datapath) # TODO: Try-catch
+            try:
+                os.remove(entry.stored_datapath)
+            except IOError:
+                logger.warning('Unable to find cache file - may not exist or might need deleting manually')
             entry = None
             self.p1.clear()
             self.p2.clear()
-            
+        
+        if action == reloadRunAction:
+            log_store = self._loadLogStoreFromCache(entry.row_values['GUID'])
+            details = []
+            for i, log in enumerate(self.settings.log_summarys):
+                if log.row_values['GUID'] == entry.row_values['GUID']: 
+                    details = [log.row_values['GUID'], log.row_values['NAME'],
+                              log.tlf_path, i]
+                    break
+
+            if details:
+                entry = LogSummaryEntry(details[0], details[1], self.data_dir, details[2])
+                entry, log_store = self._loadLogContents(entry, details[2])
+                self._saveLogStoreToCache(log_store, entry.stored_datapath)
+                self._updateTableVals(entry, details[3])
+                self._updateGraph(log_store)
+                self.settings.log_summarys[details[3]] = entry
+                
         if action == updateEntryAction:
             log_store = self._loadLogStoreFromCache(entry.row_values['GUID'])
-            if not entry.row_values['STATUS'] == 'Complete':
+            if not entry.row_values['STATUS'] == 'Complete' and not entry.row_values['STATUS'] == 'Failed':
                 entry, log_store = self._loadLogContents(entry, entry.tlf_path, log_store)
                 self._saveLogStoreToCache(log_store, entry.stored_datapath)
             entry_i = -1
@@ -168,6 +189,18 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         """
         """
         logger.debug("Updating all status'")
+        log_store = None
+        for i, log in enumerate(self.settings.log_summarys):
+            log_store = self._loadLogStoreFromCache(log.row_values['GUID'])
+            if log.row_values['STATUS'] == 'Complete' or log.row_values['STATUS'] == 'Failed':
+                entry = log
+            else:
+                entry, log_store = self._loadLogContents(log, log.tlf_path, log_store)
+                self._saveLogStoreToCache(log_store, entry.stored_datapath)
+            self._updateTableVals(entry, i)
+            self.settings.log_summarys[i] = entry
+            
+        if not log_store is None: self._updateGraph(log_store)
         
     
     
@@ -237,7 +270,8 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         if row_no == -1 or row_no > row_count:
             self.runStatusTable.setRowCount(row_count + 1)
             row_no = row_count
-
+        
+        status = summary_obj.row_values['STATUS']
         for col in range(self.runStatusTable.columnCount()):
             header = str(self.runStatusTable.horizontalHeaderItem(col).text())
             val = summary_obj.row_values[header]
@@ -254,7 +288,14 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             else:
                 item = QtGui.QTableWidgetItem(str(val))
                 item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled) 
+                if status == 'Failed':
+                    item.setBackgroundColor(QtGui.QColor(255, 204, 204)) # Light Red
+                    item.setFont(QtGui.QFont('Arial', 9, QtGui.QFont.Bold))
+                elif status == 'Complete':
+                    item.setBackgroundColor(QtGui.QColor(204, 255, 153)) # Light green
+                    
                 self.runStatusTable.setItem(row_no, col, item)
+        self.runStatusTable.selectRow(row_no)
           
     
     def myAutoRange(self):
@@ -315,13 +356,13 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                     pen=({'color': 'g', 'width': 1})))
             
         if min(log_store.ddv) < min(log_store.mb):
-            self.mMin = min(log_store.ddv)
+            self.mMin = min(log_store.ddv) - 1
         else:
-            self.mMin = min(log_store.mb)
+            self.mMin = min(log_store.mb) - 1
         if max(log_store.ddv) < max(log_store.mb):
-            self.mMax = max(log_store.ddv)
+            self.mMax = max(log_store.mb) + 1
         else:
-            self.mMax = max(log_store.mb)
+            self.mMax = max(log_store.ddv) + 1
             
         self.myAutoRange()
     
@@ -347,7 +388,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         try:
             time = datetime.datetime.strptime(date_str, "%H:%M:%S")
         except ValueError:
-            logger.error('date_str is not in the correct format (HH:MM:SS: ' + date_str)
+            #logger.error('date_str is not in the correct format (HH:MM:SS: ' + date_str)
             raise
         hours_in_mins = float(time.hour) * 60
         hours = (hours_in_mins + float(time.minute)) / 60
@@ -365,6 +406,8 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             in_results = False
             own_log = False
         finished = False
+        interrupted = False
+        error = False
         start_time = -1
         end_time = -1
         cur_row = -1
@@ -393,17 +436,30 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                         if 'Run Finished' in line:
                             finished = True
                             break
-
-                        time = line[8:16].strip()
-                        hours, t = self.getHoursFromDateStr(time)
-                        mb = float(line[61:67].strip('%'))
+                        if 'Run Interrupted' in line:
+                            interrupted = True
+                            break
+                        if 'ERROR' in line:
+                            error = True
+                            break
+                        
+                        try:
+                            time = line[8:16].strip()
+                            hours, t = self.getHoursFromDateStr(time)
+                        except (ValueError, IndexError):
+                            continue
+                        mb = line[61:67].strip('%')
+                        if '***' in mb:
+                            mb = 99
+                        else:
+                            mb = float(mb) 
                         Qin = float(line[83:89])
                         Qout = float(line[93:99])
                         ddv = float(line[103:109])
                         
-                        if mb > entry.row_values['MAX_MB']:
+                        if math.fabs(mb) > math.fabs(entry.row_values['MAX_MB']):
                             entry.row_values['MAX_MB'] = mb
-                        if abs(ddv) > abs(entry.row_values['MAX_DDV']):
+                        if math.fabs(ddv) > math.fabs(entry.row_values['MAX_DDV']):
                             entry.row_values['MAX_DDV'] = ddv
                         
                         s = t.second
@@ -415,10 +471,14 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                 
         except IOError:
             logger.error('Unable to open log file at:\n' + tlf_path)
+            entry.row_values['STATUS'] = 'Unfindable'
         
         if finished:
             entry.row_values['COMPLETION'] = end_time
             entry.row_values['STATUS'] = 'Complete'
+        elif interrupted or error:
+            entry.row_values['COMPLETION'] = log_store.time_steps[-1]
+            entry.row_values['STATUS'] = 'Failed'
         else:
             entry.row_values['COMPLETION'] = log_store.time_steps[-1]
             entry.row_values['STATUS'] = 'In Progress'
@@ -449,7 +509,6 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         self._loadIntoTable(open_path)
         
     
-    
     def loadSettings(self, settings):
         """Load any pre-saved settings provided."""
         
@@ -462,6 +521,14 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                 setattr(settings, s, getattr(temp_set, s))
         
         self.settings = settings
+        # Test first
+        for i in range(len(self.settings.log_summarys)-1, -1, -1):
+            if not os.path.exists(self.settings.log_summarys[i].stored_datapath):
+                del self.settings.log_summarys[i]
+                logger.warning('cache data for log summary unavailable - will not be loaded.')
+        
+        i = 0
+        # Then setup table
         for i, summary in enumerate(self.settings.log_summarys, 0):
             self._updateTableVals(summary, i+1)
     
