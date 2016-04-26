@@ -366,9 +366,9 @@ class ModelLoader(object):
         if log.has_own_root:
             log = log.root
         elif not log.getRelativePath():
-            log = ''
+            log = self.tcf_dir
         else:
-            log = log.getRelativePath()
+            log = os.path.join(self.tcf_dir, log.getRelativePath())
         run_cols['LOG_DIR'] = log
             
         return run_cols

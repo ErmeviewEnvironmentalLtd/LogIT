@@ -231,13 +231,22 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
     def _activateRow(self, row, col):
         """
         """
-        self.runStatusTable.selectRow(row)
-        guid = str(self.runStatusTable.item(row, 0).text())
-        log_store = self._loadLogStoreFromCache(guid)
-        self._updateGraph(log_store)
+        try:
+            self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading from cache ...')
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+            self.runStatusTable.selectRow(row)
+            guid = str(self.runStatusTable.item(row, 0).text())
+            log_store = self._loadLogStoreFromCache(guid)
+            self._updateGraph(log_store)
+        except Exception, err:
+            logger.error('Problem loading cache: ' + err)
+        finally:
+            self.emit(QtCore.SIGNAL("statusUpdate"), '')
+            self.emit(QtCore.SIGNAL("updateProgress"), 0)
+            QtGui.QApplication.restoreOverrideCursor()
     
 
-    def _loadIntoTable(self, tlf_path):
+    def loadIntoTable(self, tlf_path):
         """
         """
         logger.debug('Load into table clicked')
@@ -256,11 +265,22 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         guid = str(uuid.uuid4())
         entry = LogSummaryEntry(guid, run_name, self.data_dir, tlf_path)
         
-        entry, log_store = self._loadLogContents(entry, tlf_path)
-        self._saveLogStoreToCache(log_store, entry.stored_datapath)
-        self.settings.log_summarys.append(entry)
-        self._updateTableVals(entry)
-        self._updateGraph(log_store)
+        try:
+            self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+            entry, log_store = self._loadLogContents(entry, tlf_path)
+            self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
+            self._saveLogStoreToCache(log_store, entry.stored_datapath)
+            self.settings.log_summarys.append(entry)
+            self.emit(QtCore.SIGNAL("statusUpdate"), 'Updating graph and table ...')
+            self._updateTableVals(entry)
+            self._updateGraph(log_store)
+        except Exception, err:
+            logger.error('Problem loading model: ' + err)
+        finally:
+            self.emit(QtCore.SIGNAL("statusUpdate"), '')
+            self.emit(QtCore.SIGNAL("updateProgress"), 0)
+            QtGui.QApplication.restoreOverrideCursor()
         
     
     def _updateTableVals(self, summary_obj, row_no=-1):
@@ -410,6 +430,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         error = False
         start_time = -1
         end_time = -1
+        total_time = -1
         cur_row = -1
         try:
             with open(tlf_path, 'rb') as f:
@@ -425,6 +446,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                             start_time = float(line[22:34].strip())
                         if line.startswith('Finish Time (h):'):
                             end_time = float(line[22:34].strip())
+                            self.emit(QtCore.SIGNAL("setRange"), math.fabs(end_time - start_time))
 
                         elif '.. Running' in line:
                             in_results = True
@@ -448,6 +470,8 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                             hours, t = self.getHoursFromDateStr(time)
                         except (ValueError, IndexError):
                             continue
+                        self.emit(QtCore.SIGNAL("updateProgress"), math.fabs(end_time - hours))
+                        
                         mb = line[61:67].strip('%')
                         if '***' in mb:
                             mb = 99
@@ -506,7 +530,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         if open_path == 'False' or open_path == False:
             return
         self.settings.cur_modellog_path = open_path
-        self._loadIntoTable(open_path)
+        self.loadIntoTable(open_path)
         
     
     def loadSettings(self, settings):

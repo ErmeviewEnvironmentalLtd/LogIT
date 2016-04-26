@@ -196,6 +196,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdatesTrue)
         self.ui.actionResolveIefFiles.triggered.connect(self._resolveIefs)
         self.ui.actionExit.triggered.connect(self.closeEvent)
+        self.ui.actionUpdateAllRunStatus.triggered.connect(self._updateAllRowStatus)
         
         # Keyboard shortcuts
         # Quit
@@ -517,6 +518,7 @@ class MainGui(QtGui.QMainWindow):
             updateTcfRowAction = menu.addAction("Update Tcf Location")
             extractRowAction = menu.addAction("Extract Model")
             updateStatusAction = menu.addAction("Update Status")
+            addToRunSummaryAction = menu.addAction("Add to Run Summary")
             has_extras = True
         
         # lookup the table and database table name
@@ -594,9 +596,77 @@ class MainGui(QtGui.QMainWindow):
                     self.loadModelLog()
                     self.settings.last_model_directory = p
             
+            # Update the MB and RUN_STATUS values in RUN table
             elif action == updateStatusAction:
-                pass
+                # Get the tcf dir path and tcf name
+                row = table_obj.currentRow()
+                row_dict = table_obj.getValues(row=row, names=['ID', 'TCF_DIR', 'TCF'])
+                tcf = row_dict['TCF'][1:-1]
+                tcf = tcf.split(',')[0]
+                
+                # Find the latest values and update the RUN table
+                success, status, mb = Controller.getRunStatusInfo(row_dict['TCF_DIR'], tcf)
+                if not success:
+                    msg = "Failed to update status (ID=%s).\nIs the TCF_DIR correct and does in contain '_ TUFLOW Simulations.log' file?" % (row_dict['ID'])
+                    self.launchQMsgBox('Update Faile', msg)
+                else:
+                    del row_dict['TCF_DIR']
+                    row_dict['RUN_STATUS'] = status
+                    row_dict['MB'] = mb
+                    table_obj.addRowValues(row_dict, row)
+                    self._saveViewChangesToDatabase(table_obj, row_dict['ID'])
+                    self.loadModelLog()
             
+            elif action == addToRunSummaryAction:
+                row = table_obj.currentRow()
+                row_dict = table_obj.getValues(row=row, names=['ID', 'LOG_DIR', 'TCF'])
+                tcf = row_dict['TCF'][1:-1]
+                tcf = tcf.split(',')[0]
+                tcf_name = os.path.splitext(tcf)[0]
+                tlf_file = os.path.join(row_dict['LOG_DIR'], tcf_name + '.tlf')
+                
+                if os.path.exists(tlf_file):
+                    self.ui.tabWidget.setCurrentWidget(self.widgets['Run Summary'])
+                    self.widgets['Run Summary'].loadIntoTable(tlf_file)
+                else:
+                    msg = ("Cannot find .tlf file in LOG_DIR does it exist?\n" +
+                           "Search here:" + tlf_file)
+                    self.launchQMsgBox('File Error', msg) 
+            
+    
+    def _updateAllRowStatus(self):
+        """Update the RUN_STATUS and MB of all rows in RUN table."""
+        run_table = self.view_tables.getTable('RUN')
+        
+        failures = []
+        row_count = run_table.ref.rowCount()
+        self._updateMaxProgress(row_count+1)
+        for row in range(0, run_table.ref.rowCount()):
+            self._updateStatusBar('Updating row %s of %s' % (row, row_count))
+            self._updateCurrentProgress(row)
+            row_dict = run_table.getValues(row=row, names=['ID', 'TCF_DIR', 'TCF'])
+            id = row_dict['ID']
+            tcf_dir = row_dict['TCF_DIR']
+            tcf = row_dict['TCF'][1:-1]
+            tcf = tcf.split(',')[0]
+            success, status, mb = Controller.getRunStatusInfo(tcf_dir, tcf)
+            if not success:
+                failures.append(id)
+            else:
+                row_dict['RUN_STATUS'] = status
+                row_dict['MB'] = mb
+                run_table.addRowValues(row_dict, row)
+                self._saveViewChangesToDatabase(run_table, row)
+
+        self.loadModelLog()
+        
+        if failures:
+            msg = "Failed to update status (ID(s)=%s).\nAre the TCF_DIR's correct and do they contain '_ TUFLOW Simulations.log' file(s)?" % (row_dict['ID'])
+            self.launchQMsgBox('Update Failer', msg)
+        
+        self._updateStatusBar('')
+        self._updateCurrentProgress(0)
+        
     
     def _deleteRowFromDatabase(self, table, all_entry):
         """Deletes the row in the database based on the location that the mouse
@@ -1008,15 +1078,23 @@ class MainGui(QtGui.QMainWindow):
         save_path = d.saveFileDialog(path=p, file_types='LogIT database(*.logdb)')
         
         if not save_path == False:
-            self.settings.cur_log_path = str(save_path)
-            self.widgets['New Entry'].cur_log_path = str(save_path)
-            self.view_tables.clearAll()
-            self.ui.statusbar.showMessage('Building new log database...')
-            self.ui.centralwidget.setEnabled(False)
-            DatabaseFunctions.createNewLogDatabase(str(save_path))
-            self.ui.centralwidget.setEnabled(True)
-            self.ui.statusbar.showMessage("Current log: " + save_path)
-            self.widgets['New Entry'].cur_log_path = str(save_path)
+            try:
+                QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+                self.settings.cur_log_path = str(save_path)
+                self.widgets['New Entry'].cur_log_path = str(save_path)
+                self.view_tables.clearAll()
+                self.ui.statusbar.showMessage('Building new log database...')
+                self.ui.centralwidget.setEnabled(False)
+                DatabaseFunctions.createNewLogDatabase(str(save_path))
+                self.ui.centralwidget.setEnabled(True)
+                self.ui.statusbar.showMessage("Current log: " + save_path)
+                self.widgets['New Entry'].cur_log_path = str(save_path)
+            except Exception, err:
+                logger.error('Problem loading cache: ' + err)
+            finally:
+                self.emit(QtCore.SIGNAL("statusUpdate"), '')
+                self.emit(QtCore.SIGNAL("updateProgress"), 0)
+                QtGui.QApplication.restoreOverrideCursor()
     
     
     def _loadDatabaseFromUser(self):
