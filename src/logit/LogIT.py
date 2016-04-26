@@ -195,11 +195,9 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
         self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdatesTrue)
         self.ui.actionResolveIefFiles.triggered.connect(self._resolveIefs)
+        self.ui.actionExit.triggered.connect(self.closeEvent)
         
-        # A couple of keyboard shortcuts...because I'm lazy!
-#         # Add log entry
-#         QtGui.QShortcut(QtGui.QKeySequence("Ctrl+A"), self.ui.addSingleLogEntryButton, 
-#                                                         self._createLogEntry)
+        # Keyboard shortcuts
         # Quit
         self.ui.actionExit.setToolTip('Exit Application')
         self.ui.actionExit.setShortcut("Ctrl+Q")
