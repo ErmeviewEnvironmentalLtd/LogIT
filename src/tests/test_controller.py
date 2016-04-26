@@ -55,15 +55,22 @@ class ControllerTest(unittest.TestCase):
     def test_getRunStatusInfo(self):
         """
         """
-        tcf_dir = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\tuflow\runs'
-        kenn_path = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
-        errors = GuiStore.ErrorHolder()
-        errors, all_logs = Controller.fetchAndCheckModel(self.blank_db, self.testpath, errors)
-        all_logs = Controller.getRunStatusInfo(all_logs)
+#         tcf_dir = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\tuflow\runs'
+#         kenn_path = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
+#         errors = GuiStore.ErrorHolder()
+#         errors, all_logs = Controller.fetchAndCheckModel(self.blank_db, self.testpath, errors)
         
-        run_log = all_logs.getLogEntryContents('RUN', 0)
-        self.assertEqual(run_log['RUN_STATUS'], 'Finished')
-        self.assertEqual(run_log['MB'], '0.17')
+        tcf_name = 'kennford_1%AEP_FINAL_v5.18.tcf'
+        tcf_dir = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\tuflow\runs'
+        
+        outputs = Controller.getRunStatusInfo(tcf_dir, tcf_name)
+        self.assertTrue(outputs[0], 'Run Status Info success True fail')
+        self.assertEqual(outputs[1], 'Finished', 'Run Status Info Finished status fail')
+        self.assertEqual(outputs[2], '0.17', 'Run Status Info Finished MB status fail')
+        
+#         run_log = all_logs.getLogEntryContents('RUN', 0)
+#         self.assertEqual(run_log['RUN_STATUS'], 'Finished')
+#         self.assertEqual(run_log['MB'], '0.17')
         
         
         

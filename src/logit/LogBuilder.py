@@ -341,10 +341,13 @@ class ModelLoader(object):
         
         # Get the results and check for the result output command
         result = []
+        log = None
         in_results = self.tuflow.getContents(content_type=self.tuflow.RESULT, modelfile_type=['tcf'])
         for r in in_results:
             if r.command.upper() == 'OUTPUT FOLDER':
                 result.append(r)
+            elif r.command.upper() == 'LOG FOLDER':
+                log = r
 
         # Use the global_order variable same as for the duration calls
         result_obj = max(result, key=attrgetter('global_order'))
@@ -359,6 +362,14 @@ class ModelLoader(object):
         else:
             result = result_obj.getRelativePath()
         run_cols['RESULTS_LOCATION_2D'] = result
+        
+        if log.has_own_root:
+            log = log.root
+        elif not log.getRelativePath():
+            log = ''
+        else:
+            log = log.getRelativePath()
+        run_cols['LOG_DIR'] = log
             
         return run_cols
                 

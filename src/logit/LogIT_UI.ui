@@ -1136,6 +1136,7 @@ p, li { white-space: pre-wrap; }
       <string>Tools</string>
      </property>
      <addaction name="actionUpdateDatabaseSchema"/>
+     <addaction name="actionUpdate_All_Run_Status"/>
     </widget>
     <widget class="QMenu" name="menuLoggingLevel">
      <property name="toolTip">
@@ -1341,6 +1342,11 @@ p, li { white-space: pre-wrap; }
   <action name="actionResolveIefFiles">
    <property name="text">
     <string>Ief Path Resolver</string>
+   </property>
+  </action>
+  <action name="actionUpdate_All_Run_Status">
+   <property name="text">
+    <string>Update All Run Status</string>
    </property>
   </action>
  </widget>

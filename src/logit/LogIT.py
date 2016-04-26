@@ -518,6 +518,7 @@ class MainGui(QtGui.QMainWindow):
             updateIefRowAction = menu.addAction("Update Ief Location")
             updateTcfRowAction = menu.addAction("Update Tcf Location")
             extractRowAction = menu.addAction("Extract Model")
+            updateStatusAction = menu.addAction("Update Status")
             has_extras = True
         
         # lookup the table and database table name
@@ -595,6 +596,9 @@ class MainGui(QtGui.QMainWindow):
                     self.loadModelLog()
                     self.settings.last_model_directory = p
             
+            elif action == updateStatusAction:
+                pass
+            
     
     def _deleteRowFromDatabase(self, table, all_entry):
         """Deletes the row in the database based on the location that the mouse
@@ -602,7 +606,9 @@ class MainGui(QtGui.QMainWindow):
         This is fine because this function is called from the context menu and
         therefore relies on the user right-clicking on the correct row.
         
-        :param table: the TableWidget item to get the row data from.
+        Args:
+            table(TableWidget): to get the row data from.
+            all_entry(bool): if True deletes associated entries as well.
         """
         
         # Get the currently active row in the table and find it's ID value
@@ -613,7 +619,7 @@ class MainGui(QtGui.QMainWindow):
         if not all_entry:
             message = "Delete this row?\nTable = %s, Row ID = %s" % (table.name, row_dict['ID'])
         else:
-            message = "Delete this row AND all assocated rows?\nTable = %s, Row ID = %s" % (table.name, row_dict['ID'])
+            message = "Delete this row AND all associated rows?\nTable = %s, Row ID = %s" % (table.name, row_dict['ID'])
         answer = self.launchQtQBox('Confirm Delete?', message)            
         if answer == False:
             return

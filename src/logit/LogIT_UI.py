@@ -535,6 +535,8 @@ class Ui_MainWindow(object):
         self.actionResolveIefddFiles.setObjectName(_fromUtf8("actionResolveIefddFiles"))
         self.actionResolveIefFiles = QtGui.QAction(MainWindow)
         self.actionResolveIefFiles.setObjectName(_fromUtf8("actionResolveIefFiles"))
+        self.actionUpdate_All_Run_Status = QtGui.QAction(MainWindow)
+        self.actionUpdate_All_Run_Status.setObjectName(_fromUtf8("actionUpdate_All_Run_Status"))
         self.menuExport.addAction(self.actionExportToExcel)
         self.menuFile.addAction(self.actionNewModelLog)
         self.menuFile.addAction(self.actionLoad)
@@ -548,6 +550,7 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionExit)
         self.menuTools.addAction(self.actionUpdateDatabaseSchema)
+        self.menuTools.addAction(self.actionUpdate_All_Run_Status)
         self.menuLoggingLevel.addAction(self.actionLogWarning)
         self.menuLoggingLevel.addAction(self.actionLogInfo)
         self.menuLoggingLevel.addAction(self.actionLogDebug)
@@ -907,5 +910,6 @@ class Ui_MainWindow(object):
         self.actionCheckForUpdates.setText(_translate("MainWindow", "Check for Updates", None))
         self.actionResolveIefddFiles.setText(_translate("MainWindow", "Resolve Ief Files", None))
         self.actionResolveIefFiles.setText(_translate("MainWindow", "Ief Path Resolver", None))
+        self.actionUpdate_All_Run_Status.setText(_translate("MainWindow", "Update All Run Status", None))
 
 import LogIT_RC_rc

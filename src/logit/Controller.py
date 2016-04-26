@@ -716,8 +716,6 @@ def fetchAndCheckModel(db_path, open_path, errors):
         return errors, all_logs
     
     else:
-        # Gets run status and MB info if run is already completed
-        all_logs = getRunStatusInfo(all_logs)
 
         # Make sure that this ief or tcf do not already exist in the
         # database. You need new ones for each run so this isn't
@@ -725,6 +723,14 @@ def fetchAndCheckModel(db_path, open_path, errors):
         main_ief = all_logs.getLogEntryContents('RUN', 0)['IEF'] 
         main_tcf = all_logs.getLogEntryContents('RUN', 0)['TCF'] 
 #         tcf_results = all_logs.getLogEntryContents('RUN', 0)['RESULTS_LOCATION_2D'] 
+
+        # Gets run status and MB info if run is already completed
+        tcf_name = all_logs.log_pages['TCF'].contents[0]['TCF']
+        tcf_dir = all_logs.getLogEntryContents('RUN', 0)['TCF_DIR']
+        outputs = getRunStatusInfo(tcf_dir, tcf_name)
+        if outputs[0]:
+            all_logs.log_pages['RUN'].contents[0]['RUN_STATUS'] = outputs[1]
+            all_logs.log_pages['RUN'].contents[0]['MB'] = outputs[2]
         
         indb = False
 #         try:
@@ -767,7 +773,7 @@ def fetchAndCheckModel(db_path, open_path, errors):
         return errors, all_logs
                     
     
-def getRunStatusInfo(all_logs):
+def getRunStatusInfo(tcf_dir, tcf_name):
     """Get the status and MB of a simulation.
     
     Checks the tuflow _ TUFLOW Simulations.log file to see if the run has
@@ -783,16 +789,14 @@ def getRunStatusInfo(all_logs):
     Return:
         AllLogs - with the RUN dict RUN_STATUS and MB entries updated.
     """
-    if all_logs.tcf_dir is None: return all_logs
-    
-    sim_file = os.path.join(all_logs.tcf_dir, '_ TUFLOW Simulations.log')
-    if not os.path.exists(sim_file): return all_logs
+    sim_file = os.path.join(tcf_dir, '_ TUFLOW Simulations.log')
+    if not os.path.exists(sim_file): return (False,)
     
     # Get the first tcf in the list of tcf's
-    try:
-        tcf_name = all_logs.log_pages['TCF'].contents[0]['TCF']
-    except IndexError, KeyError:
-        return all_logs
+#     try:
+#         tcf_name = all_logs.log_pages['TCF'].contents[0]['TCF']
+#     except IndexError, KeyError:
+#         return all_logs
     
     tcf_line = None
     try:
@@ -810,21 +814,25 @@ def getRunStatusInfo(all_logs):
     except IOError:
         logger.warning('Could not load _TUFLOW Simulations.log file')
         
-    if tcf_line is None: return all_logs
+    if tcf_line is None: return (False,)
     
+    status = 'None'
+    mb = 'None'
     contents = tcf_line.split("  ") # Two spaces minimum
     for item in contents:
         if'Finished' in item or 'UNSTABLE' in item or 'INTERRUPTED' in item:
             item = item.strip()
             item = item.split(':')[0]
-            all_logs.log_pages['RUN'].contents[0]['RUN_STATUS'] = item.strip() 
+#             all_logs.log_pages['RUN'].contents[0]['RUN_STATUS'] = item.strip()
+            status = item.strip()
         
         elif 'pCME5' in item:
             val = item.split('=')
             val = val[1].strip()
-            all_logs.log_pages['RUN'].contents[0]['MB'] = val.strip('%')
+#             all_logs.log_pages['RUN'].contents[0]['MB'] = val.strip('%')
+            mb = val.strip('%')
     
-    return all_logs 
+    return True, status, mb 
 
 
 def updateDatabaseVersion(db_path, errors):
