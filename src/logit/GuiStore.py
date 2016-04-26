@@ -267,7 +267,8 @@ class TableWidget(object):
     # Columns that are editable by the user
     EDITING_ALLOWED = ['COMMENTS', 'MODELLER', 'SETUP', 'DESCRIPTION',
                         'EVENT_NAME', 'EVENT_DURATION', 'ISIS_BUILD',
-                        'TUFLOW_BUILD', 'AMENDMENTS', 'RUN_OPTIONS']
+                        'TUFLOW_BUILD', 'AMENDMENTS', 'RUN_OPTIONS',
+                        'MB', 'RUN_STATUS']
     
     def __init__(self, key, name, table_ref):
         self.key = key

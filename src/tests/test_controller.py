@@ -19,37 +19,51 @@ class ControllerTest(unittest.TestCase):
         """
         """
         self.form = LogIT.MainGui(False, os.path.join(os.getcwd(), 'settings.logset'))
+        self.blank_db = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\databases\Blank_DB.logdb'
+        self.testpath = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
 
 
     def test_fetchAndCheckModel(self):
         """
         """
-        testpath = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
         fakepath = r'C:\Fake\Path\to\Nonexistant\model.ief'
-        blank_db = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\databases\Blank_DB.logdb'
         kennford_db = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\databases\Kennford_entry.logdb'
         
         # Test with an empty database and real model
         errors = GuiStore.ErrorHolder()
-        self.form.settings.cur_log_path = blank_db
-        errors, all_logs = Controller.fetchAndCheckModel(blank_db, testpath, errors)
+        self.form.settings.cur_log_path = self.blank_db
+        errors, all_logs = Controller.fetchAndCheckModel(self.blank_db, self.testpath, errors)
         self.assertFalse(errors.has_errors, 'Found error in fetch fail')
         
         # Test with a fake model path
         errors = GuiStore.ErrorHolder()
-        self.form.settings.cur_log_path = blank_db
-        errors, all_logs = Controller.fetchAndCheckModel(blank_db, fakepath, errors)
+        self.form.settings.cur_log_path = self.blank_db
+        errors, all_logs = Controller.fetchAndCheckModel(self.blank_db, fakepath, errors)
         self.assertTrue(errors.has_errors, 'fake model error in fetch fail')
         e = errors.log[-1]
         self.assertEqual(e.title, errors.MODEL_LOAD, 'fake model error type fail')
         
         # Test with model already in database
         errors = GuiStore.ErrorHolder()
-        self.form.settings.cur_log_path = blank_db
-        errors, all_logs = Controller.fetchAndCheckModel(kennford_db, testpath, errors)
+        self.form.settings.cur_log_path = self.blank_db
+        errors, all_logs = Controller.fetchAndCheckModel(kennford_db, self.testpath, errors)
         self.assertTrue(errors.has_errors, 'existing model error in fetch fail')
         e = errors.log[-1]
         self.assertEqual(e.title, errors.LOG_EXISTS, 'fake model error type fail')
+    
+    
+    def test_getRunStatusInfo(self):
+        """
+        """
+        tcf_dir = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\tuflow\runs'
+        kenn_path = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
+        errors = GuiStore.ErrorHolder()
+        errors, all_logs = Controller.fetchAndCheckModel(self.blank_db, self.testpath, errors)
+        all_logs = Controller.getRunStatusInfo(all_logs)
+        
+        run_log = all_logs.getLogEntryContents('RUN', 0)
+        self.assertEqual(run_log['RUN_STATUS'], 'Finished')
+        self.assertEqual(run_log['MB'], '0.17')
         
         
         

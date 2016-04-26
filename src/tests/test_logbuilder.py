@@ -6,6 +6,7 @@ from PyQt4.QtTest import QTest
 from PyQt4.QtCore import Qt
 
 import LogIT
+import LogBuilder
 from LogBuilder import ModelLoader
 import LogClasses
 
@@ -143,10 +144,13 @@ class LogBuilderTest(unittest.TestCase):
                       'IEF': 'None',
                       'IEF_DIR': 'None',
                       'ISIS_BUILD': 'None',
+                      'LOG_DIR': 'None',
+                      'MB': 'None',
                       'MODELLER': 'None',
                       'RESULTS_LOCATION_1D': 'None',
                       'RESULTS_LOCATION_2D': '..\\results\\2d\\Cul_free\\Option1aPlus\\',
                       'RUN_OPTIONS': 'None',
+                      'RUN_STATUS': 'None',
                       'SETUP': 'None',
                       'TBC': '[Grange_baseline_Option1APlus_v1-00.tbc]',
                       'TCF': '[Option1aPlus_ilo3_Cul6_Grange_T100D5CC_CWI_Run3_F_MHWS_v1-01 - Copy.tcf]',
@@ -214,10 +218,13 @@ class LogBuilderTest(unittest.TestCase):
                     'IEF': 'kennford_1%AEP_FINAL_v5.18.ief',
                     'IEF_DIR': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\isis\\iefs',
                     'ISIS_BUILD': 'None',
+                    'LOG_DIR': 'None',
+                    'MB': 'None',
                     'MODELLER': 'None',
                     'RESULTS_LOCATION_1D': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\isis\\results\\kennford_1%AEP_FINAL_v5.18\\KENNFORD_1%AEP_FINAL_V5.18',
                     'RESULTS_LOCATION_2D': '..\\results\\2d\\kennford_1%AEP_FINAL_v5.18\\',
                     'RUN_OPTIONS': 'None',
+                    'RUN_STATUS': 'None',
                     'SETUP': 'None',
                     'TBC': '[kennford_v3.5.tbc]',
                     'TCF': '[kennford_1%AEP_FINAL_v5.18.tcf]',

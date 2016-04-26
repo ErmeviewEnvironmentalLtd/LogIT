@@ -497,6 +497,36 @@ p, li { white-space: pre-wrap; }
                 </font>
                </property>
               </column>
+              <column>
+               <property name="text">
+                <string>LOG_DIR</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>MB</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>RUN_STATUS</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
              </widget>
             </item>
            </layout>

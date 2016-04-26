@@ -764,11 +764,11 @@ class MainGui(QtGui.QMainWindow):
             if errors.msgbox_error and not self._TEST_MODE:
                 self.launchQMsgBox(errors.msgbox_error.title,
                                             errors.msgbox_error.message)
-            return
+            return errors
         
         # Get all of the file paths from the list
         model_paths = self.widgets['New Entry'].getMultipleModelPaths()
-        if not model_paths: return
+        if not model_paths: return errors
         
         # Load all of the models into a list
         model_logs = []
@@ -1279,7 +1279,10 @@ class MainGui(QtGui.QMainWindow):
             count = table.ref.columnCount()
             for i in range(0, count):
                 if key in self.settings.column_widths.keys():
-                    table.ref.setColumnWidth(i, self.settings.column_widths[key][i])
+                    try:
+                        table.ref.setColumnWidth(i, self.settings.column_widths[key][i])
+                    except IndexError:
+                        pass # If we've added new columns since save state
     
     
     def _loadTabChanged(self):

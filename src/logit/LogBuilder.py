@@ -227,11 +227,6 @@ class ModelLoader(object):
         """Creates the row for the 'run' model log entry based on the contents
         of the loaded ief file and tuflow model.
         
-        TODO:
-            At the moment the event duration is only found if there is an .ief file.
-            This is because the ship doesn't currently try and find the
-            event duration from the .tcf file. When it does this will be supported.
-        
         :param ief_file: the Ief object loaded from file.
         :param tuflow_model: the TuflowModel object loaded from file.
         :param log_type: the type of run being logged. I.e. Tulfow run/isis only
@@ -244,7 +239,8 @@ class ModelLoader(object):
                     'IEF': 'None', 'DAT': 'None', 'TUFLOW_BUILD': 'None', 
                     'TCF': 'None', 'TGC': 'None', 'TBC': 'None', 'BC_DBASE': 'None', 
                     'ECF': 'None', 'EVENT_NAME': 'None', 'RUN_OPTIONS': 'None',
-                    'TCF_DIR': 'None', 'IEF_DIR': 'None'}
+                    'TCF_DIR': 'None', 'IEF_DIR': 'None', 'LOG_DIR': 'None',
+                    'MB': 'None', 'RUN_STATUS': 'None'}
         
         if not self.log_type == TYPE_ESTRY and not self.ief is None:
             run_cols, options = self.buildIsisRun(run_cols)
@@ -435,5 +431,7 @@ class ModelLoader(object):
             bc_list.append(bc_cols) 
                 
         return bc_list
+
+
         
 

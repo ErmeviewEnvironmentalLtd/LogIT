@@ -55,7 +55,8 @@ class AllLogs(object):
         '''
         self.editing_allowed = ['COMMENTS', 'MODELLER', 'SETUP', 'DESCRIPTION',
                            'EVENT_NAME', 'EVENT_DURATION', 'ISIS_BUILD',
-                           'TUFLOW_BUILD', 'AMENDMENTS', 'RUN_OPTIONS']
+                           'TUFLOW_BUILD', 'AMENDMENTS', 'RUN_OPTIONS', 'MB',
+                           'RUN_STATUS']
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 'BC_DBASE']
         
         self.tcf_dir = tcf_dir

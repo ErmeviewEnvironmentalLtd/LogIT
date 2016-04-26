@@ -68,7 +68,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-DATABASE_VERSION_NO = 6
+DATABASE_VERSION_NO = 7
 DATABASE_VERSION_SAME = 0
 DATABASE_VERSION_LOW = 1
 DATABASE_VERSION_HIGH = 2
@@ -529,7 +529,10 @@ def createRunTable(cur):
                   EVENT_NAME              TEXT,
                   RUN_OPTIONS             TEXT,
                   TCF_DIR                 TEXT,
-                  IEF_DIR                 TEXT);
+                  IEF_DIR                 TEXT,
+                  LOG_DIR                 TEXT,
+                  MB                      TEXT,
+                  RUN_STATUS              TEXT);
                  """)
     
 
@@ -735,7 +738,8 @@ def dropAllTables(db_path):
 run = ['ID', 'DATE', 'MODELLER', 'RESULTS_LOCATION_2D', 'RESULTS_LOCATION_1D', 
        'EVENT_DURATION', 'DESCRIPTION', 'COMMENTS', 'SETUP', 'ISIS_BUILD', 
        'IEF', 'DAT', 'TUFLOW_BUILD', 'TCF', 'TGC', 'TBC', 'BC_DBASE', 'ECF',
-       'EVENT_NAME', 'RUN_OPTIONS', 'TCF_DIR', 'IEF_DIR'] 
+       'EVENT_NAME', 'RUN_OPTIONS', 'TCF_DIR', 'IEF_DIR', 'LOG_DIR', 'MB',
+       'RUN_STATUS'] 
 tgc = ['ID', 'DATE', 'TGC', 'FILES', 'NEW_FILES', 'COMMENTS']
 tbc = ['ID', 'DATE', 'TBC', 'FILES', 'NEW_FILES', 'COMMENTS']
 dat = ['ID', 'DATE', 'DAT', 'AMENDMENTS', 'COMMENTS']
@@ -797,10 +801,14 @@ def updateDatabaseVersion(db_path):
     conn = None
     try:
         # Make a backup of the database
-        if os.path.exists(db_path):
-            db_dir, fname = os.path.split(db_path)
-            fname = os.path.splitext(fname)[0]
-            shutil.copyfile(db_path, os.path.join(db_dir, fname + '_backup.logdb'))
+        try:
+            if os.path.exists(db_path):
+                db_dir, fname = os.path.split(db_path)
+                fname = os.path.splitext(fname)[0]
+                shutil.copyfile(db_path, os.path.join(db_dir, fname + '_backup.logdb'))
+        except:
+            logger.error('Unable to create backup of database - STOPPING NOW.')
+            return False
             
         conn = sqlite3.connect(db_path)
         
