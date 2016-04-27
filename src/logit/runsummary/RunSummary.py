@@ -49,6 +49,7 @@ import uuid
 import datetime
 import cPickle
 import math
+# import traceback
 from PyQt4 import QtCore, QtGui
 import pyqtgraph as pg
 
@@ -56,8 +57,8 @@ from ship.utils.filetools import MyFileDialogs
     
 import RunSummary_Widget as summarywidget
 logger.debug('RunSummary_Widget import complete')
-from app_metrics import utils as applog
-import globalsettings as gs
+# from app_metrics import utils as applog
+# import globalsettings as gs
 
 
 class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
@@ -168,19 +169,41 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                     break
 
             if details:
-                entry = LogSummaryEntry(details[0], details[1], self.data_dir, details[2])
-                entry, log_store = self._loadLogContents(entry, details[2])
-                self._saveLogStoreToCache(log_store, entry.stored_datapath)
-                self._updateTableVals(entry, details[3])
-                self._updateGraph(log_store)
-                self.settings.log_summarys[details[3]] = entry
+                try:
+                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
+                    QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+                    entry = LogSummaryEntry(details[0], details[1], self.data_dir, details[2])
+                    entry, log_store = self._loadLogContents(entry, details[2])
+                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
+                    self._saveLogStoreToCache(log_store, entry.stored_datapath)
+                    self._updateTableVals(entry, details[3])
+                    self._updateGraph(log_store)
+                    self.settings.log_summarys[details[3]] = entry
+                except Exception, err:
+                    logger.error('Problem loading model: ' + err)
+                finally:
+                    self.emit(QtCore.SIGNAL("statusUpdate"), '')
+                    self.emit(QtCore.SIGNAL("setRange"), 1)
+                    self.emit(QtCore.SIGNAL("updateProgress"), 0)
+                    QtGui.QApplication.restoreOverrideCursor()
                 
         # Reads a file starting from the location of the last read.
         if action == updateEntryAction:
             log_store = self._loadLogStoreFromCache(entry.row_values['GUID'])
             if not entry.row_values['STATUS'] == 'Complete' and not entry.row_values['STATUS'] == 'Failed':
-                entry, log_store = self._loadLogContents(entry, entry.tlf_path, log_store)
-                self._saveLogStoreToCache(log_store, entry.stored_datapath)
+                try:
+                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
+                    QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+                    entry, log_store = self._loadLogContents(entry, entry.tlf_path, log_store)
+                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
+                    self._saveLogStoreToCache(log_store, entry.stored_datapath)
+                except Exception, err:
+                    logger.error('Problem loading model: ' + err)
+                finally:
+                    self.emit(QtCore.SIGNAL("statusUpdate"), '')
+                    self.emit(QtCore.SIGNAL("setRange"), 1)
+                    self.emit(QtCore.SIGNAL("updateProgress"), 0)
+                    QtGui.QApplication.restoreOverrideCursor()
             entry_i = -1
             for i, log in enumerate(self.settings.log_summarys):
                 if log.row_values['GUID'] == entry.row_values['GUID']: 
@@ -256,7 +279,8 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             log_store = self._loadLogStoreFromCache(guid)
             self._updateGraph(log_store)
         except Exception, err:
-            logger.error('Problem loading cache: ' + err)
+            logger.error('Problem loading cache')
+            logger.exception(err)
         finally:
             self.emit(QtCore.SIGNAL("statusUpdate"), '')
             self.emit(QtCore.SIGNAL("updateProgress"), 0)
@@ -300,9 +324,11 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             self._updateTableVals(entry)
             self._updateGraph(log_store)
             self.cur_guid = log_store.guid
-        except Exception, err:
-            logger.error('Problem loading model: ' + err)
+        except Exception as err:
+            logger.error('Problem loading model: ')
+            logger.exception(err)
         finally:
+            self.emit(QtCore.SIGNAL("setRange"), 1)
             self.emit(QtCore.SIGNAL("statusUpdate"), '')
             self.emit(QtCore.SIGNAL("updateProgress"), 0)
             QtGui.QApplication.restoreOverrideCursor()
@@ -338,7 +364,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             if header == 'COMPLETION':
                 prog = QtGui.QProgressBar()
                 finish_time = summary_obj.finish_time
-                if finish_time == 0 and summary_obj.start_time == 0:
+                if int(finish_time) == 0 and int(summary_obj.start_time) == 0:
                     finish_time = 1
                 prog.setMaximum(int(finish_time))
                 prog.setMinimum(int(summary_obj.start_time))
@@ -398,6 +424,8 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         # Clear the current plot items
         self.p1.clear()
         self.p2.clear()
+        if not log_store.time_steps:
+            return
         time = log_store.time_steps
         
         # Add flow in and flow out to the left y axis
@@ -455,6 +483,9 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             raise
         hours_in_mins = float(time.hour) * 60
         hours = (hours_in_mins + float(time.minute)) / 60
+#         hours_in_secs = float(time.hour) * 60 * 60
+#         mins_in_secs = float(time.minute) * 60
+#         hours = (hours_in_secs + mins_in_secs + float(time.second)) / 60 / 60
         return hours, time
         
         
@@ -473,30 +504,32 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         that point.
         """
         if not log_store is None:
-            in_results = True
             own_log = True
+            start_time = log_store.start_time
+            end_time = log_store.finish_time
         else:
             log_store = LogSummaryStore(entry.row_values['GUID'])
-            in_results = False
             own_log = False
-        finished = False
-        interrupted = False
-        error = False
-        start_time = -1
-        end_time = -1
-        cur_row = -1
+            start_time = 0
+            end_time = 1
+        cur_row = 0
+
         try:
             with open(tlf_path, 'rb') as f:
                 for line in f:
                     
+                    if cur_row == 353:
+                        i=0
+                        
                     # Skip row if lower than previous visit
-                    if not log_store is None and cur_row < entry.cur_row:
+                    if own_log and (cur_row < entry.cur_row):
                         cur_row += 1
                         continue
-                    cur_row += 1
+                    else:
+                        cur_row += 1
                     
                     # Find the start and finish times first
-                    if not in_results:
+                    if not entry.in_results:
                         if line.startswith('Start Time (h):'):
                             start_time = float(line[22:34].strip())
                         if line.startswith('Finish Time (h):'):
@@ -504,7 +537,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                             self.emit(QtCore.SIGNAL("setRange"), math.fabs(end_time - start_time))
 
                         elif '.. Running' in line:
-                            in_results = True
+                            entry.in_results = True
                 
                     # Then load the simulation data
                     else:
@@ -512,13 +545,13 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                         if 'Writing Output' in line: continue
                         if line.strip() == '': continue
                         if 'Run Finished' in line:
-                            finished = True
+                            entry.finished = True
                             break
                         if 'Run Interrupted' in line:
-                            interrupted = True
+                            entry.interrupted = True
                             break
                         if 'ERROR' in line:
-                            error = True
+                            entry.error = True
                             break
                         
                         # Convert time to total in hours
@@ -527,7 +560,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                             hours, t = self.getHoursFromDateStr(time)
                         except (ValueError, IndexError):
                             continue
-                        self.emit(QtCore.SIGNAL("updateProgress"), math.fabs(end_time - hours))
+                        self.emit(QtCore.SIGNAL("updateProgress"), math.fabs(start_time + hours))
                         
                         # MB can be printed as ***** if greater than 100
                         mb = line[61:67].strip('%')
@@ -548,25 +581,27 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                         
                         # Add values to store
                         s = t.second
-                        log_store.time_steps.append(hours)
-                        log_store.mb.append(mb)
-                        log_store.flow_in.append(Qin)
-                        log_store.flow_out.append(Qout)
-                        log_store.ddv.append(ddv)
+                        if s % 30 == 0:
+                            log_store.time_steps.append(hours)
+                            log_store.mb.append(mb)
+                            log_store.flow_in.append(Qin)
+                            log_store.flow_out.append(Qout)
+                            log_store.ddv.append(ddv)
                 
         except IOError:
             logger.error('Unable to open log file at:\n' + tlf_path)
             entry.row_values['STATUS'] = 'Unfindable'
         
         # Set the appropriate status
-        if finished:
+        if entry.finished:
             entry.row_values['COMPLETION'] = end_time
             entry.row_values['STATUS'] = 'Complete'
-        elif interrupted or error:
+        elif entry.interrupted or entry.error:
             entry.row_values['COMPLETION'] = log_store.time_steps[-1]
             entry.row_values['STATUS'] = 'Failed'
         else:
-            entry.row_values['COMPLETION'] = log_store.time_steps[-1]
+            if entry.in_results:
+                entry.row_values['COMPLETION'] = log_store.time_steps[-1]
             entry.row_values['STATUS'] = 'In Progress'
         
         # Set start finish times from existing or newly found
@@ -680,9 +715,14 @@ class LogSummaryEntry(object):
         self.tlf_path = tlf_path
         self.stored_datapath = os.path.join(datapath, self.row_values['GUID'] + '.dat')
         self.start_time = 0
-        self.finish_time = 0
+        self.finish_time = 1
         self.cur_time = 0
         self.cur_row = -1
+        
+        self.finished = False
+        self.interrupted = False
+        self.error = False
+        self.in_results = False
 
 
 
