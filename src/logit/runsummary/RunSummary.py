@@ -47,34 +47,25 @@ logger = logging.getLogger(__name__)
 import os
 import uuid
 import datetime
-import cPickle
 import math
-# import traceback
 from PyQt4 import QtCore, QtGui
 import pyqtgraph as pg
 
 from ship.utils.filetools import MyFileDialogs
-    
+
+from AWidget import AWidget
 import RunSummary_Widget as summarywidget
 logger.debug('RunSummary_Widget import complete')
 # from app_metrics import utils as applog
 # import globalsettings as gs
 
 
-class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
+class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
 
     def __init__(self, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
-        QtGui.QWidget.__init__(self, parent, f)
         
-        self.tool_name = 'Run Summary'
-        self.settings = ToolSettings()
-        self.settings.cur_location = cwd
-        if not os.path.exists(os.path.join(cwd, 'data')):
-            os.mkdir(os.path.join(cwd, 'data'))
-        self.data_dir = os.path.join(cwd, 'data', 'runsummary')
-        if not os.path.exists(self.data_dir):
-            os.mkdir(self.data_dir)
+        AWidget.__init__(self, 'Run Summary', cwd, parent, f)
         
         pg.setConfigOption('background', 'w')  # Background = White
         pg.setConfigOption('foreground', 'k')  # Axis & Labels = Black
@@ -160,7 +151,9 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         
         # Re-reads a file from scratch
         if action == reloadRunAction:
-            log_store = self._loadLogStoreFromCache(entry.row_values['GUID'])
+            open_path = os.path.join(self.data_dir, log.row_values['GUID'] + '.dat')
+            log_store = self._loadFromCache(open_path)
+            self.cur_guid = log_store.guid
             details = []
             for i, log in enumerate(self.settings.log_summarys):
                 if log.row_values['GUID'] == entry.row_values['GUID']: 
@@ -175,7 +168,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                     entry = LogSummaryEntry(details[0], details[1], self.data_dir, details[2])
                     entry, log_store = self._loadLogContents(entry, details[2])
                     self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
-                    self._saveLogStoreToCache(log_store, entry.stored_datapath)
+                    self._saveToCache(log_store, entry.stored_datapath)
                     self._updateTableVals(entry, details[3])
                     self._updateGraph(log_store)
                     self.settings.log_summarys[details[3]] = entry
@@ -189,14 +182,16 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                 
         # Reads a file starting from the location of the last read.
         if action == updateEntryAction:
-            log_store = self._loadLogStoreFromCache(entry.row_values['GUID'])
+            open_path = os.path.join(self.data_dir, log.row_values['GUID'] + '.dat')
+            log_store = self._loadFromCache(open_path)
+            self.cur_guid = log_store.guid
             if not entry.row_values['STATUS'] == 'Complete' and not entry.row_values['STATUS'] == 'Failed':
                 try:
                     self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
                     QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
                     entry, log_store = self._loadLogContents(entry, entry.tlf_path, log_store)
                     self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
-                    self._saveLogStoreToCache(log_store, entry.stored_datapath)
+                    self._saveToCache(log_store, entry.stored_datapath)
                 except Exception, err:
                     logger.error('Problem loading model: ' + err)
                 finally:
@@ -224,44 +219,22 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         logger.debug("Updating all status'")
         log_store = None
         for i, log in enumerate(self.settings.log_summarys):
-            log_store = self._loadLogStoreFromCache(log.row_values['GUID'])
+            open_path = os.path.join(self.data_dir, log.row_values['GUID'] + '.dat')
+            log_store = self._loadFromCache(open_path)
+            self.cur_guid = log_store.guid
             
             # If the run is finished don't read anymore
             if log.row_values['STATUS'] == 'Complete' or log.row_values['STATUS'] == 'Failed':
                 entry = log
             else:
                 entry, log_store = self._loadLogContents(log, log.tlf_path, log_store)
-                self._saveLogStoreToCache(log_store, entry.stored_datapath)
+                self._saveToCache(log_store, entry.stored_datapath)
 
             self._updateTableVals(entry, i)
             self.settings.log_summarys[i] = entry
             
         if not log_store is None: self._updateGraph(log_store)
         
-    
-    
-    def _saveLogStoreToCache(self, log_store, path):
-        """Uses pickle to store the state of the LogSummaryStore."""
-        try:
-            with open(path, "wb") as p:
-                cPickle.dump(log_store, p)
-        except IOError:
-            logger.error('Unable to cache log_store with guid - ' + log_store.guid)
-            raise
-    
-    
-    def _loadLogStoreFromCache(self, guid):
-        """Uses pickle to load the state of a LogSummaryStore from file."""
-        try:
-            # Load the settings dictionary
-            open_path = os.path.join(self.data_dir, guid + '.dat')
-            log_store = cPickle.load(open(open_path, "rb"))
-            self.cur_guid = log_store.guid
-            return log_store
-        except IOError:
-            logger.error('Unable to load log_store from cache with guid - ' + guid)
-            raise
-    
     
     def _activateRow(self, row, col):
         """Sets the row at the given locations to be active.
@@ -276,7 +249,9 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
             self.runStatusTable.selectRow(row)
             guid = str(self.runStatusTable.item(row, 0).text())
-            log_store = self._loadLogStoreFromCache(guid)
+            open_path = os.path.join(self.data_dir, guid + '.dat')
+            log_store = self._loadFromCache(open_path)
+            self.cur_guid = log_store.guid
             self._updateGraph(log_store)
         except Exception, err:
             logger.error('Problem loading cache')
@@ -318,7 +293,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
             entry, log_store = self._loadLogContents(entry, tlf_path)
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
-            self._saveLogStoreToCache(log_store, entry.stored_datapath)
+            self._saveToCache(log_store, entry.stored_datapath)
             self.settings.log_summarys.append(entry)
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Updating graph and table ...')
             self._updateTableVals(entry)
@@ -383,81 +358,6 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         self.runStatusTable.selectRow(row_no)
           
     
-    def myAutoRange(self):
-        """Extends the autoBtnClicked functionality of PlotItem.
-        
-        Need to make sure that the other viewboxes are reset to the required
-        extents after a reset.
-        
-        Calls the autoBtnClicked function afterwards.
-        """
-        self.p2.setYRange(self.mMin, self.mMax)
-        self.p1.autoBtnClicked()
-        
-        
-    def scaleBy(self, *args, **kwargs):
-        """Attempt to scale the different axis at the same time.
-        
-        Note:
-            This is not really implemented at the moment as it's not giving
-            the desired results.
-        """
-        pg.ViewBox.scaleBy(self.p1.vb, *args, **kwargs)
-        self.p2.scaleBy(center=(0,0), y=args[0][0])
-        self.p2.setGeometry(self.p1.vb.sceneBoundingRect())
-        
-        
-    def updateViews(self):
-        """Setup slots to listen for changes in data on graph.
-        """
-        self.p2.setGeometry(self.p1.vb.sceneBoundingRect())
-        self.p2.linkedViewChanged(self.p1.vb, self.p2.XAxis)
-
-    
-    def _updateGraph(self, log_store):
-        """Updates the graph with the details a LogSummaryInfo.
-        
-        Creates flow-in, flow-out, ddv, and mass balance graphs to plot.
-        Flow PlotItem's go on the left y-axis and ddv and mb go on the right
-        y-axis. They share the same x-axis (time).
-        """
-        # Clear the current plot items
-        self.p1.clear()
-        self.p2.clear()
-        if not log_store.time_steps:
-            return
-        time = log_store.time_steps
-        
-        # Add flow in and flow out to the left y axis
-        self.p1.plot(time, log_store.flow_in,
-                    name='Flow_In', 
-                    pen=({'color': 'b', 'width': 1}))
-
-        self.p1.addItem(pg.PlotDataItem(time, log_store.flow_out,
-                    name='Flow_Out', 
-                    pen=({'color': 'r', 'width': 1})))
-
-        # Add mass balance and ddv to second y axis
-        self.p2.addItem(pg.PlotDataItem(time, log_store.ddv,
-                    name='ddv', 
-                    pen=({'color': 'k', 'width': 1})))
-        
-        self.p2.addItem(pg.PlotDataItem(time, log_store.mb,
-                    name='MB', 
-                    pen=({'color': 'g', 'width': 1})))
-            
-        if min(log_store.ddv) < min(log_store.mb):
-            self.mMin = min(log_store.ddv) - 1
-        else:
-            self.mMin = min(log_store.mb) - 1
-        if max(log_store.ddv) < max(log_store.mb):
-            self.mMax = max(log_store.mb) + 1
-        else:
-            self.mMax = max(log_store.ddv) + 1
-            
-        self.myAutoRange()
-    
-    
     def getHoursFromDateStr(self, date_str):
         """Convert a time code in string format to hours in float format.
         
@@ -479,7 +379,6 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         try:
             time = datetime.datetime.strptime(date_str, "%H:%M:%S")
         except ValueError:
-            #logger.error('date_str is not in the correct format (HH:MM:SS: ' + date_str)
             raise
         hours_in_mins = float(time.hour) * 60
         hours = (hours_in_mins + float(time.minute)) / 60
@@ -581,7 +480,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                         
                         # Add values to store
                         s = t.second
-                        if s % 30 == 0:
+                        if s % 10 == 0:
                             log_store.time_steps.append(hours)
                             log_store.mb.append(mb)
                             log_store.flow_in.append(Qin)
@@ -630,58 +529,131 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             return
         self.settings.cur_modellog_path = open_path
         self.loadIntoTable(open_path)
+    
+    
+    def myAutoRange(self):
+        """Extends the autoBtnClicked functionality of PlotItem.
+        
+        Need to make sure that the other viewboxes are reset to the required
+        extents after a reset.
+        
+        Calls the autoBtnClicked function afterwards.
+        """
+        self.p2.setYRange(self.mMin, self.mMax)
+        self.p1.autoBtnClicked()
+        
+        
+    def scaleBy(self, *args, **kwargs):
+        """Attempt to scale the different axis at the same time.
+        
+        Note:
+            This is not really implemented at the moment as it's not giving
+            the desired results.
+        """
+        pg.ViewBox.scaleBy(self.p1.vb, *args, **kwargs)
+        self.p2.scaleBy(center=(0,0), y=args[0][0])
+        self.p2.setGeometry(self.p1.vb.sceneBoundingRect())
+        
+        
+    def updateViews(self):
+        """Setup slots to listen for changes in data on graph.
+        """
+        self.p2.setGeometry(self.p1.vb.sceneBoundingRect())
+        self.p2.linkedViewChanged(self.p1.vb, self.p2.XAxis)
+
+    
+    def _updateGraph(self, log_store):
+        """Updates the graph with the details a LogSummaryInfo.
+        
+        Creates flow-in, flow-out, ddv, and mass balance graphs to plot.
+        Flow PlotItem's go on the left y-axis and ddv and mb go on the right
+        y-axis. They share the same x-axis (time).
+        """
+        # Clear the current plot items
+        self.p1.clear()
+        self.p2.clear()
+        if not log_store.time_steps:
+            return
+        time = log_store.time_steps
+        
+        # Add flow in and flow out to the left y axis
+        self.p1.plot(time, log_store.flow_in,
+                    name='Flow_In', 
+                    pen=({'color': 'b', 'width': 1}))
+
+        self.p1.addItem(pg.PlotDataItem(time, log_store.flow_out,
+                    name='Flow_Out', 
+                    pen=({'color': 'r', 'width': 1})))
+
+        # Add mass balance and ddv to second y axis
+        self.p2.addItem(pg.PlotDataItem(time, log_store.ddv,
+                    name='ddv', 
+                    pen=({'color': 'k', 'width': 1})))
+        
+        self.p2.addItem(pg.PlotDataItem(time, log_store.mb,
+                    name='MB', 
+                    pen=({'color': 'g', 'width': 1})))
+            
+        if min(log_store.ddv) < min(log_store.mb):
+            self.mMin = min(log_store.ddv) - 1
+        else:
+            self.mMin = min(log_store.mb) - 1
+        if max(log_store.ddv) < max(log_store.mb):
+            self.mMax = max(log_store.mb) + 1
+        else:
+            self.mMax = max(log_store.ddv) + 1
+            
+        self.myAutoRange()
         
     
+    def getSettingsAttrs(self):
+        """Setup the ToolSettings attributes for this widget.
+        
+        Overrides superclass method.
+        
+        Return:
+            dict - member varibles and initial state for ToolSettings.
+        """
+        attrs = {'cur_location': '', 'cur_display_path': '',
+                 'cur_modellog_path': '', 'log_summarys': []}
+        return attrs
+    
+    
     def loadSettings(self, settings):
-        """Load any pre-saved settings provided."""
+        """Load any pre-saved settings provided.
         
-        # Check that this version of the settings has all the necessary
-        # attributes, and if not add the missing ones
-        temp_set = ToolSettings()
-        settings_attrs = [s for s in dir(temp_set) if not s.startswith('__')]
-        for s in settings_attrs:
-            if not hasattr(settings, s):
-                setattr(settings, s, getattr(temp_set, s))
+        Overrides superclass method. Does some additional checks on the log
+        summary data loaded from the settings and checks the sanity of the
+        cache data.
         
-        self.settings = settings
+        Args:
+            settings(ToolSettings): to update the widget settings with.
+        """
+        AWidget.loadSettings(self, settings)
+        
         # Test first
+        files = os.listdir(self.data_dir)
+        cache_check = dict(zip(files, [False] * len(files)))
         for i in range(len(self.settings.log_summarys)-1, -1, -1):
             if not os.path.exists(self.settings.log_summarys[i].stored_datapath):
                 del self.settings.log_summarys[i]
                 logger.warning('cache data for log summary unavailable - will not be loaded.')
+            if self.settings.log_summarys[i].row_values['GUID'] + '.dat' in cache_check.keys():
+                cache_check[self.settings.log_summarys[i].row_values['GUID'] + '.dat'] = True
+        
+        for key, val in cache_check.iteritems():
+            if not val:
+                try:
+                    os.remove(os.path.join(self.data_dir, key))
+                except IOError, err:
+                    logger.warning('Unable to delete orphaned cache file: ' + key)
+        
         
         # Then setup table
         for i, summary in enumerate(self.settings.log_summarys, 0):
             self._updateTableVals(summary, i+1)
     
     
-    def saveSettings(self):
-        """Return state of settings back to caller."""
-        
-        return self.settings
-    
-
-    def launchQMsgBox(self, title, message, type='warning'):
-        """Launch a QMessageBox
-        """
-        if type == 'warning':
-            QtGui.QMessageBox.warning(self, title, message)
-        
-        elif type == 'info':
-            QtGui.QMessageBox.information(self, title, message)
-            
-            
-    def launchQtQBox(self, title, message):
-        """Launch QtQMessageBox.
-        """
-        answer = QtGui.QMessageBox.question(self, title, message,
-                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-        if answer == QtGui.QMessageBox.No:
-            return False
-        else:
-            return answer
-
-
 
 class LogSummaryStore(object):
     """Stores the log output values."""
@@ -724,18 +696,6 @@ class LogSummaryEntry(object):
         self.error = False
         self.in_results = False
 
-
-
-class ToolSettings(object):
-    """Store the settings used by this class."""
-    
-    def __init__(self):
-        
-        self.tool_name = 'Run Summary'
-        self.cur_location = ''
-        self.cur_display_path = ''
-        self.cur_modellog_path = ''
-        self.log_summarys = []
         
 
 
