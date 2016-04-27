@@ -169,7 +169,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                     self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
                     self._saveToCache(log_store, entry.stored_datapath)
                     self._updateTableVals(entry, details[3])
-                    self._updateGraph(log_store)
+                    self._updateGraph(log_store, entry.row_values['NAME'])
                     self.settings.log_summarys[details[3]] = entry
                 except Exception, err:
                     logger.error('Problem loading model: ' + err)
@@ -206,7 +206,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             if not entry_i == -1: self.settings.log_summarys[entry_i] = entry
                 
             self._updateTableVals(entry, row)
-            self._updateGraph(log_store)
+            self._updateGraph(log_store, entry.row_values['NAME'])
         
   
     def _updateAllStatus(self):
@@ -232,7 +232,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             self._updateTableVals(entry, i)
             self.settings.log_summarys[i] = entry
             
-        if not log_store is None: self._updateGraph(log_store)
+        if not log_store is None: self._updateGraph(log_store, entry.row_values['NAME'])
         
     
     def _activateRow(self, row, col):
@@ -251,7 +251,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             open_path = os.path.join(self.data_dir, guid + '.dat')
             log_store = self._loadFromCache(open_path)
             self.cur_guid = log_store.guid
-            self._updateGraph(log_store)
+            self._updateGraph(log_store, '<span style="font-weight:bold">' + str(self.runStatusTable.item(row, 1).text()) + '</span>')
         except Exception, err:
             logger.error('Problem loading cache')
             logger.exception(err)
@@ -296,7 +296,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             self.settings.log_summarys.append(entry)
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Updating graph and table ...')
             self._updateTableVals(entry)
-            self._updateGraph(log_store)
+            self._updateGraph(log_store, entry.row_values['NAME'])
             self.cur_guid = log_store.guid
         except Exception as err:
             logger.error('Problem loading model: ')
@@ -561,7 +561,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         self.p2.linkedViewChanged(self.p1.vb, self.p2.XAxis)
 
     
-    def _updateGraph(self, log_store):
+    def _updateGraph(self, log_store, title):
         """Updates the graph with the details a LogSummaryInfo.
         
         Creates flow-in, flow-out, ddv, and mass balance graphs to plot.
@@ -573,6 +573,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         self.p2.clear()
         if not log_store.time_steps:
             return
+        self.p1.setTitle(title)
         time = log_store.time_steps
         
         # Add flow in and flow out to the left y axis

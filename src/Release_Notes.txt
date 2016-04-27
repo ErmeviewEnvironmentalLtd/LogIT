@@ -1,19 +1,22 @@
-- Improved reporting of missing model files (.tgc/.tbc, etc) from loading
-  a tuflow model. There was an issue in the SHIP library and in the way logit
-  was trying to report these. They should now be listed when not found.
-- Moved the LogBuilder functionality from module functions to a class to make
-  error handling and reporting of warnings a bit cleaner and easier to maintain.
-- Fixed some bugs in the Ief Resolver. These include an oversight in finding
-  the correct reference file for the .tcf or .dat file used to work out the
-  main containing foler. If there was another file with the same name higher in
-  the directory it would pick this one. It now uses a slightly more clever
-  approach to rank the liklehood of any particular file being the correct one.
-  Improvements also made to the second pass attempt at locating files.
-- Some improvements in error handling in the model logger. These are still not
-  perfect, but they should be a bit better than they were. Tests are in place
-  that can be updated to help improve this when problems are reported.
-- Added a lot more unittests. These now include some checks for the 
-  Ief Resolver and the Model Extractor widgets. Although the coverage is not 
-  perfect at the moment most of the basic functionality of the model loaders
-  and outputs is there. Further tests will be added when bugs are identified. 
-  These should help to avoid as many regressions in the future.
+- [Feature] Added Run Summary widget (Beta). You can load a Tuflow .tlf file and 
+  display the current status and key outputs summarised in a table and graph.
+  You can also add log entry into the summary table automatically by
+  right-clicking on the RUN table entry and selecting Add to Run Summary.
+- [Feature] Added mass balance and run status columns to the to RUN table in
+  the log database. These will be automatically added to the look by reading
+  the '_TUFLOW Simulations.log' file when loading a model if it is complete. If
+  the run hasn't finished at the time of loading they will not be entered, but
+  can be added at any time by using the right-click menu in the RUN table and
+  selecting Update Status, or update the whole table under the Settings >> 
+  Tools menu.
+- IMPORTANT: The new column's will require updating your databases.
+- [BugFix] The Exit menu item and some keyboard shortcuts were broken. I think
+  these have all been fixed now.
+- Implemented a proper standardised interface for all all widgets (tabs). This
+  has unfortunately meant that the settings loading has been broken and an
+  update will reset settings (not the log database). It will help make it more
+  stable in the future and easier to maintain though.
+- Increased and improved the testing framework. Coverage is now pretty good.
+  All new features are being added by default and I'm making my way slowly
+  through the rest of the code base. Most of mission-critical stuff is now
+  tested, at least rudimentally.
