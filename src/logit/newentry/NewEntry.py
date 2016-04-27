@@ -60,15 +60,15 @@ import Controller
 import NewEntry_Widget as newentrywidget
 logger.debug('NewEntry_Widget import complete')
 # from app_metrics import utils as applog
+import globalsettings as gs
 
 
 class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
     
 
-    def __init__(self, cwd, cur_log_path, parent=None, f=QtCore.Qt.WindowFlags()):
+    def __init__(self, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
         
-        AWidget.__init__(self, 'New Entry', cwd, cur_log_path, parent, f)
-        self.cur_log_path = cur_log_path
+        AWidget.__init__(self, 'New Entry', cwd, parent, f)
         self.all_logs = None
         self._TEST_MODE = False
         self.setupUi(self)
@@ -122,12 +122,16 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
             dict - containing an entry for each variable with the key set as
                 the standard access name for that variable in the RUN table.
         """
-        input_vars = {'MODELLER': str(self.modellerTextbox.text()),
-                      'TUFLOW_BUILD': str(self.tuflowVersionTextbox.text()),
-                      'ISIS_BUILD': str(self.isisVersionTextbox.text()),
-                      'EVENT_NAME': str(self.eventNameTextbox.text())
-                     }
-        return input_vars
+        self.settings['modeller'] = str(self.modellerTextbox.text()) 
+        self.settings['tuflow_model'] = str(self.tuflowVersionTextbox.text())
+        self.settings['isis_build'] = str(self.isisVersionTextbox.text())
+        self.settings['event_name'] = str(self.eventNameTextbox.text())
+#         input_vars = {'MODELLER': str(self.modellerTextbox.text()),
+#                       'TUFLOW_BUILD': str(self.tuflowVersionTextbox.text()),
+#                       'ISIS_BUILD': str(self.isisVersionTextbox.text()),
+#                       'EVENT_NAME': str(self.eventNameTextbox.text())
+#                      }
+#         return input_vars
     
     
     def clearSingleModelTable(self):
@@ -207,7 +211,8 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                     entry_item.appendRow(child)
         
         self.modelEntryTreeView.setModel(self.tree_model)
-        self.modelEntryTreeView.setColumnWidth(0, self.settings.singleLoadColumnWidth)
+#         self.modelEntryTreeView.setColumnWidth(0, self.settings.singleLoadColumnWidth)
+        self.modelEntryTreeView.setColumnWidth(0, self.settings['singleload_column_width'])
         self.modelEntryTreeView.expandAll()
     
     
@@ -224,14 +229,15 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         if self._TEST_MODE:
             open_path = testpath
         else:
-            if not os.path.exists(self.cur_log_path):
+#             if not os.path.exists(self.cur_log_path):
+            if not 'log' in gs.path_holder.keys():
                 self.launchQMsgBox('No log Database', 'There is no log database loaded.\n Please load one first.')
                 return
             
             # Launch dialog and get a file
             chosen_path = self.cur_location
-            if not self.settings.cur_model_path == '':
-                chosen_path = self.settings.cur_model_path
+            if 'model' in gs.path_holder.keys():
+                chosen_path = gs.path_holder['model']
             d = MyFileDialogs()
             open_path = d.openFileDialog(path=chosen_path, 
                                          file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)', 
@@ -239,16 +245,18 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         
         # If the user doesn't cancel
         if not open_path == False:
-            if not os.path.exists(self.cur_log_path):
-                self.launchQMsgBox('No Database', 'Please load a log database first')
-                return
+#             if not os.path.exists(self.cur_log_path):
+#                 self.launchQMsgBox('No Database', 'Please load a log database first')
+#                 return
             
             open_path = str(open_path)
             self.loadModelTextbox.setText(open_path)
-            self.settings.cur_model_path = open_path
+#             self.settings.cur_model_path = open_path
+            gs.setPath('model', open_path)
             
             errors = GuiStore.ErrorHolder()
-            errors, self.all_logs = Controller.fetchAndCheckModel(self.cur_log_path, open_path, errors)
+#             errors, self.all_logs = Controller.fetchAndCheckModel(self.cur_log_path, open_path, errors)
+            errors, self.all_logs = Controller.fetchAndCheckModel(gs.path_holder['log'], open_path, errors)
             
             # Init a dict to hold the exists/not exists status of the data
             # being loaded
@@ -263,8 +271,10 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 # check the new entries against the database and return them with
                 # flags set for whether they are new entries or already exist
                 errors = GuiStore.ErrorHolder()
+#                 entry_status, errors = Controller.loadEntrysWithStatus(
+#                         self.cur_log_path, self.all_logs, entry_dict, errors)
                 entry_status, errors = Controller.loadEntrysWithStatus(
-                        self.cur_log_path, self.all_logs, entry_dict, errors)
+                        gs.path_holder['log'], self.all_logs, entry_dict, errors)
 
             if errors.has_errors:
                 self.launchQMsgBox("Load Error", 
@@ -273,10 +283,14 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 self.emit(QtCore.SIGNAL("statusUpdate"), 'Loaded model at: %s' % (open_path))
                 input_vars = self.getInputVars()
                 run = self.all_logs.getLogEntryContents('RUN', 0)
-                run['MODELLER'] = input_vars['MODELLER']
-                run['TUFLOW_BUILD'] = input_vars['TUFLOW_BUILD'] 
-                run['ISIS_BUILD'] = input_vars['ISIS_BUILD'] 
-                run['EVENT_NAME'] = input_vars['EVENT_NAME'] 
+                run['MODELLER'] = self.settings['modeller']
+                run['TUFLOW_BUILD'] = self.settings['tuflow_model']
+                run['ISIS_BUILD'] = self.settings['isis_build']
+                run['EVENT_NAME'] = self.settings['event_name']
+#                 run['MODELLER'] = input_vars['MODELLER']
+#                 run['TUFLOW_BUILD'] = input_vars['TUFLOW_BUILD'] 
+#                 run['ISIS_BUILD'] = input_vars['ISIS_BUILD'] 
+#                 run['EVENT_NAME'] = input_vars['EVENT_NAME'] 
                 self._updateNewEntryTree(entry_status)
                 self.submitSingleModelGroup.setEnabled(True) 
     
@@ -289,7 +303,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         """
         if self.all_logs is None: return None
         
-        self.settings.singleLoadColumnWidth = self.modelEntryTreeView.columnWidth(0)
+        self.settings['singleload_column_width'] = self.modelEntryTreeView.columnWidth(0)
         
         # Get the data from the new entry tree view
         data = {}
@@ -366,8 +380,10 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
             
             if not self._TEST_MODE:
                 chosen_path = self.cur_location
-                if not self.settings.cur_model_path == '':
-                    chosen_path = self.settings.cur_model_path
+#                 if not self.settings.cur_model_path == '':
+#                     chosen_path = self.settings.cur_model_path
+                if not 'model' in gs.path_holder.keys():
+                    chosen_path = gs.path_holder['model']
                 
                 d = MyFileDialogs()
                 open_paths = d.openFileDialog(path=chosen_path, 
@@ -380,7 +396,8 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
             
             self.loadMultiModelTable.setSortingEnabled(False)
             for p in open_paths:
-                self.settings.cur_model_path = str(p)
+#                 self.settings.cur_model_path = str(p)
+                gs.setPath('model', p)
                 
                 # Insert a new row first if needed
                 row_count = self.loadMultiModelTable.rowCount()
@@ -388,7 +405,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 
                 # Get the filename
                 d, fname = os.path.split(str(p))
-                self.settings.last_model_directory = d
+#                 self.settings.last_model_directory = d
                 
                 # Create a couple of items and add to the table
                 cbox = QtGui.QTableWidgetItem()
@@ -429,6 +446,11 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         self.multiModelLoadErrorTextEdit.clear()
     
     
+    def setMultipleErrorText(self, text):
+        """Adds the given text to the error box on the multiple model loader."""
+        self.multiModelLoadErrorTextEdit.setText(text)
+    
+    
     def _copyToClipboard(self):
         """Copies the contents of a textbox to clipboard.
         Textbox to copy is based on the calling action name.
@@ -448,10 +470,9 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         Return:
             dict - member varibles and initial state for ToolSettings.
         """
-        attrs = {'cur_model_path': '', 'cur_output_dir': '',
-                 'cur_location': '', 'modeller': '', 'tuflow_version': '',
-                 'isis_version': '', 'event_name': '', 'cur_load_tab': 0,
-                 'singleLoadColumnWidth': 100}
+        attrs = {'modeller': '', 'tuflow_version': '', 'isis_version': '', 
+                 'event_name': '', 'cur_load_tab': 0, 
+                 'singleload_column_width': 100}
         return attrs
     
     
@@ -459,24 +480,29 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         """Load any pre-saved settings provided."""
         
         AWidget.loadSettings(self, settings)
-        self.modellerTextbox.setText(settings.modeller)
-        self.tuflowVersionTextbox.setText(settings.tuflow_version)
-        self.isisVersionTextbox.setText(settings.isis_version)
-        self.eventNameTextbox.setText(settings.event_name)
-        self.loadModelTab.setCurrentIndex(settings.cur_load_tab)
-    
+#         self.modellerTextbox.setText(settings.modeller)
+#         self.tuflowVersionTextbox.setText(settings.tuflow_version)
+#         self.isisVersionTextbox.setText(settings.isis_version)
+#         self.eventNameTextbox.setText(settings.event_name)
+#         self.loadModelTab.setCurrentIndex(settings.cur_load_tab)
+        self.modellerTextbox.setText(settings['modeller'])
+        self.tuflowVersionTextbox.setText(settings['tuflow_version'])
+        self.isisVersionTextbox.setText(settings['isis_version'])
+        self.eventNameTextbox.setText(settings['event_name'])
+        self.loadModelTab.setCurrentIndex(settings['cur_load_tab'])
+
     
     def saveSettings(self):
         """Return state of settings back to caller.
         
         Overrides superclass method.
         """
-        
-        self.settings.modeller = str(self.modellerTextbox.text())
-        self.settings.tuflow_version = str(self.tuflowVersionTextbox.text())
-        self.settings.isis_version = str(self.isisVersionTextbox.text())
-        self.settings.event_name = str(self.eventNameTextbox.text())
-        self.settings.cur_load_tab = self.loadModelTab.currentIndex()
+        self.settings['modeller'] = str(self.modellerTextbox.text())
+        self.settings['tuflow_version'] = str(self.tuflowVersionTextbox.text())
+        self.settings['isis_version'] = str(self.isisVersionTextbox.text())
+        self.settings['event_name'] = str(self.eventNameTextbox.text())
+        self.settings['cur_load_tab'] = self.loadModelTab.currentIndex()
+        self.settings['singleload_column_width'] = self.modelEntryTreeView.columnWidth(0)
         return self.settings
     
     

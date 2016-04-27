@@ -63,9 +63,9 @@ logger.debug('RunSummary_Widget import complete')
 class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
 
-    def __init__(self, cwd, cur_log_path, parent=None, f=QtCore.Qt.WindowFlags()):
+    def __init__(self, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
         
-        AWidget.__init__(self, 'Run Summary', cwd, cur_log_path, parent, f)
+        AWidget.__init__(self, 'Run Summary', cwd, parent, f)
         pg.setConfigOption('background', 'w')  # Background = White
         pg.setConfigOption('foreground', 'k')  # Axis & Labels = Black
         self.setupUi(self)
@@ -125,7 +125,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         guid = str(self.runStatusTable.item(row, 0).text())
         logger.debug('Selected GUID = ' + guid)
         entry = None
-        for log in self.settings.log_summarys:
+        for log in self.settings['log_summarys']:
             if log.row_values['GUID'] == guid:
                 entry = log
                 break
@@ -135,11 +135,11 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         if action == deleteEntryAction:
             self.runStatusTable.removeRow(row) 
             entry_i = -1
-            for i, log in enumerate(self.settings.log_summarys):
+            for i, log in enumerate(self.settings['log_summarys']):
                 if log.row_values['GUID'] == entry.row_values['GUID']: 
                     entry_i = i
                     break
-            if not entry_i == -1: del self.settings.log_summarys[entry_i]
+            if not entry_i == -1: del self.settings['log_summarys'][entry_i]
             try:
                 os.remove(entry.stored_datapath)
             except IOError:
@@ -154,7 +154,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             log_store = self._loadFromCache(open_path)
             self.cur_guid = log_store.guid
             details = []
-            for i, log in enumerate(self.settings.log_summarys):
+            for i, log in enumerate(self.settings['log_summarys']):
                 if log.row_values['GUID'] == entry.row_values['GUID']: 
                     details = [log.row_values['GUID'], log.row_values['NAME'],
                               log.tlf_path, i]
@@ -170,7 +170,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                     self._saveToCache(log_store, entry.stored_datapath)
                     self._updateTableVals(entry, details[3])
                     self._updateGraph(log_store, entry.row_values['NAME'])
-                    self.settings.log_summarys[details[3]] = entry
+                    self.settings['log_summarys'][details[3]] = entry
                 except Exception, err:
                     logger.error('Problem loading model: ' + err)
                 finally:
@@ -199,11 +199,11 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                     self.emit(QtCore.SIGNAL("updateProgress"), 0)
                     QtGui.QApplication.restoreOverrideCursor()
             entry_i = -1
-            for i, log in enumerate(self.settings.log_summarys):
+            for i, log in enumerate(self.settings['log_summarys']):
                 if log.row_values['GUID'] == entry.row_values['GUID']: 
                     entry_i = i
                     break
-            if not entry_i == -1: self.settings.log_summarys[entry_i] = entry
+            if not entry_i == -1: self.settings['log_summarys'][entry_i] = entry
                 
             self._updateTableVals(entry, row)
             self._updateGraph(log_store, entry.row_values['NAME'])
@@ -217,7 +217,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         """
         logger.debug("Updating all status'")
         log_store = None
-        for i, log in enumerate(self.settings.log_summarys):
+        for i, log in enumerate(self.settings['log_summarys']):
             open_path = os.path.join(self.data_dir, log.row_values['GUID'] + '.dat')
             log_store = self._loadFromCache(open_path)
             self.cur_guid = log_store.guid
@@ -230,7 +230,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                 self._saveToCache(log_store, entry.stored_datapath)
 
             self._updateTableVals(entry, i)
-            self.settings.log_summarys[i] = entry
+            self.settings['log_summarys'][i] = entry
             
         if not log_store is None: self._updateGraph(log_store, entry.row_values['NAME'])
         
@@ -275,7 +275,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         if not os.path.exists(tlf_path):
             self.launchQMsgBox('Nonexistant tlf', 'TLF file does not exist at:\n' + tlf_path)
             return
-        for log in self.settings.log_summarys:
+        for log in self.settings['log_summarys']:
             if log.tlf_path == tlf_path:
                 self.launchQMsgBox('Load Error', ('This log file has already ' +
                                                  'been loaded into the table\n' +
@@ -293,7 +293,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             entry, log_store = self._loadLogContents(entry, tlf_path)
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
             self._saveToCache(log_store, entry.stored_datapath)
-            self.settings.log_summarys.append(entry)
+            self.settings['log_summarys'].append(entry)
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Updating graph and table ...')
             self._updateTableVals(entry)
             self._updateGraph(log_store, entry.row_values['NAME'])
@@ -520,13 +520,16 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         Launches a dialog to get the tlf file from the user.
         """
         path = self.cur_location
-        if not self.settings.cur_modellog_path== '':
-            path = self.settings.cur_modellog_path
+#         if not self.settings.cur_modellog_path== '':
+#             path = self.settings.cur_modellog_path
+        if not self.settings['tlf_path'] == '':
+            path = self.settings['tlf_path']
         d = MyFileDialogs()
         open_path = d.openFileDialog(path, file_types='Tuflow log file (*.tlf)')
         if open_path == 'False' or open_path == False:
             return
-        self.settings.cur_modellog_path = open_path
+#         self.settings.cur_modellog_path = open_path
+        self.settings['tlf_path'] = open_path
         self.loadIntoTable(open_path)
     
     
@@ -614,10 +617,13 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         Return:
             dict - member varibles and initial state for ToolSettings.
         """
-        attrs = {'cur_location': '', 'cur_display_path': '',
-                 'cur_modellog_path': '', 'log_summarys': []}
+        attrs = {'tlf_path': '', 'log_summarys': []}
         return attrs
     
+
+    def saveSettings(self):
+        return self.settings
+
     
     def loadSettings(self, settings):
         """Load any pre-saved settings provided.
@@ -634,12 +640,12 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         # Test first
         files = os.listdir(self.data_dir)
         cache_check = dict(zip(files, [False] * len(files)))
-        for i in range(len(self.settings.log_summarys)-1, -1, -1):
-            if not os.path.exists(self.settings.log_summarys[i].stored_datapath):
-                del self.settings.log_summarys[i]
+        for i in range(len(self.settings['log_summarys'])-1, -1, -1):
+            if not os.path.exists(self.settings['log_summarys'][i].stored_datapath):
+                del self.settings['log_summarys'][i]
                 logger.warning('cache data for log summary unavailable - will not be loaded.')
-            if self.settings.log_summarys[i].row_values['GUID'] + '.dat' in cache_check.keys():
-                cache_check[self.settings.log_summarys[i].row_values['GUID'] + '.dat'] = True
+            if self.settings['log_summarys'][i].row_values['GUID'] + '.dat' in cache_check.keys():
+                cache_check[self.settings['log_summarys'][i].row_values['GUID'] + '.dat'] = True
         
         for key, val in cache_check.iteritems():
             if not val:
@@ -650,7 +656,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         
         
         # Then setup table
-        for i, summary in enumerate(self.settings.log_summarys, 0):
+        for i, summary in enumerate(self.settings['log_summarys'], 0):
             self._updateTableVals(summary, i+1)
     
     
@@ -665,8 +671,8 @@ class LogSummaryStore(object):
         self.ddv = []
         self.flow_in = []
         self.flow_out = []
-        start_time = 0
-        finish_time = 0
+#         start_time = 0
+#         finish_time = 0
 
 
 

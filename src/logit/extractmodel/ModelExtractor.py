@@ -85,9 +85,9 @@ class ExtractVars(object):
 class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
     
 
-    def __init__(self, cwd, cur_log_path, parent=None, f=QtCore.Qt.WindowFlags()):
+    def __init__(self, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
         
-        AWidget.__init__(self, 'Model Extractor', cwd, cur_log_path, parent, f)
+        AWidget.__init__(self, 'Model Extractor', cwd, parent, f)
         self.setupUi(self)
         
         # Connect the slots
@@ -101,8 +101,10 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
     def _setInputFile(self):
         """Get the input model file to use."""
 
-        if not self.settings.cur_model_path == '':
-            path = self.settings.cur_model_path
+#         if not self.settings.cur_model_path == '':
+#             path = self.settings.cur_model_path
+        if 'model' in gs.path_holder.keys():
+            path = gs.path_holder['model']
         else:
             path = self.cur_location
 
@@ -113,14 +115,17 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         
         open_path = os.path.normpath(str(open_path))
         self.extractModelFileTextbox.setText(open_path)
-        self.settings.cur_model_path = open_path
+#         self.settings.cur_model_path = open_path
+        gs.setPath('model', open_path)
         
     
     def _setOutputDirectory(self):
         """Set the directory to extract the model to."""
 
-        if not self.settings.cur_output_dir == '':
-            path = self.settings.cur_output_dir
+#         if not self.settings.cur_output_dir == '':
+#             path = self.settings.cur_output_dir
+        if 'output' in gs.path_holder.keys():
+            path = gs.path_holder['output']
         else:
             path = self.cur_location
 
@@ -130,17 +135,18 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             return
         
         # Make sure we don't accidentally write over input files
-        if not self.settings.cur_model_path == '':
-            if dir_path == os.path.normpath(os.path.split(self.settings.cur_model_path)[0]):
-                message = 'Output directory matches model directory.\n This may lead to overwritten files.\n Are you sure?'
+#         if not self.settings.cur_model_path == '':
+        if 'model' in gs.path_holder.keys():
+            if dir_path == os.path.normpath(os.path.split(gs.path_holder['model'])[0]):
+                message = 'Output directory might matche model directory.\n This may lead to overwritten files.\n Are you sure?'
                 response = self.launchQtQBox('Directory Match', message)
                 if response == False:
                     return
         
         dir_path = os.path.normpath(str(dir_path))
         self.extractOutputTextbox.setText(dir_path)
-        self.settings.cur_output_dir = dir_path
-        
+#         self.settings.cur_output_dir = dir_path
+        gs.setPath('output', dir_path)
     
     def _extractModel(self):
         """Extract the given model.
@@ -734,32 +740,32 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         self._extractVars.ief.path_holder.root = os.path.join(self._extractVars.out_dir, 'fmp', 'iefs')
 
 
-    def getSettingsAttrs(self):
-        """Setup the ToolSettings attributes for this widget.
-        
-        Overrides superclass method.
-        
-        Return:
-            dict - member varibles and initial state for ToolSettings.
-        """
-        attrs = {'cur_model_path': '', 'cur_output_dir': ''}
-        return attrs
+#     def getSettingsAttrs(self):
+#         """Setup the ToolSettings attributes for this widget.
+#         
+#         Overrides superclass method.
+#         
+#         Return:
+#             dict - member varibles and initial state for ToolSettings.
+#         """
+#         attrs = {'cur_model_path': '', 'cur_output_dir': ''}
+#         return attrs
     
     
-    def loadSettings(self, settings):
-        """Load any pre-saved settings provided."""
-        
-        AWidget.loadSettings(self, settings)
-        self.extractModelFileTextbox.setText(settings.cur_model_path)
-        self.extractOutputTextbox.setText(settings.cur_output_dir)
+#     def loadSettings(self, settings):
+#         """Load any pre-saved settings provided."""
+#         
+#         AWidget.loadSettings(self, settings)
+#         self.extractModelFileTextbox.setText(settings.cur_model_path)
+#         self.extractOutputTextbox.setText(settings.cur_output_dir)
     
     
-    def saveSettings(self):
-        """Return state of settings back to caller."""
-        
-        self.settings.cur_model_path = str(self.extractModelFileTextbox.text())
-        self.settings.cur_output_dir = str(self.extractOutputTextbox.text())
-        return self.settings
+#     def saveSettings(self):
+#         """Return state of settings back to caller."""
+#         
+#         self.settings.cur_model_path = str(self.extractModelFileTextbox.text())
+#         self.settings.cur_output_dir = str(self.extractOutputTextbox.text())
+#         return self.settings
     
     
     def setupLookupLists(self):
@@ -880,15 +886,15 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         '_2D_TO_2D_CHECK_R']
 
 
-    def launchQtQBox(self, title, message):
-        """Launch QtQMessageBox.
-        """
-        answer = QtGui.QMessageBox.question(self, title, message,
-                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-        if answer == QtGui.QMessageBox.No:
-            return False
-        else:
-            return answer
+#     def launchQtQBox(self, title, message):
+#         """Launch QtQMessageBox.
+#         """
+#         answer = QtGui.QMessageBox.question(self, title, message,
+#                 QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+#         if answer == QtGui.QMessageBox.No:
+#             return False
+#         else:
+#             return answer
 
 
 

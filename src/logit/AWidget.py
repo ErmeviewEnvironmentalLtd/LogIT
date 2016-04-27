@@ -57,11 +57,10 @@ from PyQt4 import QtCore, QtGui
 
 class AWidget(QtGui.QWidget):
     
-    def __init__(self, tool_name, cwd, cur_log_path, parent=None, f=QtCore.Qt.WindowFlags()):
+    def __init__(self, tool_name, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
         QtGui.QWidget.__init__(self, parent, f)
         self.cur_location = cwd
-        self.cur_log_path = cur_log_path
-        self.settings = ToolSettings(tool_name, self.getSettingsAttrs())
+        self.settings = self.getSettingsAttrs()
         self.tool_name = str(tool_name)
         self._TEST_MODE = False # Used by some widgets in unittests
         
@@ -96,19 +95,30 @@ class AWidget(QtGui.QWidget):
         
         
     def loadSettings(self, settings):
-        """Updates the ToolSettings for this instance with those provided.
+        """Updates the settings for this instance with those provided.
         
-        Any ToolSettings member variables in the given ToolSettings instance
-        that don't/no longer exist in the current setup will be ignored.
+        Any variables in the given settings dict that don't/no longer exist in 
+        the current setup will be ignored.
         
         Args:
             settings(ToolSettings): containing member variable states to 
                 update.
         """
-        settings_attrs = [s for s in dir(settings) if not s.startswith('__')]
-        for s in settings_attrs:
-            if hasattr(self.settings, s):
-                setattr(self.settings, s, getattr(settings, s))
+#         settings_attrs = [s for s in dir(settings) if not s.startswith('__')]
+#         for s in settings_attrs:
+#             if hasattr(self.settings, s):
+#                 setattr(self.settings, s, getattr(settings, s))
+        for key, val in self.settings.iteritems():
+            if not key in settings.keys():
+                settings[key] = val
+        
+        dead_keys = []
+        for key, val in settings.iteritems():
+            if not key in self.settings.keys():
+                dead_keys.append(key)
+        
+        for k in dead_keys:
+            del settings[k]
         
         self.settings = settings
     
@@ -199,16 +209,16 @@ class AWidget(QtGui.QWidget):
     
 
 
-class ToolSettings(object):
-    
-    def __init__(self, tool_name, attrs):
-        self.guid = str(uuid.uuid4())
-        self.tool_name = str(tool_name)
-        
-        if not isinstance(attrs, dict):
-            raise AttributeError ('attrs is not a dictionary')
-        for key, val in attrs.iteritems():
-            setattr(self, key, val)
+# class ToolSettings(object):
+#     
+#     def __init__(self, tool_name, attrs):
+#         self.guid = str(uuid.uuid4())
+#         self.tool_name = str(tool_name)
+#         
+#         if not isinstance(attrs, dict):
+#             raise AttributeError ('attrs is not a dictionary')
+#         for key, val in attrs.iteritems():
+#             setattr(self, key, val)
         
         
     

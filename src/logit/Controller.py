@@ -851,11 +851,11 @@ def updateDatabaseVersion(db_path, errors):
         return errors
     
     
-def loadSetup(cur_settings_path, cur_log_path, errors):
+def loadSetup(cur_settings_path, errors):
     """Load LogIT setup from file.
     """
     d = MyFileDialogs()
-    open_path = d.openFileDialog(path=os.path.split(cur_log_path)[0], 
+    open_path = d.openFileDialog(cur_settings_path, 
                         file_types='Log Settings (*.logset)')
     
     cur_settings = None

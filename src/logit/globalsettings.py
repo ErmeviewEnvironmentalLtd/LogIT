@@ -16,3 +16,27 @@ __VERSION_CHECKPATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\versioninfo.ver
 __RELEASE_NOTES_PATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\Release_Notes_'
 
 __DEV_MODE__ = True
+
+
+'''
+    Global variables that need to be shared by all widgets.
+    Having these here just saves a lot of code and makes it simple for all
+    widgets to interact with the same file locations.
+    
+    Standard ones to use are:
+        - model
+        - output
+        - log
+    
+    But you can put anything in there.
+'''
+path_holder = {}
+def setPath(key, path):
+    path_holder[key] = str(path)
+
+
+
+
+
+
+
