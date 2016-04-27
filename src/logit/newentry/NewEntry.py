@@ -54,6 +54,7 @@ from PyQt4 import QtCore, QtGui
 
 from ship.utils.filetools import MyFileDialogs
     
+from AWidget import AWidget
 import GuiStore
 import Controller
 import NewEntry_Widget as newentrywidget
@@ -61,19 +62,15 @@ logger.debug('NewEntry_Widget import complete')
 # from app_metrics import utils as applog
 
 
-class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
+class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
     
 
     def __init__(self, cwd, cur_log_path, parent=None, f=QtCore.Qt.WindowFlags()):
-        QtGui.QWidget.__init__(self, parent, f)
         
-        self.tool_name = 'New Entry'
-        self.settings = ToolSettings()
-        self.settings.cur_location = cwd
+        AWidget.__init__(self, 'New Entry', cwd, cur_log_path, parent, f)
         self.cur_log_path = cur_log_path
         self.all_logs = None
         self._TEST_MODE = False
-        
         self.setupUi(self)
         
         '''
@@ -438,47 +435,42 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         """
         caller = self.sender()
         call_name = caller.objectName()
-        
+         
         if call_name == 'multiModelErrorCopyButton':
-            text = self.multiModelLoadErrorTextEdit.toPlainText()
+            AWidget.copyToClipboard(self, self.multiModelLoadErrorTextEdit)
+    
+    
+    def getSettingsAttrs(self):
+        """Setup the ToolSettings attributes for this widget.
         
-            clipboard = QtGui.QApplication.clipboard()
-            clipboard.setText(text)
-            event = QtCore.QEvent(QtCore.QEvent.Clipboard)
-            QtGui.QApplication.sendEvent(clipboard, event)
-    
-    
-    def launchQMsgBox(self, title, message, type='warning'):
-        """Launch a QMessageBox
+        Overrides superclass method.
+        
+        Return:
+            dict - member varibles and initial state for ToolSettings.
         """
-        if type == 'warning':
-            QtGui.QMessageBox.warning(self, title, message)
-        
-        elif type == 'info':
-            QtGui.QMessageBox.information(self, title, message)
-            
-        
+        attrs = {'cur_model_path': '', 'cur_output_dir': '',
+                 'cur_location': '', 'modeller': '', 'tuflow_version': '',
+                 'isis_version': '', 'event_name': '', 'cur_load_tab': 0,
+                 'singleLoadColumnWidth': 100}
+        return attrs
+    
+    
     def loadSettings(self, settings):
         """Load any pre-saved settings provided."""
         
-        # Check that this version of the settings has all the necessary
-        # attributes, and if not add the missing ones
-        temp_set = ToolSettings()
-        settings_attrs = [s for s in dir(temp_set) if not s.startswith('__')]
-        for s in settings_attrs:
-            if not hasattr(settings, s):
-                setattr(settings, s, getattr(temp_set, s))
-        
+        AWidget.loadSettings(self, settings)
         self.modellerTextbox.setText(settings.modeller)
         self.tuflowVersionTextbox.setText(settings.tuflow_version)
         self.isisVersionTextbox.setText(settings.isis_version)
         self.eventNameTextbox.setText(settings.event_name)
         self.loadModelTab.setCurrentIndex(settings.cur_load_tab)
-        self.settings = settings
     
     
     def saveSettings(self):
-        """Return state of settings back to caller."""
+        """Return state of settings back to caller.
+        
+        Overrides superclass method.
+        """
         
         self.settings.modeller = str(self.modellerTextbox.text())
         self.settings.tuflow_version = str(self.tuflowVersionTextbox.text())
@@ -488,21 +480,4 @@ class NewEntry_UI(QtGui.QWidget, newentrywidget.Ui_NewEntryWidget):
         return self.settings
     
     
-        
-class ToolSettings(object):
-    """Store the settings used by this class."""
-    
-    def __init__(self):
-        
-        self.tool_name = 'New Entry'
-        self.cur_model_path = ''
-        self.cur_output_dir = ''
-        self.cur_location = ''
-        self.modeller = ''
-        self.tuflow_version = ''
-        self.isis_version = ''
-        self.event_name = ''
-        self.cur_load_tab = 0
-        self.singleLoadColumnWidth = 100
-        
         

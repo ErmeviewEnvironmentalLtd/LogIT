@@ -63,10 +63,9 @@ logger.debug('RunSummary_Widget import complete')
 class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
 
-    def __init__(self, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
+    def __init__(self, cwd, cur_log_path, parent=None, f=QtCore.Qt.WindowFlags()):
         
-        AWidget.__init__(self, 'Run Summary', cwd, parent, f)
-        
+        AWidget.__init__(self, 'Run Summary', cwd, cur_log_path, parent, f)
         pg.setConfigOption('background', 'w')  # Background = White
         pg.setConfigOption('foreground', 'k')  # Axis & Labels = Black
         self.setupUi(self)

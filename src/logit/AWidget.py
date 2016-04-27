@@ -57,11 +57,13 @@ from PyQt4 import QtCore, QtGui
 
 class AWidget(QtGui.QWidget):
     
-    def __init__(self, tool_name, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
+    def __init__(self, tool_name, cwd, cur_log_path, parent=None, f=QtCore.Qt.WindowFlags()):
         QtGui.QWidget.__init__(self, parent, f)
         self.cur_location = cwd
+        self.cur_log_path = cur_log_path
         self.settings = ToolSettings(tool_name, self.getSettingsAttrs())
         self.tool_name = str(tool_name)
+        self._TEST_MODE = False # Used by some widgets in unittests
         
         # Create a data cache folder if one doesn't already exist
         if not os.path.exists(os.path.join(cwd, 'data')):
@@ -183,6 +185,17 @@ class AWidget(QtGui.QWidget):
             return False
         else:
             return answer
+    
+    
+    def _copyToClipboard(self, text_widget):
+        """Copies the contents of a textbox to clipboard.
+        Textbox to copy is based on the calling action name.
+        """
+        text = text_widget.toPlainText()
+        clipboard = QtGui.QApplication.clipboard()
+        clipboard.setText(text)
+        event = QtCore.QEvent(QtCore.QEvent.Clipboard)
+        QtGui.QApplication.sendEvent(clipboard, event)
     
 
 

@@ -310,7 +310,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), model_extractor, model_extractor.tool_name)
         
         # Run Summary
-        run_summary = RunSummary.RunSummary_UI(cur_location) 
+        run_summary = RunSummary.RunSummary_UI(cur_location, self.settings.cur_log_path) 
         self.widgets[run_summary.tool_name] = run_summary
         self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), run_summary, run_summary.tool_name)
         
