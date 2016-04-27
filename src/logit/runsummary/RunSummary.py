@@ -22,13 +22,15 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
- Module:          ModelExtractor.py 
- Date:            04/03/2016
+ Module:          RunSummary.py 
+ Date:            26/04/2016
  Author:          Duncan Runnacles
- Since-Version:   0.4
+ Since-Version:   0.7
  
  Summary:
-    Copies the model at the path location stored in the log to a new directory.
+     Displays the current status and key variables of a tuflow simulation by
+     reading a tuflow .tlf file. Presents the outputs of the file contents in
+     a graph and a table.
 
  UPDATES:
     
@@ -88,6 +90,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         
         self.mMin = -10
         self.mMax = 10
+        self.cur_guid = ''
     
     
     def _setupPlot(self):
@@ -100,7 +103,6 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         self.p1.setLabels(left=('Flow In & Flow Out'), bottom=('Time', 'h'), right='MB & DDV')
         self.p1.vb.menu.triggered.connect(self.myAutoRange)
         self.p1.autoBtn.clicked.connect(self.myAutoRange)
-#         self.p1.scene().sigMouseClicked.connect(self._mouseClicked)
         
         # create second ViewBox for mannings data 
         self.p2 = pg.ViewBox(name='MB')
@@ -115,6 +117,8 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
     
     
     def _tablePopup(self, pos):
+        """Called by items on the right-click context menu."""
+
         menu = QtGui.QMenu()
         updateEntryAction = menu.addAction("Update Entry")
         deleteEntryAction = menu.addAction("Remove Entry")
@@ -136,6 +140,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                 break
         if entry is None: return
                 
+        # Remove an item from the table
         if action == deleteEntryAction:
             self.runStatusTable.removeRow(row) 
             entry_i = -1
@@ -152,6 +157,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             self.p1.clear()
             self.p2.clear()
         
+        # Re-reads a file from scratch
         if action == reloadRunAction:
             log_store = self._loadLogStoreFromCache(entry.row_values['GUID'])
             details = []
@@ -169,6 +175,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                 self._updateGraph(log_store)
                 self.settings.log_summarys[details[3]] = entry
                 
+        # Reads a file starting from the location of the last read.
         if action == updateEntryAction:
             log_store = self._loadLogStoreFromCache(entry.row_values['GUID'])
             if not entry.row_values['STATUS'] == 'Complete' and not entry.row_values['STATUS'] == 'Failed':
@@ -186,17 +193,23 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         
   
     def _updateAllStatus(self):
-        """
+        """Updates all of the files in the table.
+        
+        Reads additional data from the file from the point where reading stopped
+        the last time.
         """
         logger.debug("Updating all status'")
         log_store = None
         for i, log in enumerate(self.settings.log_summarys):
             log_store = self._loadLogStoreFromCache(log.row_values['GUID'])
+            
+            # If the run is finished don't read anymore
             if log.row_values['STATUS'] == 'Complete' or log.row_values['STATUS'] == 'Failed':
                 entry = log
             else:
                 entry, log_store = self._loadLogContents(log, log.tlf_path, log_store)
                 self._saveLogStoreToCache(log_store, entry.stored_datapath)
+
             self._updateTableVals(entry, i)
             self.settings.log_summarys[i] = entry
             
@@ -205,8 +218,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
     
     
     def _saveLogStoreToCache(self, log_store, path):
-        """
-        """
+        """Uses pickle to store the state of the LogSummaryStore."""
         try:
             with open(path, "wb") as p:
                 cPickle.dump(log_store, p)
@@ -216,12 +228,12 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
     
     
     def _loadLogStoreFromCache(self, guid):
-        """
-        """
+        """Uses pickle to load the state of a LogSummaryStore from file."""
         try:
             # Load the settings dictionary
             open_path = os.path.join(self.data_dir, guid + '.dat')
             log_store = cPickle.load(open(open_path, "rb"))
+            self.cur_guid = log_store.guid
             return log_store
         except IOError:
             logger.error('Unable to load log_store from cache with guid - ' + guid)
@@ -229,8 +241,13 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
     
     
     def _activateRow(self, row, col):
+        """Sets the row at the given locations to be active.
+        
+        Loads the LogSummaryStore data from cache using the guid stored in the
+        table row. Then updates the graph with the contents.
         """
-        """
+        guid = str(self.runStatusTable.item(row, 0).text())
+        if self.cur_guid == guid: return
         try:
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading from cache ...')
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
@@ -247,7 +264,14 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
     
 
     def loadIntoTable(self, tlf_path):
-        """
+        """Loads a .tlf file and updates the table and graph with the contents.
+        
+        Creates LogSummaryInfo and LogEntry objects and loads them with data
+        read from the .tlf file. Then activates the new table row and displays
+        the loaded data into the graph.
+        
+        Args:
+            tlf_path(str): path to a tlf file.
         """
         logger.debug('Load into table clicked')
         if not os.path.exists(tlf_path):
@@ -275,6 +299,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Updating graph and table ...')
             self._updateTableVals(entry)
             self._updateGraph(log_store)
+            self.cur_guid = log_store.guid
         except Exception, err:
             logger.error('Problem loading model: ' + err)
         finally:
@@ -284,7 +309,21 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         
     
     def _updateTableVals(self, summary_obj, row_no=-1):
-        """
+        """Loads the values of the LogSummaryEntry into the table.
+        
+        Calculates progress through the run based on the current timestep read
+        from the file and the start and finish times and displays in the 
+        progress bar.
+        
+        Colors the row green, red, or neutral based on a successful, failed
+        or ongoing run.
+        
+        Args:
+            summary_obj(LogSummaryEntry): containing the summary info from 
+                reading the .tlf file.
+            row_no=-1(int): the row to update. If no value given or the value
+                given is higher than the number of rows it will be added to the
+                end of the table.
         """
         row_count = self.runStatusTable.rowCount()
         if row_no == -1 or row_no > row_count:
@@ -350,7 +389,11 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
 
     
     def _updateGraph(self, log_store):
-        """
+        """Updates the graph with the details a LogSummaryInfo.
+        
+        Creates flow-in, flow-out, ddv, and mass balance graphs to plot.
+        Flow PlotItem's go on the left y-axis and ddv and mb go on the right
+        y-axis. They share the same x-axis (time).
         """
         # Clear the current plot items
         self.p1.clear()
@@ -369,7 +412,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         # Add mass balance and ddv to second y axis
         self.p2.addItem(pg.PlotDataItem(time, log_store.ddv,
                     name='ddv', 
-                    pen=({'color': 'k', 'width': 1})))#, 
+                    pen=({'color': 'k', 'width': 1})))
         
         self.p2.addItem(pg.PlotDataItem(time, log_store.mb,
                     name='MB', 
@@ -416,7 +459,18 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         
         
     def _loadLogContents(self, entry, tlf_path, log_store=None):
-        """
+        """Reads the contents of a tlf file.
+        
+        Creates or updates a LogSummaryInfo object to store the values in the
+        tlf run details file.
+        
+        Searches for the start and finish time info near the top of the file
+        and then reads the output data from the run to extract the flow, ddv
+        and mb values.
+        
+        if the log_store contains a cur_row value the loader will skip the
+        parts of the file previous to that row and continue the load from 
+        that point.
         """
         if not log_store is None:
             in_results = True
@@ -430,11 +484,12 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
         error = False
         start_time = -1
         end_time = -1
-        total_time = -1
         cur_row = -1
         try:
             with open(tlf_path, 'rb') as f:
                 for line in f:
+                    
+                    # Skip row if lower than previous visit
                     if not log_store is None and cur_row < entry.cur_row:
                         cur_row += 1
                         continue
@@ -453,6 +508,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                 
                     # Then load the simulation data
                     else:
+                        # Break out when certain keywords are found
                         if 'Writing Output' in line: continue
                         if line.strip() == '': continue
                         if 'Run Finished' in line:
@@ -465,6 +521,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                             error = True
                             break
                         
+                        # Convert time to total in hours
                         try:
                             time = line[8:16].strip()
                             hours, t = self.getHoursFromDateStr(time)
@@ -472,6 +529,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                             continue
                         self.emit(QtCore.SIGNAL("updateProgress"), math.fabs(end_time - hours))
                         
+                        # MB can be printed as ***** if greater than 100
                         mb = line[61:67].strip('%')
                         if '***' in mb:
                             mb = 99
@@ -481,11 +539,14 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                         Qout = float(line[93:99])
                         ddv = float(line[103:109])
                         
+                        # Calc max ddv and mb (can be either a highest or
+                        # lowest value so find absolute)
                         if math.fabs(mb) > math.fabs(entry.row_values['MAX_MB']):
                             entry.row_values['MAX_MB'] = mb
                         if math.fabs(ddv) > math.fabs(entry.row_values['MAX_DDV']):
                             entry.row_values['MAX_DDV'] = ddv
                         
+                        # Add values to store
                         s = t.second
                         log_store.time_steps.append(hours)
                         log_store.mb.append(mb)
@@ -497,6 +558,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             logger.error('Unable to open log file at:\n' + tlf_path)
             entry.row_values['STATUS'] = 'Unfindable'
         
+        # Set the appropriate status
         if finished:
             entry.row_values['COMPLETION'] = end_time
             entry.row_values['STATUS'] = 'Complete'
@@ -507,20 +569,22 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
             entry.row_values['COMPLETION'] = log_store.time_steps[-1]
             entry.row_values['STATUS'] = 'In Progress'
         
+        # Set start finish times from existing or newly found
         if own_log:
             entry.start_time = log_store.start_time
             entry.finish_time = log_store.finish_time
         else:
             log_store.start_time = entry.start_time = start_time
             log_store.finish_time = entry.finish_time = end_time
-            
         entry.cur_row = cur_row
 
         return entry, log_store
             
         
     def _loadLogFile(self):
-        """
+        """Launch dialog and load a tlf file.
+        
+        Launches a dialog to get the tlf file from the user.
         """
         path = self.settings.cur_location
         if not self.settings.cur_modellog_path== '':
@@ -551,7 +615,6 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
                 del self.settings.log_summarys[i]
                 logger.warning('cache data for log summary unavailable - will not be loaded.')
         
-        i = 0
         # Then setup table
         for i, summary in enumerate(self.settings.log_summarys, 0):
             self._updateTableVals(summary, i+1)
@@ -586,7 +649,7 @@ class RunSummary_UI(QtGui.QWidget, summarywidget.Ui_RunSummaryWidget):
 
 
 class LogSummaryStore(object):
-    """"""
+    """Stores the log output values."""
     
     def __init__(self, guid):
         self.guid = guid
