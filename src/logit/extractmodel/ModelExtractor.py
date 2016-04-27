@@ -54,6 +54,7 @@ from ship.tuflow.data_files import datafileloader
 from ship.tuflow.tuflowmodel import FilesFilter as filter
 from ship.utils import filetools
     
+from AWidget import AWidget
 import ModelExtractor_Widget as extractwidget
 logger.debug('ModelExtractor_Widget import complete')
 from app_metrics import utils as applog
@@ -81,16 +82,12 @@ class ExtractVars(object):
 
 
 
-class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
+class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
     
 
-    def __init__(self, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
-        QtGui.QWidget.__init__(self, parent, f)
+    def __init__(self, cwd, cur_log_path, parent=None, f=QtCore.Qt.WindowFlags()):
         
-        self.tool_name = 'Model Extractor'
-        self.settings = ToolSettings()
-        self.settings.cur_location = cwd
-        
+        AWidget.__init__(self, 'Model Extractor', cwd, cur_log_path, parent, f)
         self.setupUi(self)
         
         # Connect the slots
@@ -107,7 +104,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         if not self.settings.cur_model_path == '':
             path = self.settings.cur_model_path
         else:
-            path = self.settings.cur_location
+            path = self.cur_location
 
         d = MyFileDialogs()
         open_path = d.openFileDialog(path, file_types='Ief/Tcf File(*.ief;*tcf)')
@@ -125,7 +122,7 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         if not self.settings.cur_output_dir == '':
             path = self.settings.cur_output_dir
         else:
-            path = self.settings.cur_location
+            path = self.cur_location
 
         d = MyFileDialogs()
         dir_path = str(d.dirFileDialog(path)) 
@@ -737,20 +734,24 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
         self._extractVars.ief.path_holder.root = os.path.join(self._extractVars.out_dir, 'fmp', 'iefs')
 
 
+    def getSettingsAttrs(self):
+        """Setup the ToolSettings attributes for this widget.
+        
+        Overrides superclass method.
+        
+        Return:
+            dict - member varibles and initial state for ToolSettings.
+        """
+        attrs = {'cur_model_path': '', 'cur_output_dir': ''}
+        return attrs
+    
+    
     def loadSettings(self, settings):
         """Load any pre-saved settings provided."""
         
-        # Check that this version of the settings has all the necessary
-        # attributes, and if not add the missing ones
-        temp_set = ToolSettings()
-        settings_attrs = [s for s in dir(temp_set) if not s.startswith('__')]
-        for s in settings_attrs:
-            if not hasattr(settings, s):
-                setattr(settings, s, getattr(temp_set, s))
-        
+        AWidget.loadSettings(self, settings)
         self.extractModelFileTextbox.setText(settings.cur_model_path)
         self.extractOutputTextbox.setText(settings.cur_output_dir)
-        self.settings = settings
     
     
     def saveSettings(self):
@@ -888,18 +889,6 @@ class ModelExtractor_UI(QtGui.QWidget, extractwidget.Ui_ExtractModelWidget):
             return False
         else:
             return answer
-
-
-class ToolSettings(object):
-    """Store the settings used by this class."""
-    
-    def __init__(self):
-        
-        self.tool_name = 'Model Extractor'
-        self.cur_model_path = ''
-        self.cur_output_dir = ''
-        self.cur_location = ''
-        
 
 
 

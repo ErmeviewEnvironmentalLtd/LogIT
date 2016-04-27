@@ -519,7 +519,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         
         Launches a dialog to get the tlf file from the user.
         """
-        path = self.settings.cur_location
+        path = self.cur_location
         if not self.settings.cur_modellog_path== '':
             path = self.settings.cur_modellog_path
         d = MyFileDialogs()

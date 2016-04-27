@@ -229,7 +229,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 return
             
             # Launch dialog and get a file
-            chosen_path = self.settings.cur_location
+            chosen_path = self.cur_location
             if not self.settings.cur_model_path == '':
                 chosen_path = self.settings.cur_model_path
             d = MyFileDialogs()
@@ -365,7 +365,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         if call_name == 'addMultiModelButton':
             
             if not self._TEST_MODE:
-                chosen_path = self.settings.cur_location
+                chosen_path = self.cur_location
                 if not self.settings.cur_model_path == '':
                     chosen_path = self.settings.cur_model_path
                 

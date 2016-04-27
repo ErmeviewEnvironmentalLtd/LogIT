@@ -305,7 +305,7 @@ class MainGui(QtGui.QMainWindow):
         self.widgets[new_entry.tool_name].addMultiLogEntryButton.clicked.connect(self._createMultipleLogEntry)
         
         # Storm calculator
-        model_extractor = ModelExtractor.ModelExtractor_UI(cur_location)
+        model_extractor = ModelExtractor.ModelExtractor_UI(cur_location, self.settings.cur_log_path)
         self.widgets[model_extractor.tool_name] = model_extractor
         self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), model_extractor, model_extractor.tool_name)
         
@@ -1026,7 +1026,7 @@ class MainGui(QtGui.QMainWindow):
         """
         save_path = self.settings.cur_settings_path
         self._writeSettings(save_path)
-        sys.exit()            
+#         sys.exit()            
 
  
     def _updateDatabaseVersion(self): 
