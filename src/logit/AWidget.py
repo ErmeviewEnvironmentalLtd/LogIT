@@ -104,24 +104,10 @@ class AWidget(QtGui.QWidget):
             settings(ToolSettings): containing member variable states to 
                 update.
         """
-#         settings_attrs = [s for s in dir(settings) if not s.startswith('__')]
-#         for s in settings_attrs:
-#             if hasattr(self.settings, s):
-#                 setattr(self.settings, s, getattr(settings, s))
         for key, val in self.settings.iteritems():
             if key in settings.keys():
                 self.settings[key] = settings[key]
         
-#         dead_keys = []
-#         for key, val in settings.iteritems():
-#             if not key in self.settings.keys():
-#                 dead_keys.append(key)
-#         
-#         for k in dead_keys:
-#             del settings[k]
-#         
-#         self.settings = settings
-    
 
     def saveSettings(self):
         """Return the ToolSettings instance to the caller.
@@ -186,7 +172,7 @@ class AWidget(QtGui.QWidget):
             QtGui.QMessageBox.information(self, title, message)
             
             
-    def launchQtQBox(self, title, message, parent=None):
+    def launchQtQBox(self, title, message):
         """Launch QtQMessageBox.
         """
         answer = QtGui.QMessageBox.question(self, title, message,
@@ -209,16 +195,6 @@ class AWidget(QtGui.QWidget):
     
 
 
-# class ToolSettings(object):
-#     
-#     def __init__(self, tool_name, attrs):
-#         self.guid = str(uuid.uuid4())
-#         self.tool_name = str(tool_name)
-#         
-#         if not isinstance(attrs, dict):
-#             raise AttributeError ('attrs is not a dictionary')
-#         for key, val in attrs.iteritems():
-#             setattr(self, key, val)
         
         
     

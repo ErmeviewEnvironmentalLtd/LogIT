@@ -17,3 +17,4 @@ data/
 *.logset
 *.logdb
 *.pyc
+*logs.zip

@@ -207,7 +207,6 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                     entry_item.appendRow(child)
         
         self.modelEntryTreeView.setModel(self.tree_model)
-#         self.modelEntryTreeView.setColumnWidth(0, self.settings.singleLoadColumnWidth)
         self.modelEntryTreeView.setColumnWidth(0, self.settings['singleload_column_width'])
         self.modelEntryTreeView.expandAll()
     
@@ -225,7 +224,6 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         if self._TEST_MODE:
             open_path = testpath
         else:
-#             if not os.path.exists(self.cur_log_path):
             if not 'log' in gs.path_holder.keys():
                 self.launchQMsgBox(('No log Database', 'There is no log database ' +
                                    'loaded.\n Please load one first.'))
@@ -242,17 +240,12 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         
         # If the user doesn't cancel
         if not open_path == False:
-#             if not os.path.exists(self.cur_log_path):
-#                 self.launchQMsgBox('No Database', 'Please load a log database first')
-#                 return
             
             open_path = str(open_path)
             self.loadModelTextbox.setText(open_path)
-#             self.settings.cur_model_path = open_path
             gs.setPath('model', open_path)
             
             errors = GuiStore.ErrorHolder()
-#             errors, self.all_logs = Controller.fetchAndCheckModel(self.cur_log_path, open_path, errors)
             errors, self.all_logs = Controller.fetchAndCheckModel(gs.path_holder['log'], open_path, errors)
             
             # Init a dict to hold the exists/not exists status of the data
@@ -268,8 +261,6 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 # check the new entries against the database and return them with
                 # flags set for whether they are new entries or already exist
                 errors = GuiStore.ErrorHolder()
-#                 entry_status, errors = Controller.loadEntrysWithStatus(
-#                         self.cur_log_path, self.all_logs, entry_dict, errors)
                 entry_status, errors = Controller.loadEntrysWithStatus(
                         gs.path_holder['log'], self.all_logs, entry_dict, errors)
 
@@ -283,10 +274,6 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 run['TUFLOW_BUILD'] = self.settings['tuflow_model'] = input_vars['TUFLOW_BUILD'] 
                 run['ISIS_BUILD'] = self.settings['isis_build'] = input_vars['ISIS_BUILD']
                 run['EVENT_NAME'] = self.settings['event_name'] = input_vars['EVENT_NAME'] 
-#                 run['MODELLER'] = input_vars['MODELLER']
-#                 run['TUFLOW_BUILD'] = input_vars['TUFLOW_BUILD'] 
-#                 run['ISIS_BUILD'] = input_vars['ISIS_BUILD'] 
-#                 run['EVENT_NAME'] = input_vars['EVENT_NAME'] 
                 self._updateNewEntryTree(entry_status)
                 self.submitSingleModelGroup.setEnabled(True) 
     
@@ -376,8 +363,6 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
             
             if not self._TEST_MODE:
                 chosen_path = self.cur_location
-#                 if not self.settings.cur_model_path == '':
-#                     chosen_path = self.settings.cur_model_path
                 if 'model' in gs.path_holder.keys():
                     chosen_path = gs.path_holder['model']
                 
@@ -392,7 +377,6 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
             
             self.loadMultiModelTable.setSortingEnabled(False)
             for p in open_paths:
-#                 self.settings.cur_model_path = str(p)
                 gs.setPath('model', p)
                 
                 # Insert a new row first if needed
@@ -401,7 +385,6 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 
                 # Get the filename
                 d, fname = os.path.split(str(p))
-#                 self.settings.last_model_directory = d
                 
                 # Create a couple of items and add to the table
                 cbox = QtGui.QTableWidgetItem()
@@ -476,11 +459,6 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         """Load any pre-saved settings provided."""
         
         AWidget.loadSettings(self, settings)
-#         self.modellerTextbox.setText(settings.modeller)
-#         self.tuflowVersionTextbox.setText(settings.tuflow_version)
-#         self.isisVersionTextbox.setText(settings.isis_version)
-#         self.eventNameTextbox.setText(settings.event_name)
-#         self.loadModelTab.setCurrentIndex(settings.cur_load_tab)
         self.modellerTextbox.setText(settings['modeller'])
         self.tuflowVersionTextbox.setText(settings['tuflow_version'])
         self.isisVersionTextbox.setText(settings['isis_version'])

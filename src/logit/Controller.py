@@ -164,7 +164,7 @@ class AddedRows(object):
                calling code.
         """
         for name, table in self.tables.iteritems():
-            for id in table: #reverse_enumerate(table):
+            for id in table: 
                 db_manager.deleteRow(name, id)
                 
 
@@ -792,12 +792,6 @@ def getRunStatusInfo(tcf_dir, tcf_name):
     sim_file = os.path.join(tcf_dir, '_ TUFLOW Simulations.log')
     if not os.path.exists(sim_file): return (False,)
     
-    # Get the first tcf in the list of tcf's
-#     try:
-#         tcf_name = all_logs.log_pages['TCF'].contents[0]['TCF']
-#     except IndexError, KeyError:
-#         return all_logs
-    
     tcf_line = None
     try:
         with open(sim_file, 'rb') as f:
@@ -823,13 +817,11 @@ def getRunStatusInfo(tcf_dir, tcf_name):
         if'Finished' in item or 'UNSTABLE' in item or 'INTERRUPTED' in item:
             item = item.strip()
             item = item.split(':')[0]
-#             all_logs.log_pages['RUN'].contents[0]['RUN_STATUS'] = item.strip()
             status = item.strip()
         
         elif 'pCME5' in item:
             val = item.split('=')
             val = val[1].strip()
-#             all_logs.log_pages['RUN'].contents[0]['MB'] = val.strip('%')
             mb = val.strip('%')
     
     return True, status, mb 

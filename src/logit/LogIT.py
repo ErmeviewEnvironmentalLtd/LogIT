@@ -76,12 +76,9 @@
 
 # Python standard modules
 import os
-from os.path import basename
 import sys
 import cPickle
-import sqlite3
 import logging
-import zipfile
  
 # Setup the logging protocols. Try and create a directory to put the logs into.
 # If that fails we call the console only logger, if not detailed logs will be
@@ -152,18 +149,13 @@ class MainGui(QtGui.QMainWindow):
     """Main GUI application window for the PysisTools software.
     """
      
-    def __init__(self, cur_settings, cur_settings_path, parent=None):
+    def __init__(self, cur_settings, parent=None):
         """Constructor.
         :param parent: Reference to the calling class.
         """        
         # Setup some variables
         self._TEST_MODE = False
-#         if not cur_settings == False:
         self.settings = cur_settings
-#         else:
-#             self.settings = LogitSettings()
-        
-        self.settings.cur_settings_path = cur_settings_path
         self.model_log = None
         
         # Database tables that should be exported to Excel
@@ -265,10 +257,8 @@ class MainGui(QtGui.QMainWindow):
 
         
     def startupChecks(self):
-        """
-        """
+        """Check for new versions and show release notes if needed."""
         self._showReleaseNotes()
-        # Check if there's a newer version available
         self._checkUpdatesFalse()
         
     
@@ -298,7 +288,6 @@ class MainGui(QtGui.QMainWindow):
         self.widgets = {}
         
         # New Entry
-#         new_entry = NewEntry.NewEntry_UI(cur_location, self.settings.cur_log_path)
         new_entry = NewEntry.NewEntry_UI(cur_location)
         self.widgets[new_entry.tool_name] = new_entry
         self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), new_entry, new_entry.tool_name)
@@ -306,13 +295,11 @@ class MainGui(QtGui.QMainWindow):
         self.widgets[new_entry.tool_name].addMultiLogEntryButton.clicked.connect(self._createMultipleLogEntry)
         
         # Model Extractor
-#         model_extractor = ModelExtractor.ModelExtractor_UI(cur_location, self.settings.cur_log_path)
         model_extractor = ModelExtractor.ModelExtractor_UI(cur_location)
         self.widgets[model_extractor.tool_name] = model_extractor
         self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), model_extractor, model_extractor.tool_name)
         
         # Run Summary
-#         run_summary = RunSummary.RunSummary_UI(cur_location, self.settings.cur_log_path) 
         run_summary = RunSummary.RunSummary_UI(cur_location) 
         self.widgets[run_summary.tool_name] = run_summary
         self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), run_summary, run_summary.tool_name)
@@ -430,66 +417,6 @@ class MainGui(QtGui.QMainWindow):
         call_name = caller.objectName()
         
     
-#     def _updateMultipleLogSelection(self):
-#         """Updates the contents of the loadMultiModelListView.
-#         Called by both the add and remove buttons. It will open a multiple
-#         choice file dialog by the former or remove the selected items by the
-#         latter.
-#         """
-#         caller = self.sender()
-#         call_name = caller.objectName()
-#         logger.debug('Caller = ' + call_name)
-#         
-#         # Add a new file
-#         if call_name == 'addMultiModelButton':
-#             open_paths = self._getModelFileDialog(multi_paths=True)
-#             if open_paths == False:
-#                 return
-#             
-#             self.ui.loadMultiModelTable.setSortingEnabled(False)
-#             row_count = self.ui.loadMultiModelTable.rowCount()
-#             for p in open_paths:
-#                 
-#                 # Insert a new row first if needed
-#                 self.ui.loadMultiModelTable.insertRow(row_count)
-#                 
-#                 # Get the filename
-#                 d, fname = os.path.split(str(p))
-#                 self.settings.last_model_directory = d
-#                 
-#                 # Create a couple of items and add to the table
-#                 cbox = QtGui.QTableWidgetItem()
-#                 cbox.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled)
-#                 cbox.setCheckState(QtCore.Qt.Unchecked)
-#                 self.ui.loadMultiModelTable.setItem(row_count, 0, cbox)
-#                 self.ui.loadMultiModelTable.setItem(row_count, 1, 
-#                                         Controller.createQtTableItem(fname, drag_enabled=True))
-#                 self.ui.loadMultiModelTable.setItem(row_count, 2, 
-#                                         Controller.createQtTableItem(p, drag_enabled=True))
-#                 
-#             # Set the sumbit button to enabled
-#             self.ui.submitMultiModelGroup.setEnabled(True)
-#             self.ui.loadMultiModelTable.sortItems(0,  QtCore.Qt.AscendingOrder)
-#             self.ui.loadMultiModelTable.setSortingEnabled(False)
-#                 
-#             
-#         elif call_name == 'removeMultiModelButton':
-# 
-#             # Get the selected rows, reverse them and remove them
-#             rows = self.ui.loadMultiModelTable.rowCount()
-#             for r in range(rows-1, -1, -1):
-#                 cbox = self.ui.loadMultiModelTable.item(r, 0)
-#                 if cbox.checkState() == QtCore.Qt.Checked:
-#                     self.ui.loadMultiModelTable.removeRow(r)
-#             
-#             # Deactivate the log button if there's no rows left
-#             if self.ui.loadMultiModelTable.rowCount() < 1:
-#                 self.ui.submitMultiModelGroup.setEnabled(False)
-#         
-#         else:
-#             logger.info('Caller %s not recongnised' % call_name)
-       
-    
     def _tablePopup(self, pos):
         """This is the action performed when the user opens the context menu
         with right click on on of the tables in the View Log tab.
@@ -570,12 +497,6 @@ class MainGui(QtGui.QMainWindow):
                     self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
             
             elif action == updateIefRowAction or action == updateTcfRowAction:
-#                 if not self.settings.last_model_directory == '':
-#                     p = self.settings.last_model_directory
-#                 elif not self.settings.cur_log_path == '':
-#                     p = self.settings.cur_log_path
-#                 else:
-#                     p = self.settings.cur_settings_path
                 if 'model' in gs.path_holder.keys():
                     p = gs.path_holder['model']
                 elif 'log' in gs.path_holder.keys():
@@ -603,7 +524,6 @@ class MainGui(QtGui.QMainWindow):
                     table_obj.addRowValues(row_dict, row)
                     self._saveViewChangesToDatabase(table_obj, row)
                     self.loadModelLog()
-#                     self.settings.last_model_directory = p
                     gs.setPath('model', p)
             
             # Update the MB and RUN_STATUS values in RUN table
@@ -704,8 +624,6 @@ class MainGui(QtGui.QMainWindow):
         
         # Delete from database
         errors = GuiStore.ErrorHolder()
-#         errors = Controller.deleteDatabaseRow(self.settings.cur_log_path,
-#                                 table.key, row_dict['ID'], errors, all_entry)
         errors = Controller.deleteDatabaseRow(gs.path_holder['log'],
                                 table.key, row_dict['ID'], errors, all_entry)
         # and then from the table
@@ -736,12 +654,9 @@ class MainGui(QtGui.QMainWindow):
         
         # Add the updates to the database
         errors = GuiStore.ErrorHolder()
-#         errors = Controller.editDatabaseRow(self.settings.cur_log_path, 
-#                                         table.key, id_key, save_dict, errors)
         errors = Controller.editDatabaseRow(gs.path_holder['log'], 
                                         table.key, id_key, save_dict, errors)
         
-#         db_path = os.path.split(gs.path_holder['log'])[0]
         if errors.has_errors:
             logger.error('Row ID=%s failed to update' % (id_key))
             if errors.msgbox_error:
@@ -759,15 +674,6 @@ class MainGui(QtGui.QMainWindow):
         """
         if self.checkDbLoaded(False):
             errors = GuiStore.ErrorHolder()
-            # Check that the database actually exists. If not get out of here.
-#             if not os.path.exists(self.settings.cur_log_path):
-#                 logger.info('No existing log database to load')
-#                 self.settings.cur_log_path = ''
-#                 self.widgets['New Entry'].cur_log_path = ''
-#                 return
-            
-#             errors = Controller.checkDatabaseVersion(
-#                                         self.settings.cur_log_path, errors)
             errors = Controller.checkDatabaseVersion(gs.path_holder['log'], errors)
             if errors.has_errors:
                 if errors.msgbox_error:
@@ -783,8 +689,6 @@ class MainGui(QtGui.QMainWindow):
             for table in self.view_tables.tables.values():
                 table_list.append([table.key, table.name])
             
-#             entries, errors = Controller.fetchTableValues(
-#                             self.settings.cur_log_path, table_list, errors)
             entries, errors = Controller.fetchTableValues(gs.path_holder['log'],
                                                           table_list, errors)
             
@@ -814,8 +718,6 @@ class MainGui(QtGui.QMainWindow):
             
             try:
                 errors = GuiStore.ErrorHolder()
-#                 errors, all_logs = Controller.updateLog(
-#                             self.settings.cur_log_path, all_logs, errors) 
                 errors, all_logs = Controller.updateLog(
                             gs.path_holder['log'], all_logs, errors) 
                 
@@ -855,8 +757,6 @@ class MainGui(QtGui.QMainWindow):
             else:
                 self.launchQMsgBox('No Database', 'Please load a log database first')
                 return
-#         errors = Controller.checkDatabaseVersion(
-#                                         self.settings.cur_log_path, errors)
         errors = Controller.checkDatabaseVersion(gs.path_holder['log'], errors)
         if errors.has_errors:
             if errors.msgbox_error and not self._TEST_MODE:
@@ -868,9 +768,6 @@ class MainGui(QtGui.QMainWindow):
         model_paths = self.widgets['New Entry'].getMultipleModelPaths()
         if not model_paths: return errors
         
-        # Load all of the models into a list
-        model_logs = []
-        
         # Setup the progress monitor. It updates prgress bars etc
         total = len(model_paths)
         prog_count = 1
@@ -880,20 +777,14 @@ class MainGui(QtGui.QMainWindow):
         input_vars = self.widgets['New Entry'].getInputVars()
         
         try:
-            # Loop through all of the file paths given
             for path in model_paths:
-                error_found = False
                 
                 self._updateStatusBar('Loading model %s of %s' % (prog_count, total))
                 self._updateCurrentProgress(prog_count)
                 prog_count += 1
-                
-#                 errors, all_logs = Controller.fetchAndCheckModel(
-#                            self.settings.cur_log_path, path, errors)
                 errors, all_logs = Controller.fetchAndCheckModel(
                                         gs.path_holder['log'], path, errors)
                 
-                # Go to next if we find an error
                 if errors.has_local_errors:
                     continue
                 
@@ -903,7 +794,6 @@ class MainGui(QtGui.QMainWindow):
                 run['ISIS_BUILD'] = input_vars['ISIS_BUILD'] 
                 run['EVENT_NAME'] = input_vars['EVENT_NAME'] 
 
-                # Update the log entries
                 errors, all_logs = Controller.updateLog(gs.path_holder['log'], 
                                     all_logs, errors, check_new_entries=True)
                 
@@ -959,26 +849,15 @@ class MainGui(QtGui.QMainWindow):
         """Get the settings loaded from file if they exist.
         """
         try:
-#             self.ui.statusbar.showMessage("Current log: " + gs.path_holder['log'])
-            
             if self.settings.logging_level == logging.WARNING:
                 self.ui.actionLogWarning.setChecked(True)
             elif self.settings.logging_level == logging.INFO:
                 self.ui.actionLogInfo.setChecked(True)
             elif self.settings.logging_level == logging.DEBUG:
                 self.ui.actionLogDebug.setChecked(True)                
-            
             logging.getLogger().setLevel(self.settings.logging_level)
-            
             gs.path_holder = self.settings.path_holder
             
-#             if self.settings.last_model_directory == '' or self.settings.last_model_directory == False:
-#                 if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
-#                     self.settings.last_model_directory = os.path.split(self.settings.cur_settings_path)[0]
-#                 else:
-#                     self.settings.last_model_directory = os.path.split(self.settings.cur_log_path)[0]
-            
-       
         except:
             logger.warning('Was unable to retrieve previous settings - Has LogIT been updated?')
         
@@ -1009,8 +888,6 @@ class MainGui(QtGui.QMainWindow):
             self.settings = LogitSettings()
 
         try:
-            # Load the UnitCollection from file and convert it back to the
-            # dictionary format being used.
             with open(save_path, "wb") as p:
                 cPickle.dump(self.settings, p)
         except:
@@ -1033,10 +910,6 @@ class MainGui(QtGui.QMainWindow):
         """Load LogIT setup from file.
         """
         errors = GuiStore.ErrorHolder()
-#         settings, errors = Controller.loadSetup(
-#                                         self.settings.cur_settings_path, 
-#                                         self.settings.cur_log_path,
-#                                         errors)d = MyFileDialogs()
         d = MyFileDialogs(parent=self)
         open_path = d.openFileDialog(self.settings.cur_settings_path, 
                         file_types='Log Settings (*.logset)')
@@ -1066,14 +939,11 @@ class MainGui(QtGui.QMainWindow):
         """
         d = MyFileDialogs(parent=self)
         if not self.checkDbLoaded():
-#             open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
-#                                         file_types='LogIT database(*.logdb)'))
             open_path = d.openFileDialog(path=gs.path_holder['log'], 
                                         file_types='LogIT database(*.logdb)')
         else:
             open_path = d.openFileDialog(path=self.settings.cur_settings_path, 
                                         file_types='LogIT database(*.logdb)')
-        # User cancel return
         if open_path == False:
             return None
         open_path = str(open_path)
@@ -1088,17 +958,14 @@ class MainGui(QtGui.QMainWindow):
             msg = "Update Successfull\nWould you like to load updated database?"
             reply = self.launchQtQBox('Update Successful', msg)
             if not reply == False:
-#                 temp = self.settings.cur_log_path = open_path
                 temp = gs.path_holder['log'] = open_path
                 try:
                     self.loadModelLog()
                     self.ui.statusbar.showMessage("Current log: " + open_path)
-#                     self.widgets['New Entry'].cur_log_path = open_path
                 except:
                     logger.error('Cannot load database: see log for details')
                     self.launchQMsgBox(errors.types[errors.DB_UPDATE].title, 
                                        errors.types[errors.DB_UPDATE].message)
-#                     self.settings.cur_log_path = temp
     
     
     def _createNewLogDatabase(self):
@@ -1108,10 +975,6 @@ class MainGui(QtGui.QMainWindow):
             p = gs.path_holder['log']
         else:
             p = self.cur_location
-#         if not self.settings.cur_log_path == '':
-#             p = self.settings.cur_log_path
-#         else:
-#             p = self.settings.cur_settings_path
             
         d = MyFileDialogs(parent=self)
         save_path = d.saveFileDialog(path=p, file_types='LogIT database(*.logdb)')
@@ -1119,9 +982,7 @@ class MainGui(QtGui.QMainWindow):
         if not save_path == False:
             try:
                 QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-#                 self.settings.cur_log_path = str(save_path)
                 gs.setPath('log', save_path)
-#                 self.widgets['New Entry'].cur_log_path = str(save_path)
                 self.view_tables.clearAll()
                 self.ui.statusbar.showMessage('Building new log database...')
                 self.ui.centralwidget.setEnabled(False)
@@ -1129,7 +990,6 @@ class MainGui(QtGui.QMainWindow):
                 DatabaseFunctions.createNewLogDatabase(gs.path_holder['log'])
                 self.ui.centralwidget.setEnabled(True)
                 self.ui.statusbar.showMessage("Current log: " + save_path)
-#                 self.widgets['New Entry'].cur_log_path = str(save_path)
             except Exception, err:
                 logger.error('Problem loading cache: ' + err)
             finally:
@@ -1143,27 +1003,18 @@ class MainGui(QtGui.QMainWindow):
         """
         d = MyFileDialogs(parent=self)
         if self.checkDbLoaded(False):
-#             open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
-#                                         file_types='LogIT database(*.logdb)'))
             open_path = str(d.openFileDialog(path=gs.path_holder['log'],
                                         file_types='LogIT database(*.logdb)'))
         else:
-#             open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, 
-#                                         file_types='LogIT database(*.logdb)'))
             open_path = str(d.openFileDialog(path=cur_location,
                                         file_types='LogIT database(*.logdb)'))
-        
         if open_path == False:
             return
         
         if self.settings == False:
             self.settings = LogitSettings()
         
-#         self.settings.cur_log_path = open_path
-#         self.widgets['New Entry'].cur_log_path = str(open_path)
         gs.setPath('log', open_path)
-#         self.widgets['New Entry'].cur_log_path = str(open_path)
-        
         try:
             self.loadModelLog()
             self.ui.statusbar.showMessage("Current log: " + open_path)
@@ -1178,9 +1029,6 @@ class MainGui(QtGui.QMainWindow):
             p = gs.path_holder['log']
             if 'export' in gs.path_holder.keys(): p = gs.path_holder['export']
             d = MyFileDialogs(parent=self)
-#             save_path = d.saveFileDialog(path=os.path.split(
-#                                         self.settings.cur_log_path)[0], 
-#                                         file_types='Excel File (*.xls)')
             save_path = d.saveFileDialog(path=gs.path_holder['log'], 
                                          file_types='Excel File (*.xls)')
             if save_path == False:
@@ -1192,7 +1040,6 @@ class MainGui(QtGui.QMainWindow):
             errors = Controller.exportToExcel(gs.path_holder['log'],
                                               self.export_tables, save_path,
                                                                     errors)
-            
             if errors.has_errors:
                 if errors.msgbox_error:
                     self.launchQMsgBox(errors.msgbox_error.title, 
@@ -1240,7 +1087,6 @@ class MainGui(QtGui.QMainWindow):
         if not self.checkDbLoaded():
             return False          
 
-#         p = self.settings.last_model_directory
         p = gs.path_holder['model']
         if not path is None: p = path
             
@@ -1266,10 +1112,6 @@ class MainGui(QtGui.QMainWindow):
         p = cur_location
         if 'ief' in gs.path_holder.keys(): p = gs.path_holder['ief']
         elif 'model' in gs.path_holder.keys(): p = gs.path_holder['model']
-#         if not self.settings.ief_resolver_path == '':
-#             p = self.settings.ief_resolver_path
-
-#         ief_paths = self._getModelFileDialog(multi_paths=True, path=p)
         d = MyFileDialogs(parent=self)
         ief_paths = d.openFileDialog(path=p, 
                 file_types='ISIS/TUFLOW (*.ief *.IEF)', multi_file=True)
@@ -1280,7 +1122,6 @@ class MainGui(QtGui.QMainWindow):
         file_list = []
         for i in ief_paths:
             file_list.append(str(i))
-#             self.settings.ief_resolver_path = i
             gs.setPath('ief', i)
         # DEBUG
 #         file_list = [r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief',
@@ -1371,7 +1212,6 @@ class MainGui(QtGui.QMainWindow):
     def checkDbLoaded(self, show_dialog=True):
         """Check if there's a database filepath set.
         """
-#         if self.settings.cur_log_path == '' or self.settings.cur_log_path == False:
         if not 'log' in gs.path_holder.keys():
             if show_dialog:
                 QtGui.QMessageBox.warning(self, "No Database Loaded",
@@ -1413,11 +1253,6 @@ class MainGui(QtGui.QMainWindow):
                         table.ref.setColumnWidth(i, self.settings.main['column_widths'][key][i])
                     except IndexError:
                         pass # If we've added new columns since save state
-    
-    
-#     def _loadTabChanged(self):
-#         """The current tab in loadModelTab has changed."""
-#         self.settings.cur_load_tab = self.ui.loadModelTab.currentIndex()
     
     
     def _showReleaseNotes(self):
@@ -1477,21 +1312,6 @@ class LogitSettings(object):
         self.cur_settings_path = ''
         self.logging_level = 0
 
-#         self.release_notes_version = ''
-#         self.column_widths = {}
-#         self.cur_tab = 0
-
-#         self.cur_log_path = ''
-#         self.last_model_directory = ''
-#         self.modeller = ''
-#         self.tuflow_version = ''
-#         self.isis_version = ''
-#         self.event_name = ''
-#         self.log_path = ''
-#         self.log_export_path = ''
-#         self.ief_resolver_path = ''
-#         self.cur_model_type = 0
-#         self.cur_load_tab = 0
     
     def getMainToolSettings(self):
         """"""
@@ -1520,16 +1340,6 @@ class LogitSettings(object):
                 if key in main_dict.keys():
                     self.main[key] = main_dict[key]
         
-#         dead_settings = []
-#         for key, val in main_dict.iteritems():
-#             if not key in self.main.keys():
-#                 dead_settings.append(key)
-#         
-#         for d in dead_settings:
-#             del main_dict[key]
-        
-#         self.main = main_dict
-                             
         
         
 def main():
@@ -1548,24 +1358,16 @@ def main():
         
         # Check that this version of the settings has all the necessary
         # attributes, and if not add the missing ones
-#         new_set = LogitSettings()
-#         settings_attrs = [s for s in dir(new_set) if not s.startswith('__')]
-#         for s in settings_attrs:
-#             if hasattr(cur_settings, s):
-#                 setattr(new_set, s, getattr(cur_settings, s))
         new_set.copySettings(cur_settings)
         cur_settings = new_set
-#         cur_settings.cur_settings_path = settings_path 
-
     except:
-#         cur_settings = LogitSettings()
         print 'Unable to load user defined settings'
     cur_settings = new_set
     cur_settings.cur_settings_path = settings_path
          
     # Launch the user interface.
     app = QtGui.QApplication(sys.argv)
-    myapp = MainGui(cur_settings, settings_path)
+    myapp = MainGui(cur_settings)
     icon_path = os.path.join(settings_path, 'Logit_Logo.ico')
     app.setWindowIcon(QtGui.QIcon(':images/Logit_Logo.png'))
     myapp.show()

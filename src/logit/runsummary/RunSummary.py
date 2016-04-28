@@ -521,8 +521,6 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         Launches a dialog to get the tlf file from the user.
         """
         path = self.cur_location
-#         if not self.settings.cur_modellog_path== '':
-#             path = self.settings.cur_modellog_path
         if not self.settings['tlf_path'] == '':
             path = self.settings['tlf_path']
         elif 'model' in gs.path_holder.keys():
@@ -531,7 +529,6 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         open_path = d.openFileDialog(path, file_types='Tuflow log file (*.tlf)')
         if open_path == 'False' or open_path == False:
             return
-#         self.settings.cur_modellog_path = open_path
         self.settings['tlf_path'] = open_path
         self.loadIntoTable(open_path)
     
@@ -674,8 +671,6 @@ class LogSummaryStore(object):
         self.ddv = []
         self.flow_in = []
         self.flow_out = []
-#         start_time = 0
-#         finish_time = 0
 
 
 
