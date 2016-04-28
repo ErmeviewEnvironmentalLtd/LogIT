@@ -108,7 +108,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
 
         d = MyFileDialogs(parent=self)
         open_path = d.openFileDialog(path, file_types='Ief/Tcf File(*.ief;*tcf)')
-        if open_path == 'False' or open_path == False:
+        if open_path == False:
             return
         
         open_path = os.path.normpath(str(open_path))
@@ -125,10 +125,10 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             path = self.cur_location
 
         d = MyFileDialogs(parent=self)
-        dir_path = str(d.dirFileDialog(path)) 
-        if dir_path == 'False' or dir_path == False:
+        dir_path = d.dirFileDialog(path)
+        if dir_path == False:
             return
-        
+        dir_path = str(dir_path)
         # Make sure we don't accidentally write over input files
         if 'model' in gs.path_holder.keys():
             if dir_path == os.path.normpath(os.path.split(gs.path_holder['model'])[0]):

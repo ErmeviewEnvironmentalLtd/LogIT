@@ -512,12 +512,12 @@ class MainGui(QtGui.QMainWindow):
                     lookup_name = 'TCF_DIR'
                     
                 d = MyFileDialogs(parent=self)
-                open_path = str(d.openFileDialog(p, file_types=file_types, 
-                                                 multi_file=False))
+                open_path = d.openFileDialog(p, file_types=file_types, 
+                                                 multi_file=False)
                     
-                if not open_path == 'False' and not open_path == False:
+                if not open_path == False:
+                    open_path = str(open_path)
                     p = os.path.split(open_path)[0]
-                    
                     row = table_obj.currentRow()
                     row_dict = table_obj.getValues(row=row, names=['ID', lookup_name])
                     row_dict[lookup_name] = p
@@ -1003,13 +1003,14 @@ class MainGui(QtGui.QMainWindow):
         """
         d = MyFileDialogs(parent=self)
         if self.checkDbLoaded(False):
-            open_path = str(d.openFileDialog(path=gs.path_holder['log'],
-                                        file_types='LogIT database(*.logdb)'))
+            open_path = d.openFileDialog(path=gs.path_holder['log'],
+                                        file_types='LogIT database(*.logdb)')
         else:
-            open_path = str(d.openFileDialog(path=cur_location,
-                                        file_types='LogIT database(*.logdb)'))
+            open_path = d.openFileDialog(path=cur_location,
+                                        file_types='LogIT database(*.logdb)')
         if open_path == False:
             return
+        open_path = str(open_path)
         
         if self.settings == False:
             self.settings = LogitSettings()
@@ -1212,15 +1213,14 @@ class MainGui(QtGui.QMainWindow):
     def checkDbLoaded(self, show_dialog=True):
         """Check if there's a database filepath set.
         """
-        if not 'log' in gs.path_holder.keys():
+        path, exists = gs.getPath('log')
+        if not exists:
             if show_dialog:
                 QtGui.QMessageBox.warning(self, "No Database Loaded",
                         "No log database active. Please load or create one from the file menu.")
             logger.error('No log database found. Load or create one from File menu')
             return False
         
-        elif not os.path.exists(gs.path_holder['log']):
-            return False
         else:
             return True
     

@@ -156,7 +156,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         """
         brush_green = QtGui.QBrush(QtGui.QColor(204, 255, 153)) # Light green
         brush_red = QtGui.QBrush(QtGui.QColor(255, 204, 204)) # Light red
-
+        
         self.tree_model = QtGui.QStandardItemModel()
         self.tree_model.setColumnCount(2)
         self.tree_model.setHorizontalHeaderLabels(['Log Type', 'Variables'])
@@ -207,8 +207,8 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                     entry_item.appendRow(child)
         
         self.modelEntryTreeView.setModel(self.tree_model)
-        self.modelEntryTreeView.setColumnWidth(0, self.settings['singleload_column_width'])
         self.modelEntryTreeView.expandAll()
+        self.modelEntryTreeView.setColumnWidth(0, self.settings['singleload_column_width'])
     
     
     def _loadSingleLogEntry(self, testpath=''):
@@ -224,9 +224,10 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         if self._TEST_MODE:
             open_path = testpath
         else:
-            if not 'log' in gs.path_holder.keys():
-                self.launchQMsgBox(('No log Database', 'There is no log database ' +
-                                   'loaded.\n Please load one first.'))
+            path, exists = gs.getPath('log')
+            if not exists:
+                self.launchQMsgBox('No log Database', ('There is no log database ' +
+                                   'loaded.\nPlease load one first.'))
                 return
             
             # Launch dialog and get a file
@@ -464,6 +465,8 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         self.isisVersionTextbox.setText(settings['isis_version'])
         self.eventNameTextbox.setText(settings['event_name'])
         self.loadModelTab.setCurrentIndex(settings['cur_load_tab'])
+        if self.settings['singleload_column_width'] < 100:
+            self.settings['singleload_column_width'] = 100
 
     
     def saveSettings(self):

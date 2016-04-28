@@ -30,9 +30,30 @@ __DEV_MODE__ = True
     
     But you can put anything in there.
 '''
+import os
+
 path_holder = {}
 def setPath(key, path):
+    """Sets a path and converts to str in case of QString."""
     path_holder[key] = str(path)
+
+def getPath(key):
+    """Check if path variable sets and checks it exists if requested.
+    
+    Args:
+        key(str): key to the path variable in path_holder.
+    
+    Return:
+        tuple(str, bool): path and exist status. Path can be False if the key
+            is not found in path_holder.
+    """
+    path = False
+    exists = False
+    if key in path_holder.keys():
+        path = path_holder[key]
+    if not path == False:
+        exists = os.path.exists(path)
+    return path, exists
 
 
 
