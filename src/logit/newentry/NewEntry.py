@@ -37,6 +37,11 @@
      data in the single and multiple model load tables.
 
  UPDATES:
+     DR (28/04/2016):
+         Changed use of ToolSettings class to use of a dictionary instead. This
+         should cause less hassle when additional variables need to be added.
+         Also now shares the path_holder dict in globalsettings.py.
+         Now using the AWidget interface.
     
 
  TODO:

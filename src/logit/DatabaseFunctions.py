@@ -48,6 +48,9 @@
         database creation, update and delete functionality.
     DR - 22/03/2016:
         Updated database version to 6.
+    DR - 28/04/2016:
+        Updated database to version 7. Includes RUN_STATUS, MB and LOG_DIR in
+        the RUN table.
 
  TODO:
     The functions almost entirely use string replacement to create the

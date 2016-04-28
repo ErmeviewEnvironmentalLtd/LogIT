@@ -52,6 +52,8 @@
         new enough version of the database.
     DR - 04/03/2016:
         Added extractModel function.
+    DR - 28/04/2016:
+        Moved most of the vopyLogsToClipboard code into here from MainGui.
 
  TODO:
     AddedRows class may not be needed now that there is a bulk insert statement

@@ -67,7 +67,18 @@
          Removed log_type and selection combo box from interface. This is no
          longer needed because the loader accepts any type of model file.
     DR - 14/04/2016:
-         Moved the new entry tab into a seperate widget.
+         Moved the new entry tab into a separate widget.
+    DR - 28/04/2016:
+         Changed the way settings work to now use a combination of the 
+         LogitSettings class some global path variables (stored in 
+         globalsettings.py) and dictionaries for the other tools rather than
+         ToolSettings.
+         Updated Keyboard shortcuts and fixed a few.
+         Added Run Summary widget, cleaned up the class and moved most of the
+         zip up and copy logs stuff into Controller.py.
+         Added LOG_DIR, RUN_STATUS and MB to run table and added update Run
+         Status to context and settings menu. Also added Add to Run Summary
+         option to context menu.
 
   TODO:
      
@@ -294,15 +305,6 @@ class MainGui(QtGui.QMainWindow):
                             'datEntryViewTable', self.ui.datEntryViewTable))
         self._addWidgets()
     
-    
-    def keyPressEvent(self, event):
-        """
-        """
-        if type(event) == QtGui.QKeyEvent:
-            
-            if event.key() == "Ctrl+A": #QtCore.Qt.Key_F5:
-                print "YYYYYYYEEEEAAAHHHHHH"
-        
     
     def _addWidgets(self):
         """Adds tool widgets to the tabbed interface."""

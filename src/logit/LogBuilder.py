@@ -44,6 +44,9 @@
         Now returns logs as an AllLogs object rather than as a dictionary.
     DR - 29/02/2016:
         Major re-write of module to use updated version of the ship.
+    DR - 28/04/2016:
+        Added LOG_DIR, RUN_STATUS and MB to RUN table variables. Also obtains
+        the location of the log directory from the SHIP library. 
 
  TODO:
 
