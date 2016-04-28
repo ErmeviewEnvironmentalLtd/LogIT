@@ -9,6 +9,7 @@ from PyQt4.QtCore import Qt
 import LogIT
 import Controller
 import GuiStore
+import globalsettings as gs
 
 # Need to call this here to avoid some weird behaviour
 app = QApplication(sys.argv)
@@ -19,7 +20,9 @@ class LogitTest(unittest.TestCase):
     def setUp(self):
         """
         """
-        self.form = LogIT.MainGui(False, os.path.join(os.getcwd(), 'settings.logset'))
+        settings = LogIT.LogitSettings()
+        settings.cur_settings_path = os.path.join(os.getcwd(), 'settings.logset')
+        self.form = LogIT.MainGui(LogIT.LogitSettings())
         self.new_entry = self.form.widgets['New Entry']
         self.form._TEST_MODE = True
         self.new_entry._TEST_MODE = True
@@ -50,7 +53,7 @@ class LogitTest(unittest.TestCase):
         # blank database path over
         model_paths = self.new_entry.getMultipleModelPaths()
         self.assertListEqual(test_paths, model_paths, 'Input output model path equality fail')
-        self.form.settings.cur_log_path = self.blank_db
+        gs.setPath('log', self.blank_db)
         
         # Check that all goes well with adding the new entries
         errors = self.form._createMultipleLogEntry()
@@ -76,7 +79,7 @@ class LogitTest(unittest.TestCase):
         self.new_entry._updateMultipleLogSelection('addMultiModelButton', test_paths)
         model_paths = self.new_entry.getMultipleModelPaths()
         self.assertListEqual(test_paths, model_paths, 'Input output model path equality fail')
-        self.form.settings.cur_log_path = self.kenn_db
+        gs.setPath('log', self.kenn_db)
         
         # Make sure we get some errors for trying to load an existing model
         errors = self.form._createMultipleLogEntry()

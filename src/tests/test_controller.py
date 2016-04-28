@@ -18,7 +18,9 @@ class ControllerTest(unittest.TestCase):
     def setUp(self):
         """
         """
-        self.form = LogIT.MainGui(False, os.path.join(os.getcwd(), 'settings.logset'))
+        settings = LogIT.LogitSettings()
+        settings.cur_settings_path = os.path.join(os.getcwd(), 'settings.logset')
+        self.form = LogIT.MainGui(LogIT.LogitSettings())
         self.blank_db = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\databases\Blank_DB.logdb'
         self.testpath = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\Kennford\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
 

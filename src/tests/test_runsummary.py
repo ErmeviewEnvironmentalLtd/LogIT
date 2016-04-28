@@ -19,7 +19,9 @@ class RunSummaryTest(unittest.TestCase):
     def setUp(self):
         """
         """
-        self.form = LogIT.MainGui(False, os.path.join(os.getcwd(), 'settings.logset'))
+        settings = LogIT.LogitSettings()
+        settings.cur_settings_path = os.path.join(os.getcwd(), 'settings.logset')
+        self.form = LogIT.MainGui(LogIT.LogitSettings())
         self.summary = self.form.widgets['Run Summary']
         self.data_dir = r'C:\Some\Fake\path'
         self.test_dir = r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Run_Summary'

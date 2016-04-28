@@ -169,7 +169,7 @@ class MainGui(QtGui.QMainWindow):
         # Database tables that should be exported to Excel
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 'BC_DBASE']
             
-        icon_path = os.path.join(cur_settings_path, 'Logit_Logo.ico')
+        icon_path = os.path.join(self.settings.cur_settings_path, 'Logit_Logo.ico')
         QtGui.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow() # ~
         self.ui.setupUi(self)
@@ -848,9 +848,9 @@ class MainGui(QtGui.QMainWindow):
         """Takes all the files in the multiple model list, load them and add
         them to the database.        
         """
-        # Check that we have a database
-        if not self.checkDbLoaded(): return
         errors = GuiStore.ErrorHolder()
+        # Check that we have a database
+        if not self.checkDbLoaded(): return errors
 #         errors = Controller.checkDatabaseVersion(
 #                                         self.settings.cur_log_path, errors)
         errors = Controller.checkDatabaseVersion(gs.path_holder['log'], errors)

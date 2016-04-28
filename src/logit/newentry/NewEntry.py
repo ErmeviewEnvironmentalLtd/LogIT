@@ -122,16 +122,12 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
             dict - containing an entry for each variable with the key set as
                 the standard access name for that variable in the RUN table.
         """
-        self.settings['modeller'] = str(self.modellerTextbox.text()) 
-        self.settings['tuflow_model'] = str(self.tuflowVersionTextbox.text())
-        self.settings['isis_build'] = str(self.isisVersionTextbox.text())
-        self.settings['event_name'] = str(self.eventNameTextbox.text())
-#         input_vars = {'MODELLER': str(self.modellerTextbox.text()),
-#                       'TUFLOW_BUILD': str(self.tuflowVersionTextbox.text()),
-#                       'ISIS_BUILD': str(self.isisVersionTextbox.text()),
-#                       'EVENT_NAME': str(self.eventNameTextbox.text())
-#                      }
-#         return input_vars
+        input_vars = {'MODELLER': str(self.modellerTextbox.text()),
+                      'TUFLOW_BUILD': str(self.tuflowVersionTextbox.text()),
+                      'ISIS_BUILD': str(self.isisVersionTextbox.text()),
+                      'EVENT_NAME': str(self.eventNameTextbox.text())
+                     }
+        return input_vars
     
     
     def clearSingleModelTable(self):
@@ -283,10 +279,10 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 self.emit(QtCore.SIGNAL("statusUpdate"), 'Loaded model at: %s' % (open_path))
                 input_vars = self.getInputVars()
                 run = self.all_logs.getLogEntryContents('RUN', 0)
-                run['MODELLER'] = self.settings['modeller']
-                run['TUFLOW_BUILD'] = self.settings['tuflow_model']
-                run['ISIS_BUILD'] = self.settings['isis_build']
-                run['EVENT_NAME'] = self.settings['event_name']
+                run['MODELLER'] = self.settings['modeller'] = input_vars['MODELLER']
+                run['TUFLOW_BUILD'] = self.settings['tuflow_model'] = input_vars['TUFLOW_BUILD'] 
+                run['ISIS_BUILD'] = self.settings['isis_build'] = input_vars['ISIS_BUILD']
+                run['EVENT_NAME'] = self.settings['event_name'] = input_vars['EVENT_NAME'] 
 #                 run['MODELLER'] = input_vars['MODELLER']
 #                 run['TUFLOW_BUILD'] = input_vars['TUFLOW_BUILD'] 
 #                 run['ISIS_BUILD'] = input_vars['ISIS_BUILD'] 
@@ -459,7 +455,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         call_name = caller.objectName()
          
         if call_name == 'multiModelErrorCopyButton':
-            AWidget.copyToClipboard(self, self.multiModelLoadErrorTextEdit)
+            AWidget._copyToClipboard(self, self.multiModelLoadErrorTextEdit)
     
     
     def getSettingsAttrs(self):

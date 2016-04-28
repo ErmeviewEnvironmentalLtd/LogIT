@@ -21,8 +21,10 @@ class IefResolverTest(unittest.TestCase):
     def setUp(self):
         """
         """
-        self.form = LogIT.MainGui(False, os.path.join(os.getcwd(), 'settings.logset'))
-    
+        settings = LogIT.LogitSettings()
+        settings.cur_settings_path = os.path.join(os.getcwd(), 'settings.logset')
+        self.form = LogIT.MainGui(LogIT.LogitSettings())
+
     
     def test_autoResolvePath(self):
         """

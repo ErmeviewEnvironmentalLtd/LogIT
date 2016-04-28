@@ -109,18 +109,18 @@ class AWidget(QtGui.QWidget):
 #             if hasattr(self.settings, s):
 #                 setattr(self.settings, s, getattr(settings, s))
         for key, val in self.settings.iteritems():
-            if not key in settings.keys():
-                settings[key] = val
+            if key in settings.keys():
+                self.settings[key] = settings[key]
         
-        dead_keys = []
-        for key, val in settings.iteritems():
-            if not key in self.settings.keys():
-                dead_keys.append(key)
-        
-        for k in dead_keys:
-            del settings[k]
-        
-        self.settings = settings
+#         dead_keys = []
+#         for key, val in settings.iteritems():
+#             if not key in self.settings.keys():
+#                 dead_keys.append(key)
+#         
+#         for k in dead_keys:
+#             del settings[k]
+#         
+#         self.settings = settings
     
 
     def saveSettings(self):
