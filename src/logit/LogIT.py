@@ -571,16 +571,19 @@ class MainGui(QtGui.QMainWindow):
                 tcf = tcf.split(',')[0]
                 
                 # Find the latest values and update the RUN table
-                success, status, mb = Controller.getRunStatusInfo(row_dict['TCF_DIR'], tcf)
-                if not success:
+                results = Controller.getRunStatusInfo(row_dict['TCF_DIR'], tcf)
+                if not results[0] and not results[1]:
                     msg = "Failed to update status (ID=%s).\nIs the TCF_DIR correct and does in contain '_ TUFLOW Simulations.log' file?" % (row_dict['ID'])
-                    self.launchQMsgBox('Update Faile', msg)
+                    self.launchQMsgBox('Update Failed', msg)
+                elif not results[0]:
+                    msg = "Run is not yet complete(ID=%s).\nYou can only update status for a completed run" % (row_dict['ID'])
+                    self.launchQMsgBox('Update Failed', msg)
                 else:
                     del row_dict['TCF_DIR']
-                    row_dict['RUN_STATUS'] = status
-                    row_dict['MB'] = mb
+                    row_dict['RUN_STATUS'] = results[1]
+                    row_dict['MB'] = results[2]
                     table_obj.addRowValues(row_dict, row)
-                    self._saveViewChangesToDatabase(table_obj, row_dict['ID'])
+                    self._saveViewChangesToDatabase(table_obj, row)
                     self.loadModelLog()
             
             elif action == addToRunSummaryAction:
@@ -1228,7 +1231,7 @@ class MainGui(QtGui.QMainWindow):
         """Launch QtQMessageBox.
         """
         answer = QtGui.QMessageBox.question(self, title, message,
-                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, parent=self)
+                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
         if answer == QtGui.QMessageBox.No:
             return False
         else:

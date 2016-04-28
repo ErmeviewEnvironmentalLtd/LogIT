@@ -789,10 +789,12 @@ def getRunStatusInfo(tcf_dir, tcf_name):
         all_logs(AllLogs): 
     
     Return:
-        AllLogs - with the RUN dict RUN_STATUS and MB entries updated.
+        tuple(bool, str, str) - with the RUN dict RUN_STATUS and MB entries 
+            updated. Or if there was a failure: (False, False, False) for a
+            unfound path and (False, True, False) for an incomplete run.  
     """
     sim_file = os.path.join(tcf_dir, '_ TUFLOW Simulations.log')
-    if not os.path.exists(sim_file): return (False,)
+    if not os.path.exists(sim_file): return False, False, False
     
     tcf_line = None
     try:
@@ -810,7 +812,7 @@ def getRunStatusInfo(tcf_dir, tcf_name):
     except IOError:
         logger.warning('Could not load _TUFLOW Simulations.log file')
         
-    if tcf_line is None: return (False,)
+    if tcf_line is None: return False, True, False
     
     status = 'None'
     mb = 'None'

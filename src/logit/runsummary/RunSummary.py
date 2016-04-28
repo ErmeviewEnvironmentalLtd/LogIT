@@ -212,7 +212,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         open_path = os.path.join(self.data_dir, entry.row_values['GUID'] + '.dat') 
         log_store = self._loadFromCache(open_path)
         self.cur_guid = log_store.guid
-        if not entry.row_values['STATUS'] == 'Complete' and not entry.row_values['STATUS'] == 'Failed':
+        if not entry.row_values['STATUS'] == 'Complete' and not entry.row_values['STATUS'] == 'Failed' and not entry.row_values['STATUS'] == 'Interrupted':
             try:
                 self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
                 QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
@@ -250,14 +250,14 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             self.emit(QtCore.SIGNAL("setRange"), length)
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
             for i, log in enumerate(self.settings['log_summarys']):
-                self.emit(QtCore.SIGNAL("updateProgress"), i+1)
+                self.emit(QtCore.SIGNAL("updateProgress"), i)
                 self.emit(QtCore.SIGNAL("statusUpdate"), 'Updating row %s of %s' % (i+1, length))
                 open_path = os.path.join(self.data_dir, log.row_values['GUID'] + '.dat')
                 log_store = self._loadFromCache(open_path)
                 self.cur_guid = log_store.guid
                 
                 # If the run is finished don't read anymore
-                if log.row_values['STATUS'] == 'Complete' or log.row_values['STATUS'] == 'Failed':
+                if log.row_values['STATUS'] == 'Complete' or log.row_values['STATUS'] == 'Failed' or log.row_values['STATUS'] == 'Interrupted':
                     entry = log
                 else:
                     entry, log_store = self._loadLogContents(log, log.tlf_path, log_store)
@@ -288,12 +288,13 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         try:
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading from cache ...')
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-            self.runStatusTable.selectRow(row)
+#             self.runStatusTable.selectRow(row)
             guid = str(self.runStatusTable.item(row, 0).text())
             open_path = os.path.join(self.data_dir, guid + '.dat')
             log_store = self._loadFromCache(open_path)
             self.cur_guid = log_store.guid
-            self._updateGraph(log_store, '<span style="font-weight:bold">' + str(self.runStatusTable.item(row, 1).text()) + '</span>')
+            self._updateGraph(log_store, str(self.runStatusTable.item(row, 1).text()))
+            self._setActiveRowStyle(row)
         except Exception, err:
             logger.error('Problem loading cache')
             logger.exception(err)
@@ -302,6 +303,23 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             self.emit(QtCore.SIGNAL("updateProgress"), 0)
             QtGui.QApplication.restoreOverrideCursor()
     
+    
+    def _setActiveRowStyle(self, row_no):
+        """
+        """
+        row_count = self.runStatusTable.rowCount()
+        if row_no > row_count:
+            row_no = row_count
+        
+        for row in range(self.runStatusTable.rowCount()):
+            for col in range(self.runStatusTable.columnCount()-1):
+                
+                item = self.runStatusTable.item(row, col)
+                if row == row_no:
+                    item.setFont(QtGui.QFont('Arial', 9, QtGui.QFont.Bold))
+                else:
+                    item.setFont(QtGui.QFont('Arial', 9, QtGui.QFont.Normal))
+                    
 
     def loadIntoTable(self, tlf_path):
         """Loads a .tlf file and updates the table and graph with the contents.
@@ -383,21 +401,24 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                 finish_time = summary_obj.finish_time
                 if int(finish_time) == 0 and int(summary_obj.start_time) == 0:
                     finish_time = 1
-                prog.setMaximum(int(finish_time))
+                
+                # * 100 so if updates more frequently for low numbers
+                prog.setMaximum(int(finish_time * 100))
                 prog.setMinimum(int(summary_obj.start_time))
-                prog.setValue(int(val))
+                prog.setValue(int(val * 100))
                 self.runStatusTable.setCellWidget(row_no, col, prog)
             else:
                 item = QtGui.QTableWidgetItem(str(val))
                 item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled) 
-                if status == 'Failed':
+                if status == 'Failed' or status == 'Interrupted':
                     item.setBackgroundColor(QtGui.QColor(255, 204, 204)) # Light Red
                     item.setFont(QtGui.QFont('Arial', 9, QtGui.QFont.Bold))
                 elif status == 'Complete':
                     item.setBackgroundColor(QtGui.QColor(204, 255, 153)) # Light green
                     
                 self.runStatusTable.setItem(row_no, col, item)
-        self.runStatusTable.selectRow(row_no)
+        self._setActiveRowStyle(row_no)
+#         self.runStatusTable.selectRow(row_no)
           
     
     def getHoursFromDateStr(self, date_str):
@@ -477,8 +498,12 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                             end_time = float(line[22:34].strip())
                             self.emit(QtCore.SIGNAL("setRange"), math.fabs(end_time - start_time))
 
-                        elif '.. Running' in line:
+                        elif '..... Running' in line:
                             entry.in_results = True
+                        
+                        elif ': ERROR' in line:
+                            entry.error = True
+                            break
                 
                     # Then load the simulation data
                     else:
@@ -501,8 +526,11 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                             hours, t = self.getHoursFromDateStr(time)
                         except (ValueError, IndexError):
                             continue
-                        self.emit(QtCore.SIGNAL("updateProgress"), math.fabs(start_time + hours))
-                        
+                        if math.fabs(hours - entry.last_recorded_time) > 0.25:
+                            #temp = math.fabs(start_time + hours)
+                            self.emit(QtCore.SIGNAL("updateProgress"), math.fabs(start_time + hours))
+                            entry.last_recorded_time = hours
+                                                
                         # MB can be printed as ***** if greater than 100
                         mb = line[61:67].strip('%')
                         if '***' in mb:
@@ -515,14 +543,20 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                         
                         # Calc max ddv and mb (can be either a highest or
                         # lowest value so find absolute)
+                        record = False
                         if math.fabs(mb) > math.fabs(entry.row_values['MAX_MB']):
                             entry.row_values['MAX_MB'] = mb
+                            record = True
                         if math.fabs(ddv) > math.fabs(entry.row_values['MAX_DDV']):
                             entry.row_values['MAX_DDV'] = ddv
+                            record = True
                         
                         # Add values to store
                         s = t.second
                         if s % 10 == 0:
+                            record = True
+                        
+                        if record:
                             log_store.time_steps.append(hours)
                             log_store.mb.append(mb)
                             log_store.flow_in.append(Qin)
@@ -537,8 +571,18 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         if entry.finished:
             entry.row_values['COMPLETION'] = end_time
             entry.row_values['STATUS'] = 'Complete'
-        elif entry.interrupted or entry.error:
-            entry.row_values['COMPLETION'] = log_store.time_steps[-1]
+        elif entry.interrupted:
+            if not log_store.time_steps:
+                entry.row_values['COMPLETION'] = 0
+            else:
+                entry.row_values['COMPLETION'] = log_store.time_steps[-1]
+            entry.row_values['STATUS'] = 'Interrupted'
+        
+        elif entry.error:
+            if not log_store.time_steps:
+                entry.row_values['COMPLETION'] = 0
+            else:
+                entry.row_values['COMPLETION'] = log_store.time_steps[-1]
             entry.row_values['STATUS'] = 'Failed'
         else:
             if entry.in_results:
@@ -741,6 +785,7 @@ class LogSummaryEntry(object):
         self.interrupted = False
         self.error = False
         self.in_results = False
+        self.last_recorded_time = -9999
 
         
 
