@@ -274,6 +274,30 @@ v0.6.3-Beta:
       and outputs is there. Further tests will be added when bugs are identified. 
       These should help to avoid as many regressions in the future.
 
+v0.7.0-Beta:
+    - [Feature] Added Run Summary widget (Beta). You can load a Tuflow .tlf file and 
+      display the current status and key outputs summarised in a table and graph.
+      You can also add log entry into the summary table automatically by
+      right-clicking on the RUN table entry and selecting Add to Run Summary.
+    - [Feature] Added mass balance and run status columns to the to RUN table in
+      the log database. These will be automatically added to the look by reading
+      the '_TUFLOW Simulations.log' file when loading a model if it is complete. If
+      the run hasn't finished at the time of loading they will not be entered, but
+      can be added at any time by using the right-click menu in the RUN table and
+      selecting Update Status, or update the whole table under the Settings >> 
+      Tools menu.
+    - IMPORTANT: The new column's will require updating your databases.
+    - [BugFix] The Exit menu item and some keyboard shortcuts were broken. I think
+      these have all been fixed now.
+    - Implemented a proper standardised interface for all all widgets (tabs). This
+      has unfortunately meant that the settings loading has been broken and an
+      update will reset settings (not the log database). It will help make it more
+      stable in the future and easier to maintain though.
+    - Increased and improved the testing framework. Coverage is now pretty good.
+      All new features are being added by default and I'm making my way slowly
+      through the rest of the code base. Most of mission-critical stuff is now
+      tested, at least rudimentally.
+
 ##~##
 
 LICENSE

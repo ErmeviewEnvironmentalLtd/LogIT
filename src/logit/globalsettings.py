@@ -8,8 +8,8 @@
     easily get out of sync when harcoded into many places.
 """
 
-__VERSION__ = 'v0.6.3-Beta'
-__APPID__ = 'LogIT.0-5-Beta'
+__VERSION__ = 'v0.7.0-Beta'
+__APPID__ = 'LogIT.0-7-Beta'
 __SERVER_PATH__ = r'P:\04 IT\utils\beta\LogIT'
 __DOWNLOAD_FILENAME__ = 'Logit_'
 __VERSION_CHECKPATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\versioninfo.ver'

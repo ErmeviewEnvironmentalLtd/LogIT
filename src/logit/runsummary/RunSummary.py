@@ -78,14 +78,30 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         self.runStatusTable.customContextMenuRequested.connect(self._tablePopup)
         self.runStatusTable.cellClicked.connect(self._activateRow)
         self.updateAllStatusButton.clicked.connect(self._updateAllStatus)
+        # Keyboard shortcuts
+        self.updateAllStatusButton.setToolTip('Update all entries in table (Ctrl-G)')
+        self.updateAllStatusButton.setShortcut(QtCore.Qt.SHIFT + QtCore.Qt.Key_F5)
+        self.tlfAddButton.setToolTip('Add a new log file to the table (Ctrl-T)')
+        self.tlfAddButton.setShortcut("Ctrl+T")
         
         self.mMin = -10
         self.mMax = 10
         self.cur_guid = ''
     
     
+    def keyPressEvent(self, event):
+        """
+        """
+        if type(event) == QtGui.QKeyEvent:
+            
+            if event.key() == QtCore.Qt.Key_F5:
+                for i, entry in enumerate(self.settings['log_summarys']):
+                    if entry.row_values['GUID'] == self.cur_guid:
+                        self._updateEntry(entry, i)
+            
+    
     def _setupPlot(self):
-        """Setups up the main layou and viewboxes for the graph.
+        """Setups up the main layout and viewboxes for the graph.
         
         Creates three ViewBox's for the cross section, conveyance and mannings.
         All other data series are added to one of these.
@@ -150,63 +166,75 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         
         # Re-reads a file from scratch
         if action == reloadRunAction:
-            open_path = os.path.join(self.data_dir, log.row_values['GUID'] + '.dat')
-            log_store = self._loadFromCache(open_path)
-            self.cur_guid = log_store.guid
-            details = []
-            for i, log in enumerate(self.settings['log_summarys']):
-                if log.row_values['GUID'] == entry.row_values['GUID']: 
-                    details = [log.row_values['GUID'], log.row_values['NAME'],
-                              log.tlf_path, i]
-                    break
-
-            if details:
-                try:
-                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
-                    QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-                    entry = LogSummaryEntry(details[0], details[1], self.data_dir, details[2])
-                    entry, log_store = self._loadLogContents(entry, details[2])
-                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
-                    self._saveToCache(log_store, entry.stored_datapath)
-                    self._updateTableVals(entry, details[3])
-                    self._updateGraph(log_store, entry.row_values['NAME'])
-                    self.settings['log_summarys'][details[3]] = entry
-                except Exception, err:
-                    logger.error('Problem loading model: ' + err)
-                finally:
-                    self.emit(QtCore.SIGNAL("statusUpdate"), '')
-                    self.emit(QtCore.SIGNAL("setRange"), 1)
-                    self.emit(QtCore.SIGNAL("updateProgress"), 0)
-                    QtGui.QApplication.restoreOverrideCursor()
+            self._reloadRun(entry, row)
                 
         # Reads a file starting from the location of the last read.
         if action == updateEntryAction:
-            open_path = os.path.join(self.data_dir, log.row_values['GUID'] + '.dat')
-            log_store = self._loadFromCache(open_path)
-            self.cur_guid = log_store.guid
-            if not entry.row_values['STATUS'] == 'Complete' and not entry.row_values['STATUS'] == 'Failed':
-                try:
-                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
-                    QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-                    entry, log_store = self._loadLogContents(entry, entry.tlf_path, log_store)
-                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
-                    self._saveToCache(log_store, entry.stored_datapath)
-                except Exception, err:
-                    logger.error('Problem loading model: ' + err)
-                finally:
-                    self.emit(QtCore.SIGNAL("statusUpdate"), '')
-                    self.emit(QtCore.SIGNAL("setRange"), 1)
-                    self.emit(QtCore.SIGNAL("updateProgress"), 0)
-                    QtGui.QApplication.restoreOverrideCursor()
-            entry_i = -1
-            for i, log in enumerate(self.settings['log_summarys']):
-                if log.row_values['GUID'] == entry.row_values['GUID']: 
-                    entry_i = i
-                    break
-            if not entry_i == -1: self.settings['log_summarys'][entry_i] = entry
-                
-            self._updateTableVals(entry, row)
-            self._updateGraph(log_store, entry.row_values['NAME'])
+            self._updateEntry(entry, row)
+    
+    
+    def _reloadRun(self, entry, row):
+        """
+        """
+        open_path = os.path.join(self.data_dir, entry.row_values['GUID'] + '.dat')
+        log_store = self._loadFromCache(open_path)
+        self.cur_guid = log_store.guid
+        details = []
+        for i, log in enumerate(self.settings['log_summarys']):
+            if log.row_values['GUID'] == entry.row_values['GUID']: 
+                details = [log.row_values['GUID'], log.row_values['NAME'],
+                          log.tlf_path, i]
+                break
+
+        if details:
+            try:
+                self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
+                QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+                entry = LogSummaryEntry(details[0], details[1], self.data_dir, details[2])
+                entry, log_store = self._loadLogContents(entry, details[2])
+                self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
+                self._saveToCache(log_store, entry.stored_datapath)
+                self._updateTableVals(entry, details[3])
+                self._updateGraph(log_store, entry.row_values['NAME'])
+                self.settings['log_summarys'][details[3]] = entry
+            except Exception, err:
+                logger.error('Problem loading model: ' + err)
+            finally:
+                self.emit(QtCore.SIGNAL("statusUpdate"), '')
+                self.emit(QtCore.SIGNAL("setRange"), 1)
+                self.emit(QtCore.SIGNAL("updateProgress"), 0)
+                QtGui.QApplication.restoreOverrideCursor()
+        
+    
+    def _updateEntry(self, entry, row):
+        """
+        """
+        open_path = os.path.join(self.data_dir, entry.row_values['GUID'] + '.dat') 
+        log_store = self._loadFromCache(open_path)
+        self.cur_guid = log_store.guid
+        if not entry.row_values['STATUS'] == 'Complete' and not entry.row_values['STATUS'] == 'Failed':
+            try:
+                self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
+                QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+                entry, log_store = self._loadLogContents(entry, entry.tlf_path, log_store)
+                self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
+                self._saveToCache(log_store, entry.stored_datapath)
+            except Exception, err:
+                logger.error('Problem loading model: ' + err)
+            finally:
+                self.emit(QtCore.SIGNAL("statusUpdate"), '')
+                self.emit(QtCore.SIGNAL("setRange"), 1)
+                self.emit(QtCore.SIGNAL("updateProgress"), 0)
+                QtGui.QApplication.restoreOverrideCursor()
+        entry_i = -1
+        for i, log in enumerate(self.settings['log_summarys']):
+            if log.row_values['GUID'] == entry.row_values['GUID']: 
+                entry_i = i
+                break
+        if not entry_i == -1: self.settings['log_summarys'][entry_i] = entry
+            
+        self._updateTableVals(entry, row)
+        self._updateGraph(log_store, entry.row_values['NAME'])
         
   
     def _updateAllStatus(self):
@@ -217,20 +245,34 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         """
         logger.debug("Updating all status'")
         log_store = None
-        for i, log in enumerate(self.settings['log_summarys']):
-            open_path = os.path.join(self.data_dir, log.row_values['GUID'] + '.dat')
-            log_store = self._loadFromCache(open_path)
-            self.cur_guid = log_store.guid
-            
-            # If the run is finished don't read anymore
-            if log.row_values['STATUS'] == 'Complete' or log.row_values['STATUS'] == 'Failed':
-                entry = log
-            else:
-                entry, log_store = self._loadLogContents(log, log.tlf_path, log_store)
-                self._saveToCache(log_store, entry.stored_datapath)
+        length = len(self.settings['log_summarys'])
+        try:
+            self.emit(QtCore.SIGNAL("setRange"), length)
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+            for i, log in enumerate(self.settings['log_summarys']):
+                self.emit(QtCore.SIGNAL("updateProgress"), i+1)
+                self.emit(QtCore.SIGNAL("statusUpdate"), 'Updating row %s of %s' % (i+1, length))
+                open_path = os.path.join(self.data_dir, log.row_values['GUID'] + '.dat')
+                log_store = self._loadFromCache(open_path)
+                self.cur_guid = log_store.guid
+                
+                # If the run is finished don't read anymore
+                if log.row_values['STATUS'] == 'Complete' or log.row_values['STATUS'] == 'Failed':
+                    entry = log
+                else:
+                    entry, log_store = self._loadLogContents(log, log.tlf_path, log_store)
+                    self._saveToCache(log_store, entry.stored_datapath)
 
-            self._updateTableVals(entry, i)
-            self.settings['log_summarys'][i] = entry
+                self._updateTableVals(entry, i)
+                self.settings['log_summarys'][i] = entry
+
+        except Exception, err:
+            logger.error('Problem Updating one of the models: ' + err)
+        finally:
+            self.emit(QtCore.SIGNAL("statusUpdate"), '')
+            self.emit(QtCore.SIGNAL("setRange"), 1)
+            self.emit(QtCore.SIGNAL("updateProgress"), 0)
+            QtGui.QApplication.restoreOverrideCursor()
             
         if not log_store is None: self._updateGraph(log_store, entry.row_values['NAME'])
         

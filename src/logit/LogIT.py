@@ -187,7 +187,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
         self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdatesTrue)
         self.ui.actionResolveIefFiles.triggered.connect(self._resolveIefs)
-        self.ui.actionExit.triggered.connect(self.closeEvent)
+        self.ui.actionExit.triggered.connect(self.close)
         self.ui.actionUpdateAllRunStatus.triggered.connect(self._updateAllRowStatus)
         
         # Keyboard shortcuts
@@ -203,6 +203,18 @@ class MainGui(QtGui.QMainWindow):
         # Export to Excel
         self.ui.actionExportToExcel.setToolTip('Export Database to Excel Spreadsheet (*.xls)')
         self.ui.actionExportToExcel.setShortcut("Ctrl+E")
+        # Zip up and copy logs
+        self.ui.actionCopyLogsToClipboard.setToolTip('Zip up and copy log files to clipboard')
+        self.ui.actionCopyLogsToClipboard.setShortcut("Ctrl+Z")
+        # Reload log database
+        self.ui.actionReloadDatabase.setToolTip('Reload the log database and tables')
+        self.ui.actionReloadDatabase.setShortcut("Ctrl+R")
+        # Run Ief resolver tool
+        self.ui.actionResolveIefFiles.setToolTip('Run the Ief Resolver tool')
+        self.ui.actionResolveIefFiles.setShortcut("Ctrl+I")
+        # Update all Run status information
+        self.ui.actionUpdateAllRunStatus.setToolTip('Update all run status information')
+        self.ui.actionUpdateAllRunStatus.setShortcut("Ctrl+U")
         
         # Set the context menu and connect the tables
         self.ui.runEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -281,6 +293,15 @@ class MainGui(QtGui.QMainWindow):
         self.view_tables.addTable(GuiStore.TableWidget('DAT', 
                             'datEntryViewTable', self.ui.datEntryViewTable))
         self._addWidgets()
+    
+    
+    def keyPressEvent(self, event):
+        """
+        """
+        if type(event) == QtGui.QKeyEvent:
+            
+            if event.key() == "Ctrl+A": #QtCore.Qt.Key_F5:
+                print "YYYYYYYEEEEAAAHHHHHH"
         
     
     def _addWidgets(self):
@@ -293,6 +314,12 @@ class MainGui(QtGui.QMainWindow):
         self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), new_entry, new_entry.tool_name)
         self.widgets[new_entry.tool_name].addSingleLogEntryButton.clicked.connect(self._createLogEntry)
         self.widgets[new_entry.tool_name].addMultiLogEntryButton.clicked.connect(self._createMultipleLogEntry)
+        # Update all Run status information
+        self.widgets[new_entry.tool_name].addSingleLogEntryButton.setToolTip('Add model details to log database (Ctrl-A)')
+        self.widgets[new_entry.tool_name].addSingleLogEntryButton.setShortcut("Ctrl+A")
+        self.widgets[new_entry.tool_name].addMultiLogEntryButton.setToolTip('Add model details to log database (Alt-A)')
+        self.widgets[new_entry.tool_name].addMultiLogEntryButton.setShortcut("Alt+A")
+        
         
         # Model Extractor
         model_extractor = ModelExtractor.ModelExtractor_UI(cur_location)

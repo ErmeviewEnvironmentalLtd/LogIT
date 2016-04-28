@@ -113,8 +113,15 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         self.removeMultiModelButton.clicked.connect(self._updateMultipleLogSelection)
         self.multiModelErrorClearButton.clicked.connect(self._clearMultiErrorText)
         self.multiModelErrorCopyButton.clicked.connect(self._copyToClipboard)
-        
+        # Keyboard shortcuts
+        self.loadModelButton.setToolTip('Load a new model into table (Ctrl-L)')
+        self.loadModelButton.setShortcut("Ctrl+L")
+        self.addMultiModelButton.setToolTip('Add model to multiple model list (Ctrl-M)')
+        self.addMultiModelButton.setShortcut("Ctrl+M")
+        self.removeMultiModelButton.setToolTip('Remove selected models from multiple model list (Ctrl-X)')
+        self.removeMultiModelButton.setShortcut("Ctrl+X")
     
+
     def getInputVars(self):
         """Get the main user supplied variables from the input boxes.
         
