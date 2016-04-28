@@ -57,7 +57,7 @@ from AWidget import AWidget
 import RunSummary_Widget as summarywidget
 logger.debug('RunSummary_Widget import complete')
 # from app_metrics import utils as applog
-# import globalsettings as gs
+import globalsettings as gs
 
 
 class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
@@ -524,6 +524,8 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
 #             path = self.settings.cur_modellog_path
         if not self.settings['tlf_path'] == '':
             path = self.settings['tlf_path']
+        elif 'model' in gs.path_holder.keys():
+            path = gs.path_holder['model']
         d = MyFileDialogs()
         open_path = d.openFileDialog(path, file_types='Tuflow log file (*.tlf)')
         if open_path == 'False' or open_path == False:

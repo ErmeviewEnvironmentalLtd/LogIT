@@ -999,5 +999,31 @@ def extractModel(cur_settings_path, run_row, errors):
     return errors, input_path
 
 
+def prepLogsForCopy(log_path):
+    """
+    """
+    zip_log = os.path.join(log_path, '..', 'logs.zip')
+        
+    # Remove any existing zip file
+    if os.path.exists(zip_log):
+        try:
+            os.remove(zip_log)
+        except:
+            logger.warning('Unable to delete existing log zip file')
+    
+    # Create a zipfile handler
+    zipper = zipfile.ZipFile(zip_log, 'w', zipfile.ZIP_DEFLATED)
+    
+    # Grab all of the log files into it
+    for roots, dir, files in os.walk(log_path):
+        for f in files:
+            write_path = os.path.join(log_path, f)
+            zipper.write(write_path, os.path.basename(write_path))
+    zipper.close()
+    
+    return zip_log
+    
+
+
 
     
