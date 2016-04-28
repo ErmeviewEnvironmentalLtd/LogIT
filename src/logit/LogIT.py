@@ -90,6 +90,13 @@ import os
 import sys
 import cPickle
 import logging
+
+# Stupid imports to make pyinstaller work with pyqtgraph
+import six
+import packaging
+import packaging.version
+import packaging.specifiers
+import packaging.requirements
  
 # Setup the logging protocols. Try and create a directory to put the logs into.
 # If that fails we call the console only logger, if not detailed logs will be
