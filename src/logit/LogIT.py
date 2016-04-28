@@ -590,7 +590,7 @@ class MainGui(QtGui.QMainWindow):
                     file_types = 'TCF(*.tcf)'
                     lookup_name = 'TCF_DIR'
                     
-                d = MyFileDialogs()
+                d = MyFileDialogs(parent=self)
                 open_path = str(d.openFileDialog(p, file_types=file_types, 
                                                  multi_file=False))
                     
@@ -850,7 +850,11 @@ class MainGui(QtGui.QMainWindow):
         """
         errors = GuiStore.ErrorHolder()
         # Check that we have a database
-        if not self.checkDbLoaded(): return errors
+        if not self.checkDbLoaded(): 
+            if self._TEST_MODE: return errors
+            else:
+                self.launchQMsgBox('No Database', 'Please load a log database first')
+                return
 #         errors = Controller.checkDatabaseVersion(
 #                                         self.settings.cur_log_path, errors)
         errors = Controller.checkDatabaseVersion(gs.path_holder['log'], errors)
@@ -1016,7 +1020,7 @@ class MainGui(QtGui.QMainWindow):
     def _saveSetup(self):
         """Write the current LogIT setup to file.
         """
-        d = MyFileDialogs()
+        d = MyFileDialogs(parent=self)
         save_path = d.saveFileDialog(path=os.path.split(gs.path_holder['log'])[0], 
                                      file_types='Log Settings (*.logset)')
         
@@ -1032,9 +1036,11 @@ class MainGui(QtGui.QMainWindow):
 #         settings, errors = Controller.loadSetup(
 #                                         self.settings.cur_settings_path, 
 #                                         self.settings.cur_log_path,
-#                                         errors)
-        settings, errors = Controller.loadSetup(self.settings.cur_settings_path, 
-                                                gs.path_holder['log'], errors)
+#                                         errors)d = MyFileDialogs()
+        d = MyFileDialogs(parent=self)
+        open_path = d.openFileDialog(self.settings.cur_settings_path, 
+                        file_types='Log Settings (*.logset)')
+        settings, errors = Controller.loadSetup(open_path, errors)
          
         if settings == None:
             if errors.has_errors:
@@ -1058,18 +1064,19 @@ class MainGui(QtGui.QMainWindow):
         """Checks if the databse at the given path is compatible with the
         latest version of LogIT.
         """
-        d = MyFileDialogs()
+        d = MyFileDialogs(parent=self)
         if not self.checkDbLoaded():
 #             open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
 #                                         file_types='LogIT database(*.logdb)'))
-            open_path = str(d.openFileDialog(path=gs.path_holder['log'], 
-                                        file_types='LogIT database(*.logdb)'))
+            open_path = d.openFileDialog(path=gs.path_holder['log'], 
+                                        file_types='LogIT database(*.logdb)')
         else:
-            open_path = str(d.openFileDialog(path=self.settings.cur_settings_path, 
-                                        file_types='LogIT database(*.logdb)'))
+            open_path = d.openFileDialog(path=self.settings.cur_settings_path, 
+                                        file_types='LogIT database(*.logdb)')
         # User cancel return
         if open_path == False:
             return None
+        open_path = str(open_path)
         errors = GuiStore.ErrorHolder()
         errors = Controller.updateDatabaseVersion(open_path, errors)
         if errors.has_errors:
@@ -1106,7 +1113,7 @@ class MainGui(QtGui.QMainWindow):
 #         else:
 #             p = self.settings.cur_settings_path
             
-        d = MyFileDialogs()
+        d = MyFileDialogs(parent=self)
         save_path = d.saveFileDialog(path=p, file_types='LogIT database(*.logdb)')
         
         if not save_path == False:
@@ -1134,7 +1141,7 @@ class MainGui(QtGui.QMainWindow):
     def _loadDatabaseFromUser(self):
         """Load database chosen by user in dialog.
         """
-        d = MyFileDialogs()
+        d = MyFileDialogs(parent=self)
         if self.checkDbLoaded(False):
 #             open_path = str(d.openFileDialog(path=self.settings.cur_log_path, 
 #                                         file_types='LogIT database(*.logdb)'))
@@ -1170,7 +1177,7 @@ class MainGui(QtGui.QMainWindow):
         if self.checkDbLoaded():
             p = gs.path_holder['log']
             if 'export' in gs.path_holder.keys(): p = gs.path_holder['export']
-            d = MyFileDialogs()
+            d = MyFileDialogs(parent=self)
 #             save_path = d.saveFileDialog(path=os.path.split(
 #                                         self.settings.cur_log_path)[0], 
 #                                         file_types='Excel File (*.xls)')
@@ -1262,9 +1269,14 @@ class MainGui(QtGui.QMainWindow):
 #         if not self.settings.ief_resolver_path == '':
 #             p = self.settings.ief_resolver_path
 
-        ief_paths = self._getModelFileDialog(multi_paths=True, path=p)
-        if ief_paths == False or ief_paths == 'False' or ief_paths == []:
+#         ief_paths = self._getModelFileDialog(multi_paths=True, path=p)
+        d = MyFileDialogs(parent=self)
+        ief_paths = d.openFileDialog(path=p, 
+                file_types='ISIS/TUFLOW (*.ief *.IEF)', multi_file=True)
+        if ief_paths == False:
             return
+        
+        # Convert QString's to str's
         file_list = []
         for i in ief_paths:
             file_list.append(str(i))
@@ -1338,7 +1350,7 @@ class MainGui(QtGui.QMainWindow):
         """Launch QtQMessageBox.
         """
         answer = QtGui.QMessageBox.question(self, title, message,
-                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No, parent=self)
         if answer == QtGui.QMessageBox.No:
             return False
         else:
@@ -1350,7 +1362,8 @@ class MainGui(QtGui.QMainWindow):
         """
         if type == 'warning':
             QtGui.QMessageBox.warning(self, title, message)
-        
+        elif type == 'critical':
+            QtGui.QMessageBox.critical(self, title, message)
         elif type == 'info':
             QtGui.QMessageBox.information(self, title, message)
     

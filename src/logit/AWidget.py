@@ -178,19 +178,19 @@ class AWidget(QtGui.QWidget):
     def launchQMsgBox(self, title, message, type='warning'):
         """Launch a QMessageBox
         """
-        if type == 'critical':
-            QtGui.QMessageBox.critical(self, title, message)
         if type == 'warning':
             QtGui.QMessageBox.warning(self, title, message)
+        elif type == 'critical':
+            QtGui.QMessageBox.critical(self, title, message)
         elif type == 'info':
             QtGui.QMessageBox.information(self, title, message)
             
             
-    def launchQtQBox(self, title, message):
+    def launchQtQBox(self, title, message, parent=None):
         """Launch QtQMessageBox.
         """
         answer = QtGui.QMessageBox.question(self, title, message,
-                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+                                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No) 
         if answer == QtGui.QMessageBox.No:
             return False
         else:

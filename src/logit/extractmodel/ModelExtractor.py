@@ -108,7 +108,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         else:
             path = self.cur_location
 
-        d = MyFileDialogs()
+        d = MyFileDialogs(parent=self)
         open_path = d.openFileDialog(path, file_types='Ief/Tcf File(*.ief;*tcf)')
         if open_path == 'False' or open_path == False:
             return
@@ -129,7 +129,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         else:
             path = self.cur_location
 
-        d = MyFileDialogs()
+        d = MyFileDialogs(parent=self)
         dir_path = str(d.dirFileDialog(path)) 
         if dir_path == 'False' or dir_path == False:
             return
@@ -138,7 +138,9 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
 #         if not self.settings.cur_model_path == '':
         if 'model' in gs.path_holder.keys():
             if dir_path == os.path.normpath(os.path.split(gs.path_holder['model'])[0]):
-                message = 'Output directory might matche model directory.\n This may lead to overwritten files.\n Are you sure?'
+                message = ('It looks like the output directory matches the ' +
+                           'model directory.\n This can lead to files being ' +
+                           'overwritten.\n Are you sure?')
                 response = self.launchQtQBox('Directory Match', message)
                 if response == False:
                     return

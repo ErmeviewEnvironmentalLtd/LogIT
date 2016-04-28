@@ -851,21 +851,17 @@ def updateDatabaseVersion(db_path, errors):
         return errors
     
     
-def loadSetup(cur_settings_path, errors):
+def loadSetup(settings_path, errors):
     """Load LogIT setup from file.
     """
-    d = MyFileDialogs()
-    open_path = d.openFileDialog(cur_settings_path, 
-                        file_types='Log Settings (*.logset)')
-    
     cur_settings = None
-    if open_path == False:
+    if settings_path == False:
         return cur_settings, errors
     try:
         # Load the settings dictionary
-        open_path = str(open_path)
+        open_path = str(settings_path)
         cur_settings = cPickle.load(open(open_path, "rb"))
-        cur_settings.cur_settings_path = cur_settings_path
+        cur_settings.cur_settings_path = settings_path
         return cur_settings, errors
     except:
         errors.addError(errors.SETTINGS_LOAD, msg_add='from:\n%s' % (open_path),

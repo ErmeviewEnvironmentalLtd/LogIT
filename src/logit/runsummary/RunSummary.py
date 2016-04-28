@@ -273,7 +273,8 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         """
         logger.debug('Load into table clicked')
         if not os.path.exists(tlf_path):
-            self.launchQMsgBox('Nonexistant tlf', 'TLF file does not exist at:\n' + tlf_path)
+            self.launchQMsgBox(('Nonexistant tlf', 'TLF file does not exist ' +
+                                'at:\n' + tlf_path))
             return
         for log in self.settings['log_summarys']:
             if log.tlf_path == tlf_path:
@@ -526,7 +527,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             path = self.settings['tlf_path']
         elif 'model' in gs.path_holder.keys():
             path = gs.path_holder['model']
-        d = MyFileDialogs()
+        d = MyFileDialogs(parent=self)
         open_path = d.openFileDialog(path, file_types='Tuflow log file (*.tlf)')
         if open_path == 'False' or open_path == False:
             return

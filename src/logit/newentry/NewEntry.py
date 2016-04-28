@@ -227,14 +227,15 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         else:
 #             if not os.path.exists(self.cur_log_path):
             if not 'log' in gs.path_holder.keys():
-                self.launchQMsgBox('No log Database', 'There is no log database loaded.\n Please load one first.')
+                self.launchQMsgBox(('No log Database', 'There is no log database ' +
+                                   'loaded.\n Please load one first.'))
                 return
             
             # Launch dialog and get a file
             chosen_path = self.cur_location
             if 'model' in gs.path_holder.keys():
                 chosen_path = gs.path_holder['model']
-            d = MyFileDialogs()
+            d = MyFileDialogs(parent=self)
             open_path = d.openFileDialog(path=chosen_path, 
                                          file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)', 
                                          multi_file=False)
@@ -273,8 +274,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                         gs.path_holder['log'], self.all_logs, entry_dict, errors)
 
             if errors.has_errors:
-                self.launchQMsgBox("Load Error", 
-                                   errors.formatErrors())
+                self.launchQMsgBox("Load Error", errors.formatErrors())
             else:
                 self.emit(QtCore.SIGNAL("statusUpdate"), 'Loaded model at: %s' % (open_path))
                 input_vars = self.getInputVars()
@@ -381,7 +381,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 if 'model' in gs.path_holder.keys():
                     chosen_path = gs.path_holder['model']
                 
-                d = MyFileDialogs()
+                d = MyFileDialogs(parent=self)
                 open_paths = d.openFileDialog(path=chosen_path, 
                     file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)',
                     multi_file=True)
