@@ -382,7 +382,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 chosen_path = self.cur_location
 #                 if not self.settings.cur_model_path == '':
 #                     chosen_path = self.settings.cur_model_path
-                if not 'model' in gs.path_holder.keys():
+                if 'model' in gs.path_holder.keys():
                     chosen_path = gs.path_holder['model']
                 
                 d = MyFileDialogs()

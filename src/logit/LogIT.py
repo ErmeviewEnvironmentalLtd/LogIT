@@ -158,10 +158,10 @@ class MainGui(QtGui.QMainWindow):
         """        
         # Setup some variables
         self._TEST_MODE = False
-        if not cur_settings == False:
-            self.settings = cur_settings
-        else:
-            self.settings = LogitSettings()
+#         if not cur_settings == False:
+        self.settings = cur_settings
+#         else:
+#             self.settings = LogitSettings()
         
         self.settings.cur_settings_path = cur_settings_path
         self.model_log = None
@@ -332,7 +332,7 @@ class MainGui(QtGui.QMainWindow):
                 logger.info('No loadSettings() found for %s' % (w.tool_name))
 
         # Do this here so it accounts for all the tabs
-        self.ui.tabWidget.setCurrentIndex(self.settings.cur_tab)
+        self.ui.tabWidget.setCurrentIndex(self.settings.main['cur_tab'])
     
     
     def _checkUpdatesFalse(self):
@@ -996,7 +996,7 @@ class MainGui(QtGui.QMainWindow):
         logger.info('Closing program')
         logger.info('Saving user settings to: ' + save_path)
         try:
-            self.settings.cur_tab = self.ui.tabWidget.currentIndex()
+            self.settings.main['cur_tab'] = self.ui.tabWidget.currentIndex()
             self.settings.path_holder = gs.path_holder
             self._getColumnWidths()
             _writeWidgetSettings()
@@ -1373,11 +1373,8 @@ class MainGui(QtGui.QMainWindow):
     
     
     def _copyLogs(self):
-        """Zip up all of the log file and copy them to the system clipbaord.
-        """
+        """Zip up all of the log file and copy them to the system clipbaord."""
         zip_log = Controller.prepLogsForCopy(log_path)
-        
-        # Copy the logs zip file to clipboard
         data = QtCore.QMimeData()
         url = QtCore.QUrl.fromLocalFile(zip_log)
         data.setUrls([url])
@@ -1387,10 +1384,10 @@ class MainGui(QtGui.QMainWindow):
     def _getColumnWidths(self):
         """Store the current column widths for the view tables."""
         for key, table in self.view_tables.tables.iteritems():
-            self.settings.column_widths[key] = []
+            self.settings.main['column_widths'][key] = []
             count = table.ref.columnCount()
             for i in range(0, count):
-                self.settings.column_widths[key].append(table.ref.columnWidth(i))
+                self.settings.main['column_widths'][key].append(table.ref.columnWidth(i))
 
 
     def _setColumnWidths(self):
@@ -1398,9 +1395,9 @@ class MainGui(QtGui.QMainWindow):
         for key, table in self.view_tables.tables.iteritems():
             count = table.ref.columnCount()
             for i in range(0, count):
-                if key in self.settings.column_widths.keys():
+                if key in self.settings.main['column_widths'].keys():
                     try:
-                        table.ref.setColumnWidth(i, self.settings.column_widths[key][i])
+                        table.ref.setColumnWidth(i, self.settings.main['column_widths'][key][i])
                     except IndexError:
                         pass # If we've added new columns since save state
     
@@ -1414,9 +1411,9 @@ class MainGui(QtGui.QMainWindow):
         """Show the release notes for this version to the user."""
         if gs.__DEV_MODE__ == True: return
         
-        if self.settings.release_notes_version == gs.__VERSION__: return
+        if self.settings.main['release_notes_version'] == gs.__VERSION__: return
         
-        self.settings.release_notes_version = gs.__VERSION__
+        self.settings.main['release_notes_version'] = gs.__VERSION__
         
         try:
             version_dialog = GuiStore.VersionInfoDialog(
@@ -1431,7 +1428,7 @@ class MainGui(QtGui.QMainWindow):
         
         except Exception, err:
             logger.error('Could not show release notes' + str(err))
-            self.settings.release_notes_version = ''
+            self.settings.main['release_notes_version'] = ''
         
     
     ''' 
@@ -1462,8 +1459,16 @@ class LogitSettings(object):
         """Constructor.
         """
         self.path_holder = {}
-#         self.cur_log_path = ''
+        self.tool_settings = {}
+        self.main = self.getMainToolSettings()
         self.cur_settings_path = ''
+        self.logging_level = 0
+
+#         self.release_notes_version = ''
+#         self.column_widths = {}
+#         self.cur_tab = 0
+
+#         self.cur_log_path = ''
 #         self.last_model_directory = ''
 #         self.modeller = ''
 #         self.tuflow_version = ''
@@ -1473,12 +1478,44 @@ class LogitSettings(object):
 #         self.log_export_path = ''
 #         self.ief_resolver_path = ''
 #         self.cur_model_type = 0
-        self.logging_level = 0
-        self.column_widths = {}
-        self.tool_settings = {}
-        self.cur_tab = 0
 #         self.cur_load_tab = 0
-        self.release_notes_version = ''
+    
+    def getMainToolSettings(self):
+        """"""
+        return {'release_notes_version': '', 'column_widths': {}, 'cur_tab': 0}
+    
+    
+    def copySettings(self, existing_settings):
+        """Update this class with another LogitSettings object.
+        
+        Set the class members equal to those of the loaded settings, ignoring
+        any that are not longer user and adding any new ones. Then set the
+        main dict values with the loaded settings if they exist in the current
+        setup as well.
+        
+        Args:
+            existing_settings(LogitSettings): 
+        """
+        settings_attrs = [s for s in dir(self) if not s.startswith('__') and not s == 'copySettings' and not s == 'getMainToolSettings']
+        for s in settings_attrs:
+            if hasattr(existing_settings, s):
+                setattr(self, s, getattr(existing_settings, s))
+        
+        if hasattr(existing_settings, 'main'):
+            main_dict = existing_settings.main
+            for key, val in self.main.iteritems():
+                if key in main_dict.keys():
+                    self.main[key] = main_dict[key]
+        
+#         dead_settings = []
+#         for key, val in main_dict.iteritems():
+#             if not key in self.main.keys():
+#                 dead_settings.append(key)
+#         
+#         for d in dead_settings:
+#             del main_dict[key]
+        
+#         self.main = main_dict
                              
         
         
@@ -1490,6 +1527,7 @@ def main():
      
     cur_location = os.getcwd()
     settings_path = os.path.join(cur_location, 'settings.logset')
+    new_set = LogitSettings()
  
     try:
         # Load the settings dictionary
@@ -1497,16 +1535,20 @@ def main():
         
         # Check that this version of the settings has all the necessary
         # attributes, and if not add the missing ones
-        temp_set = LogitSettings()
-        settings_attrs = [s for s in dir(temp_set) if not s.startswith('__')]
-        for s in settings_attrs:
-            if not hasattr(cur_settings, s):
-                setattr(cur_settings, s, getattr(temp_set, s))
-        cur_settings.cur_settings_path = settings_path 
+#         new_set = LogitSettings()
+#         settings_attrs = [s for s in dir(new_set) if not s.startswith('__')]
+#         for s in settings_attrs:
+#             if hasattr(cur_settings, s):
+#                 setattr(new_set, s, getattr(cur_settings, s))
+        new_set.copySettings(cur_settings)
+        cur_settings = new_set
+#         cur_settings.cur_settings_path = settings_path 
 
     except:
-        cur_settings = False
+#         cur_settings = LogitSettings()
         print 'Unable to load user defined settings'
+    cur_settings = new_set
+    cur_settings.cur_settings_path = settings_path
          
     # Launch the user interface.
     app = QtGui.QApplication(sys.argv)
