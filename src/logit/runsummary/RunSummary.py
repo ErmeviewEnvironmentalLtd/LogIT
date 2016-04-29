@@ -198,7 +198,8 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                 self._updateGraph(log_store, entry.row_values['NAME'])
                 self.settings['log_summarys'][details[3]] = entry
             except Exception, err:
-                logger.error('Problem loading model: ' + err)
+                logger.error('Problem loading model')
+                logger.exception(err)
             finally:
                 self.emit(QtCore.SIGNAL("statusUpdate"), '')
                 self.emit(QtCore.SIGNAL("setRange"), 1)
@@ -437,18 +438,20 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         Raises:
             ValueError: if date_str is not in the expected format.
         """
+        if '24:00:00' in date_str: 
+            i=0
         time = None
         if date_str[1] == ':': date_str = '0' + date_str
         try:
-            time = datetime.datetime.strptime(date_str, "%H:%M:%S")
+            time = date_str.split(':')
+            hours = float(time[0])
+            minutes = float(time[1])
+            seconds = float(time[2])
         except ValueError:
             raise
-        hours_in_mins = float(time.hour) * 60
-        hours = (hours_in_mins + float(time.minute)) / 60
-#         hours_in_secs = float(time.hour) * 60 * 60
-#         mins_in_secs = float(time.minute) * 60
-#         hours = (hours_in_secs + mins_in_secs + float(time.second)) / 60 / 60
-        return hours, time
+        hours_in_mins = hours * 60
+        hours = (hours_in_mins + minutes) / 60
+        return hours, minutes, seconds
         
         
     def _loadLogContents(self, entry, tlf_path, log_store=None):
@@ -501,7 +504,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                         elif '..... Running' in line:
                             entry.in_results = True
                         
-                        elif ': ERROR' in line:
+                        elif line.startswith('ERROR') or ': ERROR' in line:
                             entry.error = True
                             break
                 
@@ -522,8 +525,8 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                         
                         # Convert time to total in hours
                         try:
-                            time = line[8:16].strip()
-                            hours, t = self.getHoursFromDateStr(time)
+                            time = line[7:16].strip()
+                            hours, minutes, seconds = self.getHoursFromDateStr(time)
                         except (ValueError, IndexError):
                             continue
                         if math.fabs(hours - entry.last_recorded_time) > 0.25:
@@ -552,8 +555,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                             record = True
                         
                         # Add values to store
-                        s = t.second
-                        if s % 10 == 0:
+                        if seconds % 10 == 0:
                             record = True
                         
                         if record:
