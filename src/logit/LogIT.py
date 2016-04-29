@@ -480,11 +480,14 @@ class MainGui(QtGui.QMainWindow):
         has_extras = False
         if sender == self.view_tables.tables['RUN'].name:
             deleteAllRowAction = menu.addAction("Delete Associated Entries")
-            updateIefRowAction = menu.addAction("Update Ief Location")
-            updateTcfRowAction = menu.addAction("Update Tcf Location")
-            extractRowAction = menu.addAction("Extract Model")
+            paths_menu = menu.addMenu('Update Paths')
+            updateIefRowAction = paths_menu.addAction("Update Ief Location")
+            updateTcfRowAction = paths_menu.addAction("Update Tcf Location")
+            updateLogRowAction = paths_menu.addAction("Update Logs Location")
             updateStatusAction = menu.addAction("Update Status")
-            addToRunSummaryAction = menu.addAction("Add to Run Summary")
+            tools_menu = menu.addMenu('Send to Tool')
+            extractRowAction = tools_menu.addAction("Extract Model")
+            addToRunSummaryAction = tools_menu.addAction("Add to Run Summary")
             has_extras = True
         
         # lookup the table and database table name
@@ -516,7 +519,9 @@ class MainGui(QtGui.QMainWindow):
             if action == deleteAllRowAction:
                 self._deleteRowFromDatabase(table_obj, True)
             
+            # Send model path to ModelExtractor
             elif action == extractRowAction:
+                if not 'Model Extractor' in self.widgets.keys(): return
                 errors = GuiStore.ErrorHolder()
                 row = table_obj.currentRow()
                 row_dict = table_obj.getValues(row=row, names=['ID', 'IEF', 'IEF_DIR', 'TCF', 'TCF_DIR'])
@@ -532,7 +537,26 @@ class MainGui(QtGui.QMainWindow):
                     self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
                     self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
             
-            elif action == updateIefRowAction or action == updateTcfRowAction:
+            # Send log path to RunSummary tool
+            elif action == addToRunSummaryAction:
+                if not 'Run Summary' in self.widgets.keys(): return
+                row = table_obj.currentRow()
+                row_dict = table_obj.getValues(row=row, names=['ID', 'LOG_DIR', 'TCF'])
+                tcf = row_dict['TCF'][1:-1]
+                tcf = tcf.split(',')[0]
+                tcf_name = os.path.splitext(tcf)[0]
+                tlf_file = os.path.join(row_dict['LOG_DIR'], tcf_name + '.tlf')
+                
+                if os.path.exists(tlf_file):
+                    self.ui.tabWidget.setCurrentWidget(self.widgets['Run Summary'])
+                    self.widgets['Run Summary'].loadIntoTable(tlf_file)
+                else:
+                    msg = ("Cannot find .tlf file in LOG_DIR does it exist?\n" +
+                           "Search here:" + tlf_file)
+                    self.launchQMsgBox('File Error', msg) 
+            
+            # Update IEF_DIR, TCF_DIR, or LOG_DIR
+            elif action == updateIefRowAction or action == updateTcfRowAction or action == updateLogRowAction:
                 if 'model' in gs.path_holder.keys():
                     p = gs.path_holder['model']
                 elif 'log' in gs.path_holder.keys():
@@ -540,16 +564,20 @@ class MainGui(QtGui.QMainWindow):
                 else:
                     p = cur_location
                     
-                if action == updateIefRowAction:
-                    file_types = 'IEF(*.ief)'
-                    lookup_name = 'IEF_DIR'
-                else:
-                    file_types = 'TCF(*.tcf)'
-                    lookup_name = 'TCF_DIR'
-                    
                 d = MyFileDialogs(parent=self)
-                open_path = d.openFileDialog(p, file_types=file_types, 
-                                                 multi_file=False)
+                if action == updateIefRowAction or action == updateTcfRowAction:
+                    if action == updateIefRowAction:
+                        file_types = 'IEF(*.ief)'
+                        lookup_name = 'IEF_DIR'
+                    else:
+                        file_types = 'TCF(*.tcf)'
+                        lookup_name = 'TCF_DIR'
+                        
+                    open_path = d.openFileDialog(p, file_types=file_types, 
+                                                     multi_file=False)
+                else:
+                    open_path = d.dirFileDialog(p)
+                    lookup_name = 'LOG_DIR'
                     
                 if not open_path == False:
                     open_path = str(open_path)
@@ -562,7 +590,7 @@ class MainGui(QtGui.QMainWindow):
                     self.loadModelLog()
                     gs.setPath('model', p)
             
-            # Update the MB and RUN_STATUS values in RUN table
+            # Update the MB and RUN_STATUS values
             elif action == updateStatusAction:
                 # Get the tcf dir path and tcf name
                 row = table_obj.currentRow()
@@ -585,22 +613,6 @@ class MainGui(QtGui.QMainWindow):
                     table_obj.addRowValues(row_dict, row)
                     self._saveViewChangesToDatabase(table_obj, row)
                     self.loadModelLog()
-            
-            elif action == addToRunSummaryAction:
-                row = table_obj.currentRow()
-                row_dict = table_obj.getValues(row=row, names=['ID', 'LOG_DIR', 'TCF'])
-                tcf = row_dict['TCF'][1:-1]
-                tcf = tcf.split(',')[0]
-                tcf_name = os.path.splitext(tcf)[0]
-                tlf_file = os.path.join(row_dict['LOG_DIR'], tcf_name + '.tlf')
-                
-                if os.path.exists(tlf_file):
-                    self.ui.tabWidget.setCurrentWidget(self.widgets['Run Summary'])
-                    self.widgets['Run Summary'].loadIntoTable(tlf_file)
-                else:
-                    msg = ("Cannot find .tlf file in LOG_DIR does it exist?\n" +
-                           "Search here:" + tlf_file)
-                    self.launchQMsgBox('File Error', msg) 
             
     
     def _updateAllRowStatus(self):

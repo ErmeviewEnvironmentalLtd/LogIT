@@ -515,12 +515,15 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                         if line.strip() == '': continue
                         if 'Run Finished' in line:
                             entry.finished = True
+                            self.emit(QtCore.SIGNAL("updateProgress"), end_time)
                             break
                         if 'Run Interrupted' in line:
                             entry.interrupted = True
+                            self.emit(QtCore.SIGNAL("updateProgress"), end_time)
                             break
                         if 'ERROR' in line:
                             entry.error = True
+                            self.emit(QtCore.SIGNAL("updateProgress"), end_time)
                             break
                         
                         # Convert time to total in hours
