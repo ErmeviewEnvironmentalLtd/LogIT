@@ -1022,10 +1022,12 @@ class MainGui(QtGui.QMainWindow):
     def _createNewLogDatabase(self):
         """Create a new model log database.
         """
+        self.launchQMsgBox('', 'In new log create')
         if 'log' in gs.path_holder.keys():
             p = gs.path_holder['log']
         else:
-            p = self.cur_location
+            p = cur_location
+        self.launchQMsgBox('', 'After path variable check')
             
         d = MyFileDialogs(parent=self)
         save_path = d.saveFileDialog(path=p, file_types='LogIT database(*.logdb)')
@@ -1037,7 +1039,7 @@ class MainGui(QtGui.QMainWindow):
                 self.view_tables.clearAll()
                 self.ui.statusbar.showMessage('Building new log database...')
                 self.ui.centralwidget.setEnabled(False)
-                DatabaseFunctions.createNewLogDatabase(str(save_path))
+                #DatabaseFunctions.createNewLogDatabase(str(save_path))
                 DatabaseFunctions.createNewLogDatabase(gs.path_holder['log'])
                 self.ui.centralwidget.setEnabled(True)
                 self.ui.statusbar.showMessage("Current log: " + save_path)
