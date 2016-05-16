@@ -1,6 +1,7 @@
+- [Bugfix] Error in 1D only load.
 - [Bugfix] Issue with creating new log database.
 -
-- Main relase notes below:
+- <em>Main relase notes below:</em>
 - [Feature] Added Run Summary widget (Beta). You can load a Tuflow .tlf file and 
   display the current status and key outputs summarised in a table and graph.
   You can also add a log entry into the summary table automatically by

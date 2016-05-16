@@ -310,40 +310,6 @@ v0.7.0-Beta:
 
 v0.7.1-Beta:
     - [Bugfix] Issue with creating new log database.
-    -
-    - Main relase notes below:
-    - [Feature] Added Run Summary widget (Beta). You can load a Tuflow .tlf file and 
-      display the current status and key outputs summarised in a table and graph.
-      You can also add a log entry into the summary table automatically by
-      right clicking on the RUN table entry and selecting Add to Run Summary.
-    - [Feature] Added mass balance and run status columns to the to RUN table in
-      the log database. These will be automatically added to the log by reading
-      the '_TUFLOW Simulations.log' file when loading a model, if it is complete. If
-      the run hasn't finished at the time of loading they will not be entered, but
-      can be added at any time by using the right click menu in the RUN table and
-      selecting Update Status, or update the whole table under the Settings >> 
-      Tools menu.
-    - IMPORTANT: The new column's will require updating your databases.
-    - [BugFix] The Exit menu item and some keyboard shortcuts were broken. I think
-      these have all been fixed now.
-    - [Feature] Added lots of new keyboard shortcuts. You can find out most of them
-      from the Help tab of by hovering over the buttons / looking at the menu items.
-      A nonobvious one is the use of F5 to reload the current row in the Run
-      Summary Tool table.
-    - Implemented a proper standardised interface for all all widgets (tabs). This
-      has unfortunately meant that the settings loading has been broken and an
-      update will reset settings (not the log database). It will help make it more
-      stable in the future and easier to maintain though.
-    - Increased and improved the testing framework. Coverage is now pretty good.
-      All new features are being added by default and I'm making my way slowly
-      through the rest of the code base. Most of mission critical stuff is now
-      tested, at least rudimentally.
-    - Improvements to the way that settings are stored. It should make them a lot
-      more stable and less prone to break when updated...except this once when they
-      will definitely completely break. There should be a bit more consitency in 
-      how file paths are remembered now. e.g. if you load an .ief file in one tool
-      the same directory will be used in another next time.
-    - Lots, and lots and lots of bug fixes.
 
 ##~##
 
