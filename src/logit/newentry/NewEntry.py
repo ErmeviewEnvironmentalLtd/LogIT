@@ -254,41 +254,51 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         # If the user doesn't cancel
         if not open_path == False:
             
-            open_path = str(open_path)
-            self.loadModelTextbox.setText(open_path)
-            gs.setPath('model', open_path)
-            
-            errors = GuiStore.ErrorHolder()
-            errors, self.all_logs = Controller.fetchAndCheckModel(gs.path_holder['log'], open_path, errors)
-            
-            # Init a dict to hold the exists/not exists status of the data
-            # being loaded
-            if not errors.has_errors:
-                entry_dict = {}
-                for log_key, log in self.all_logs.log_pages.iteritems(): 
-                    if log_key == 'RUN' or log.has_contents == False: continue
-                    entry_dict[log_key] = {}
-                    for item in log.contents:
-                        entry_dict[log_key][item[log_key]] = {}
-                 
-                # check the new entries against the database and return them with
-                # flags set for whether they are new entries or already exist
+            try:
+                open_path = str(open_path)
+                self.loadModelTextbox.setText(open_path)
+                gs.setPath('model', open_path)
+                
                 errors = GuiStore.ErrorHolder()
-                entry_status, errors = Controller.loadEntrysWithStatus(
-                        gs.path_holder['log'], self.all_logs, entry_dict, errors)
+                errors, self.all_logs = Controller.fetchAndCheckModel(gs.path_holder['log'], open_path, errors)
+                
+                # Init a dict to hold the exists/not exists status of the data
+                # being loaded
+                if not errors.has_errors:
+                    entry_dict = {}
+                    for log_key, log in self.all_logs.log_pages.iteritems(): 
+                        if log_key == 'RUN' or log.has_contents == False: continue
+                        entry_dict[log_key] = {}
+                        for item in log.contents:
+                            entry_dict[log_key][item[log_key]] = {}
+                     
+                    # check the new entries against the database and return them with
+                    # flags set for whether they are new entries or already exist
+                    errors = GuiStore.ErrorHolder()
+                    entry_status, errors = Controller.loadEntrysWithStatus(
+                            gs.path_holder['log'], self.all_logs, entry_dict, errors)
 
-            if errors.has_errors:
-                self.launchQMsgBox("Load Error", errors.formatErrors())
-            else:
-                self.emit(QtCore.SIGNAL("statusUpdate"), 'Loaded model at: %s' % (open_path))
-                input_vars = self.getInputVars()
-                run = self.all_logs.getLogEntryContents('RUN', 0)
-                run['MODELLER'] = self.settings['modeller'] = input_vars['MODELLER']
-                run['TUFLOW_BUILD'] = self.settings['tuflow_model'] = input_vars['TUFLOW_BUILD'] 
-                run['ISIS_BUILD'] = self.settings['isis_build'] = input_vars['ISIS_BUILD']
-                run['EVENT_NAME'] = self.settings['event_name'] = input_vars['EVENT_NAME'] 
-                self._updateNewEntryTree(entry_status)
-                self.submitSingleModelGroup.setEnabled(True) 
+                if errors.has_errors:
+                    self.launchQMsgBox("Load Error", errors.formatErrors())
+                else:
+                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Loaded model at: %s' % (open_path))
+                    input_vars = self.getInputVars()
+                    run = self.all_logs.getLogEntryContents('RUN', 0)
+                    run['MODELLER'] = self.settings['modeller'] = input_vars['MODELLER']
+                    run['TUFLOW_BUILD'] = self.settings['tuflow_model'] = input_vars['TUFLOW_BUILD'] 
+                    run['ISIS_BUILD'] = self.settings['isis_build'] = input_vars['ISIS_BUILD']
+                    run['EVENT_NAME'] = self.settings['event_name'] = input_vars['EVENT_NAME'] 
+                    self._updateNewEntryTree(entry_status)
+                    self.submitSingleModelGroup.setEnabled(True)
+                    
+            except Exception, err:
+                self.emit(QtCore.SIGNAL("statusUpdate"), '')
+                msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
+                       "all gone terribly wrong. You're on your own dude.\n" +
+                       "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
+                       "Game over man, I'm outta here <-((+_+))->")
+                logger.error(msg)
+                logger.exception(err)
     
     
     def getSingleLogEntry(self):

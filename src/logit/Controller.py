@@ -726,14 +726,6 @@ def fetchAndCheckModel(db_path, open_path, errors):
         main_tcf = all_logs.getLogEntryContents('RUN', 0)['TCF'] 
 #         tcf_results = all_logs.getLogEntryContents('RUN', 0)['RESULTS_LOCATION_2D'] 
 
-        # Gets run status and MB info if run is already completed
-        tcf_name = all_logs.log_pages['TCF'].contents[0]['TCF']
-        tcf_dir = all_logs.getLogEntryContents('RUN', 0)['TCF_DIR']
-        outputs = getRunStatusInfo(tcf_dir, tcf_name)
-        if outputs[0]:
-            all_logs.log_pages['RUN'].contents[0]['RUN_STATUS'] = outputs[1]
-            all_logs.log_pages['RUN'].contents[0]['MB'] = outputs[2]
-        
         indb = False
 #         try:
         db_manager = DatabaseFunctions.DatabaseManager(db_path)
@@ -764,6 +756,15 @@ def fetchAndCheckModel(db_path, open_path, errors):
                 
         # Do the whole lot again for the tuflow run
         if not main_tcf == 'None':
+            
+            # Gets run status and MB info if run is already completed
+            tcf_name = all_logs.log_pages['TCF'].contents[0]['TCF']
+            tcf_dir = all_logs.getLogEntryContents('RUN', 0)['TCF_DIR']
+            outputs = getRunStatusInfo(tcf_dir, tcf_name)
+            if outputs[0]:
+                all_logs.log_pages['RUN'].contents[0]['RUN_STATUS'] = outputs[1]
+                all_logs.log_pages['RUN'].contents[0]['MB'] = outputs[2]
+            
             indb = db_manager.findEntry('RUN', 'TCF', 
                                         main_tcf,column_only=True)
         
