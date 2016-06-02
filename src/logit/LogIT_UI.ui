@@ -457,6 +457,16 @@ p, li { white-space: pre-wrap; }
               </column>
               <column>
                <property name="text">
+                <string>TEF</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
+              <column>
+               <property name="text">
                 <string>EVENT_NAME</string>
                </property>
                <property name="font">

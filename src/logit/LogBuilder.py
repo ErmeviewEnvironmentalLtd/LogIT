@@ -241,9 +241,9 @@ class ModelLoader(object):
                     'COMMENTS': 'None', 'SETUP': 'None', 'ISIS_BUILD': 'None', 
                     'IEF': 'None', 'DAT': 'None', 'TUFLOW_BUILD': 'None', 
                     'TCF': 'None', 'TGC': 'None', 'TBC': 'None', 'BC_DBASE': 'None', 
-                    'ECF': 'None', 'EVENT_NAME': 'None', 'RUN_OPTIONS': 'None',
-                    'TCF_DIR': 'None', 'IEF_DIR': 'None', 'LOG_DIR': 'None',
-                    'MB': 'None', 'RUN_STATUS': 'None'}
+                    'ECF': 'None', 'TEF': 'None', 'EVENT_NAME': 'None', 
+                    'RUN_OPTIONS': 'None', 'TCF_DIR': 'None', 'IEF_DIR': 'None', 
+                    'LOG_DIR': 'None', 'MB': 'None', 'RUN_STATUS': 'None'}
         
         if not self.log_type == TYPE_ESTRY and not self.ief is None:
             run_cols, options = self.buildIsisRun(run_cols)
