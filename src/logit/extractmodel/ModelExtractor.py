@@ -55,7 +55,6 @@ from PyQt4 import QtCore, QtGui
 from ship.utils.filetools import MyFileDialogs
 from ship.utils.fileloaders.fileloader import FileLoader
 from ship.tuflow.data_files import datafileloader
-from ship.tuflow.tuflowmodel import FilesFilter as filter
 from ship.utils import filetools
     
 from AWidget import AWidget

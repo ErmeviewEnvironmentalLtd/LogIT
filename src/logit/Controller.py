@@ -682,7 +682,7 @@ def fetchTableValues(db_path, table_list, errors):
         return entries, errors
  
 
-def fetchAndCheckModel(db_path, open_path, errors):
+def fetchAndCheckModel(db_path, open_path, run_options, errors):
     """Loads a model and makes a few conditional checks on it.
     Loads model from the given .tcf/.ief file and checks that the .ief, 
     .tcf and ISIS results don't already exist in the DB and then returns
@@ -705,7 +705,7 @@ def fetchAndCheckModel(db_path, open_path, errors):
         
     
     loader = LogBuilder.ModelLoader()
-    all_logs = loader.loadModel(open_path)
+    all_logs = loader.loadModel(open_path, run_options)
     if all_logs == False:
         logger.warning('Unable to load file:\n%s\nDoes it exist?' % (open_path))
         

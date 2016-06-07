@@ -67,7 +67,7 @@ try:
     from ship.utils import utilfunctions as ufunc
     from ship.utils import filetools
     from ship.tuflow.data_files import datafileloader
-    from ship.tuflow.tuflowmodel import FilesFilter as filter
+    from ship.tuflow import FILEPART_TYPES as fpt
     
 except:
     logger.error('Cannot load ship: Is it installed?')
@@ -91,6 +91,7 @@ class ModelLoader(object):
         self.tuflow = None
         self.ief_dir = 'None'
         self.tcf_dir = 'None'
+        self.run_options = {}
         self.error = None
         self.missing_files = []
         
@@ -99,9 +100,11 @@ class ModelLoader(object):
         self.cur_date = date_now.strftime('%d/%m/%Y')
         
     
-    def loadModel(self, file_path):
+    def loadModel(self, file_path, run_options={}):
         """
         """
+        self.run_options = run_options
+        
         # Check that the path actually exists before we start.
         if not os.path.exists(file_path):
             self.error = 'File does not exist'
@@ -125,16 +128,22 @@ class ModelLoader(object):
             logger.error('File: ' + file_path + '\nis not ief or tcf format')
             self.error = 'Not a recognised .ief or .tcf file'
             return False 
+        
+        if self.run_options:
+            options = self.createSEVals(self.run_options)
+        else:
+            options = {}
 
         loader = FileLoader()
         try:
-            model_file = loader.loadFile(file_path)
+            model_file = loader.loadFile(file_path, options)
         except Exception, err:
-            logger.error('Unable to load model file at:\n' + file_path + '\n' + err)
+            logger.error('Unable to load model file at:\n' + file_path)
+            logger.exception(err)
+            print str(err)
             return False, 'Unable to load model file'
 
         # If we have an .ief file; load it first.
-#         if file_type == 'ief': 
         if self.log_type == TYPE_ISIS:
             
             self.ief = model_file
@@ -143,6 +152,15 @@ class ModelLoader(object):
             # Get the tcf and the 2D Scheme details
             tcf_path = self.ief.getValue('2DFile')
             scheme = self.ief.getValue('2DScheme')
+            
+            # Get the 2D run options from the isis ief form
+            # These take precedence over any handed in by the user
+            self.run_options = self.ief.getValue('2DOptions')
+            if not self.run_options is None: 
+                options = self.createSEVals(self.run_options)
+            else:
+                self.run_options = {}
+                options = {}
             
             # If the path that the ief uses to reach the tcf file doesn't exist it
             # means that the ief paths haven't been updated on the local machine, so
@@ -164,7 +182,7 @@ class ModelLoader(object):
                     return False
 
                 try:
-                    self.tuflow = loader.loadFile(tcf_path)
+                    self.tuflow = loader.loadFile(tcf_path, self.run_options)
                     self.tcf_dir = os.path.split(tcf_path)[0]
                     self.missing_files = self.tuflow.missing_model_files
                     if self.missing_files:
@@ -205,10 +223,13 @@ class ModelLoader(object):
             log_pages['TCF'] = [None]
             log_pages['BC_DBASE'] = [None]
         else:
-            log_pages['ECF'] = self.buildModelFileRow('ecf')
-            log_pages['TCF'] = self.buildModelFileRow('tcf')
-            log_pages['TGC'] = self.buildModelFileRow('tgc')
-            log_pages['TBC'] = self.buildModelFileRow('tbc')
+            se_vals = self.tuflow.getCurrentSEVals()
+            tmfs = self.tuflow.getTuflowModelFiles(se_only=True)
+            log_pages['ECF'] = self.buildModelFileRow(tmfs['ecf'], 'ecf', se_vals)
+            log_pages['TCF'] = self.buildModelFileRow(tmfs['tcf'], 'tcf', se_vals)
+            log_pages['TGC'] = self.buildModelFileRow(tmfs['tgc'], 'tgc', se_vals)
+            log_pages['TBC'] = self.buildModelFileRow(tmfs['tbc'], 'tbc', se_vals)
+            log_pages['TEF'] = self.buildModelFileRow(tmfs['tef'], 'tef', se_vals)
             log_pages['BC_DBASE'] = self.buildBcRowFromModel()
 
         if self.log_type == TYPE_ESTRY:
@@ -224,6 +245,20 @@ class ModelLoader(object):
             all_logs = LogClasses.AllLogs(log_pages, ief_dir=self.ief_dir)
             
         return all_logs
+    
+    
+    def createSEVals(self, options):
+        """
+        """
+        outvals = {'scenario': {}, 'event': {}}
+        vals = options.split(" ")
+        for i in range(vals):
+            if vals[i].startswith('s'):
+                outvals['scenario'][vals[i]] = [i+1]
+            elif vals[i].startswith('e'):
+                outvals['event'][vals[i]] = [i+1]
+        
+        return outvals
     
     
     def buildRunRowFromModel(self):
@@ -275,9 +310,11 @@ class ModelLoader(object):
         else:
             run_cols['EVENT_DURATION'] = 'None'
             
+#         options = 'None'
+#         if self.ief.event_details.has_key('2DOptions'):
+#             options = self.ief.event_details['2DOptions']
         options = 'None'
-        if self.ief.event_details.has_key('2DOptions'):
-            options = self.ief.event_details['2DOptions']
+        if self.run_options: options = self.run_options
         
         return run_cols, options
         
@@ -289,11 +326,18 @@ class ModelLoader(object):
         :param tuflow_model: the TuflowModel object.
         :param run_cols: the log data dictionary to fill.
         :return: the updated log_files dictionary.
-        """    
+        """
+        # Fetch all of the tuflow control files that are within the current
+        # scenario and event setups.
+        modelfiles = self.tuflow.getModelFiles(se_only=True)
+         
         # Fetch the main tcf file and the list of .trd files referenced by it.
-        tcf_paths = self.tuflow.getFileNames(filter(content_type=self.tuflow.MODEL,
-                                               in_model_order=True), 
-                                        extensions=['tcf'])
+        tcf_paths = []
+        for t in modelfiles['tcf']:
+            tcf_paths.append(t.getFileNameAndExtension())
+#         tcf_paths = self.tuflow.getFileNames(filter(content_type=self.tuflow.MODEL,
+#                                                in_model_order=True), 
+#                                         extensions=['tcf'])
 
         run_cols['TCF'] = "[" + ", ".join(tcf_paths) + "]"
 
@@ -302,14 +346,15 @@ class ModelLoader(object):
             # variables from the tcf files instead
             start = None
             end = None
-            variables = self.tuflow.getContents(self.tuflow.VARIABLE, in_order=True)
+            variables = self.tuflow.getVariables(se_only=True, no_duplicates=True)
+#             variables = self.tuflow.getContents(self.tuflow.VARIABLE, in_order=True)
             
             # We get them in order so any later references will overwrite the
             # previous versions
             for v in variables:
-                if v.command == 'Start Time':
+                if v.command.upper() == 'START TIME':
                     start = v.raw_var
-                if v.command == 'End Time':
+                if v.command.upper() == 'END TIME':
                     end = v.raw_var
                         
             if not (start == None or end == None):
@@ -319,10 +364,14 @@ class ModelLoader(object):
                     pass
         
         # Get the tgc and tbc file details.
-        tgc_paths = self.tuflow.getFileNames(filter(content_type=self.tuflow.MODEL), extensions=['tgc'])
-        tbc_paths = self.tuflow.getFileNames(filter(content_type=self.tuflow.MODEL), extensions=['tbc'])
-        ecf_paths = self.tuflow.getFileNames(filter(content_type=self.tuflow.MODEL), extensions=['ecf']) 
-        #tuflow.getFileNames(filter(modelfile_type=['ecf']))
+        tgc_paths = [m.getFileNameAndExtension() for m in modelfiles['tgc']]
+        tbc_paths = [m.getFileNameAndExtension() for m in modelfiles['tbc']]
+        ecf_paths = [m.getFileNameAndExtension() for m in modelfiles['ecf']]
+        tef_paths = [m.getFileNameAndExtension() for m in modelfiles['tef']]
+#         tgc_paths = self.tuflow.getFileNames(filter(content_type=self.tuflow.MODEL), extensions=['tgc'])
+#         tbc_paths = self.tuflow.getFileNames(filter(content_type=self.tuflow.MODEL), extensions=['tbc'])
+#         ecf_paths = self.tuflow.getFileNames(filter(content_type=self.tuflow.MODEL), extensions=['ecf']) 
+#         tuflow.getFileNames(filter(modelfile_type=['ecf']))
 
         if not len(tgc_paths) < 1:
             run_cols['TGC'] = "[" + ", ".join(tgc_paths) + "]"
@@ -332,7 +381,8 @@ class ModelLoader(object):
             run_cols['ECF'] = "[" + ", ".join(ecf_paths) + "]"
 
         # Get the BC Database file references
-        data = self.tuflow.getContents(content_type=self.tuflow.DATA, no_duplicates=True)
+        data = self.tuflow.getFiles(fpt.DATA, no_duplicates=True, se_only=True)
+#         data = self.tuflow.getContents(content_type=self.tuflow.DATA, no_duplicates=True)
         bc_paths = []
         for d in data:
             if d.command.upper() == 'BC DATABASE':
@@ -343,64 +393,100 @@ class ModelLoader(object):
             run_cols['BC_DBASE'] = "[" + ", ".join(bc_paths) + "]"
         
         # Get the results and check for the result output command
-        result = []
-        log = None
-        in_results = self.tuflow.getContents(content_type=self.tuflow.RESULT, modelfile_type=['tcf'])
+        result_obj = None
+        log_obj = None
+        in_results = self.tuflow.getFiles(fpt.RESULT, se_only=True, no_duplicates=True)
+#         in_results = self.tuflow.getContents(content_type=self.tuflow.RESULT, modelfile_type=['tcf'])
         for r in in_results:
             if r.command.upper() == 'OUTPUT FOLDER':
-                result.append(r)
+                result_obj = r
+#                 result.append(r)
             elif r.command.upper() == 'LOG FOLDER':
-                log = r
+                log_obj = r
 
         # Use the global_order variable same as for the duration calls
-        result_obj = max(result, key=attrgetter('global_order'))
+#         result_obj = max(result, key=attrgetter('global_order'))
         result = ''
-        main_tcf = self.tuflow.getModelFilesByType(filter(modelfile_type='main',
-                                                     filename_only=True))
-        main_tcf = os.path.splitext(main_tcf[0])[0]
-        if result_obj.has_own_root:
-            result = result_obj.root
-        elif not result_obj.getRelativePath():
-            result = ''
-        else:
-            result = result_obj.getRelativePath()
+        main_tcf = self.tuflow.mainfile.getFileNameAndExtension()
+#         main_tcf = self.tuflow.getModelFilesByType(filter(modelfile_type='main',
+#                                                      filename_only=True))
+        main_tcf = os.path.splitext(main_tcf)[0]
+#         main_tcf = os.path.splitext(main_tcf[0])[0]
+        
+        result = ''
+        if not result_obj is None:
+            if result_obj.has_own_root:
+                result = result_obj.root
+            elif not result_obj.getRelativePath():
+                result = ''
+            else:
+                result = result_obj.getRelativePath()
         run_cols['RESULTS_LOCATION_2D'] = result
         
-        if log.has_own_root:
-            log = log.root
-        elif not log.getRelativePath():
-            log = self.tcf_dir
-        else:
-            log = os.path.join(self.tcf_dir, log.getRelativePath())
+        log = ''
+        if not log_obj is None:
+            if log_obj.has_own_root:
+                log = log_obj.root
+            elif not log_obj.getRelativePath():
+                log = self.tcf_dir
+            else:
+                log = os.path.join(self.tcf_dir, log_obj.getRelativePath())
         run_cols['LOG_DIR'] = log
+
+#         if result_obj.has_own_root:
+#             result = result_obj.root
+#         elif not result_obj.getRelativePath():
+#             result = ''
+#         else:
+#             result = result_obj.getRelativePath()
+#         run_cols['RESULTS_LOCATION_2D'] = result
+#         
+#         if log.has_own_root:
+#             log = log.root
+#         elif not log.getRelativePath():
+#             log = self.tcf_dir
+#         else:
+#             log = os.path.join(self.tcf_dir, log.getRelativePath())
+#         run_cols['LOG_DIR'] = log
             
         return run_cols
                 
 
-    def buildModelFileRow(self, model_file):
+    def buildModelFileRow(self, model_files, mtype, se_vals):
         """Create a new row for the model file page.
         @var tulfow_model: The TuflowModel object loaded from file
         """
         cur_date = str(self.cur_date)
-        cols = {'DATE': cur_date, model_file.upper(): 'None', 'FILES': 'None', 
+        cols = {'DATE': cur_date, mtype.upper(): 'None', 'FILES': 'None', 
                     'COMMENTS': 'None'}
-        out_list = []
 
-        model_types = self.tuflow.getModelFilesByType(filter(modelfile_type=[model_file.lower()]))
-        if len(model_types) > 0:
-            for m in model_types:
-                files = self.tuflow.getFileNamesFromModelFile(m)
-                
-                # Get rid of any emtpty strings
-                # The '.' catch is a fudge until a better way of catching check file
-                # prefixes is implemented
-                files = [x for x in files if x and not x[-1] == '.']
-                
-                out_list.append({'DATE': cur_date, 
-                                 model_file.upper(): self.tuflow.getNameFromModelFile(m), 
+        out_list = []
+        if len(model_files) > 0:
+            for m in model_files:
+                files = m[0].getFileNames(with_extension=True, include_results=False,
+                                         se_vals=se_vals)
+                out_list.append({'DATE': 'somedate', 
+                                 mtype.upper(): m[1],
                                  'FILES': files, 'COMMENTS': 'None'})
         else:
             out_list.append(cols) 
+#             print 'No entries for ' + mtype
+
+#         model_types = self.tuflow.getModelFilesByType(filter(modelfile_type=[model_file.lower()]))
+#         if len(model_types) > 0:
+#             for m in model_types:
+#                 files = self.tuflow.getFileNamesFromModelFile(m)
+#                 
+#                 # Get rid of any emtpty strings
+#                 # The '.' catch is a fudge until a better way of catching check file
+#                 # prefixes is implemented
+#                 files = [x for x in files if x and not x[-1] == '.']
+#                 
+#                 out_list.append({'DATE': cur_date, 
+#                                  model_file.upper(): self.tuflow.getNameFromModelFile(m), 
+#                                  'FILES': files, 'COMMENTS': 'None'})
+#         else:
+#             out_list.append(cols) 
             
         return out_list
     
@@ -428,10 +514,10 @@ class ModelLoader(object):
         bc_list = []
         
         # Get the BC Database objects from the model
-        data = self.tuflow.getContents(self.tuflow.DATA, no_duplicates=True)
+        data = self.tuflow.getFiles(fpt.DATA, no_duplicates=True, se_only=True)
         bc = []
         for d in data:
-            if d.command == 'BC Database':
+            if d.command.upper() == 'BC DATABASE':
                 bc.append(d)
         
         if len(bc) > 0:

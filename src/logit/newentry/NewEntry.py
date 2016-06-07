@@ -137,7 +137,8 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         input_vars = {'MODELLER': str(self.modellerTextbox.text()),
                       'TUFLOW_BUILD': str(self.tuflowVersionTextbox.text()),
                       'ISIS_BUILD': str(self.isisVersionTextbox.text()),
-                      'EVENT_NAME': str(self.eventNameTextbox.text())
+                      'EVENT_NAME': str(self.eventNameTextbox.text()),
+                      'RUN_OPTIONS': str(self.runOptionsTextbox.text())
                      }
         return input_vars
     
@@ -259,8 +260,9 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 self.loadModelTextbox.setText(open_path)
                 gs.setPath('model', open_path)
                 
+                run_options = str(self.runOptionsTextbox().text())
                 errors = GuiStore.ErrorHolder()
-                errors, self.all_logs = Controller.fetchAndCheckModel(gs.path_holder['log'], open_path, errors)
+                errors, self.all_logs = Controller.fetchAndCheckModel(gs.path_holder['log'], open_path, run_options, errors)
                 
                 # Init a dict to hold the exists/not exists status of the data
                 # being loaded
@@ -288,6 +290,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                     run['TUFLOW_BUILD'] = self.settings['tuflow_model'] = input_vars['TUFLOW_BUILD'] 
                     run['ISIS_BUILD'] = self.settings['isis_build'] = input_vars['ISIS_BUILD']
                     run['EVENT_NAME'] = self.settings['event_name'] = input_vars['EVENT_NAME'] 
+#                     run['RUN_OPTIONS'] = self.settings['run_options'] = input_vars['RUN_OPTIONS']
                     self._updateNewEntryTree(entry_status)
                     self.submitSingleModelGroup.setEnabled(True)
                     
@@ -473,7 +476,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
             dict - member varibles and initial state for ToolSettings.
         """
         attrs = {'modeller': '', 'tuflow_version': '', 'isis_version': '', 
-                 'event_name': '', 'cur_load_tab': 0, 
+                 'event_name': '', 'run_options': '' , 'cur_load_tab': 0, 
                  'singleload_column_width': 100}
         return attrs
     
@@ -486,6 +489,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         self.tuflowVersionTextbox.setText(settings['tuflow_version'])
         self.isisVersionTextbox.setText(settings['isis_version'])
         self.eventNameTextbox.setText(settings['event_name'])
+        self.runOptionsTextbox.setText(settings['run_options'])
         self.loadModelTab.setCurrentIndex(settings['cur_load_tab'])
         if self.settings['singleload_column_width'] < 100:
             self.settings['singleload_column_width'] = 100
@@ -500,6 +504,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         self.settings['tuflow_version'] = str(self.tuflowVersionTextbox.text())
         self.settings['isis_version'] = str(self.isisVersionTextbox.text())
         self.settings['event_name'] = str(self.eventNameTextbox.text())
+        self.settings['run_options'] = str(self.runOptionsTextbox.text())
         self.settings['cur_load_tab'] = self.loadModelTab.currentIndex()
         self.settings['singleload_column_width'] = self.modelEntryTreeView.columnWidth(0)
         return self.settings
