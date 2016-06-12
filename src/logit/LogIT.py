@@ -816,7 +816,7 @@ class MainGui(QtGui.QMainWindow):
             return errors
         
         # Get all of the file paths from the list
-        model_paths = self.widgets['New Entry'].getMultipleModelPaths()
+        model_paths, run_options = self.widgets['New Entry'].getMultipleModelPaths()
         if not model_paths: return errors
         
         # Setup the progress monitor. It updates prgress bars etc
@@ -834,7 +834,7 @@ class MainGui(QtGui.QMainWindow):
                 self._updateCurrentProgress(prog_count)
                 prog_count += 1
                 errors, all_logs = Controller.fetchAndCheckModel(
-                                        gs.path_holder['log'], path, errors)
+                                        gs.path_holder['log'], path, run_options, errors)
                 
                 if errors.has_local_errors:
                     continue

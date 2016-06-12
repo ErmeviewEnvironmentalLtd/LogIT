@@ -68,7 +68,7 @@ class LogBuilderTest(unittest.TestCase):
         for log_key, log in all_logs.log_pages.iteritems():
             self.assertListEqual(KENNFORD_DICT[log_key], log.contents, 'Log contents for %s not equal' % (log_key))
             
-            if log_key == 'BC_DBASE' or log_key == 'ECF':
+            if log_key == 'BC_DBASE' or log_key == 'ECF' or log_key == 'TEF':
                 self.assertFalse(log.has_contents, 'Log %s has_contents fail' % (log_key))
             else:
                 self.assertTrue(log.has_contents, 'Log %s has_contents fail' % (log_key))
@@ -98,7 +98,7 @@ class LogBuilderTest(unittest.TestCase):
         for log_key, log in all_logs.log_pages.iteritems():
             self.assertListEqual(GOS_DICT[log_key], log.contents, 'Log contents for %s not equal' % (log_key))
             
-            if log_key == 'DAT':
+            if log_key == 'DAT' or log_key == 'TEF':
                 self.assertFalse(log.has_contents, 'Log %s has_contents fail' % (log_key))
             else:
                 self.assertTrue(log.has_contents, 'Log %s has_contents fail' % (log_key))
@@ -155,7 +155,8 @@ class LogBuilderTest(unittest.TestCase):
                       'TBC': '[Grange_baseline_Option1APlus_v1-00.tbc]',
                       'TCF': '[Option1aPlus_ilo3_Cul6_Grange_T100D5CC_CWI_Run3_F_MHWS_v1-01 - Copy.tcf]',
                       'TCF_DIR': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\GoS\\tuflow\\runs',
-                      'TGC': '[Grange_baseline_Option1A_v1-00_test.tgc, Grange_baseline_Option1A_v1-00.tgc]',
+                      'TEF': 'None',
+                      'TGC': '[Grange_baseline_Option1A_v1-00.tgc, Grange_baseline_Option1A_v1-00_test.tgc]',
                       'TUFLOW_BUILD': 'None'}],
             'TBC': [{'COMMENTS': 'None',
                       'DATE': '27/03/2016',
@@ -172,6 +173,7 @@ class LogBuilderTest(unittest.TestCase):
                                 '2d_po_grange001.mif',
                                 '2d_iwl_pond.mif'],
                       'TCF': 'Option1aPlus_ilo3_Cul6_Grange_T100D5CC_CWI_Run3_F_MHWS_v1-01 - Copy.tcf'}],
+            'TEF': [{'COMMENTS': 'None', 'DATE': '27/03/2016', 'FILES': 'None', 'TEF': 'None'}],
             'TGC': [{'COMMENTS': 'None',
                       'DATE': '27/03/2016',
                       'FILES': ['2d_loc_Grange001.mif',
@@ -229,6 +231,7 @@ class LogBuilderTest(unittest.TestCase):
                     'TBC': '[kennford_v3.5.tbc]',
                     'TCF': '[kennford_1%AEP_FINAL_v5.18.tcf]',
                     'TCF_DIR': 'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs',
+                    'TEF': 'None',
                     'TGC': '[kennford_v5.9.tgc]',
                     'TUFLOW_BUILD': 'None'}],
             'TBC': [{'COMMENTS': 'None',
@@ -249,6 +252,7 @@ class LogBuilderTest(unittest.TestCase):
                             'Kennford_2d_po_DefLB_USB_v1.0.mif',
                             'Kennford_2d_po_DefRB_USB_v1.0.mif'],
                     'TCF': 'kennford_1%AEP_FINAL_v5.18.tcf'}],
+            'TEF': [{'COMMENTS': 'None', 'DATE': '27/03/2016', 'FILES': 'None', 'TEF': 'None'}],
             'TGC': [{'COMMENTS': 'None',
                     'DATE': '27/03/2016',
                     'FILES': ['kennford_2d_code_v1.0.mif',

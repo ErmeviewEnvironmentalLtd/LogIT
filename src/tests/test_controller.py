@@ -34,13 +34,13 @@ class ControllerTest(unittest.TestCase):
         # Test with an empty database and real model
         errors = GuiStore.ErrorHolder()
         self.form.settings.cur_log_path = self.blank_db
-        errors, all_logs = Controller.fetchAndCheckModel(self.blank_db, self.testpath, errors)
+        errors, all_logs = Controller.fetchAndCheckModel(self.blank_db, self.testpath, {}, errors)
         self.assertFalse(errors.has_errors, 'Found error in fetch fail')
         
         # Test with a fake model path
         errors = GuiStore.ErrorHolder()
         self.form.settings.cur_log_path = self.blank_db
-        errors, all_logs = Controller.fetchAndCheckModel(self.blank_db, fakepath, errors)
+        errors, all_logs = Controller.fetchAndCheckModel(self.blank_db, fakepath, {}, errors)
         self.assertTrue(errors.has_errors, 'fake model error in fetch fail')
         e = errors.log[-1]
         self.assertEqual(e.title, errors.MODEL_LOAD, 'fake model error type fail')
@@ -48,7 +48,7 @@ class ControllerTest(unittest.TestCase):
         # Test with model already in database
         errors = GuiStore.ErrorHolder()
         self.form.settings.cur_log_path = self.blank_db
-        errors, all_logs = Controller.fetchAndCheckModel(kennford_db, self.testpath, errors)
+        errors, all_logs = Controller.fetchAndCheckModel(kennford_db, self.testpath, {}, errors)
         self.assertTrue(errors.has_errors, 'existing model error in fetch fail')
         e = errors.log[-1]
         self.assertEqual(e.title, errors.LOG_EXISTS, 'fake model error type fail')

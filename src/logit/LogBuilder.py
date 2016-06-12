@@ -140,8 +140,15 @@ class ModelLoader(object):
         except Exception, err:
             logger.error('Unable to load model file at:\n' + file_path)
             logger.exception(err)
+            self.error = 'Unable to load model file at:\n' + file_path
             print str(err)
-            return False, 'Unable to load model file'
+            return False
+        
+#         if loader.warnings:
+#             logger.error('Model loaded with warnings at: ' + file_path)
+#             logger.error('Warnings:\n' + str(loader.warnings))
+#             self.error('Model loaded with warnings at: ' + file_path)
+#             return False
 
         # If we have an .ief file; load it first.
         if self.log_type == TYPE_ISIS:
@@ -194,6 +201,11 @@ class ModelLoader(object):
                     self.missing_files.append(tcf_path)
                     self.error = 'Tcf file does not exist at: ' + str(tcf_path)
                     return False
+                
+                if loader.warnings:
+                    logger.error('Model loaded with warnings at: ' + file_path)
+                    logger.error('Warnings:\n' + str(loader.warnings))
+                    return False
             
         # Then load the tuflow model if we are looking for one.
         if self.log_type == TYPE_TUFLOW and not self.file_type == 'ief':
@@ -210,6 +222,11 @@ class ModelLoader(object):
             self.missing_files = self.tuflow.missing_model_files
             if self.missing_files:
                 self.error = 'Some key model files could not be found during load'
+                return False
+            
+            if loader.warnings:
+                logger.error('Model loaded with warnings at: ' + file_path)
+                logger.error('Warnings:\n' + str(loader.warnings))
                 return False
 
         # Load the data needed for the log into the log pages dictionary.
@@ -398,7 +415,7 @@ class ModelLoader(object):
         in_results = self.tuflow.getFiles(fpt.RESULT, se_only=True, no_duplicates=True)
 #         in_results = self.tuflow.getContents(content_type=self.tuflow.RESULT, modelfile_type=['tcf'])
         for r in in_results:
-            if r.command.upper() == 'OUTPUT FOLDER':
+            if r.command.upper() == 'OUTPUT FOLDER' and r.modelfile_type.upper() == 'TCF':
                 result_obj = r
 #                 result.append(r)
             elif r.command.upper() == 'LOG FOLDER':

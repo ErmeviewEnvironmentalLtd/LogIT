@@ -51,7 +51,7 @@ class LogitTest(unittest.TestCase):
         
         # Check we get the same file paths back that we put in and hand the
         # blank database path over
-        model_paths = self.new_entry.getMultipleModelPaths()
+        model_paths, run_options = self.new_entry.getMultipleModelPaths()
         self.assertListEqual(test_paths, model_paths, 'Input output model path equality fail')
         gs.setPath('log', self.blank_db)
         
@@ -62,7 +62,7 @@ class LogitTest(unittest.TestCase):
         # Check what happens when we try to load a model with an error
         error_path = [r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogITApp\Regression_Test_Data\Loader\model\GoS\tuflow\runs\Option1aPlus_ilo3_Cul6_Grange_T100D5CC_CWI_Run3_F_MHWS_v1-01_MissingTgc.tcf']
         self.new_entry._updateMultipleLogSelection('addMultiModelButton', error_path)
-        model_paths = self.new_entry.getMultipleModelPaths()
+        model_paths, run_options = self.new_entry.getMultipleModelPaths()
         self.assertListEqual(error_path, model_paths, 'Input output error_path equailty fail')
         errors = self.form._createMultipleLogEntry()
         self.assertTrue(errors.has_errors, 'error_path has error fail')
@@ -77,7 +77,7 @@ class LogitTest(unittest.TestCase):
         
         # Set to the non blank database
         self.new_entry._updateMultipleLogSelection('addMultiModelButton', test_paths)
-        model_paths = self.new_entry.getMultipleModelPaths()
+        model_paths, run_options = self.new_entry.getMultipleModelPaths()
         self.assertListEqual(test_paths, model_paths, 'Input output model path equality fail')
         gs.setPath('log', self.kenn_db)
         

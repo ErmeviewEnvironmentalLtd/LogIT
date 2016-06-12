@@ -260,7 +260,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 self.loadModelTextbox.setText(open_path)
                 gs.setPath('model', open_path)
                 
-                run_options = str(self.runOptionsTextbox().text())
+                run_options = str(self.runOptionsTextbox.text())
                 errors = GuiStore.ErrorHolder()
                 errors, self.all_logs = Controller.fetchAndCheckModel(gs.path_holder['log'], open_path, run_options, errors)
                 
@@ -358,6 +358,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         # Get all of the file paths from the list
         model_paths = []
         allRows = self.loadMultiModelTable.rowCount()
+        run_options = str(self.runOptionsTextbox.text())
         try:
             for row in xrange(0, allRows):
                 model_paths.append(str(self.loadMultiModelTable.item(row,2).text()))
@@ -368,7 +369,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                                 'Please reload files and try again'))
             return []
         
-        return model_paths
+        return model_paths, run_options
     
         
     def _updateMultipleLogSelection(self, test_callname='', test_paths=[]):
