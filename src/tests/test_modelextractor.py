@@ -108,6 +108,8 @@ class ModelExtractorTest(unittest.TestCase):
                              'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\Kennford_2d_po_DefRB_USB_v1.0.mif',
                              'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\Kennford_2d_po_DefRB_USB_v1.0.mid',
                              'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\Materials.csv',
+                             'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_bc_ALL_v4.5.mif',
+                             'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_bc_ALL_v4.5.mid',
                              'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_code_v1.0.mif',
                              'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_code_v1.0.mid',
                              'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_bc_ALL_v4.5.mif',
@@ -128,9 +130,7 @@ class ModelExtractorTest(unittest.TestCase):
                              'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_mat_v2.0.mif',
                              'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_mat_v2.0.mid',
                              'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_mat_Buildings_v1.0.mif',
-                             'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_mat_Buildings_v1.0.mid',
-                             'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_bc_ALL_v4.5.mif',
-                             'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_bc_ALL_v4.5.mid']
+                             'C:\\Some\\fake\\folder\\tuflow\\runs\\..\\model\\gis\\kennford_2d_mat_Buildings_v1.0.mid']
         return OUT_FILES_CHECK
         
         
@@ -153,6 +153,8 @@ class ModelExtractorTest(unittest.TestCase):
                          'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\mi\\Kennford_2d_po_DefRB_USB_v1.0.mif',
                          'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\mi\\Kennford_2d_po_DefRB_USB_v1.0.mid',
                          'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\Materials.csv',
+                         'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_bc_ALL_v4.5.mif',
+                         'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_bc_ALL_v4.5.mid',
                          'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_code_v1.0.mif',
                          'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_code_v1.0.mid',
                          'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_bc_ALL_v4.5.mif',
@@ -173,9 +175,7 @@ class ModelExtractorTest(unittest.TestCase):
                          'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_mat_v2.0.mif',
                          'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_mat_v2.0.mid',
                          'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_mat_Buildings_v1.0.mif',
-                         'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_mat_Buildings_v1.0.mid',
-                         'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_bc_ALL_v4.5.mif',
-                         'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_bc_ALL_v4.5.mid']
+                         'C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogITApp\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\runs\\..\\model\\..\\model\\mi\\kennford_2d_mat_Buildings_v1.0.mid']
         return IN_FILES_CHECK
         
         

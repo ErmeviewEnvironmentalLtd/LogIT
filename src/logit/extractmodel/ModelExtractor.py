@@ -38,6 +38,9 @@
          Now using the AWidget interface.
 
  TODO:
+     (12/06/16): Some files are being added to the in and out lists twice.
+     It doesn't actually cause an issue, but should be fixed to avoid possible
+     copy problems and increases run times.
     
 
 ###############################################################################
