@@ -56,6 +56,7 @@ from ship.utils.filetools import MyFileDialogs
 from ship.utils.fileloaders.fileloader import FileLoader
 from ship.tuflow.data_files import datafileloader
 from ship.utils import filetools
+from ship.tuflow import FILEPART_TYPES as fpt
     
 from AWidget import AWidget
 import ModelExtractor_Widget as extractwidget
@@ -436,45 +437,44 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         
         These are the result, check and log files.
         """
-        result_hashes = model_file.getHashCategory(self._extractVars.tuflow.RESULT)
-        for r in result_hashes:
-            part = self._extractVars.tuflow.file_parts[r].filepart
+        results_files = model_file.getFiles(fpt.RESULT)
+        for r in results_files:
+            paths = r.getAbsolutePath(all_types=True)
             
-            if part.command.upper() == 'OUTPUT FOLDER':
+            if r.command.upper() == 'OUTPUT FOLDER':
                 if model_file.TYPE == 'tcf':
                     new_root = r'..\results\2d'
                 else:
                     new_root = r'..\results\1d'
             
-            elif part.command.upper() == 'WRITE CHECK FILES':
+            elif r.command.upper() == 'WRITE CHECK FILES':
                 new_root = r'..\checks'
             
-            elif part.command.upper() == 'LOG FOLDER':
+            elif r.command.upper() == 'LOG FOLDER':
                 new_root = r'logs'
             
             # Update the file paths. Check files are treated differently
             # because they can have a prefix as part of the file name
-            if part.command.upper() == 'WRITE CHECK FILES':
-                in_name = os.path.join(part.root, part.parent_relative_root,
-                                       part.relative_root)
+            if r.command.upper() == 'WRITE CHECK FILES':
+                in_name = os.path.join(r.root, r.parent_relative_root,
+                                       r.relative_root)
                 out_name = os.path.join(self._extractVars.out_dir, 
                                           new_root)
-                if part.file_name_is_prefix:
-                    in_name = os.path.join(in_name, part.file_name)
-                    out_name = os.path.join(out_name, part.file_name)
+                if r.file_name_is_prefix:
+                    in_name = os.path.join(in_name, r.file_name)
+                    out_name = os.path.join(out_name, r.file_name)
                 else:
                     in_name = os.path.join(in_name, run_name)
                     out_name = os.path.join(out_name, run_name)
             else:
-                in_name = os.path.join(part.root, part.parent_relative_root,
-                                       part.relative_root, run_name)
+                in_name = os.path.join(r.root, r.parent_relative_root,
+                                       r.relative_root, run_name)
                 out_name = os.path.join(self._extractVars.out_dir, 
                                           new_root, run_name)
             
             self._extractVars.results_files.append([in_name, out_name])
-            part.relative_root = new_root
-            part.parent_relative_root = rel_root
-            self._extractVars.tuflow.file_parts[part.hex_hash].filepart = part
+            r.relative_root = new_root
+            r.parent_relative_root = rel_root
         
 
     def _fetchDataFiles(self, model_file, source_root, rel_root, model_root): 
@@ -491,36 +491,91 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             model_root(str): the relative path of the model file to set.
         
         """
-        data_hashes = model_file.getHashCategory(self._extractVars.tuflow.DATA)
-        for d in data_hashes:
-            part = self._extractVars.tuflow.file_parts[d].filepart
-            self._extractVars.in_files.extend(part.getAbsolutePath(all_types=True))
+        data_files = model_file.getFiles(fpt.DATA)
+        for d in data_files:
+            paths = d.getAbsolutePath(all_types=True)
+
+            # Don't add the same files twice
+            #if paths[0] in self._extractVars.in_files:
+            self._extractVars.in_files.extend(d.getAbsolutePath(all_types=True))
             
             subfiles_in = []
             subfiles_out = []
-            if not part.extension == 'tmf':
+            if not d.extension == 'tmf':
                 
-                success, subfiles_in, subfiles_out = self._getSourceFiles(part, 
+                success, subfiles_in, subfiles_out = self._getSourceFiles(d, 
                                         r'..\bc_dbase', model_root, rel_root)
                 if not success:
-                    self._extractVars.failed_data_files.append(part.getAbsolutePath()) 
+                    self._extractVars.failed_data_files.append(d.getAbsolutePath()) 
 
-            part.parent_relative_root = rel_root
-            part.root = self._extractVars.out_dir
+            d.parent_relative_root = rel_root
+            d.root = self._extractVars.out_dir
             
-            if part.command.upper() == 'BC DATABASE':
-                part.relative_root = os.path.join(model_root, source_root)
+            if d.command.upper() == 'BC DATABASE':
+                d.relative_root = os.path.join(model_root, source_root)
             
-            elif part.command.upper() == 'READ MATERIALS FILE':
-                part.relative_root = model_root
+            elif d.command.upper() == 'READ MATERIALS FILE':
+                d.relative_root = model_root
             
+            #if paths[0] in self._extractVars.in_files: continue
             
-            self._extractVars.tuflow.file_parts[part.hex_hash].filepart = part
-            self._extractVars.out_files.extend(part.getAbsolutePath(all_types=True))
+            self._extractVars.out_files.extend(d.getAbsolutePath(all_types=True))
             self._extractVars.in_files.extend(subfiles_in)
             self._extractVars.out_files.extend(subfiles_out)
 
 
+    def _fetchGisFiles(self, model_file, source_root, main_root, rel_root, model_root): 
+        """Get all of the data files and any subfiles they contain.
+        
+        Attempts to load any data files (.tmf, .csv, etc) and checks to see if
+        they contain references to any subfiles. If they do it calls 
+        getSourceFiles() to create the in and out paths for them as well.
+        
+        Args:
+            model_file(TuflowModelFile): the model file being read.
+            source_root(str): location to set for the out file.
+            main_root(str): location to set for the gis file, which may be 
+                different to that for the subfiles.
+            rel_root(str): the relative path to set for the files.
+            model_root(str): the relative path of the model file to set.
+        
+        """
+        gis_files = model_file.getFiles(fpt.GIS)
+        for g in gis_files:
+            paths = g.getAbsolutePath(all_types=True)
+            
+            # Don't add the same files twice
+            #if paths[0] in self._extractVars.in_files:
+            self._extractVars.in_files.extend(g.getAbsolutePath(all_types=True))
+        
+            subfiles_in = []
+            subfiles_out = []
+            if g.command.upper() == 'READ MI TABLE LINKS':
+                
+                success, subfiles_in, subfiles_out = self._getSourceFiles(g, 
+                                                    'xs', model_root, rel_root)
+                if not success:
+                    self._extractVars.failed_data_files.append(g.getAbsolutePath()) 
+
+                g.relative_root = os.path.join(model_root, source_root)
+
+            elif g.command.upper().startswith('READ GRID'):
+                g.relative_root = os.path.join(model_root, 'grid')
+
+            else:
+                g.relative_root = os.path.join(model_root, main_root)
+                
+            g.parent_relative_root = rel_root
+
+            g.root = self._extractVars.out_dir
+            
+            #if paths[0] in self._extractVars.in_files: continue 
+            
+            self._extractVars.out_files.extend(g.getAbsolutePath(all_types=True))
+            self._extractVars.in_files.extend(subfiles_in)
+            self._extractVars.out_files.extend(subfiles_out)
+    
+    
     def _getSourceFiles(self, data_file, source_root, model_root, rel_root): 
         """Get all of the sub files contained by a data file.
         
@@ -563,53 +618,6 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         
         return True, subfiles_in, subfiles_out
 
-
-    def _fetchGisFiles(self, model_file, source_root, main_root, rel_root, model_root): 
-        """Get all of the data files and any subfiles they contain.
-        
-        Attempts to load any data files (.tmf, .csv, etc) and checks to see if
-        they contain references to any subfiles. If they do it calls 
-        getSourceFiles() to create the in and out paths for them as well.
-        
-        Args:
-            model_file(ATuflowModelFile): the model file being read.
-            source_root(str): location to set for the out file.
-            main_root(str): location to set for the gis file, which may be 
-                different to that for the subfiles.
-            rel_root(str): the relative path to set for the files.
-            model_root(str): the relative path of the model file to set.
-        
-        """
-        hashes = model_file.getHashCategory(self._extractVars.tuflow.GIS)
-        for h in hashes:
-            part = self._extractVars.tuflow.file_parts[h].filepart
-            self._extractVars.in_files.extend(part.getAbsolutePath(all_types=True))
-            
-            subfiles_in = []
-            subfiles_out = []
-            if part.command.upper() == 'READ MI TABLE LINKS':
-                
-                success, subfiles_in, subfiles_out = self._getSourceFiles(part, 
-                                                    'xs', model_root, rel_root)
-                if not success:
-                    self._extractVars.failed_data_files.append(part.getAbsolutePath()) 
-
-                part.relative_root = os.path.join(model_root, source_root)
-
-            elif part.command.upper().startswith('READ GRID'):
-                part.relative_root = os.path.join(model_root, 'grid')
-
-            else:
-                part.relative_root = os.path.join(model_root, main_root)
-                
-            part.parent_relative_root = rel_root
-
-            part.root = self._extractVars.out_dir
-            self._extractVars.tuflow.file_parts[part.hex_hash].filepart = part
-            self._extractVars.out_files.extend(part.getAbsolutePath(all_types=True))
-            self._extractVars.in_files.extend(subfiles_in)
-            self._extractVars.out_files.extend(subfiles_out)
-
     
     def _updateModelFilePaths(self): 
         """Update the paths of the ATuflowModelFiles (tcf, tgc, etc).
@@ -621,18 +629,16 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         """
         out_name_check = []
         in_name_check = []
-        model_files = model_files = self._extractVars.tuflow.getModelFilesByAllTypes(
-                                            filter(filename_only=False))
+        
+        model_files = self._extractVars.tuflow.getModelFiles()
         
         try:
-            for key, models in model_files.iteritems():
+            for key, models in model_files.items():
                 for m in models:
-                    part = self._extractVars.tuflow.file_parts[m.hex_hash].filepart
-                    in_name_check.append(part.root)
-                    part.parent_relative_root = r''
-                    part.root = self._extractVars.out_dir
-                    self._extractVars.tuflow.file_parts[m.hex_hash].filepart = part
-                    out_name_check.append(self._extractVars.tuflow.file_parts[m.hex_hash].filepart.root) 
+                    in_name_check.append(m.root)
+                    m.parent_relative_root = r''
+                    m.root = self._extractVars.out_dir
+                    out_name_check.append(m.root) 
         except:
             logger.error('Problem changing paths - aborting to avoid overwriting file!')
             return False
@@ -640,7 +646,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         # Make sure all paths have been updated.
         for o in out_name_check:
             if o in in_name_check:
-                logger.warning('Some file paths have failed to update - Aborting to avoid overwriting file!')
+                logger.warning('Some file paths have failed to update - Aborting to avoid overwriting files!')
                 return False
         
         return True
@@ -671,23 +677,21 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         contain a files (gis files, data files, results files, etc). The 
         functions called updated the path variables on all of these files.
         """
-        run_name = self._extractVars.tuflow.getModelFilesByType(filter(modelfile_type='main',
-                                                                       filename_only=True))[0]
-        run_name = os.path.splitext(run_name)[0]
-        model_files = self._extractVars.tuflow.getModelFilesByAllTypes(filter())
+        run_name = self._extractVars.tuflow.mainfile.file_name
+        model_files = self._extractVars.tuflow.getTuflowModelFiles()
 
-        for key, model_list in model_files.iteritems():
+        for key, model_list in model_files.items():
             for m in model_list:
-                if  key == 'tcf' or key == 'ecf':
+                if  key == 'tcf' or key == 'ecf' or key == 'tef':
                     model_root = r'..\model'
                     rel_root = r''
                 else:
                     model_root = r''
                     rel_root = r'..\model'
                 
-                self._fetchGisFiles(m, 'xs', 'gis', rel_root, model_root)
-                self._fetchDataFiles(m, r'..\bc_dbase', rel_root, model_root)
-                self._fetchResultsFiles(m, rel_root, model_root, run_name)
+                self._fetchGisFiles(m[0], 'xs', 'gis', rel_root, model_root)
+                self._fetchDataFiles(m[0], r'..\bc_dbase', rel_root, model_root)
+                self._fetchResultsFiles(m[0], rel_root, model_root, run_name)
             
     
     def _getIsisFiles(self): 
