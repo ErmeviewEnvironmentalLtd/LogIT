@@ -323,6 +323,20 @@ v0.7.3-Beta:
     - Updated database to version 8.
     - Added TEF column to RUN table.
 
+v0.7.4-Beta:
+    - Added some additional database tables and some changes to the user interface
+      to maintain complience with the next release.
+    - [Bugfix] problem with multiple model loader when one of the files already
+      exists in the database.
+    - <em>Original release notes below:</em>
+    -
+    - This is a minor release to update the database before a major upgrade from
+      the SHIP library is introduced in the next version. Next version will 
+      possibly be an unstable release so database compatibility with this one will
+      make it possible to switch back if needed.
+    - Updated database to version 8.
+    - Added TEF column to RUN table.
+
 ##~##
 
 LICENSE

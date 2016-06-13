@@ -1,3 +1,9 @@
+- Added some additional database tables and some changes to the user interface
+  to maintain complience with the next release.
+- [Bugfix] problem with multiple model loader when one of the files already
+  exists in the database.
+- <em>Original release notes below:</em>
+-
 - This is a minor release to update the database before a major upgrade from
   the SHIP library is introduced in the next version. Next version will 
   possibly be an unstable release so database compatibility with this one will

@@ -71,7 +71,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-DATABASE_VERSION_NO = 8
+DATABASE_VERSION_NO = 9
 DATABASE_VERSION_SAME = 0
 DATABASE_VERSION_LOW = 1
 DATABASE_VERSION_HIGH = 2
@@ -484,6 +484,9 @@ def createNewLogDatabase(db_path):
         
         createTcfFilesTable(cur)
         logger.info('Tcf Files table created')
+
+        createTefFilesTable(cur)
+        logger.info('Tef Files table created')
         
         createRunIdTable(cur)
         logger.info('Run id table created')
@@ -641,6 +644,21 @@ def createTcfTable(cur):
                     COMMENTS       TEXT);
                     """)
     
+    
+def createTefTable(cur):
+    """Create the tef table
+    
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE TEF
+                    (ID            INTEGER     PRIMARY KEY    NOT NULL,
+                    DATE           TEXT                       NOT NULL,
+                    TEF            TEXT,
+                    FILES          TEXT,
+                    NEW_FILES      TEXT,
+                    COMMENTS       TEXT);
+                    """)
+    
 
 def createTgcFilesTable(cur):
     """Create the tgc_files table
@@ -701,7 +719,19 @@ def createTcfFilesTable(cur):
                     FILES              TEXT);
                     """)
 
+
+def createTefFilesTable(cur):
+    """Create the tef_files table
+    
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE TEF_FILES 
+                    (ID                INTEGER     PRIMARY KEY    NOT NULL,
+                    TEF                TEXT,
+                    FILES              TEXT);
+                    """)
         
+
 def dropAllTables(db_path):
     """Drops all of the tables in the database at the given path.
     
@@ -720,11 +750,13 @@ def dropAllTables(db_path):
             cur.execute("""DROP TABLE IF EXISTS BC_DBASE""")
             cur.execute("""DROP TABLE IF EXISTS ECF""")
             cur.execute("""DROP TABLE IF EXISTS TCF""")
+            cur.execute("""DROP TABLE IF EXISTS TEF""")
             cur.execute("""DROP TABLE IF EXISTS TGC_FILES""")
             cur.execute("""DROP TABLE IF EXISTS TBC_FILES""")
             cur.execute("""DROP TABLE IF EXISTS BC_DBASE_FILES""")
             cur.execute("""DROP TABLE IF EXISTS ECF_FILES""")
             cur.execute("""DROP TABLE IF EXISTS TCF_FILES""")
+            cur.execute("""DROP TABLE IF EXISTS TEF_FILES""")
             cur.execute("""DROP TABLE IF EXISTS RUN_ID""")
             con.commit()
         except con.Error:
@@ -750,18 +782,20 @@ dat = ['ID', 'DATE', 'DAT', 'AMENDMENTS', 'COMMENTS']
 bc_dbase = ['ID', 'BC_DBASE', 'FILES', 'NEW_FILES', 'COMMENTS']
 ecf = ['ID', 'ECF', 'FILES', 'NEW_FILES', 'COMMENTS']
 tcf = ['ID', 'TCF', 'FILES', 'NEW_FILES', 'COMMENTS']
+tef = ['ID', 'TEF', 'FILES', 'NEW_FILES', 'COMMENTS']
 tgc_files = ['ID', 'TGC', 'FILES']
 tbc_files = ['ID', 'TBC', 'FILES']
 bc_dbase_files = ['ID', 'BC_DBASE', 'FILES']
 ecf_files = ['ID', 'ECF', 'FILES']
 tcf_files = ['ID', 'TCF', 'FILES']
+tef_files = ['ID', 'TEF', 'FILES']
 run_id = ['ID', 'RUN_ID', 'FILE']
 
 cur_tables = {'RUN': run, 'TGC': tgc, 'TBC': tbc, 'DAT': dat, 'ECF': ecf, 'TCF': tcf,
-              'BC_DBASE': bc_dbase, 'TGC_FILES': tgc_files, 
+              'TEF': tef, 'BC_DBASE': bc_dbase, 'TGC_FILES': tgc_files, 
               'TBC_FILES': tbc_files, 'BC_DBASE_FILES': bc_dbase_files,
               'ECF_FILES': ecf_files, 'TCF_FILES': tcf_files,
-              'RUN_ID': run_id
+              'TEF_FILES': tef_files, 'RUN_ID': run_id
               }
 
 def buildTableFromName(table_type, cur):
@@ -773,12 +807,13 @@ def buildTableFromName(table_type, cur):
         table_types = {'RUN': createRunTable, 'TGC': createTgcTable, 
                         'TBC': createTbcTable, 'DAT': createDatTable, 
                         'BC_DBASE': createBcTable, 'ECF': createEcfTable,
-                        'TCF': createTcfTable,
+                        'TCF': createTcfTable, 'TEF': createTefTable,
                         'TGC_FILES': createTgcFilesTable, 
                         'TBC_FILES': createTbcFilesTable, 
                         'BC_DBASE_FILES': createBcFilesTable,
                         'ECF_FILES': createEcfFilesTable,
                         'TCF_FILES': createTcfFilesTable,
+                        'TEF_FILES': createTefFilesTable,
                         'RUN_ID': createRunIdTable,
                        }
         
