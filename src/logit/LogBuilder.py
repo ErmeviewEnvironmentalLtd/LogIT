@@ -269,11 +269,11 @@ class ModelLoader(object):
         """
         outvals = {'scenario': {}, 'event': {}}
         vals = options.split(" ")
-        for i in range(vals):
+        for i in range(len(vals)):
             if vals[i].startswith('s'):
-                outvals['scenario'][vals[i]] = [i+1]
+                outvals['scenario'][vals[i]] = vals[i+1]
             elif vals[i].startswith('e'):
-                outvals['event'][vals[i]] = [i+1]
+                outvals['event'][vals[i]] = vals[i+1]
         
         return outvals
     
