@@ -837,6 +837,7 @@ class MainGui(QtGui.QMainWindow):
                                         gs.path_holder['log'], path, errors)
                 
                 if errors.has_local_errors:
+                    errors.has_local_errors = False
                     continue
                 
                 run = all_logs.getLogEntryContents('RUN', 0)
@@ -850,7 +851,7 @@ class MainGui(QtGui.QMainWindow):
                 
                 # If there was an issue updating the database drop out now and 
                 # launch the error.
-                if errors.msgbox_error and errors.msgbox_error.type == self.DB_UPDATE:
+                if errors.msgbox_error and errors.msgbox_error.title == errors.DB_UPDATE:
                     if not self._TEST_MODE:
                         self.launchQMsgBox(errors.msgbox_error.title, 
                                                 errors.msgbox_error.message)
@@ -1022,12 +1023,12 @@ class MainGui(QtGui.QMainWindow):
     def _createNewLogDatabase(self):
         """Create a new model log database.
         """
-        self.launchQMsgBox('', 'In new log create')
+#         self.launchQMsgBox('', 'In new log create')
         if 'log' in gs.path_holder.keys():
             p = gs.path_holder['log']
         else:
             p = cur_location
-        self.launchQMsgBox('', 'After path variable check')
+#         self.launchQMsgBox('', 'After path variable check')
             
         d = MyFileDialogs(parent=self)
         save_path = d.saveFileDialog(path=p, file_types='LogIT database(*.logdb)')
