@@ -290,7 +290,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                     run['TUFLOW_BUILD'] = self.settings['tuflow_model'] = input_vars['TUFLOW_BUILD'] 
                     run['ISIS_BUILD'] = self.settings['isis_build'] = input_vars['ISIS_BUILD']
                     run['EVENT_NAME'] = self.settings['event_name'] = input_vars['EVENT_NAME'] 
-#                     run['RUN_OPTIONS'] = self.settings['run_options'] = input_vars['RUN_OPTIONS']
+                    run['RUN_OPTIONS'] = self.settings['run_options'] = input_vars['RUN_OPTIONS']
                     self._updateNewEntryTree(entry_status)
                     self.submitSingleModelGroup.setEnabled(True)
                     

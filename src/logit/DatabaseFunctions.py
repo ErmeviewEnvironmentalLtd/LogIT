@@ -466,6 +466,9 @@ def createNewLogDatabase(db_path):
         
         createTcfTable(cur)
         logger.info('Tcf table created')
+        
+        createTefTable(cur)
+        logger.info('Tef table created')
 
         createBcTable(cur)
         logger.info('BC Database table created')

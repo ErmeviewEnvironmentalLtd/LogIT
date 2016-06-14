@@ -310,6 +310,8 @@ class MainGui(QtGui.QMainWindow):
                             'bcEntryViewTable', self.ui.bcEntryViewTable))
         self.view_tables.addTable(GuiStore.TableWidget('DAT', 
                             'datEntryViewTable', self.ui.datEntryViewTable))
+        self.view_tables.addTable(GuiStore.TableWidget('TEF', 
+                            'datEntryViewTable', self.ui.tefEntryViewTable))
         self._addWidgets()
     
     
