@@ -67,6 +67,7 @@ import itertools
 import cPickle
 import shutil
 import zipfile
+from operator import itemgetter
 
 from PyQt4 import QtCore, QtGui
 
@@ -1017,6 +1018,49 @@ def prepLogsForCopy(log_path):
     return zip_log
     
 
-
+def resolveFilenameSEVals(filename, se_vals):
+    """
+    """
+#     se_vals += ' -s blah' 
+    vals1 = []
+    se_vals = se_vals.split(' ')
+    for i in range(len(se_vals)):
+        if se_vals[i].startswith('-s') or se_vals[i].startswith('-e'):
+            vals1.append([se_vals[i], se_vals[i+1]])
+    
+    vals = sorted(vals1, key=itemgetter(0))
+        
+    outname = filename
+    in_e = False
+    for v in vals:
+        placeholder = ''.join(['~', v[0][1:], '~'])
+        
+        if placeholder in filename:
+            outname = outname.replace(placeholder, v[1])
+        elif v[0] == '-e1' and '~e~' in filename and not '-e' in se_vals:
+            outname = outname.replace('~e~', v[1])
+        elif v[0] == '-s1' and '~s~' in filename and not '-s' in se_vals:
+            outname = outname.replace('~s~', v[1])
+        else:
+            if v[0].startswith('-e'):
+                if not in_e: 
+                    prefix = '_'
+                else:
+                    prefix = '+'
+                in_e = True
+            elif v[0].startswith('-s'):
+                if in_e: 
+                    prefix = '_'
+                else:
+                    prefix = '+'
+                in_e = False
+            outname += prefix + v[1]
+        
+    return outname
+    
+    
+    
+    
+    
 
     

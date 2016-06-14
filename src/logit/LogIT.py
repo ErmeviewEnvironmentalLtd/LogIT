@@ -256,6 +256,9 @@ class MainGui(QtGui.QMainWindow):
         self.ui.tcfEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tcfEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
         self.ui.tcfEntryViewTable.itemChanged.connect(self._highlightEditRow)
+        self.ui.tefEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.tefEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.tefEntryViewTable.itemChanged.connect(self._highlightEditRow)
         logger.debug('Slot connection complete')
         
         # Load the user settings from the last time the software was used 
@@ -311,7 +314,7 @@ class MainGui(QtGui.QMainWindow):
         self.view_tables.addTable(GuiStore.TableWidget('DAT', 
                             'datEntryViewTable', self.ui.datEntryViewTable))
         self.view_tables.addTable(GuiStore.TableWidget('TEF', 
-                            'datEntryViewTable', self.ui.tefEntryViewTable))
+                            'tefEntryViewTable', self.ui.tefEntryViewTable))
         self._addWidgets()
     
     
@@ -543,11 +546,18 @@ class MainGui(QtGui.QMainWindow):
             elif action == addToRunSummaryAction:
                 if not 'Run Summary' in self.widgets.keys(): return
                 row = table_obj.currentRow()
-                row_dict = table_obj.getValues(row=row, names=['ID', 'LOG_DIR', 'TCF'])
+                row_dict = table_obj.getValues(row=row, names=['ID', 'LOG_DIR', 
+                                                               'TCF', 'RUN_OPTIONS'])
                 tcf = row_dict['TCF'][1:-1]
                 tcf = tcf.split(',')[0]
                 tcf_name = os.path.splitext(tcf)[0]
-                tlf_file = os.path.join(row_dict['LOG_DIR'], tcf_name + '.tlf')
+                
+                option_name = tcf_name
+                if not row_dict['RUN_OPTIONS'] == 'None':
+                    option_name = Controller.resolveFilenameSEVals(tcf_name, 
+                                                    row_dict['RUN_OPTIONS'])
+                
+                tlf_file = os.path.join(row_dict['LOG_DIR'], option_name + '.tlf')
                 
                 if os.path.exists(tlf_file):
                     self.ui.tabWidget.setCurrentWidget(self.widgets['Run Summary'])
