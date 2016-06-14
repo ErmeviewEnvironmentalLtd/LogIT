@@ -616,7 +616,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         self.tabWidget.setCurrentIndex(1)
-        self.logViewTab.setCurrentIndex(7)
+        self.logViewTab.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.tabWidget, self.logViewTab)
         MainWindow.setTabOrder(self.logViewTab, self.runEntryViewTable)

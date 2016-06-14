@@ -1019,17 +1019,36 @@ def prepLogsForCopy(log_path):
     
 
 def resolveFilenameSEVals(filename, se_vals):
+    """Replace a tuflow placeholder filename with the scenario/event values.
+    
+    Replaces all of the placholder values (e.g. ~s1~_~e1~) in a tuflow 
+    filename with the corresponding values provided in the run options string.
+    If the run options flags are not found in the filename their values will
+    be appended to the end of the string.
+    
+    The setup of the returned filename is always the same:  
+        - First replace all placeholders with corresponding flag values.
+        - s1 == s and e1 == e.
+        - Append additional e values to end with '_' before first and '+' before others.
+        - Append additional s values to end with '_' before first and '+' before others.
+    
+    Args:
+        filename(str): the filename to update.
+        se_vals(str): the run options string containing the 's' and 'e' flags
+            and their corresponding values.
+    
+    Return:
+        str - the updated filename.
     """
-    """
-#     se_vals += ' -s blah' 
+    # Format the input string as a list and sort by s and e flags
     vals1 = []
     se_vals = se_vals.split(' ')
     for i in range(len(se_vals)):
         if se_vals[i].startswith('-s') or se_vals[i].startswith('-e'):
             vals1.append([se_vals[i], se_vals[i+1]])
-    
     vals = sorted(vals1, key=itemgetter(0))
         
+    # Build a new filename by replacing or adding the flag values
     outname = filename
     in_e = False
     for v in vals:
