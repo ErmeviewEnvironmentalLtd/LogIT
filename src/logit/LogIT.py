@@ -529,7 +529,9 @@ class MainGui(QtGui.QMainWindow):
                 if not 'Model Extractor' in self.widgets.keys(): return
                 errors = GuiStore.ErrorHolder()
                 row = table_obj.currentRow()
-                row_dict = table_obj.getValues(row=row, names=['ID', 'IEF', 'IEF_DIR', 'TCF', 'TCF_DIR'])
+                row_dict = table_obj.getValues(row=row, names=['ID', 'IEF', 'IEF_DIR', 
+                                                               'TCF', 'TCF_DIR', 
+                                                               'RUN_OPTIONS'])
                 errors, in_path = Controller.extractModel(
                                                 self.settings.cur_settings_path, 
                                                 row_dict, errors)
@@ -539,6 +541,7 @@ class MainGui(QtGui.QMainWindow):
                         self.launchQMsgBox(errors.msgbox_error.title, 
                                        errors.msgbox_error.message)
                 else:
+                    self.widgets['Model Extractor'].extractRunOptionsTextbox.setText(row_dict['RUN_OPTIONS'])
                     self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
                     self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
             

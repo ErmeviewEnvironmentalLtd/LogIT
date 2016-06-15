@@ -60,6 +60,7 @@ from ship.utils.fileloaders.fileloader import FileLoader
 from ship.tuflow.data_files import datafileloader
 from ship.utils import filetools
 from ship.tuflow import FILEPART_TYPES as fpt
+from ship.utils import utilfunctions as uf
     
 from AWidget import AWidget
 import ModelExtractor_Widget as extractwidget
@@ -188,6 +189,11 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         self._extractVars = ExtractVars()
         self.extractOutputTextArea.clear()
         self._extractVars.out_dir = out_dir
+        se_vals = str(self.extractRunOptionsTextbox.text())
+        if not se_vals == '':
+            self.se_vals = uf.convertRunOptionsToSEDict(se_vals)
+        else:
+            self.se_vals = None
         
         # Check if we're dealing with an ief or a tcf
         ext = os.path.splitext(in_path)[1]
@@ -686,6 +692,8 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         functions called updated the path variables on all of these files.
         """
         run_name = self._extractVars.tuflow.mainfile.file_name
+        if not self.se_vals is None:
+            run_name = uf.getSEResolvedFilename(run_name, self.se_vals)
         model_files = self._extractVars.tuflow.getTuflowModelFiles()
 
         for key, model_list in model_files.items():

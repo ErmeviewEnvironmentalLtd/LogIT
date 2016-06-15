@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '..\LogIt\src\logit\extractmodel\ModelExtractor_Widget.ui'
+# Form implementation generated from reading ui file '.\ModelExtractor_Widget.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -50,26 +50,32 @@ class Ui_ExtractModelWidget(object):
         self.inputBox.setObjectName(_fromUtf8("inputBox"))
         self.gridLayout = QtGui.QGridLayout(self.inputBox)
         self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+        self.extractModelFileTextbox = QtGui.QLineEdit(self.inputBox)
+        self.extractModelFileTextbox.setObjectName(_fromUtf8("extractModelFileTextbox"))
+        self.gridLayout.addWidget(self.extractModelFileTextbox, 1, 1, 1, 1)
+        self.extractModelFileButton = QtGui.QPushButton(self.inputBox)
+        self.extractModelFileButton.setObjectName(_fromUtf8("extractModelFileButton"))
+        self.gridLayout.addWidget(self.extractModelFileButton, 1, 2, 1, 1)
         self.extractOutputButton = QtGui.QPushButton(self.inputBox)
         self.extractOutputButton.setObjectName(_fromUtf8("extractOutputButton"))
-        self.gridLayout.addWidget(self.extractOutputButton, 1, 2, 1, 1)
+        self.gridLayout.addWidget(self.extractOutputButton, 2, 2, 1, 1)
         self.extractOutputLabel = QtGui.QLabel(self.inputBox)
         self.extractOutputLabel.setMinimumSize(QtCore.QSize(50, 0))
         self.extractOutputLabel.setObjectName(_fromUtf8("extractOutputLabel"))
-        self.gridLayout.addWidget(self.extractOutputLabel, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.extractOutputLabel, 2, 0, 1, 1)
         self.extractOutputTextbox = QtGui.QLineEdit(self.inputBox)
         self.extractOutputTextbox.setObjectName(_fromUtf8("extractOutputTextbox"))
-        self.gridLayout.addWidget(self.extractOutputTextbox, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.extractOutputTextbox, 2, 1, 1, 1)
         self.extractModelFileLabel = QtGui.QLabel(self.inputBox)
         self.extractModelFileLabel.setMinimumSize(QtCore.QSize(50, 0))
         self.extractModelFileLabel.setObjectName(_fromUtf8("extractModelFileLabel"))
-        self.gridLayout.addWidget(self.extractModelFileLabel, 0, 0, 1, 1)
-        self.extractModelFileTextbox = QtGui.QLineEdit(self.inputBox)
-        self.extractModelFileTextbox.setObjectName(_fromUtf8("extractModelFileTextbox"))
-        self.gridLayout.addWidget(self.extractModelFileTextbox, 0, 1, 1, 1)
-        self.extractModelFileButton = QtGui.QPushButton(self.inputBox)
-        self.extractModelFileButton.setObjectName(_fromUtf8("extractModelFileButton"))
-        self.gridLayout.addWidget(self.extractModelFileButton, 0, 2, 1, 1)
+        self.gridLayout.addWidget(self.extractModelFileLabel, 1, 0, 1, 1)
+        self.extractRunOptionsTextbox = QtGui.QLineEdit(self.inputBox)
+        self.extractRunOptionsTextbox.setObjectName(_fromUtf8("extractRunOptionsTextbox"))
+        self.gridLayout.addWidget(self.extractRunOptionsTextbox, 0, 1, 1, 1)
+        self.label_2 = QtGui.QLabel(self.inputBox)
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.gridLayout.addWidget(self.label_2, 0, 0, 1, 1)
         self.verticalLayout_2.addWidget(self.inputBox)
         self.modelExtractorGroup = QtGui.QGroupBox(ExtractModelWidget)
         font = QtGui.QFont()
@@ -92,13 +98,16 @@ class Ui_ExtractModelWidget(object):
         self.extractOutputTextArea.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.extractOutputTextArea.setLineWrapMode(QtGui.QTextEdit.NoWrap)
         self.extractOutputTextArea.setObjectName(_fromUtf8("extractOutputTextArea"))
-        self.gridLayout_2.addWidget(self.extractOutputTextArea, 1, 0, 1, 2)
+        self.gridLayout_2.addWidget(self.extractOutputTextArea, 2, 0, 1, 3)
         self.extractModelButton = QtGui.QPushButton(self.modelExtractorGroup)
         self.extractModelButton.setMinimumSize(QtCore.QSize(100, 0))
         self.extractModelButton.setObjectName(_fromUtf8("extractModelButton"))
-        self.gridLayout_2.addWidget(self.extractModelButton, 0, 0, 1, 1)
+        self.gridLayout_2.addWidget(self.extractModelButton, 1, 0, 1, 1)
         spacerItem = QtGui.QSpacerItem(490, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
-        self.gridLayout_2.addItem(spacerItem, 0, 1, 1, 1)
+        self.gridLayout_2.addItem(spacerItem, 1, 2, 1, 1)
+        self.extractorHardcodeFilesCbox = QtGui.QCheckBox(self.modelExtractorGroup)
+        self.extractorHardcodeFilesCbox.setObjectName(_fromUtf8("extractorHardcodeFilesCbox"))
+        self.gridLayout_2.addWidget(self.extractorHardcodeFilesCbox, 1, 1, 1, 1)
         self.verticalLayout_2.addWidget(self.modelExtractorGroup)
 
         self.retranslateUi(ExtractModelWidget)
@@ -107,14 +116,16 @@ class Ui_ExtractModelWidget(object):
     def retranslateUi(self, ExtractModelWidget):
         ExtractModelWidget.setWindowTitle(_translate("ExtractModelWidget", "Form", None))
         self.groupBox.setTitle(_translate("ExtractModelWidget", "Overview", None))
-        self.label.setText(_translate("ExtractModelWidget", "Extract all of the files associated with a model into another directory.\n"
-"Either browse for a model file (.ief or .tcf) in the inputs group or right-click on an logged entry in the Run table and select \'Extract model\'.\n"
+        self.label.setText(_translate("ExtractModelWidget", "Extract all of the files associated with a model into another directory. Either browse for a model file (.ief or .tcf) in the inputs group or right-click on an logged entry in the Run table and select \'Extract model\'. If using the right-click menu any run options should be automatically written to the text box, or you can enter them manually. These will be needed if placeholders are used in filenames in order to locate results, checkfiles, and log files. If  the model contains scenario and event setups and you would like to create standard hardcoded control files for delivery check the box.\n"
+"\n"
 "Any issues with exporting the model, including missing files, or files that could not be copied, will be recorded in the text box below the extract model button.", None))
         self.inputBox.setTitle(_translate("ExtractModelWidget", "Inputs", None))
+        self.extractModelFileButton.setText(_translate("ExtractModelWidget", "Browse...", None))
         self.extractOutputButton.setText(_translate("ExtractModelWidget", "Browse...", None))
         self.extractOutputLabel.setText(_translate("ExtractModelWidget", "Output folder", None))
         self.extractModelFileLabel.setText(_translate("ExtractModelWidget", "Model file", None))
-        self.extractModelFileButton.setText(_translate("ExtractModelWidget", "Browse...", None))
+        self.label_2.setText(_translate("ExtractModelWidget", "Run options", None))
         self.modelExtractorGroup.setTitle(_translate("ExtractModelWidget", "Model extractor", None))
         self.extractModelButton.setText(_translate("ExtractModelWidget", "Extract Model", None))
+        self.extractorHardcodeFilesCbox.setText(_translate("ExtractModelWidget", "Hardcode output files", None))
 
