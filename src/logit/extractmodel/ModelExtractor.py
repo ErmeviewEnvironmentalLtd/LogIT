@@ -220,8 +220,14 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
                                       "Model has found tcf but tcf_path is None")
             return False, None
         
-        return True, tuflow_files
+        #DEBUG
+#         for k, t in tuflow_files.items():
+#             filetools.writeFile(t, k)
+        
             
+        return True, tuflow_files
+        
+    
     def _extractModelWrite(self, tuflow_files):
         """Writes out all the updated files to the new location."""
         
@@ -242,12 +248,11 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             if not os.path.exists(d):
                 os.makedirs(d, 0777)
             filetools.writeFile(contents, 
-                                self._extractVars.ief.path_holder.getAbsolutePath(), 
-                                add_newline=True)
+                                self._extractVars.ief.path_holder.getAbsolutePath())
         
         if not self._extractVars.tcf_path == None:
             for path, contents in tuflow_files.iteritems():
-                filetools.writeFile(contents, path, add_newline=False)
+                filetools.writeFile(contents, path)
         
         return True
         
