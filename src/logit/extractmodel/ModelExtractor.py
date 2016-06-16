@@ -36,6 +36,12 @@
          should cause less hassle when additional variables need to be added.
          Also now shares the path_holder dict in globalsettings.py.
          Now using the AWidget interface.
+     DR (16/06/2-16):
+         Add run options input textbox and logic for dealing with run options.
+         When run options are supplied the user can choose between either 
+         copying all files in the model and maintaining the original setup of
+         the control files, or hardcoding the output control files and only
+         copying the files specified by the run options.
 
  TODO:
      (12/06/16): Some files are being added to the in and out lists twice.
@@ -159,6 +165,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         """
         in_path = str(self.extractModelFileTextbox.text())
         out_dir = str(self.extractOutputTextbox.text())
+        
         if not os.path.exists(in_path):
             logger.error('Model file does not exist')
             QtGui.QMessageBox.warning(self, "File not found",
@@ -189,11 +196,14 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         self._extractVars = ExtractVars()
         self.extractOutputTextArea.clear()
         self._extractVars.out_dir = out_dir
+        self._extractVars.hardcode = self.extractorHardcodeFilesCbox.isChecked()
+        
         se_vals = str(self.extractRunOptionsTextbox.text())
         if not se_vals == '':
             self.se_vals = uf.convertRunOptionsToSEDict(se_vals)
         else:
-            self.se_vals = None
+            self.se_vals = {}
+            self._extractVars.hardcode = False
         
         # Check if we're dealing with an ief or a tcf
         ext = os.path.splitext(in_path)[1]
@@ -211,14 +221,20 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Reading Tuflow files')
             self._extractVars.out_dir = os.path.join(self._extractVars.out_dir, 'tuflow','runs')
             loader = FileLoader()
-            self._extractVars.tuflow = loader.loadFile(self._extractVars.tcf_path)
+            self._extractVars.tuflow = loader.loadFile(self._extractVars.tcf_path,
+                                                       self.se_vals)
             self._loadModelFiles()
             
             success = self._updateModelFilePaths() 
             if not success:
                 return False, None
 
-            tuflow_files = self._extractVars.tuflow.getPrintableContents()
+            if self._extractVars.hardcode:
+                tuflow_files = self._extractVars.tuflow.getPrintableContents(se_only=True)
+            else:
+                tuflow_files = self._extractVars.tuflow.getPrintableContents()
+            
+            i=0
         
         elif not self._extractVars.has_tcf:
             logger.error('Model has found tcf but tcf_path is None')
@@ -489,6 +505,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             self._extractVars.results_files.append([in_name, out_name])
             r.relative_root = new_root
             r.parent_relative_root = rel_root
+            r.root = ''
         
 
     def _fetchDataFiles(self, model_file, source_root, rel_root, model_root): 
@@ -505,7 +522,11 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             model_root(str): the relative path of the model file to set.
         
         """
-        data_files = model_file.getFiles(fpt.DATA)
+        if self._extractVars.hardcode:
+            data_files = model_file.getFiles(fpt.DATA, se_vals=self.se_vals)
+        else:
+            data_files = model_file.getFiles(fpt.DATA)
+
         for d in data_files:
             paths = d.getAbsolutePath(all_types=True)
 
@@ -554,7 +575,10 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             model_root(str): the relative path of the model file to set.
         
         """
-        gis_files = model_file.getFiles(fpt.GIS)
+        if self._extractVars.hardcode:
+            gis_files = model_file.getFiles(fpt.GIS, se_vals=self.se_vals)
+        else:
+            gis_files = model_file.getFiles(fpt.GIS)
         for g in gis_files:
             paths = g.getAbsolutePath(all_types=True)
             
@@ -644,6 +668,12 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         out_name_check = []
         in_name_check = []
         
+        # Maybe play it safe here and update all of the files just in case?
+        # It would avoid accidentally overwriting a file if something went wrong
+#         if self._extractVars.se_only:
+#             model_files = self._extractVars.tuflow.getModelFiles(se_only=True)
+#         else:
+#             model_files = self._extractVars.tuflow.getModelFiles()
         model_files = self._extractVars.tuflow.getModelFiles()
         
         try:
@@ -692,9 +722,13 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         functions called updated the path variables on all of these files.
         """
         run_name = self._extractVars.tuflow.mainfile.file_name
-        if not self.se_vals is None:
+        if not self.se_vals == {}:
             run_name = uf.getSEResolvedFilename(run_name, self.se_vals)
-        model_files = self._extractVars.tuflow.getTuflowModelFiles()
+        
+        if self._extractVars.hardcode:
+            model_files = self._extractVars.tuflow.getTuflowModelFiles(se_only=True)
+        else:
+            model_files = self._extractVars.tuflow.getTuflowModelFiles()
 
         for key, model_list in model_files.items():
             for m in model_list:
@@ -719,10 +753,19 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         self._extractVars.ief = loader.loadFile(self._extractVars.ief_path)
         
         if '2DFile' in self._extractVars.ief.event_details.keys():
-            self._extractVars.tcf_path = self._extractVars.ief.event_details['2DFile']
-            out_tcf = os.path.split(self._extractVars.tcf_path)[1]
-            self._extractVars.ief.event_details['2DFile'] = os.path.join(r'..\..\tuflow\runs', out_tcf)
-            self._extractVars.has_tcf = True
+            scheme = self._extractVars.ief.getValue('2DScheme')
+            if scheme == 'Tuflow':
+                self._extractVars.tcf_path = self._extractVars.ief.event_details['2DFile']
+                out_tcf = os.path.split(self._extractVars.tcf_path)[1]
+                self._extractVars.ief.event_details['2DFile'] = os.path.join(r'..\..\tuflow\runs', out_tcf)
+                self._extractVars.has_tcf = True
+                
+                # Get 2D run options str if found and convert to correct format
+                options = self._extractVars.ief.getValue('2DOptions')
+                if not options is None:
+                    self.se_vals = uf.convertRunOptionsToSEDict(options)
+                else:
+                    self.se_vals = {}
         
         if 'InitialConditions' in self._extractVars.ief.event_details.keys():
             ic = self._extractVars.ief.event_details['InitialConditions']
