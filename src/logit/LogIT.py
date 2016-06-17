@@ -796,13 +796,14 @@ class MainGui(QtGui.QMainWindow):
                 
                 # Add the new entries to the view table as well
                 self.loadModelLog()
-            except:
+            except Exception, err:
                 self._updateStatusBar('')
                 msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
                        "all gone terribly wrong. You're on your own dude.\n" +
                        "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
                        "Game over man, I'm outta here <-((+_+))->")
-                logger.error(msg)
+                logger.error('Critical error in create log entry')
+                logger.exception(err)
                 self.launchQMsgBox('Critical Error', msg)
                 return
             
@@ -884,7 +885,8 @@ class MainGui(QtGui.QMainWindow):
                    "all gone terribly wrong. You're on your own dude.\n" +
                    "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
                    "Game over man, I'm outta here <-((+_+))->")
-            logger.error(msg + str(err))
+            logger.error('Critical error in multiple model load.')
+            logger.exception(err)
             
             if self._TEST_MODE:
                 return errors

@@ -163,24 +163,37 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         Calls two functions to setup and find the file and then to write them
         to the new location.
         """
-        in_path = str(self.extractModelFileTextbox.text())
-        out_dir = str(self.extractOutputTextbox.text())
-        
-        if not os.path.exists(in_path):
-            logger.error('Model file does not exist')
-            QtGui.QMessageBox.warning(self, "File not found",
-                                      "Model file does not exist")
-            return
+        try:
+            in_path = str(self.extractModelFileTextbox.text())
+            out_dir = str(self.extractOutputTextbox.text())
             
-        if not os.path.exists(out_dir):
-            logger.error('Output directory does not exist')
-            QtGui.QMessageBox.warning(self, "Directory not found",
-                                      "Output directory does not exist")
-            return
+            if not os.path.exists(in_path):
+                logger.error('Model file does not exist')
+                QtGui.QMessageBox.warning(self, "File not found",
+                                          "Model file does not exist")
+                return
+                
+            if not os.path.exists(out_dir):
+                logger.error('Output directory does not exist')
+                QtGui.QMessageBox.warning(self, "Directory not found",
+                                          "Output directory does not exist")
+                return
 
-        success, tuflow_files = self._extractModelSetup(in_path, out_dir)
-        if success:
-            success = self._extractModelWrite(tuflow_files)
+            success, tuflow_files = self._extractModelSetup(in_path, out_dir)
+            if success:
+                success = self._extractModelWrite(tuflow_files)
+        
+        except Exception, err:
+            msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
+                   "all gone terribly wrong. You're on your own dude.\n" +
+                   "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
+                   "Game over man, I'm outta here <-((+_+))->")
+            logger.error('Critical error in model extraction - trying to exit gracefully')
+            logger.exception(err)
+            self.launchQMsgBox('Critical Error', msg)
+            self.emit(QtCore.SIGNAL("updateProgress"), 0)
+            self.emit(QtCore.SIGNAL("statusUpdate"), '')
+            return
 
         self._displayOutput(in_path, out_dir)
         self.emit(QtCore.SIGNAL("updateProgress"), 0)
