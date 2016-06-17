@@ -1,12 +1,15 @@
+- [Feature] Added support for scenarios and events when logging. Providing run
+  options, either in the UI or the FMP run form will cause only the
+  corresponding files to be logged.
+- [Feature] Added suppoer for scenario and events when using the model extractor.
+  It is now possible to select a 'Harcode output files' option. This will 
+  re-write the control files to only use the file and variable calls within
+  the specified scenarios and events. None of the if else logic will be kept
+  in the output files.
+- Updated to new version of SHIP library with support for scenario and event
+  logic.
+- Added scenario run options input box to New Entry and Model Extractor.
 - Added some additional database tables and some changes to the user interface
-  to maintain complience with the next release.
 - [Bugfix] problem with multiple model loader when one of the files already
   exists in the database.
-- <em>Original release notes below:</em>
--
-- This is a minor release to update the database before a major upgrade from
-  the SHIP library is introduced in the next version. Next version will 
-  possibly be an unstable release so database compatibility with this one will
-  make it possible to switch back if needed.
-- Updated database to version 8.
-- Added TEF column to RUN table.
+- [Feature] Added TEF column to RUN table.
