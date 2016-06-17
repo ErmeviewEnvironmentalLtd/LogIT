@@ -754,7 +754,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         
         if '2DFile' in self._extractVars.ief.event_details.keys():
             scheme = self._extractVars.ief.getValue('2DScheme')
-            if scheme == 'Tuflow':
+            if scheme.upper() == 'TUFLOW':
                 self._extractVars.tcf_path = self._extractVars.ief.event_details['2DFile']
                 out_tcf = os.path.split(self._extractVars.tcf_path)[1]
                 self._extractVars.ief.event_details['2DFile'] = os.path.join(r'..\..\tuflow\runs', out_tcf)
