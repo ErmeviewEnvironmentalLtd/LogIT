@@ -520,7 +520,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             r.parent_relative_root = rel_root
             r.root = ''
             r.has_own_root = False
-            i=0
+            
         
 
     def _fetchDataFiles(self, model_file, source_root, rel_root, model_root): 
