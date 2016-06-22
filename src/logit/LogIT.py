@@ -177,7 +177,8 @@ class MainGui(QtGui.QMainWindow):
         self.model_log = None
         
         # Database tables that should be exported to Excel
-        self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 'BC_DBASE']
+        self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 
+                              'BC_DBASE', 'TEF']
             
         icon_path = os.path.join(self.settings.cur_settings_path, 'Logit_Logo.ico')
         QtGui.QMainWindow.__init__(self, parent)
