@@ -112,6 +112,14 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         self.setupLookupLists()
     
 
+    def resetForm(self):
+        """Resets all of the form inputs."""
+        self.extractRunOptionsTextbox.setText('')
+        self.extractModelFileTextbox.setText('')
+        self.extractOutputTextbox.setText('')
+        self.extractOutputTextArea.setText('')
+
+        
     def _setInputFile(self):
         """Get the input model file to use."""
 
@@ -719,11 +727,13 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         """
         no_dup_old = []
         for f in self._extractVars.in_files:
-            if not f in no_dup_old: no_dup_old.append(f)
+            new_f = os.path.normpath(f)
+            if not new_f in no_dup_old: no_dup_old.append(new_f)
         
         no_dup_new = []
         for f in self._extractVars.out_files:
-            if not f in no_dup_new: no_dup_new.append(f)
+            new_f = os.path.normpath(f)
+            if not new_f in no_dup_new: no_dup_new.append(new_f)
         
         combo = zip(no_dup_old, no_dup_new)
         return combo

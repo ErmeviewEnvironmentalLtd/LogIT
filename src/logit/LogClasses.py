@@ -58,7 +58,7 @@ class AllLogs(object):
                            'TUFLOW_BUILD', 'AMENDMENTS', 'RUN_OPTIONS', 'MB',
                            'RUN_STATUS']
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 
-                              'BC_DBASE', 'TEF']
+                              'BC_DBASE', 'TEF', 'TRD']
         
         self.tcf_dir = tcf_dir
         self.ief_dir = ief_dir

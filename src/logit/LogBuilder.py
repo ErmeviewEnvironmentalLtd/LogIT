@@ -238,6 +238,8 @@ class ModelLoader(object):
             log_pages['TBC'] = [None]
             log_pages['ECF'] = [None]
             log_pages['TCF'] = [None]
+            log_pages['TEF'] = [None]
+            log_pages['TRD'] = [None]
             log_pages['BC_DBASE'] = [None]
         else:
             se_vals = self.tuflow.getCurrentSEVals()
@@ -247,6 +249,7 @@ class ModelLoader(object):
             log_pages['TGC'] = self.buildModelFileRow(tmfs['tgc'], 'tgc', se_vals)
             log_pages['TBC'] = self.buildModelFileRow(tmfs['tbc'], 'tbc', se_vals)
             log_pages['TEF'] = self.buildModelFileRow(tmfs['tef'], 'tef', se_vals)
+            log_pages['TRD'] = self.buildModelFileRow(tmfs['trd'], 'trd', se_vals)
             log_pages['BC_DBASE'] = self.buildBcRowFromModel()
 
         if self.log_type == TYPE_ESTRY:
@@ -293,7 +296,7 @@ class ModelLoader(object):
                     'COMMENTS': 'None', 'SETUP': 'None', 'ISIS_BUILD': 'None', 
                     'IEF': 'None', 'DAT': 'None', 'TUFLOW_BUILD': 'None', 
                     'TCF': 'None', 'TGC': 'None', 'TBC': 'None', 'BC_DBASE': 'None', 
-                    'ECF': 'None', 'TEF': 'None', 'EVENT_NAME': 'None', 
+                    'ECF': 'None', 'TEF': 'None', 'TRD': 'None', 'EVENT_NAME': 'None', 
                     'RUN_OPTIONS': 'None', 'TCF_DIR': 'None', 'IEF_DIR': 'None', 
                     'LOG_DIR': 'None', 'MB': 'None', 'RUN_STATUS': 'None'}
         
@@ -380,6 +383,7 @@ class ModelLoader(object):
         tbc_paths = [m.getFileNameAndExtension() for m in modelfiles['tbc']]
         ecf_paths = [m.getFileNameAndExtension() for m in modelfiles['ecf']]
         tef_paths = [m.getFileNameAndExtension() for m in modelfiles['tef']]
+        trd_paths = [m.getFileNameAndExtension() for m in modelfiles['trd']]
 
         if not len(tgc_paths) < 1:
             run_cols['TGC'] = "[" + ", ".join(tgc_paths) + "]"
@@ -387,6 +391,10 @@ class ModelLoader(object):
             run_cols['TBC'] = "[" + ", ".join(tbc_paths) + "]"
         if not len(ecf_paths) < 1:
             run_cols['ECF'] = "[" + ", ".join(ecf_paths) + "]"
+        if not len(tef_paths) < 1:
+            run_cols['TEF'] = "[" + ", ".join(tef_paths) + "]"
+        if not len(trd_paths) < 1:
+            run_cols['TRD'] = "[" + ", ".join(trd_paths) + "]"
 
         # Get the BC Database file references
         data = self.tuflow.getFiles(fpt.DATA, no_duplicates=True, se_only=True)

@@ -178,7 +178,7 @@ class MainGui(QtGui.QMainWindow):
         
         # Database tables that should be exported to Excel
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 
-                              'BC_DBASE', 'TEF']
+                              'BC_DBASE', 'TEF' 'TRD']
             
         icon_path = os.path.join(self.settings.cur_settings_path, 'Logit_Logo.ico')
         QtGui.QMainWindow.__init__(self, parent)
@@ -260,6 +260,9 @@ class MainGui(QtGui.QMainWindow):
         self.ui.tefEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.ui.tefEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
         self.ui.tefEntryViewTable.itemChanged.connect(self._highlightEditRow)
+        self.ui.trdEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.ui.trdEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
+        self.ui.trdEntryViewTable.itemChanged.connect(self._highlightEditRow)
         logger.debug('Slot connection complete')
         
         # Load the user settings from the last time the software was used 
@@ -316,6 +319,8 @@ class MainGui(QtGui.QMainWindow):
                             'datEntryViewTable', self.ui.datEntryViewTable))
         self.view_tables.addTable(GuiStore.TableWidget('TEF', 
                             'tefEntryViewTable', self.ui.tefEntryViewTable))
+        self.view_tables.addTable(GuiStore.TableWidget('TRD', 
+                            'trdEntryViewTable', self.ui.trdEntryViewTable))
         self._addWidgets()
     
     
@@ -493,7 +498,7 @@ class MainGui(QtGui.QMainWindow):
             updateStatusAction = menu.addAction("Update Status")
             tools_menu = menu.addMenu('Send to Tool')
             extractRowAction = tools_menu.addAction("Extract Model")
-            addToRunSummaryAction = tools_menu.addAction("Add to Run Summary")
+            addToRunSummaryAction = tools_menu.addAction("Run Summary")
             has_extras = True
         
         # lookup the table and database table name
@@ -542,7 +547,10 @@ class MainGui(QtGui.QMainWindow):
                         self.launchQMsgBox(errors.msgbox_error.title, 
                                        errors.msgbox_error.message)
                 else:
-                    self.widgets['Model Extractor'].extractRunOptionsTextbox.setText(row_dict['RUN_OPTIONS'])
+                    self.widgets['Model Extractor'].resetForm()
+                    options = row_dict['RUN_OPTIONS']
+                    if not options == 'None':
+                        self.widgets['Model Extractor'].extractRunOptionsTextbox.setText(options)
                     self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
                     self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
             

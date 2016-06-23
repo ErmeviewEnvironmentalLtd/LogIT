@@ -35,9 +35,9 @@
          <enum>QFrame::Raised</enum>
         </property>
         <property name="text">
-         <string>Extract all of the files associated with a model into another directory. Either browse for a model file (.ief or .tcf) in the inputs group or right-click on an logged entry in the Run table and select 'Extract model'. If using the right-click menu any run options should be automatically written to the text box, or you can enter them manually. These will be needed if placeholders are used in filenames in order to locate results, checkfiles, and log files. If  the model contains scenario and event setups and you would like to create standard hardcoded control files for delivery check the box.
+         <string>Extract all of the files associated with a model into another directory. Either browse for a model file (.ief or .tcf) in the inputs group or right-click on an logged entry in the Run table and select 'Send to Tool &gt; Extract model'. If using the right-click menu any run options should be automatically written to the text box, or you can enter them manually. These will be needed if placeholders are used in filenames in order to locate results, checkfiles, and log files. If  the model contains scenario and event logic and you would like to create standard hardcoded control files for delivery check the box.
 
-Any issues with exporting the model, including missing files, or files that could not be copied, will be recorded in the text box below the extract model button.</string>
+Any issues with exporting the model, including missing files, or files that could not be copied, will be recorded in the text box.</string>
         </property>
         <property name="textFormat">
          <enum>Qt::PlainText</enum>

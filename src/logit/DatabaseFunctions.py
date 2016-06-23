@@ -71,7 +71,7 @@ import traceback
 import logging
 logger = logging.getLogger(__name__)
 
-DATABASE_VERSION_NO = 9
+DATABASE_VERSION_NO = 10
 DATABASE_VERSION_SAME = 0
 DATABASE_VERSION_LOW = 1
 DATABASE_VERSION_HIGH = 2
@@ -469,6 +469,9 @@ def createNewLogDatabase(db_path):
         
         createTefTable(cur)
         logger.info('Tef table created')
+        
+        createTrdTable(cur)
+        logger.info('Trd table created')
 
         createBcTable(cur)
         logger.info('BC Database table created')
@@ -490,6 +493,9 @@ def createNewLogDatabase(db_path):
 
         createTefFilesTable(cur)
         logger.info('Tef Files table created')
+        
+        createTrdFilesTable(cur)
+        logger.info('Trd Files table created')
         
         createRunIdTable(cur)
         logger.info('Run id table created')
@@ -536,6 +542,7 @@ def createRunTable(cur):
                   BC_DBASE                TEXT,
                   ECF                     TEXT,
                   TEF                     TEXT,
+                  TRD                     TEXT,
                   EVENT_NAME              TEXT,
                   RUN_OPTIONS             TEXT,
                   TCF_DIR                 TEXT,
@@ -661,6 +668,21 @@ def createTefTable(cur):
                     NEW_FILES      TEXT,
                     COMMENTS       TEXT);
                     """)
+
+
+def createTrdTable(cur):
+    """Create the trd table
+    
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE TRD
+                    (ID            INTEGER     PRIMARY KEY    NOT NULL,
+                    DATE           TEXT                       NOT NULL,
+                    TRD            TEXT,
+                    FILES          TEXT,
+                    NEW_FILES      TEXT,
+                    COMMENTS       TEXT);
+                    """)
     
 
 def createTgcFilesTable(cur):
@@ -733,6 +755,18 @@ def createTefFilesTable(cur):
                     TEF                TEXT,
                     FILES              TEXT);
                     """)
+
+
+def createTrdFilesTable(cur):
+    """Create the trd_files table
+    
+    :param cur: a cursor to an open database connection
+    """
+    cur.execute("""CREATE TABLE TRD_FILES 
+                    (ID                INTEGER     PRIMARY KEY    NOT NULL,
+                    TRD                TEXT,
+                    FILES              TEXT);
+                    """)
         
 
 def dropAllTables(db_path):
@@ -754,12 +788,14 @@ def dropAllTables(db_path):
             cur.execute("""DROP TABLE IF EXISTS ECF""")
             cur.execute("""DROP TABLE IF EXISTS TCF""")
             cur.execute("""DROP TABLE IF EXISTS TEF""")
+            cur.execute("""DROP TABLE IF EXISTS TRD""")
             cur.execute("""DROP TABLE IF EXISTS TGC_FILES""")
             cur.execute("""DROP TABLE IF EXISTS TBC_FILES""")
             cur.execute("""DROP TABLE IF EXISTS BC_DBASE_FILES""")
             cur.execute("""DROP TABLE IF EXISTS ECF_FILES""")
             cur.execute("""DROP TABLE IF EXISTS TCF_FILES""")
             cur.execute("""DROP TABLE IF EXISTS TEF_FILES""")
+            cur.execute("""DROP TABLE IF EXISTS TRD_FILES""")
             cur.execute("""DROP TABLE IF EXISTS RUN_ID""")
             con.commit()
         except con.Error:
@@ -777,8 +813,8 @@ def dropAllTables(db_path):
 run = ['ID', 'DATE', 'MODELLER', 'RESULTS_LOCATION_2D', 'RESULTS_LOCATION_1D', 
        'EVENT_DURATION', 'DESCRIPTION', 'COMMENTS', 'SETUP', 'ISIS_BUILD', 
        'IEF', 'DAT', 'TUFLOW_BUILD', 'TCF', 'TGC', 'TBC', 'BC_DBASE', 'ECF',
-       'TEF', 'EVENT_NAME', 'RUN_OPTIONS', 'TCF_DIR', 'IEF_DIR', 'LOG_DIR', 'MB',
-       'RUN_STATUS'] 
+       'TEF', 'TRD', 'EVENT_NAME', 'RUN_OPTIONS', 'TCF_DIR', 'IEF_DIR', 
+       'LOG_DIR', 'MB', 'RUN_STATUS'] 
 tgc = ['ID', 'DATE', 'TGC', 'FILES', 'NEW_FILES', 'COMMENTS']
 tbc = ['ID', 'DATE', 'TBC', 'FILES', 'NEW_FILES', 'COMMENTS']
 dat = ['ID', 'DATE', 'DAT', 'AMENDMENTS', 'COMMENTS']
@@ -786,19 +822,21 @@ bc_dbase = ['ID', 'DATE', 'BC_DBASE', 'FILES', 'NEW_FILES', 'COMMENTS']
 ecf = ['ID', 'DATE', 'ECF', 'FILES', 'NEW_FILES', 'COMMENTS']
 tcf = ['ID', 'DATE', 'TCF', 'FILES', 'NEW_FILES', 'COMMENTS']
 tef = ['ID', 'DATE', 'TEF', 'FILES', 'NEW_FILES', 'COMMENTS']
+trd = ['ID', 'DATE', 'TRD', 'FILES', 'NEW_FILES', 'COMMENTS']
 tgc_files = ['ID', 'TGC', 'FILES']
 tbc_files = ['ID', 'TBC', 'FILES']
 bc_dbase_files = ['ID', 'BC_DBASE', 'FILES']
 ecf_files = ['ID', 'ECF', 'FILES']
 tcf_files = ['ID', 'TCF', 'FILES']
 tef_files = ['ID', 'TEF', 'FILES']
+trd_files = ['ID', 'TRD', 'FILES']
 run_id = ['ID', 'RUN_ID', 'FILE']
 
 cur_tables = {'RUN': run, 'TGC': tgc, 'TBC': tbc, 'DAT': dat, 'ECF': ecf, 'TCF': tcf,
-              'TEF': tef, 'BC_DBASE': bc_dbase, 'TGC_FILES': tgc_files, 
+              'TEF': tef, 'TRD': trd, 'BC_DBASE': bc_dbase, 'TGC_FILES': tgc_files, 
               'TBC_FILES': tbc_files, 'BC_DBASE_FILES': bc_dbase_files,
               'ECF_FILES': ecf_files, 'TCF_FILES': tcf_files,
-              'TEF_FILES': tef_files, 'RUN_ID': run_id
+              'TEF_FILES': tef_files, 'TRD_FILES': trd_files, 'RUN_ID': run_id
               }
 
 def buildTableFromName(table_type, cur):
@@ -811,12 +849,14 @@ def buildTableFromName(table_type, cur):
                         'TBC': createTbcTable, 'DAT': createDatTable, 
                         'BC_DBASE': createBcTable, 'ECF': createEcfTable,
                         'TCF': createTcfTable, 'TEF': createTefTable,
+                        'TRD': createTrdTable,
                         'TGC_FILES': createTgcFilesTable, 
                         'TBC_FILES': createTbcFilesTable, 
                         'BC_DBASE_FILES': createBcFilesTable,
                         'ECF_FILES': createEcfFilesTable,
                         'TCF_FILES': createTcfFilesTable,
                         'TEF_FILES': createTefFilesTable,
+                        'TRD_FILES': createTrdFilesTable,
                         'RUN_ID': createRunIdTable,
                        }
         

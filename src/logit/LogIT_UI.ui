@@ -467,6 +467,16 @@ p, li { white-space: pre-wrap; }
               </column>
               <column>
                <property name="text">
+                <string>TRD</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
+              <column>
+               <property name="text">
                 <string>EVENT_NAME</string>
                </property>
                <property name="font">
@@ -1140,6 +1150,98 @@ p, li { white-space: pre-wrap; }
               <column>
                <property name="text">
                 <string>TEF</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>FILES</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>NEW_FILES</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>COMMENTS</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="trdViewTab">
+           <attribute name="title">
+            <string>Trd Log</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <item>
+             <widget class="QTableWidget" name="trdEntryViewTable">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:9pt;&quot;&gt;Right-click row entry to delete or update&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="horizontalScrollMode">
+               <enum>QAbstractItemView::ScrollPerPixel</enum>
+              </property>
+              <property name="sortingEnabled">
+               <bool>true</bool>
+              </property>
+              <attribute name="horizontalHeaderStretchLastSection">
+               <bool>true</bool>
+              </attribute>
+              <column>
+               <property name="text">
+                <string>ID</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>DATE</string>
+               </property>
+               <property name="font">
+                <font>
+                 <pointsize>7</pointsize>
+                </font>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>TRD</string>
                </property>
                <property name="font">
                 <font>

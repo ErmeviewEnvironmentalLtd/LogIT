@@ -116,9 +116,9 @@ class Ui_ExtractModelWidget(object):
     def retranslateUi(self, ExtractModelWidget):
         ExtractModelWidget.setWindowTitle(_translate("ExtractModelWidget", "Form", None))
         self.groupBox.setTitle(_translate("ExtractModelWidget", "Overview", None))
-        self.label.setText(_translate("ExtractModelWidget", "Extract all of the files associated with a model into another directory. Either browse for a model file (.ief or .tcf) in the inputs group or right-click on an logged entry in the Run table and select \'Extract model\'. If using the right-click menu any run options should be automatically written to the text box, or you can enter them manually. These will be needed if placeholders are used in filenames in order to locate results, checkfiles, and log files. If  the model contains scenario and event setups and you would like to create standard hardcoded control files for delivery check the box.\n"
+        self.label.setText(_translate("ExtractModelWidget", "Extract all of the files associated with a model into another directory. Either browse for a model file (.ief or .tcf) in the inputs group or right-click on an logged entry in the Run table and select \'Send to Tool > Extract model\'. If using the right-click menu any run options should be automatically written to the text box, or you can enter them manually. These will be needed if placeholders are used in filenames in order to locate results, checkfiles, and log files. If  the model contains scenario and event logic and you would like to create standard hardcoded control files for delivery check the box.\n"
 "\n"
-"Any issues with exporting the model, including missing files, or files that could not be copied, will be recorded in the text box below the extract model button.", None))
+"Any issues with exporting the model, including missing files, or files that could not be copied, will be recorded in the text box.", None))
         self.inputBox.setTitle(_translate("ExtractModelWidget", "Inputs", None))
         self.extractModelFileButton.setText(_translate("ExtractModelWidget", "Browse...", None))
         self.extractOutputButton.setText(_translate("ExtractModelWidget", "Browse...", None))
