@@ -28,6 +28,7 @@ Dim bc_sheet As Worksheet
 Dim ecf_Sheet As Worksheet
 Dim tcf_sheet As Worksheet
 Dim tef_sheet As Worksheet
+Dim trd_sheet As Worksheet
 
 
 ' Sets up the log book with the custom colours and formatting
@@ -83,6 +84,12 @@ Sub formatLogbook()
     If has_tef Then
         setupTefSheet
     End If
+
+    Dim has_trd As Boolean
+    has_trd = sheetExists("TRD")
+    If has_trd Then
+        setupTrdSheet
+    End If
     
     ' Zoom out a little bit on all of the sheets and then set the active sheet
     ' as the Run sheet
@@ -132,7 +139,7 @@ Private Sub setupRunSheet()
     run_sheet.Range("A9:I9").Interior.Color = RGB(204, 255, 255) ' Turquise
     run_sheet.Range("J9:L9").Interior.Color = RGB(153, 204, 255) ' Blue
     run_sheet.Range("M9:U9").Interior.Color = RGB(153, 204, 0) ' Green
-    run_sheet.Range("V9:Z9").Interior.Color = RGB(204, 255, 204) ' Light Green
+    run_sheet.Range("V9:AA9").Interior.Color = RGB(204, 255, 204) ' Light Green
     
     ' Fit the title contents
     Dim used_range As Range
@@ -140,7 +147,7 @@ Private Sub setupRunSheet()
     used_range.ColumnWidth = 20
     Set used_range = run_sheet.Range("C9")
     used_range.ColumnWidth = 15
-    Set used_range = run_sheet.Range("D9:Z9")
+    Set used_range = run_sheet.Range("D9:AA9")
     used_range.ColumnWidth = 20
     
     ' Set bold titles
@@ -156,7 +163,7 @@ Private Sub setupRunSheet()
         .BorderAround Weight:=xlMedium
     End With
 
-    Set used_range = run_sheet.Range("A9:Z9")
+    Set used_range = run_sheet.Range("A9:AA9")
     With used_range
         .Font.Bold = True
         .BorderAround Weight:=xlMedium
@@ -403,15 +410,15 @@ End Sub
 ' Tef worksheet
 Private Sub setupTefSheet()
     
-    ' Get the tbc sheet and add the header row
+    ' Get the tef sheet and add the header row
     Set tef_sheet = Application.ActiveWorkbook.Sheets("TEF")
-    tcf_sheet.Activate
-    tcf_sheet.Rows(1).Select
+    tef_sheet.Activate
+    tef_sheet.Rows(1).Select
     Selection.Resize(1).Insert Shift:=xlDown
-    tcf_sheet.Range("A1").Value = "TUFLOW Event File"
+    tef_sheet.Range("A1").Value = "TUFLOW Event File"
     
     ' Change the background colour of the titles
-    tcf_sheet.Range("A2:F2").Interior.Color = RGB(153, 204, 0) ' Green
+    tef_sheet.Range("A2:F2").Interior.Color = RGB(153, 204, 0) ' Green
     
     ' Fit the title contents
     Dim used_range As Range
@@ -437,6 +444,42 @@ Private Sub setupTefSheet()
 
 End Sub
 
+' Trd worksheet
+Private Sub setupTrdSheet()
+    
+    ' Get the trd sheet and add the header row
+    Set trd_sheet = Application.ActiveWorkbook.Sheets("TRD")
+    trd_sheet.Activate
+    trd_sheet.Rows(1).Select
+    Selection.Resize(1).Insert Shift:=xlDown
+    trd_sheet.Range("A1").Value = "TUFLOW Read File"
+    
+    ' Change the background colour of the titles
+    trd_sheet.Range("A2:F2").Interior.Color = RGB(153, 204, 0) ' Green
+    
+    ' Fit the title contents
+    Dim used_range As Range
+    Set used_range = trd_sheet.Range("A2:B2")
+    used_range.ColumnWidth = 10
+    Set used_range = trd_sheet.Range("C2:E2")
+    used_range.ColumnWidth = 30
+    Set used_range = trd_sheet.Range("F2")
+    used_range.ColumnWidth = 70
+    
+    ' Set bold titles
+    Set used_range = trdsheet.Range("A1:F2")
+    With used_range
+        .Font.Bold = True
+        .BorderAround Weight:=xlMedium
+    End With
+    
+    ' Freeze the panes
+    trd_sheet.Range("D3").Select
+    ActiveWindow.FreezePanes = True
+    
+    Call setTabColours(tef_sheet, 153, 204, 0)
+
+End Sub
 
 ' Checks if a worksheet exists at the given name or not
 ' @param shtName: the Worksheet name to check.
