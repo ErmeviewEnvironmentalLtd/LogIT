@@ -338,6 +338,9 @@ v0.8.0-Beta:
       re-write the control files to only use the file and variable calls within
       the specified scenarios and events. None of the if else logic will be kept
       in the output files.
+    - [Feature] Added improved support for .trd files (following update for SHIP
+      library) and added them as a table to the database.
+    - Updated LogFormatter.bas VBA file to work with new TEF and TRD tables.
     - Updated to new version of SHIP library with support for scenario and event
       logic.
     - Added scenario run options input box to New Entry and Model Extractor.
@@ -345,6 +348,9 @@ v0.8.0-Beta:
     - [Bugfix] problem with multiple model loader when one of the files already
       exists in the database.
     - [Feature] Added TEF column to RUN table.
+    - [Feature] Added TRD column to RUN table.
+    - [Bugfix] Run Summary not picking up when FMP crashes. Calling it complete
+      instead. Fix should work, but time toerances may need some adjusting later.
 
 ##~##
 

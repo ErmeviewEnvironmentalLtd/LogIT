@@ -514,7 +514,11 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                         if 'Writing Output' in line: continue
                         if line.strip() == '': continue
                         if 'Run Finished' in line:
-                            entry.finished = True
+                            end_diff = end_time - entry.last_recorded_time
+                            if end_diff > 1:
+                                entry.error = True
+                            else:
+                                entry.finished = True
                             self.emit(QtCore.SIGNAL("updateProgress"), end_time)
                             break
                         if 'Run Interrupted' in line:
