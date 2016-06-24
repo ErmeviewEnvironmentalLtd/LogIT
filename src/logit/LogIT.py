@@ -1017,10 +1017,11 @@ class MainGui(QtGui.QMainWindow):
         """
         d = MyFileDialogs(parent=self)
         if not self.checkDbLoaded():
-            open_path = d.openFileDialog(path=gs.path_holder['log'], 
+            p = os.path.splitext(self.settings.cur_settings_path)[0]
+            open_path = d.openFileDialog(path=p, 
                                         file_types='LogIT database(*.logdb)')
         else:
-            open_path = d.openFileDialog(path=self.settings.cur_settings_path, 
+            open_path = d.openFileDialog(path=gs.path_holder['log'], 
                                         file_types='LogIT database(*.logdb)')
         if open_path == False:
             return None
