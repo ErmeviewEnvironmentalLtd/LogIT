@@ -175,6 +175,7 @@ class MainGui(QtGui.QMainWindow):
         self._TEST_MODE = False
         self.settings = cur_settings
         self.model_log = None
+        self._previous_widget = None
         
         # Database tables that should be exported to Excel
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 
@@ -208,6 +209,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionResolveIefFiles.triggered.connect(self._resolveIefs)
         self.ui.actionExit.triggered.connect(self.close)
         self.ui.actionUpdateAllRunStatus.triggered.connect(self._updateAllRowStatus)
+        self.ui.tabWidget.currentChanged.connect(self._tabChanged)
         
         # Keyboard shortcuts
         # Quit
@@ -1358,6 +1360,52 @@ class MainGui(QtGui.QMainWindow):
         except Exception, err:
             logger.error('Could not show release notes' + str(err))
             self.settings.main['release_notes_version'] = ''
+            
+    
+    def _tabChanged(self):
+        """Lets a widget know that it's tab has just been activated / deactivated.
+        
+        Some of the widgets may want to load data or use memory intensive 
+        objects. As the number of tools grows this will become more of an issue
+        in terms of load times and runtime memory.
+        
+        To avoid this we let them know when they're needed or not needed and
+        they can claim and release resources appropriately.
+        """
+        try:
+            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+            self.ui.tabWidget.setEnabled(False)
+            current_widget = self.ui.tabWidget.currentWidget()
+            
+            # Try to call the activation notice
+            try:
+                current_widget.activate()
+            except AttributeError:
+                # It might be one of the main tabs and not have a 'tool_name'
+                try:
+                    logger.debug(current_widget.tool_name + ' has not implemented an activation notice')
+                except AttributeError:
+                    logger.debug('Unnamed tab has not implemented an activation notice')
+            
+            # Let the old tab know that we're going somewhere else
+            if not self._previous_widget is None:
+                try:
+                    self._previous_widget.deactivate()
+                except AttributeError:
+                    # It might be one of the main tabs and not have a 'tool_name'
+                    try:
+                        logger.debug(self._previous_widget.tool_name + ' has not implemented an deactivation notice')
+                    except AttributeError:
+                        logger.debug('Unnamed tab has not implemented an deactivation notice')
+
+            self._previous_widget = current_widget
+
+        except Exception, err:
+            logger.warning('Exception in activation/deactivation of tab')
+            logger.exception(err)
+        finally:
+            self.ui.tabWidget.setEnabled(True)
+            QtGui.QApplication.restoreOverrideCursor()
         
     
     ''' 

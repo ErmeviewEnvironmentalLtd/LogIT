@@ -225,15 +225,9 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         """
         """
         def runLoop():
-            """
-            """
-#             while self.do_auto:
-#             if self.do_auto == False:
-#                 break
+            """QTimer function to auto update currently selected entry."""
             if entry.row_values['STATUS'] == 'Complete' or entry.row_values['STATUS'] == 'Failed' or entry.row_values['STATUS'] == 'Interrupted':
                 self._stopAutoUpdate()
-#                 break
-            
             self._updateEntry(entry, cur_row)
             
             
@@ -253,28 +247,15 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                 break
         if entry is None: return
         
-        self.autoUpdateButton.setText('Stop Update')
-        self.do_auto = True
-#         while self.do_auto:
-#             if entry.row_values['STATUS'] == 'Complete' or entry.row_values['STATUS'] == 'Failed' or entry.row_values['STATUS'] == 'Interrupted':
-#                 self._stopAutoUpdate()
-#                 break
-            
-#             self._updateEntry(entry, cur_row)
-#             QtGui.QApplication.processEvents()
-#         QtCore.QTimer.singleShot(2000, lambda: runLoop())
-
         if entry.row_values['STATUS'] == 'Complete' or entry.row_values['STATUS'] == 'Failed' or entry.row_values['STATUS'] == 'Interrupted':
             return
+        
+        self.autoUpdateButton.setText('Stop Update')
+        self.do_auto = True
         self._updateEntry(entry, cur_row)
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(runLoop)
         self.timer.start(3000)
-        
-#             time.sleep(1)
-#             QtGui.QApplication.processEvents()
-            
-#         self.autoUpdateButton.setText('Auto Update Active Run')
         
     
     def _updateEntry(self, entry, row):
