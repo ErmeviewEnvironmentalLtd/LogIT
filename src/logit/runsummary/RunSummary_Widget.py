@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '..\LogIt\src\logit\runsummary\RunSummary_Widget.ui'
+# Form implementation generated from reading ui file '.\RunSummary_Widget.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -64,6 +64,9 @@ class Ui_RunSummaryWidget(object):
         self.tlfAddButton.setMinimumSize(QtCore.QSize(80, 0))
         self.tlfAddButton.setObjectName(_fromUtf8("tlfAddButton"))
         self.horizontalLayout.addWidget(self.tlfAddButton)
+        self.autoUpdateButton = QtGui.QPushButton(self.runStatusGroup)
+        self.autoUpdateButton.setObjectName(_fromUtf8("autoUpdateButton"))
+        self.horizontalLayout.addWidget(self.autoUpdateButton)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.verticalLayout_3.addLayout(self.horizontalLayout)
@@ -144,6 +147,7 @@ class Ui_RunSummaryWidget(object):
         self.runStatusGroup.setTitle(_translate("RunSummaryWidget", "Run status", None))
         self.updateAllStatusButton.setText(_translate("RunSummaryWidget", "Update All", None))
         self.tlfAddButton.setText(_translate("RunSummaryWidget", "Add Log", None))
+        self.autoUpdateButton.setText(_translate("RunSummaryWidget", "Auto Update Active Run", None))
         item = self.runStatusTable.horizontalHeaderItem(0)
         item.setText(_translate("RunSummaryWidget", "GUID", None))
         item = self.runStatusTable.horizontalHeaderItem(1)

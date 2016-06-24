@@ -48,6 +48,7 @@ import os
 import uuid
 import datetime
 import math
+import time
 from PyQt4 import QtCore, QtGui
 import pyqtgraph as pg
 
@@ -78,6 +79,8 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         self.runStatusTable.customContextMenuRequested.connect(self._tablePopup)
         self.runStatusTable.cellClicked.connect(self._activateRow)
         self.updateAllStatusButton.clicked.connect(self._updateAllStatus)
+        self.autoUpdateButton.clicked.connect(self._autoUpdateEntry)
+        
         # Keyboard shortcuts
         self.updateAllStatusButton.setToolTip('Update all entries in table (Ctrl-G)')
         self.updateAllStatusButton.setShortcut(QtCore.Qt.SHIFT + QtCore.Qt.Key_F5)
@@ -87,6 +90,8 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         self.mMin = -10
         self.mMax = 10
         self.cur_guid = ''
+        self.do_auto = False
+        self.timer = None
     
     
     def keyPressEvent(self, event):
@@ -205,6 +210,71 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                 self.emit(QtCore.SIGNAL("setRange"), 1)
                 self.emit(QtCore.SIGNAL("updateProgress"), 0)
                 QtGui.QApplication.restoreOverrideCursor()
+    
+    
+    def _stopAutoUpdate(self):
+        """
+        """
+        self.autoUpdateButton.setText('Auto Update Active Run')
+        self.do_auto = False
+        if not self.timer is None:
+            self.timer.stop()
+        
+    
+    def _autoUpdateEntry(self, ignore_stop=False):
+        """
+        """
+        def runLoop():
+            """
+            """
+#             while self.do_auto:
+#             if self.do_auto == False:
+#                 break
+            if entry.row_values['STATUS'] == 'Complete' or entry.row_values['STATUS'] == 'Failed' or entry.row_values['STATUS'] == 'Interrupted':
+                self._stopAutoUpdate()
+#                 break
+            
+            self._updateEntry(entry, cur_row)
+            
+            
+        if str(self.autoUpdateButton.text()) == 'Stop Update':
+            self._stopAutoUpdate()
+            return
+
+        cur_row = self.runStatusTable.currentRow()
+        if cur_row == -1:
+            self.launchQMsgBox('Selection Error', 'Click on the required entry first')
+            return
+        
+        guid = str(self.runStatusTable.item(cur_row, 0).text())
+        for log in self.settings['log_summarys']:
+            if log.row_values['GUID'] == guid:
+                entry = log
+                break
+        if entry is None: return
+        
+        self.autoUpdateButton.setText('Stop Update')
+        self.do_auto = True
+#         while self.do_auto:
+#             if entry.row_values['STATUS'] == 'Complete' or entry.row_values['STATUS'] == 'Failed' or entry.row_values['STATUS'] == 'Interrupted':
+#                 self._stopAutoUpdate()
+#                 break
+            
+#             self._updateEntry(entry, cur_row)
+#             QtGui.QApplication.processEvents()
+#         QtCore.QTimer.singleShot(2000, lambda: runLoop())
+
+        if entry.row_values['STATUS'] == 'Complete' or entry.row_values['STATUS'] == 'Failed' or entry.row_values['STATUS'] == 'Interrupted':
+            return
+        self._updateEntry(entry, cur_row)
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(runLoop)
+        self.timer.start(3000)
+        
+#             time.sleep(1)
+#             QtGui.QApplication.processEvents()
+            
+#         self.autoUpdateButton.setText('Auto Update Active Run')
         
     
     def _updateEntry(self, entry, row):
@@ -284,6 +354,8 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         Loads the LogSummaryStore data from cache using the guid stored in the
         table row. Then updates the graph with the contents.
         """
+        self._stopAutoUpdate()
+        
         guid = str(self.runStatusTable.item(row, 0).text())
         if self.cur_guid == guid: return
         try:
@@ -718,6 +790,12 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
 
     def saveSettings(self):
         return self.settings
+    
+    
+    def deactivate(self):
+        """
+        """
+        self._stopAutoUpdate()
 
     
     def loadSettings(self, settings):
