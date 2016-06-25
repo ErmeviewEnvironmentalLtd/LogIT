@@ -352,6 +352,34 @@ v0.8.0-Beta:
     - [Bugfix] Run Summary not picking up when FMP crashes. Calling it complete
       instead. Fix should work, but time toerances may need some adjusting later.
 
+v0.8.1-Beta:
+    - [Feature] Added automatic update functinoality to Run Summary tool.
+    - [Feature] Added view FMP runform for completed runs to the Run Summary tool.
+      It isn't possible to view this during a run unfortunately because FMP only
+      writes it to file on completion. Other ways of visualising this data are 
+      doable, possibly, by would require a lot more work.
+    - [Feature] Added support for scenarios and events when logging. Providing run
+      options, either in the UI or the FMP run form will cause only the
+      corresponding files to be logged.
+    - [Feature] Added suppoer for scenario and events when using the model extractor.
+      It is now possible to select a 'Harcode output files' option. This will 
+      rewrite the control files to only use the file and variable calls within
+      the specified scenarios and events. None of the if else logic will be kept
+      in the output files.
+    - [Feature] Added improved support for .trd files (following update for SHIP
+      library) and added them as a table to the database.
+    - Updated LogFormatter.bas VBA file to work with new TEF and TRD tables.
+    - Updated to new version of SHIP library with support for scenario and event
+      logic.
+    - Added scenario run options input box to New Entry and Model Extractor.
+    - Added some additional database tables and some changes to the user interface
+    - [Bugfix] problem with multiple model loader when one of the files already
+      exists in the database.
+    - [Feature] Added TEF column to RUN table.
+    - [Feature] Added TRD column to RUN table.
+    - [Bugfix] Run Summary not picking up when FMP crashes. Calling it complete
+      instead. Fix should work, but time toerances may need some adjusting later.
+
 ##~##
 
 LICENSE

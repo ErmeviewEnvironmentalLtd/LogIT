@@ -65,19 +65,24 @@ import globalsettings as gs
 
 
 class RunformLabel(QtGui.QLabel):
+    """Used to display the FMP runform diagnostics graphic."""
     
     def __init__(self, title='Some Model', parent=None, f=QtCore.Qt.WindowFlags()):
+        """
+        Args:
+            title(str): window title.
+        """
         QtGui.QLabel.__init__(self, '', parent, f)
         QtGui.QWidget.setWindowTitle(self, title)
     
     def refreshGraph(self, bmp_path):
-        """
-        """
+        """Update the graph displayed."""
         pixmap = QtGui.QPixmap(bmp_path)
         self.setPixmap(pixmap)
 
     
     def closeEvent(self, event):
+        """Custom window close event."""
         self.emit(QtCore.SIGNAL("closingForm"))
         event.ignore()
 
@@ -123,8 +128,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         
     
     def keyPressEvent(self, event):
-        """
-        """
+        """Catch keypress events fo updating the entry."""
         if type(event) == QtGui.QKeyEvent:
             
             if event.key() == QtCore.Qt.Key_F5:
@@ -217,7 +221,14 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
     
     def _reloadRun(self, entry, row):
-        """
+        """Completely reload the selected run.
+        
+        Instead of just updating from where we last left off it reloads it
+        from the start of the file.
+        
+        Args:
+            entry(LogSummaryEntry): with details for this run.
+            row(int): the row in the run summary table to update.
         """
         open_path = os.path.join(self.data_dir, entry.row_values['GUID'] + '.dat')
         log_store = self._loadFromCache(open_path)
@@ -259,16 +270,25 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
     
     def _stopAutoUpdate(self):
-        """
+        """Stops the automatic run update from running.
+        
+        Does a little clean up to make sure everything is reset properly.
         """
         self.autoUpdateButton.setText('Auto Update Active Run')
+        self.emit(QtCore.SIGNAL("statusUpdate"), 'Run auto update stopped')
+        self.emit(QtCore.SIGNAL("setRange"), 1)
+        self.emit(QtCore.SIGNAL("updateProgress"), 0)
+        QtGui.QApplication.restoreOverrideCursor()
         self.do_auto = False
         if not self.timer is None:
             self.timer.stop()
         
     
-    def _autoUpdateEntry(self, ignore_stop=False):
-        """
+    def _autoUpdateEntry(self):
+        """Automatically updates the currently active run.
+        
+        Launches a QTimer than continuously calls the runLoop function to
+        check if the run's finished and if not update the status.
         """
         def runLoop():
             """QTimer function to auto update currently selected entry."""
@@ -297,6 +317,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             return
         
         self.autoUpdateButton.setText('Stop Update')
+        self.emit(QtCore.SIGNAL("statusUpdate"), 'Auto updating run ...')
         self.do_auto = True
         self._updateEntry(entry, cur_row)
         self.timer = QtCore.QTimer()
@@ -305,7 +326,14 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         
     
     def _updateEntry(self, entry, row):
-        """
+        """Update the run summary entry at the given row.
+        
+        Continues to read from the .tlf file at the point where it last 
+        finished checking.
+        
+        Args:
+            entry(LogSummaryEntry): with details for this run.
+            row(int): the row in the run summary table to update.
         """
         open_path = os.path.join(self.data_dir, entry.row_values['GUID'] + '.dat') 
         log_store = self._loadFromCache(open_path)
@@ -315,20 +343,23 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         except: runform_path = None
         if not entry.row_values['STATUS'] == 'Complete' and not entry.row_values['STATUS'] == 'Failed' and not entry.row_values['STATUS'] == 'Interrupted':
             try:
-                self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
+                if not self.do_auto: # Stop tons of rubbish in logs
+                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
                 QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
                 entry, log_store = self._loadLogContents(entry, entry.tlf_path, log_store)
-                self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
+                if not self.do_auto:
+                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
                 self._saveToCache(log_store, entry.stored_datapath)
             except Exception, err:
                 logger.error('Problem loading model: ' + err)
             finally:
-                self.emit(QtCore.SIGNAL("statusUpdate"), '')
-                self.emit(QtCore.SIGNAL("setRange"), 1)
-                self.emit(QtCore.SIGNAL("updateProgress"), 0)
+                if not self.do_auto:
+                    self.emit(QtCore.SIGNAL("statusUpdate"), '')
+                    self.emit(QtCore.SIGNAL("setRange"), 1)
+                    self.emit(QtCore.SIGNAL("updateProgress"), 0)
                 QtGui.QApplication.restoreOverrideCursor()
         else:
-            if not runform_path is None:
+            if not runform_path is None and not self.do_auto:
                 self._addRunformWindow(runform_path)
 
         entry_i = -1
@@ -422,8 +453,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
     
     def _setActiveRowStyle(self, row_no):
-        """
-        """
+        """Set the style for the active row based on status."""
         row_count = self.runStatusTable.rowCount()
         if row_no > row_count:
             row_no = row_count
@@ -439,7 +469,17 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
     
     def _loadRunform(self, results_path):
-        """
+        """Find the latest .bmp runform graphic for this result path and load it.
+        
+        Checks all of the files in the folder and collects the ones that contain
+        the filename stipulated by the results directory. It then sorts these
+        to find the latest version (e.g. finename_003.bmp).
+        
+        Args:
+            results_path(str): path to the results folder from the ief file.
+        
+        Return:
+            str - path of the most recent run form diagnostics graph (.bmp)
         """
         path, name = os.path.split(results_path)
         file_list = os.listdir(path)
@@ -533,7 +573,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
     
     def _closeLabel(self):
-        print 'Closing Label'
+        """Gracefully shutdown to 1d runform graphics window."""
         try:
             del self.runformLabel
             self.runformLabel = None
@@ -542,7 +582,12 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
         
     def _addRunformWindow(self, results_path, ignore_check_status=False):
-        """
+        """Opens up a new window with the 1d runform graphics in it.
+        
+        Args:
+            results_path(str): path to the results directory(from ief).
+            ignore_check_status=False(Bool): if True it will launch the 
+                window regardless of whether the checkbox status says to or not.
         """
         if not ignore_check_status and not self.showFmpRunform: return
         
@@ -728,7 +773,8 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                             continue
                         if math.fabs(hours - entry.last_recorded_time) > 0.25:
                             #temp = math.fabs(start_time + hours)
-                            self.emit(QtCore.SIGNAL("updateProgress"), math.fabs(start_time + hours))
+                            if not self.do_auto:
+                                self.emit(QtCore.SIGNAL("updateProgress"), math.fabs(start_time + hours))
                             entry.last_recorded_time = hours
                                                 
                         # MB can be printed as ***** if greater than 100
@@ -912,8 +958,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
     
     def deactivate(self):
-        """
-        """
+        """Overrides superclass method."""
         self._stopAutoUpdate()
         self._closeLabel()
 
