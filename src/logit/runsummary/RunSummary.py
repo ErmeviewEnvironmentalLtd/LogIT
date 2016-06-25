@@ -46,19 +46,40 @@ logger = logging.getLogger(__name__)
 
 import os
 import uuid
-import datetime
+# import datetime
 import math
 import time
+import re
+
 from PyQt4 import QtCore, QtGui
 import pyqtgraph as pg
 
 from ship.utils.filetools import MyFileDialogs
+from ship.utils.fileloaders import fileloader as fl
 
 from AWidget import AWidget
 import RunSummary_Widget as summarywidget
 logger.debug('RunSummary_Widget import complete')
 # from app_metrics import utils as applog
 import globalsettings as gs
+
+
+class RunformLabel(QtGui.QLabel):
+    
+    def __init__(self, title='Some Model', parent=None, f=QtCore.Qt.WindowFlags()):
+        QtGui.QLabel.__init__(self, '', parent, f)
+        QtGui.QWidget.setWindowTitle(self, title)
+    
+    def refreshGraph(self, bmp_path):
+        """
+        """
+        pixmap = QtGui.QPixmap(bmp_path)
+        self.setPixmap(pixmap)
+
+    
+    def closeEvent(self, event):
+        self.emit(QtCore.SIGNAL("closingForm"))
+        event.ignore()
 
 
 class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
@@ -80,6 +101,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         self.runStatusTable.cellClicked.connect(self._activateRow)
         self.updateAllStatusButton.clicked.connect(self._updateAllStatus)
         self.autoUpdateButton.clicked.connect(self._autoUpdateEntry)
+        self.showFmpRunCbox.stateChanged.connect(self._updateShowRunformStatus)
         
         # Keyboard shortcuts
         self.updateAllStatusButton.setToolTip('Update all entries in table (Ctrl-G)')
@@ -92,7 +114,13 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         self.cur_guid = ''
         self.do_auto = False
         self.timer = None
+        self.showFmpRunform = True
+        self.runformLabel = None
     
+    
+    def _updateShowRunformStatus(self):
+        self.showFmpRunform = self.showFmpRunCbox.isChecked()
+        
     
     def keyPressEvent(self, event):
         """
@@ -135,6 +163,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         updateEntryAction = menu.addAction("Update Entry")
         deleteEntryAction = menu.addAction("Remove Entry")
         reloadRunAction = menu.addAction("Reload Run")
+        runformAction = menu.addAction('Show latest FMP Runform')
 
         # Find who called us and get the object that the name refers to.
         sender = self.sender()
@@ -153,21 +182,30 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         if entry is None: return
                 
         # Remove an item from the table
-        if action == deleteEntryAction:
-            self.runStatusTable.removeRow(row) 
+        if action == deleteEntryAction or action == runformAction:
+            self._closeLabel()
             entry_i = -1
             for i, log in enumerate(self.settings['log_summarys']):
                 if log.row_values['GUID'] == entry.row_values['GUID']: 
                     entry_i = i
                     break
-            if not entry_i == -1: del self.settings['log_summarys'][entry_i]
-            try:
-                os.remove(entry.stored_datapath)
-            except IOError:
-                logger.warning('Unable to find cache file - may not exist or might need deleting manually')
-            entry = None
-            self.p1.clear()
-            self.p2.clear()
+
+            if action == deleteEntryAction:
+                self.runStatusTable.removeRow(row) 
+                if not entry_i == -1: del self.settings['log_summarys'][entry_i]
+                try:
+                    os.remove(entry.stored_datapath)
+                except IOError:
+                    logger.warning('Unable to find cache file - may not exist or might need deleting manually')
+                entry = None
+                self.p1.clear()
+                self.p2.clear()
+            elif action == runformAction:
+                try:
+                    self._addRunformWindow(
+                            self.settings['log_summarys'][entry_i].runform_path,
+                            ignore_check_status=True)
+                except: pass
         
         # Re-reads a file from scratch
         if action == reloadRunAction:
@@ -183,6 +221,9 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         """
         open_path = os.path.join(self.data_dir, entry.row_values['GUID'] + '.dat')
         log_store = self._loadFromCache(open_path)
+        try:
+            runform_path = log_store.runform_path
+        except: runform_path = None
         self.cur_guid = log_store.guid
         details = []
         for i, log in enumerate(self.settings['log_summarys']):
@@ -197,10 +238,15 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                 QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
                 entry = LogSummaryEntry(details[0], details[1], self.data_dir, details[2])
                 entry, log_store = self._loadLogContents(entry, details[2])
+                if not runform_path is None:
+                    entry.runform_path = runform_path
+                    log_store.runform_path = runform_path
+                    self._addRunformWindow(entry.runform_path)
                 self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
                 self._saveToCache(log_store, entry.stored_datapath)
-                self._updateTableVals(entry, details[3])
+                self._updateTableVals(entry, details[3]) # -1
                 self._updateGraph(log_store, entry.row_values['NAME'])
+                
                 self.settings['log_summarys'][details[3]] = entry
             except Exception, err:
                 logger.error('Problem loading model')
@@ -264,6 +310,9 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         open_path = os.path.join(self.data_dir, entry.row_values['GUID'] + '.dat') 
         log_store = self._loadFromCache(open_path)
         self.cur_guid = log_store.guid
+        try:
+            runform_path = log_store.runform_path
+        except: runform_path = None
         if not entry.row_values['STATUS'] == 'Complete' and not entry.row_values['STATUS'] == 'Failed' and not entry.row_values['STATUS'] == 'Interrupted':
             try:
                 self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
@@ -278,6 +327,10 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                 self.emit(QtCore.SIGNAL("setRange"), 1)
                 self.emit(QtCore.SIGNAL("updateProgress"), 0)
                 QtGui.QApplication.restoreOverrideCursor()
+        else:
+            if not runform_path is None:
+                self._addRunformWindow(runform_path)
+
         entry_i = -1
         for i, log in enumerate(self.settings['log_summarys']):
             if log.row_values['GUID'] == entry.row_values['GUID']: 
@@ -287,6 +340,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             
         self._updateTableVals(entry, row)
         self._updateGraph(log_store, entry.row_values['NAME'])
+        
         
   
     def _updateAllStatus(self):
@@ -349,6 +403,15 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             self.cur_guid = log_store.guid
             self._updateGraph(log_store, str(self.runStatusTable.item(row, 1).text()))
             self._setActiveRowStyle(row)
+            
+            status = str(self.runStatusTable.item(row, 4).text())
+            if status == 'Complete' or status == 'Failed' or status == 'Interrupted':
+                if not self.runformLabel is None:
+                    self._closeLabel()
+                try:
+                    if not log_store.runform_path is None:
+                        self._addRunformWindow(log_store.runform_path)
+                except: pass
         except Exception, err:
             logger.error('Problem loading cache')
             logger.exception(err)
@@ -373,9 +436,42 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
                     item.setFont(QtGui.QFont('Arial', 9, QtGui.QFont.Bold))
                 else:
                     item.setFont(QtGui.QFont('Arial', 9, QtGui.QFont.Normal))
-                    
+    
+    
+    def _loadRunform(self, results_path):
+        """
+        """
+        path, name = os.path.split(results_path)
+        file_list = os.listdir(path)
+        
+        bmps = []
+        for f in file_list:
+            parts = f.split(name)
+            # If it's only the filename matched exactly
+            if len(parts) < 2:
+                continue
+            # If second part is the start of the extension
+            if parts[1].startswith('.'):
+                if parts[1][1:] == 'bmp':
+                    bmps.append(f)
+                continue
+            subparts = parts[1].split('.')
+            if len(subparts) < 2:
+                continue
+            # If the extra bit before extension is an '_' followed by three
+            # numbers (matches isis run output .bmp's)
+            if re.match(r'[_]\d{3}', subparts[0]):
+                bmps.append(f)
+        
+        if not bmps: 
+            return False
+        else:
+            # Order by the last number and take the latest one
+            bmps = sorted(bmps)
+            return os.path.join(path, bmps[-1])
+        
 
-    def loadIntoTable(self, tlf_path):
+    def loadIntoTable(self, tlf_path, isis_path=None):
         """Loads a .tlf file and updates the table and graph with the contents.
         
         Creates LogSummaryInfo and LogEntry objects and loads them with data
@@ -401,18 +497,31 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         run_name = os.path.splitext(os.path.split(tlf_path)[1])[0]
         guid = str(uuid.uuid4())
         entry = LogSummaryEntry(guid, run_name, self.data_dir, tlf_path)
+        if not isis_path is None:
+            runformpath = self._loadRunform(isis_path)
+            if not runformpath == False:
+                entry.runform_path = isis_path
         
         try:
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Loading file into table ...')
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
             entry, log_store = self._loadLogContents(entry, tlf_path)
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Saving to cache ...')
-            self._saveToCache(log_store, entry.stored_datapath)
+#             self._saveToCache(log_store, entry.stored_datapath)
             self.settings['log_summarys'].append(entry)
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Updating graph and table ...')
             self._updateTableVals(entry)
             self._updateGraph(log_store, entry.row_values['NAME'])
+
+            if not entry.runform_path == False:
+#                 self._addRunformWindow(entry.runform_path)
+                log_store.runform_path = entry.runform_path
+                status = entry.row_values['STATUS']
+                if status == 'Complete' or status == 'Failed' or status == 'Interrupted':
+                    self._addRunformWindow(entry.runform_path)
+            self._saveToCache(log_store, entry.stored_datapath)
             self.cur_guid = log_store.guid
+            
         except Exception as err:
             logger.error('Problem loading model: ')
             logger.exception(err)
@@ -421,6 +530,34 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             self.emit(QtCore.SIGNAL("statusUpdate"), '')
             self.emit(QtCore.SIGNAL("updateProgress"), 0)
             QtGui.QApplication.restoreOverrideCursor()
+    
+    
+    def _closeLabel(self):
+        print 'Closing Label'
+        try:
+            del self.runformLabel
+            self.runformLabel = None
+        except:
+            logger.info('No runform label to close')
+    
+        
+    def _addRunformWindow(self, results_path, ignore_check_status=False):
+        """
+        """
+        if not ignore_check_status and not self.showFmpRunform: return
+        
+        bmp_path = self._loadRunform(results_path)
+        if bmp_path == False: return
+        name = os.path.basename(bmp_path)
+        if not self.runformLabel is None:
+            self.runformLabel.refreshGraph(bmp_path)
+            self.runformLabel.show()
+        else:
+            self.runformLabel = RunformLabel(title=name, f=QtCore.Qt.WindowStaysOnTopHint) 
+            self.runformLabel.refreshGraph(bmp_path)
+            self.runformLabel.show()
+            self.connect(self.runformLabel, QtCore.SIGNAL("closingForm"), self._closeLabel)
+        
         
     
     def _updateTableVals(self, summary_obj, row_no=-1):
@@ -765,11 +902,12 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         Return:
             dict - member varibles and initial state for ToolSettings.
         """
-        attrs = {'tlf_path': '', 'log_summarys': []}
+        attrs = {'tlf_path': '', 'log_summarys': [], 'show_runform': True}
         return attrs
     
 
     def saveSettings(self):
+        self.settings['show_runform'] = self.showFmpRunCbox.isChecked()
         return self.settings
     
     
@@ -777,6 +915,7 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
         """
         """
         self._stopAutoUpdate()
+        self._closeLabel()
 
     
     def loadSettings(self, settings):
@@ -790,6 +929,8 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
             settings(ToolSettings): to update the widget settings with.
         """
         AWidget.loadSettings(self, settings)
+        
+        self.showFmpRunCbox.setChecked(settings['show_runform'])
         
         # Test first
         files = os.listdir(self.data_dir)
@@ -825,6 +966,7 @@ class LogSummaryStore(object):
         self.ddv = []
         self.flow_in = []
         self.flow_out = []
+        self.runform_path = None
 
 
 
@@ -842,6 +984,11 @@ class LogSummaryEntry(object):
             'MAX_MB': max_mb,
             'MAX_DDV': max_ddv
         }
+        
+        # Runform bitmap stuff
+        self.runform_path = None
+        
+        # .tlf stuff
         self.tlf_path = tlf_path
         self.stored_datapath = os.path.join(datapath, self.row_values['GUID'] + '.dat')
         self.start_time = 0

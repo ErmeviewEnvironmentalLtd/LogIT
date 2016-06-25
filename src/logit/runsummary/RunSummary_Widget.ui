@@ -114,6 +114,16 @@
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QCheckBox" name="showFmpRunCbox">
+          <property name="text">
+           <string>Show FMP Runform when complete</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item>
@@ -226,38 +236,45 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="simGraphGroup">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>175</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>Arial</family>
-       <pointsize>9</pointsize>
-      </font>
-     </property>
-     <property name="title">
-      <string>Simulation graph</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="PlotWidget" name="simGraphGraphics"/>
-      </item>
-      <item>
-       <widget class="QLabel" name="legendLabel">
-        <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#000000;&quot;&gt;Legend:&lt;/span&gt;&lt;span style=&quot; color:#004eeb;&quot;&gt;   Flow In&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;   Flow Out  &lt;/span&gt; DDV   &lt;span style=&quot; color:#4be100;&quot;&gt;MB&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
+    <layout class="QHBoxLayout" name="graphLayoutH">
+     <item>
+      <widget class="QGroupBox" name="simGraphGroup">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>175</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>9</pointsize>
+        </font>
+       </property>
+       <property name="title">
+        <string>Simulation graph</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="PlotWidget" name="simGraphGraphics"/>
+        </item>
+        <item>
+         <widget class="QLabel" name="legendLabel">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#000000;&quot;&gt;Legend:&lt;/span&gt;&lt;span style=&quot; color:#004eeb;&quot;&gt;   Flow In&lt;/span&gt;&lt;span style=&quot; color:#ff0000;&quot;&gt;   Flow Out  &lt;/span&gt; DDV   &lt;span style=&quot; color:#4be100;&quot;&gt;MB&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

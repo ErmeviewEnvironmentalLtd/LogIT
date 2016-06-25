@@ -561,7 +561,10 @@ class MainGui(QtGui.QMainWindow):
                 if not 'Run Summary' in self.widgets.keys(): return
                 row = table_obj.currentRow()
                 row_dict = table_obj.getValues(row=row, names=['ID', 'LOG_DIR', 
-                                                               'TCF', 'RUN_OPTIONS'])
+                                                               'TCF', 'RUN_OPTIONS',
+                                                               'RESULTS_LOCATION_1D'])
+                isis_results = row_dict['RESULTS_LOCATION_1D']
+                if isis_results == 'None': isis_results = None
                 tcf = row_dict['TCF'][1:-1]
                 tcf = tcf.split(',')[0]
                 tcf_name = os.path.splitext(tcf)[0]
@@ -575,7 +578,7 @@ class MainGui(QtGui.QMainWindow):
                 
                 if os.path.exists(tlf_file):
                     self.ui.tabWidget.setCurrentWidget(self.widgets['Run Summary'])
-                    self.widgets['Run Summary'].loadIntoTable(tlf_file)
+                    self.widgets['Run Summary'].loadIntoTable(tlf_file, isis_results)
                 else:
                     msg = ("Cannot find .tlf file in LOG_DIR does it exist?\n" +
                            "Search here:" + tlf_file)
