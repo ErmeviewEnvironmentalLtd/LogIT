@@ -358,6 +358,17 @@ v0.8.1-Beta:
       It isn't possible to view this during a run unfortunately because FMP only
       writes it to file on completion. Other ways of visualising this data are 
       doable, possibly, by would require a lot more work.
+
+v0.8.2-Beta:
+    - [Bugfix] Run options being incorrectly read sometimes when read from the
+      FMP .ief form.
+    - [Bugfix] Run options not being displayed in the Single Model Load review
+      table.
+    - [Feature] Added automatic update functinoality to Run Summary tool.
+    - [Feature] Added view FMP runform for completed runs to the Run Summary tool.
+      It isn't possible to view this during a run unfortunately because FMP only
+      writes it to file on completion. Other ways of visualising this data are 
+      doable, possibly, by would require a lot more work.
     - [Feature] Added support for scenarios and events when logging. Providing run
       options, either in the UI or the FMP run form will cause only the
       corresponding files to be logged.

@@ -1,3 +1,7 @@
+- [Bugfix] Run options being incorrectly read sometimes when read from the
+  FMP .ief form.
+- [Bugfix] Run options not being displayed in the Single Model Load review
+  table.
 - [Feature] Added automatic update functinoality to Run Summary tool.
 - [Feature] Added view FMP runform for completed runs to the Run Summary tool.
   It isn't possible to view this during a run unfortunately because FMP only

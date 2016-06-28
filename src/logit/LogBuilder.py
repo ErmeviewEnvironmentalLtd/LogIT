@@ -104,6 +104,7 @@ class ModelLoader(object):
         """
         """
         self.run_options = run_options
+        options = ''
         
         # Check that the path actually exists before we start.
         if not os.path.exists(file_path):
@@ -189,7 +190,7 @@ class ModelLoader(object):
                     return False
 
                 try:
-                    self.tuflow = loader.loadFile(tcf_path, self.run_options)
+                    self.tuflow = loader.loadFile(tcf_path, options) # self.run_options)
                     self.tcf_dir = os.path.split(tcf_path)[0]
                     self.missing_files = self.tuflow.missing_model_files
                     if self.missing_files:
@@ -302,7 +303,7 @@ class ModelLoader(object):
         
         if not self.log_type == TYPE_ESTRY and not self.ief is None:
             run_cols, options = self.buildIsisRun(run_cols)
-            run_cols['RUN_OPTIONS'] = options
+            run_cols['RUN_OPTIONS'] = self.run_options
             run_cols['IEF_DIR'] = self.ief_dir
         
         if self.log_type == TYPE_TUFLOW:

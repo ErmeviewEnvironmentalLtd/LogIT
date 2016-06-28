@@ -264,6 +264,9 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 errors = GuiStore.ErrorHolder()
                 errors, self.all_logs = Controller.fetchAndCheckModel(gs.path_holder['log'], open_path, run_options, errors)
                 
+                # They might have been collected from .ief so get them again here
+                run_options = self.all_logs.getLogEntryContents('RUN', 0)['RUN_OPTIONS']
+                
                 # Init a dict to hold the exists/not exists status of the data
                 # being loaded
                 if not errors.has_errors:
@@ -290,7 +293,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                     run['TUFLOW_BUILD'] = self.settings['tuflow_model'] = input_vars['TUFLOW_BUILD'] 
                     run['ISIS_BUILD'] = self.settings['isis_build'] = input_vars['ISIS_BUILD']
                     run['EVENT_NAME'] = self.settings['event_name'] = input_vars['EVENT_NAME'] 
-                    run['RUN_OPTIONS'] = self.settings['run_options'] = input_vars['RUN_OPTIONS']
+                    run['RUN_OPTIONS'] = self.settings['run_options'] = run_options 
                     self._updateNewEntryTree(entry_status)
                     self.submitSingleModelGroup.setEnabled(True)
                     
