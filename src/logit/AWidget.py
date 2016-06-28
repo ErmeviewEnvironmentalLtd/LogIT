@@ -55,111 +55,16 @@ import os
 
 from PyQt4 import QtCore, QtGui
 
-class AWidget(QtGui.QWidget):
+import ATool
+
+class AWidget(QtGui.QWidget, ATool.ATool):
     
-    def __init__(self, tool_name, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
+    def __init__(self, tool_name, cwd, parent=None, f=QtCore.Qt.WindowFlags(),
+                 create_data_dir=True):
+        ATool.ATool.__init__(self, tool_name, cwd, create_data_dir)
         QtGui.QWidget.__init__(self, parent, f)
-        self.cur_location = cwd
-        self.settings = self.getSettingsAttrs()
-        self.tool_name = str(tool_name)
         self._TEST_MODE = False # Used by some widgets in unittests
         
-        # Create a data cache folder if one doesn't already exist
-        if not os.path.exists(os.path.join(cwd, 'data')):
-            try:
-                os.mkdir(os.path.join(cwd, 'data'))
-            except Exception, err:
-                logger.warning('Could not create data directory')
-                logger.exception(err)
-        self.data_dir = os.path.join(cwd, 'data', str(tool_name))
-        if not os.path.exists(self.data_dir):
-            try:
-                os.mkdir(self.data_dir)
-            except Exception, err:
-                logger.warning('Could not create tool data directory:' + self.data_dir)
-                logger.exception(err)
-        
-    
-    def getSettingsAttrs(self):
-        """Get the attributes to include in this class' ToolSettings.
-        
-        Note:
-            This should be overriden by the concrete class. If it isn't the
-            ToolSettings will contain only the tool_name and guid.
-        
-        Return:
-            dict - containing {variable name: default} for all member variables
-                added to the ToolSettings.
-        """
-        return {}
-        
-        
-    def loadSettings(self, settings):
-        """Updates the settings for this instance with those provided.
-        
-        Any variables in the given settings dict that don't/no longer exist in 
-        the current setup will be ignored.
-        
-        Args:
-            settings(ToolSettings): containing member variable states to 
-                update.
-        """
-        for key, val in self.settings.iteritems():
-            if key in settings.keys():
-                self.settings[key] = settings[key]
-        
-
-    def saveSettings(self):
-        """Return the ToolSettings instance to the caller.
-        
-        By default it literally just return the current state of the 
-        ToolSettings. If any other updates should be made before this happend
-        this method should be overriden.
-        """
-        return self.settings
-    
-
-    def activate(self):
-        """Will be called by the MainGui class whenever the widget is activated.
-        
-        By default this method does nothing. If anything should be done when
-        a widget it activated this method should be overridden. This might
-        include loading some data to the cache, resetting inputs or suchlike.
-        """
-        pass
-    
-
-    def deactivate(self):
-        """Will be called by the MainGui class whenever the widget is deactivated.
-        
-        By default this method does nothing. If anything should be done when
-        a widget it deactivated this method should be overridden. This might
-        include saving some data to the cache or suchlike to make sure that
-        the widget isn't hogging lots of memory when not in use.
-        """
-        pass
-    
-    
-    def _saveToCache(self, cachefile, path):
-        """Uses pickle to store the state of the given object."""
-        try:
-            with open(path, "wb") as p:
-                cPickle.dump(cachefile, p)
-        except IOError:
-            logger.error('Unable to cache file:' + path)
-            raise
-
-    
-    def _loadFromCache(self, cachefile_path):
-        """Uses pickle to load the state of a pickled object from file."""
-        try:
-            # Load the settings dictionary
-            cache = cPickle.load(open(cachefile_path, "rb"))
-            return cache
-        except IOError:
-            logger.error('Unable to load cache file: ' + cachefile_path)
-            raise
-    
     
     def launchQMsgBox(self, title, message, type='warning'):
         """Launch a QMessageBox
@@ -183,6 +88,18 @@ class AWidget(QtGui.QWidget):
             return answer
     
     
+    def launchQtQInput(self, title, message):
+        """Launch a QtQInputDialog.
+        
+        Returns False if user cancels or the input text otherwise.
+        """
+        input, status = QtGui.QInputDialog.getText(self, title, message)
+        if status:
+            return input
+        else:
+            return False
+    
+    
     def _copyToClipboard(self, text_widget):
         """Copies the contents of a textbox to clipboard.
         Textbox to copy is based on the calling action name.
@@ -194,7 +111,4 @@ class AWidget(QtGui.QWidget):
         QtGui.QApplication.sendEvent(clipboard, event)
     
 
-
-        
-        
     
