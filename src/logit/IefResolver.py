@@ -91,8 +91,8 @@ class IefResolverDialog(QtGui.QDialog):
             formatted.append(self.getStandardParagraphIn() + '<em style="font-weight: bold">Ief file: ' + k + '</em>: ' + self.getStandardParagraphOut())
             for i, p in v.iteritems():
                 if i == 'Ied':
-                    for ied in p:
-                        formatted.append(self.getStandardParagraphIn() + i + ': ' + ied + self.getStandardParagraphOut())
+                    for entry in p:
+                        formatted.append(self.getStandardParagraphIn() + i + ': ' + entry['file'] + self.getStandardParagraphOut())
                         
                 else:
                     formatted.append(self.getStandardParagraphIn() + i + ': ' + p + self.getStandardParagraphOut())
@@ -151,7 +151,6 @@ class IefResolverDialog(QtGui.QDialog):
             for i, p in enumerate(v['in']):
                 formatted.append(self.getStandardParagraphIn() + '<em style="font-weight: bold">Original:</em> ' + p + self.getStandardParagraphOut())
                 formatted.append(self.getStandardParagraphIn() + '<em style="font-weight: bold">Updated:</em> ' + str(v['out'][i]) + self.getStandardParagraphOut())
-            
             formatted.append('<br /><br />')
         
         return formatted
@@ -244,7 +243,7 @@ class IefHolder(object):
         
         for i, ied_out in enumerate(self.ieds_list_types['out']):
             if ied_out == '': continue
-            self.ief_obj.ied_data.append(ied_out)
+            self.ief_obj.ied_data[i]['file'] = ied_out 
         
         return self.ief_obj
         
@@ -274,7 +273,7 @@ class IefHolder(object):
                 self.missing_types['.ied'] = False
             else:
                 self.has_types['.ied'] = True
-            self.ieds_list_types[in_or_out] = new_file
+            self.ieds_list_types[in_or_out].append(new_file)
         
         else:
             if in_or_out == 'out': 
@@ -411,10 +410,10 @@ def resolveUnfoundPaths(ief_holders):
                         ief_holder.addFile(file_out[0], 'out', False)
                 
                 elif k == '.ied':
-                    for ied in ief_holder.ieds_list_types:
-                        filename = os.path.split(ied['in'])[1]
+                    for ied in ief_holder.ieds_list_types['in']:
+                        filename = os.path.split(ied)[1]
                         file_out = findFile(ief_holder.original_path, filename, 4, True)
-                        in_out_list['in'].append(infile)
+                        in_out_list['in'].append(ied)
                         in_out_list['out'].append(file_out)
                         if not file_out == False:
                             ief_holder.addFile(file_out[0], 'out', False)
@@ -523,7 +522,6 @@ def autoResolveIefs(iefs):
             ief_holders.append(new_holder)
         else:
             ief_fail.append(ief)
-#             return False, ief_holders
     
     return ief_holders, ief_fail
     
@@ -633,7 +631,12 @@ def autoResolvePath(ief_path, search_folder_depth=4):
     This can then be joined to the new root and we've updated the 
     file names to the new location.
     '''
+    ieds = ief_obj.getIedData()
+    ieds = [i['file'] for i in ieds]
+    for i in ieds:
+        ief_holder.addFile(i, 'in', test_exists=False)
     updated_paths = []
+    in_paths.extend(ieds)
     for p in in_paths:    
         match_results = p.split(prefix_old)
         if len(match_results) > 1:

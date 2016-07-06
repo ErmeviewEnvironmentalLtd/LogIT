@@ -391,6 +391,9 @@ v0.8.2-Beta:
     - [Bugfix] Run Summary not picking up when FMP crashes. Calling it complete
       instead. Fix should work, but time toerances may need some adjusting later.
 
+v0.8.3-Beta:
+    - [Bugfix] Issue with updating .ieds files in the Ief Resolver tool.
+
 ##~##
 
 LICENSE
