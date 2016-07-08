@@ -145,12 +145,6 @@ class ModelLoader(object):
             print str(err)
             return False
         
-#         if loader.warnings:
-#             logger.error('Model loaded with warnings at: ' + file_path)
-#             logger.error('Warnings:\n' + str(loader.warnings))
-#             self.error('Model loaded with warnings at: ' + file_path)
-#             return False
-
         # If we have an .ief file; load it first.
         if self.log_type == TYPE_ISIS:
             
@@ -190,7 +184,7 @@ class ModelLoader(object):
                     return False
 
                 try:
-                    self.tuflow = loader.loadFile(tcf_path, options) # self.run_options)
+                    self.tuflow = loader.loadFile(tcf_path, options) 
                     self.tcf_dir = os.path.split(tcf_path)[0]
                     self.missing_files = self.tuflow.missing_model_files
                     if self.missing_files:
@@ -232,6 +226,7 @@ class ModelLoader(object):
 
         # Load the data needed for the log into the log pages dictionary.
         log_pages = {}
+        if self.run_options == {}: self.run_options = ''
         log_pages['RUN'] = self.buildRunRowFromModel()
         
         if self.log_type == TYPE_ISIS:

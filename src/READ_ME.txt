@@ -394,6 +394,14 @@ v0.8.2-Beta:
 v0.8.3-Beta:
     - [Bugfix] Issue with updating .ieds files in the Ief Resolver tool.
 
+v0.8.4-Beta:
+    - [Feature] Much improved edit saving capabilities in the main logs tab. You
+      can update all edits in the table (without needing to select) or update all
+      edits in all tables at once. 
+    - [Feature] Message box launched when moving away from the logs with unsaved
+      edits. This offers to save any changes before they are lost.
+    - [Bugfix] Issue with updating .ieds files in the Ief Resolver tool.
+
 ##~##
 
 LICENSE

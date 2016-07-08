@@ -176,6 +176,7 @@ class MainGui(QtGui.QMainWindow):
         self.settings = cur_settings
         self.model_log = None
         self._previous_widget = None
+        self._unsaved_entries = {}
         
         # Database tables that should be exported to Excel
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 
@@ -292,6 +293,7 @@ class MainGui(QtGui.QMainWindow):
             logger.info('Logging level set to: INFO')
             logger.debug('info set check')
         
+        self._previous_widget = self.ui.tabWidget.currentWidget()
         logger.debug('MainGui construction complete')
 
         
@@ -307,22 +309,31 @@ class MainGui(QtGui.QMainWindow):
         self.view_tables = GuiStore.TableHolder(GuiStore.TableHolder.VIEW_LOG)
         self.view_tables.addTable(GuiStore.TableWidget('RUN', 
                             'runEntryViewTable', self.ui.runEntryViewTable))
+        self._unsaved_entries['runEntryViewTable'] = []
         self.view_tables.addTable(GuiStore.TableWidget('TCF', 
                             'tcfEntryViewTable', self.ui.tcfEntryViewTable))
+        self._unsaved_entries['tcfEntryViewTable'] = []
         self.view_tables.addTable(GuiStore.TableWidget('ECF', 
                             'ecfEntryViewTable', self.ui.ecfEntryViewTable))
+        self._unsaved_entries['ecfEntryViewTable'] = []
         self.view_tables.addTable(GuiStore.TableWidget('TGC', 
                             'tgcEntryViewTable', self.ui.tgcEntryViewTable))
+        self._unsaved_entries['tgcEntryViewTable'] = []
         self.view_tables.addTable(GuiStore.TableWidget('TBC', 
                             'tbcEntryViewTable', self.ui.tbcEntryViewTable))
+        self._unsaved_entries['tbcEntryViewTable'] = []
         self.view_tables.addTable(GuiStore.TableWidget('BC_DBASE', 
                             'bcEntryViewTable', self.ui.bcEntryViewTable))
+        self._unsaved_entries['bcEntryViewTable'] = []
         self.view_tables.addTable(GuiStore.TableWidget('DAT', 
                             'datEntryViewTable', self.ui.datEntryViewTable))
+        self._unsaved_entries['datEntryViewTable'] = []
         self.view_tables.addTable(GuiStore.TableWidget('TEF', 
                             'tefEntryViewTable', self.ui.tefEntryViewTable))
+        self._unsaved_entries['tefEntryViewTable'] = []
         self.view_tables.addTable(GuiStore.TableWidget('TRD', 
                             'trdEntryViewTable', self.ui.trdEntryViewTable))
+        self._unsaved_entries['trdEntryViewTable'] = []
         self._addWidgets()
     
     
@@ -369,6 +380,10 @@ class MainGui(QtGui.QMainWindow):
 
         # Do this here so it accounts for all the tabs
         self.ui.tabWidget.setCurrentIndex(self.settings.main['cur_tab'])
+        if str(self.ui.tabWidget.tabText(self.settings.main['cur_tab'])) == 'View Log':
+            self._on_viewlog = True
+        else:
+            self._on_view_log = False
     
     
     def _checkUpdatesFalse(self):
@@ -408,13 +423,19 @@ class MainGui(QtGui.QMainWindow):
                     self.launchQMsgBox('Update Success', msg)
     
     
+    @QtCore.pyqtSlot()
     def _highlightEditRow(self):
         """Highlightes the calling cell in the View Tables."""
         sender = self.sender()
         s_name = str(sender.objectName())
         item = sender.currentItem()
         if not item is None:
-            item.setBackgroundColor(QtGui.QColor(178, 255, 102)) # Light Green
+            id = str(sender.item(item.row(), 0).text())
+            # Need to do this because it keeps calling the slot twice
+            if not id in self._unsaved_entries[s_name]:
+                print id
+                self._unsaved_entries[s_name].append(id)
+                item.setBackgroundColor(QtGui.QColor(178, 255, 102)) # Light Green
          
     
     def _updateLoggingLevel(self):
@@ -464,6 +485,51 @@ class MainGui(QtGui.QMainWindow):
         """
         caller = self.sender()
         call_name = caller.objectName()
+    
+    
+    def saveTableEdits(self, table_obj=None): 
+        """Save the active edits in the view tables.
+        
+        Clears the self._unsaved_entries lists after updating.
+        
+        Args:
+            table_obj=None(TableWidget): table to update. If None all will be 
+                updated.
+        """
+        total_updates = 0
+        cur_prog = 1
+        for v in self._unsaved_entries.values():
+            total_updates += len(v)
+        self._updateMaxProgress(total_updates)
+        
+        # Update just the table provided
+        if not table_obj is None:
+            if self._unsaved_entries[table_obj.name]:
+                for row in range(table_obj.ref.rowCount()):
+                    if str(table_obj.ref.item(row, 0).text()) in self._unsaved_entries[table_obj.name]:
+                        self._updateStatusBar('Updating edit %s of %s' % (cur_prog, total_updates))
+                        self._saveViewChangesToDatabase(table_obj, row)
+                        cur_prog += 1
+                        self._updateCurrentProgress(cur_prog)
+            self._unsaved_entries[table_obj.name] = []
+        
+        # Update all tables
+        else:
+            for k, v in self._unsaved_entries.items():
+                if v:
+                    table_obj = self.view_tables.getTable(name=k)
+                    for row in range(table_obj.ref.rowCount()):
+                        if str(table_obj.ref.item(row, 0).text()) in v:
+                            self._updateStatusBar('Updating edit %s of %s' % (cur_prog, total_updates))
+                            self._saveViewChangesToDatabase(table_obj, row)
+                            cur_prog += 1
+                            self._updateCurrentProgress(cur_prog)
+                self._unsaved_entries[k] = []
+                
+        self._updateStatusBar('')
+        self._updateCurrentProgress(0)
+        self._updateMaxProgress(1)
+        self.loadModelLog()  
         
     
     def _tablePopup(self, pos):
@@ -484,7 +550,8 @@ class MainGui(QtGui.QMainWindow):
         :param pos: the QPoint of the mouse cursor when clicked.
         """
         menu = QtGui.QMenu()
-        updateMultipleRowAction = menu.addAction("Update Row(s)")
+        updateCurrentRowAction = menu.addAction("Update Current Table Row(s)")
+        updateAllRowAction = menu.addAction("Update All Table Row(s)")
         deleteRowAction = menu.addAction("Delete Row")
         
         # Find who called us and get the object that the name refers to.
@@ -509,20 +576,12 @@ class MainGui(QtGui.QMainWindow):
         # Get the action and do whatever it says
         action = menu.exec_(table_obj.ref.viewport().mapToGlobal(pos))
              
-        if action == updateMultipleRowAction:
+        if action == updateCurrentRowAction:
+            self.saveTableEdits(table_obj)
             
-            # Get a list of selected ranges and loop from top row to bottom
-            sel_range = table_obj.ref.selectedRanges()
-            for sel in sel_range:
-                top_row = sel.topRow()
-                bottom_row = sel.bottomRow()
-                
-                # Save row contents to database
-                for row in range(top_row, bottom_row+1):
-                    self._saveViewChangesToDatabase(table_obj, row)
-                    logger.info('Updating row no: ' + str(row+1))
-            self.loadModelLog()               
-        
+        elif action == updateAllRowAction:
+            self.saveTableEdits()
+            
         elif action == deleteRowAction:
             self._deleteRowFromDatabase(table_obj, False)
         
@@ -1365,7 +1424,7 @@ class MainGui(QtGui.QMainWindow):
             self.settings.main['release_notes_version'] = ''
             
     
-    def _tabChanged(self):
+    def _tabChanged(self, int):
         """Lets a widget know that it's tab has just been activated / deactivated.
         
         Some of the widgets may want to load data or use memory intensive 
@@ -1375,10 +1434,23 @@ class MainGui(QtGui.QMainWindow):
         To avoid this we let them know when they're needed or not needed and
         they can claim and release resources appropriately.
         """
+        # Check we don't have any unsaved table view edits
+        if self._on_viewlog == True:
+            self._on_view_log = False
+            for k, v in self._unsaved_entries.items():
+                if v:
+                    msg = "Save your log edits? (or changes will be lost!)"
+                    answer = self.launchQtQBox('Unsaved Edits', msg)
+                    if not answer == False:
+                        self.saveTableEdits()
+                    break
+        if str(self.ui.tabWidget.tabText(int)) == 'View Log': self._on_view_log = True 
+
         try:
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
             self.ui.tabWidget.setEnabled(False)
             current_widget = self.ui.tabWidget.currentWidget()
+            
             
             # Try to call the activation notice
             try:
