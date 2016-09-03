@@ -177,6 +177,7 @@ class MainGui(QtGui.QMainWindow):
         self.model_log = None
         self._previous_widget = None
         self._unsaved_entries = {}
+        self._on_viewlog = False
         
         # Database tables that should be exported to Excel
         self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 
@@ -383,7 +384,7 @@ class MainGui(QtGui.QMainWindow):
         if str(self.ui.tabWidget.tabText(self.settings.main['cur_tab'])) == 'View Log':
             self._on_viewlog = True
         else:
-            self._on_view_log = False
+            self._on_viewlog = False
     
     
     def _checkUpdatesFalse(self):
@@ -1436,7 +1437,7 @@ class MainGui(QtGui.QMainWindow):
         """
         # Check we don't have any unsaved table view edits
         if self._on_viewlog == True:
-            self._on_view_log = False
+            self._on_viewlog = False
             for k, v in self._unsaved_entries.items():
                 if v:
                     msg = "Save your log edits? (or changes will be lost!)"
@@ -1444,7 +1445,7 @@ class MainGui(QtGui.QMainWindow):
                     if not answer == False:
                         self.saveTableEdits()
                     break
-        if str(self.ui.tabWidget.tabText(int)) == 'View Log': self._on_view_log = True 
+        if str(self.ui.tabWidget.tabText(int)) == 'View Log': self._on_viewlog = True 
 
         try:
             QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
