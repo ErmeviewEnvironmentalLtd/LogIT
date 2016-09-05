@@ -44,158 +44,73 @@
 import logging
 logger = logging.getLogger(__name__)
 
+import hashlib
+
+EDITING_ALLOWED = ['COMMENTS', 'MODELLER', 'SETUP', 'DESCRIPTION',
+                   'EVENT_NAME', 'EVENT_DURATION', 'ISIS_BUILD',
+                   'TUFLOW_BUILD', 'AMENDMENTS', 'RUN_OPTIONS', 'MB',
+                   'RUN_STATUS']
+
 class AllLogs(object):
-    '''Container class for all of the SubLog objects.
-    '''
     
-    SINGLE_FILE = ['RUN', 'DAT']
+    TYPES = ['RUN', 'MODEL', 'DAT', 'SUBFILE']
     
-    def __init__(self, log_pages, tcf_dir=None, ief_dir=None):
-        '''Create new SubLog and set multi_file.
+    def __init__(self, run_filename, tcf_dir='', ief_dir=''):
         '''
-        self.editing_allowed = ['COMMENTS', 'MODELLER', 'SETUP', 'DESCRIPTION',
-                           'EVENT_NAME', 'EVENT_DURATION', 'ISIS_BUILD',
-                           'TUFLOW_BUILD', 'AMENDMENTS', 'RUN_OPTIONS', 'MB',
-                           'RUN_STATUS']
-        self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 
-                              'BC_DBASE', 'TEF', 'TRD']
-        
+        '''
+        self.editing_allowed = EDITING_ALLOWED
         self.tcf_dir = tcf_dir
         self.ief_dir = ief_dir
-
-        self.log_pages = {}        
-        for key, page in log_pages.iteritems():
-            if key in AllLogs.SINGLE_FILE:
-                self.log_pages[key] = SubLog(key, page, False)
+        self.run_filename = run_filename
+        self.run_hash = None
+        self.run = None
+        self.dat = None
+        self.models = []
+        
+    
+    def addLogEntry(self, entry, type=None):
+        """
+        """
+        for e in entry:
+            if e['TYPE'] == 'RUN':
+                self.run = e
+                self._buildRunName()
+            elif e['TYPE'] == 'DAT':
+                if e['NAME'].strip() != '':
+                    self.dat = e
             else:
-                self.log_pages[key] = SubLog(key, page, True)
+                self.models.append(e)
+                self.models[-1]['INDEX'] = len(self.models) - 1
+    
+    def _buildRunName(self):
+        rn = []
+        if not self.run['TCF'].strip() == '':
+            rn.append(self.run['TCF'].strip())
+        if not self.run['IEF'].strip() == '':
+            rn.append(self.run['IEF'].strip())
+        if not self.run['RUN_OPTIONS'].strip() == '':
+            rn.append(self.run['RUN_OPTIONS'].strip())
+        
+        self.run_hash = hashlib.sha1(';'.join(rn)).hexdigest()
     
     
-    def getLogEntryContents(self, key, index=None):
-        '''Get the log entry at the given key and index.
-        @param key: the key to the SubLog entry.
-        @param index=None: the index in the contents list to return.
-        '''
-        if index == None:
-            return self.log_pages[key].contents
+    def updateLogEntry(self, entry, values, index=None):
+        
+        if entry == 'RUN':
+            for k, v in values.items():
+                if k in self.editing_allowed:
+                    self.run[k] = v
+            
+        elif entry == 'DAT':
+            for k, v in values.items():
+                if k in self.editing_allowed:
+                    self.dat[k] = v
+            
         else:
-            return self.log_pages[key].contents[index]
-    
-    def getLogDictionary(self):
-        '''Return all logs in class as a dictionary.
-        '''
-        out_log = {}
-        for page in self.log_pages.values():
-            # DEBUG - have to convert back from list at the moment
-            if page.name in AllLogs.SINGLE_FILE:
-                if not len(page.contents) < 1:
-                    page.contents = page.contents[0]
-            out_log[page.name] = page.contents
-        
-        return out_log
-    
-    def getUpdateCheck(self):
-        '''Return dictionary containing update status.
-        Update status is a boolean flag indicating whether a log page should
-        be updated or not.
-        '''
-        out_check = {}
-        for page in self.log_pages.values():
-            out_check[page.name] = page.update_check
-        
-        return out_check
+            for k, v in values.items():
+                if k in self.editing_allowed:
+                    self.models[int(values['INDEX'])][k] = v
+            
     
     
-    def updateSubLog(self, log, log_key):
-        """
-        """
-        for i, l in enumerate(log, 0):
-            for key, val in l.iteritems():
-                if key in self.editing_allowed:
-                    self.log_pages[log_key].updateValue(val, i, key)
-    
-        
-
-class SubLog(object):
-    '''Log page objects.
-    E.g. RUN, TGC, etc.
-    '''
-    
-    def __init__(self, name, sub_page, multi_file):
-        '''Set vars and make sure everything is in the format needed.
-        '''
-        self.name = name
-        self.multi_file = multi_file
-        self.has_contents = self._checkHasContents(sub_page)
-        sub_page = self._checkIsList(sub_page)
-        self.contents = sub_page
-        self.update_check = False
-        #self.update_check = self._createUpdateCheck(sub_page)
-        self.subfile_name = None
-        if multi_file: self.subfile_name = name + '_FILES'
-    
-    
-    def _checkIsList(self, sub_page):
-        '''Checks if given page is in a list and puts it in one if not.
-        
-        Some pages like RUN and DAT can only have one entry, while the others
-        may have many. Originally the others were put in a list and RUN & DAT
-        weren't. This is a design fault and this method can be removed once 
-        it is dealt with throughout the codebase.
-        '''
-        if not isinstance(sub_page, list):
-            sub_page = [sub_page]
-        return sub_page
-    
-    def _checkHasContents(self, contents):
-        '''Checks the status of the page contents.
-        
-        If the contents are set to a default value this will return False.
-        This should also be possible to clean up by ensuring only a single
-        default value is used throughout the codebase.
-        '''
-        if not self.name == 'RUN':
-            if self.multi_file:
-                if contents[0] == 'None' or contents[0] == False or contents[0] == None:
-                    return False
-                elif contents[0][self.name] == 'None':
-                    return False
-            else:
-                if contents == 'None' or contents == False or contents == None:
-                    return False
-                elif contents[self.name] == 'None':
-                    return False
-
-        return True
-    
-    
-    def updateValue(self, value, index, key):
-        """
-        """
-        self.contents[index][key] = value
-    
-    
-    def updateValues(self, row, index):
-        '''
-        '''
-        self.contents[index] = row
-    
-    
-    def bracketFiles(self, index, key, files=None):
-        '''Encloses all of the files, under a certain key, in brackets.
-        If not files==None a new key will be created and those files will be
-        enclosed in brackets.
-        '''
-        if not files == None: self.contents[index][key] = files
-        self.contents[index][key] = "[" + ", ".join(self.contents[index][key]) + "]"
-    
-    def deleteItem(self, index):
-        '''Deletes an item (i.e. a row) from the contents.
-        '''
-        del self.contents[index]
-        
-    
-        
-        
-        
 

@@ -97,16 +97,16 @@ def sqlite_to_workbook(cur, table, workbook, keep_tables):
         ws = workbook.add_sheet(table)  
         logger.info('create Worksheet %s.'  % table)
     
-        #for colx, heading in enumerate(sqlite_get_col_names(cur, table)):  
-        #        ws.write(0,colx, heading)  
-        #for rowy,row in enumerate(sqlite_query(cur, table)):  
-        #    for colx, text in enumerate(row):  
-        #        ws.write(rowy+ 1, colx, text)
-        for colx, heading in enumerate(DatabaseFunctions.cur_tables[table]):
-                ws.write(0,colx, heading)
+        for colx, heading in enumerate(sqlite_get_col_names(cur, table)):  
+                ws.write(0,colx, heading)  
         for rowy,row in enumerate(sqlite_query(cur, table)):  
             for colx, text in enumerate(row):  
-                ws.write(rowy+ 1, colx, text)  
+                ws.write(rowy+ 1, colx, text)
+#         for colx, heading in enumerate(DatabaseFunctions.cur_tables[table]):
+#                 ws.write(0,colx, heading)
+#         for rowy,row in enumerate(sqlite_query(cur, table)):  
+#             for colx, text in enumerate(row):  
+#                 ws.write(rowy+ 1, colx, text)  
   
 
 def exportToExcel(dbpath, keep_tables, excel_path=None):  
@@ -135,3 +135,52 @@ def exportToExcel(dbpath, keep_tables, excel_path=None):
     cur.close()  
     db.close()  
     if tbl_name !=[]: w.save(xlspath)  
+    
+
+def newExportToExcel(run, runh, dat, dath, model, xlspath):
+    
+    w = xlwt.Workbook()
+    ws = w.add_sheet('Run')  
+    logger.info('create Worksheet: Run')
+    for i, h in enumerate(runh): 
+        ws.write(0, i, h)
+    
+    count = 1
+    for k, v in run.items():
+        max = len(v) - 1
+        for j, r in enumerate(v):
+            if j == max:
+                ws.write(count, j, ', '.join(r))
+            else:
+                ws.write(count, j, r)
+        count += 1
+    
+    ws = w.add_sheet('Dat')
+    for i, h in enumerate(dath, 0): 
+        ws.write(0, i, h)
+    
+    count = 1
+    for k, v in dat.items():
+        for j, d in enumerate(v, 0):
+            ws.write(count, j, d)
+        count += 1
+    
+    headers = ['Name', 'Date', 'Comments', 'Files', 'New Files']
+    for mtype, models in model.items():
+        ws = w.add_sheet(mtype)
+        
+        for i, h in enumerate(headers, 0):
+            ws.write(0, i, h)
+        
+        count = 1
+        for k, m in models.items():
+            ws.write(count, 0, k)
+            ws.write(count, 1, models[k]['date'])
+            ws.write(count, 2, models[k]['comments'])
+            ws.write(count, 3, ', '.join(models[k]['files']))
+            ws.write(count, 4, ', '.join(models[k]['new_files']))
+            count += 1
+        
+    w.save(xlspath) 
+    
+    

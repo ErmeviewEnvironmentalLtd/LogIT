@@ -1,215 +1,177 @@
-2016-07-28 19:41:36,339 __main__                                           line:379  INFO     No loadSettings() found for Model Extractor
-2016-07-28 19:41:37,250 __main__                                           line:379  INFO     No loadSettings() found for New Entry
-2016-07-28 19:41:37,256 __main__                                           line:275  DEBUG    Setup UIContainer complete
-2016-07-28 19:41:37,257 __main__                                           line:277  DEBUG    Set column widths complete
-2016-07-28 19:41:37,257 __main__                                           line:1366 ERROR    No log database found. Load or create one from File menu
-2016-07-28 19:41:37,259 __main__                                           line:282  DEBUG    Attempt to laod model log complete
-2016-07-28 19:41:37,444 __main__                                           line:297  DEBUG    MainGui construction complete
-2016-07-28 19:42:05,881 __main__                                           line:1021 INFO     Closing program
-2016-07-28 19:42:05,881 __main__                                           line:1022 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
-2016-07-28 19:43:31,295 __main__                                           line:114  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
-2016-07-28 19:43:31,295 __main__                                           line:125  DEBUG    SQLite3 import complete
-2016-07-28 19:43:31,392 __main__                                           line:140  DEBUG    Start of Logit imports
-2016-07-28 19:43:31,395 __main__                                           line:142  DEBUG    Main Window import complete
-2016-07-28 19:43:31,512 __main__                                           line:144  DEBUG    LogBuilder import complete
-2016-07-28 19:43:31,526 __main__                                           line:146  DEBUG    Database functions import complete
-2016-07-28 19:43:31,573 __main__                                           line:148  DEBUG    Exporters import complete
-2016-07-28 19:43:31,628 Controller                                         line:88   DEBUG    Import app_metrics complete
-2016-07-28 19:43:31,628 __main__                                           line:150  DEBUG    Controller import complete
-2016-07-28 19:43:31,628 __main__                                           line:152  DEBUG    GuiStore import complete
-2016-07-28 19:43:31,628 __main__                                           line:154  DEBUG    Ief Resolver import complete
-2016-07-28 19:43:31,628 __main__                                           line:156  DEBUG    Global Settings import complete
-2016-07-28 19:43:31,658 newentry.NewEntry                                  line:66   DEBUG    NewEntry_Widget import complete
-2016-07-28 19:43:31,658 __main__                                           line:158  DEBUG    New Entry import complete
-2016-07-28 19:43:31,674 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
-2016-07-28 19:43:31,674 __main__                                           line:160  DEBUG    Extract Model import complete
-2016-07-28 19:43:32,177 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
-2016-07-28 19:43:32,194 __main__                                           line:162  DEBUG    Run Summary import complete
-2016-07-28 19:43:32,194 __main__                                           line:163  DEBUG    Import modules complete
-2016-07-28 19:43:32,329 __main__                                           line:189  DEBUG    Setup UI complete
-2016-07-28 19:43:32,329 __main__                                           line:269  DEBUG    Slot connection complete
-2016-07-28 19:43:32,329 __main__                                           line:273  DEBUG    Load settings complete
-2016-07-28 19:43:32,526 __main__                                           line:275  DEBUG    Setup UIContainer complete
-2016-07-28 19:43:32,528 __main__                                           line:277  DEBUG    Set column widths complete
-2016-07-28 19:43:32,528 __main__                                           line:1366 ERROR    No log database found. Load or create one from File menu
-2016-07-28 19:43:32,528 __main__                                           line:282  DEBUG    Attempt to laod model log complete
-2016-07-28 19:43:32,529 __main__                                           line:297  DEBUG    MainGui construction complete
-2016-07-28 19:45:03,836 __main__                                           line:1021 INFO     Closing program
-2016-07-28 19:45:03,836 __main__                                           line:1022 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
-2016-07-28 19:45:06,759 __main__                                           line:114  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
-2016-07-28 19:45:06,759 __main__                                           line:125  DEBUG    SQLite3 import complete
-2016-07-28 19:45:06,858 __main__                                           line:140  DEBUG    Start of Logit imports
-2016-07-28 19:45:06,858 __main__                                           line:142  DEBUG    Main Window import complete
-2016-07-28 19:45:06,960 __main__                                           line:144  DEBUG    LogBuilder import complete
-2016-07-28 19:45:06,974 __main__                                           line:146  DEBUG    Database functions import complete
-2016-07-28 19:45:07,029 __main__                                           line:148  DEBUG    Exporters import complete
-2016-07-28 19:45:07,174 Controller                                         line:88   DEBUG    Import app_metrics complete
-2016-07-28 19:45:07,190 __main__                                           line:150  DEBUG    Controller import complete
-2016-07-28 19:45:07,190 __main__                                           line:152  DEBUG    GuiStore import complete
-2016-07-28 19:45:07,190 __main__                                           line:154  DEBUG    Ief Resolver import complete
-2016-07-28 19:45:07,190 __main__                                           line:156  DEBUG    Global Settings import complete
-2016-07-28 19:45:07,227 newentry.NewEntry                                  line:66   DEBUG    NewEntry_Widget import complete
-2016-07-28 19:45:07,227 __main__                                           line:158  DEBUG    New Entry import complete
-2016-07-28 19:45:07,227 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
-2016-07-28 19:45:07,243 __main__                                           line:160  DEBUG    Extract Model import complete
-2016-07-28 19:45:07,736 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
-2016-07-28 19:45:07,736 __main__                                           line:162  DEBUG    Run Summary import complete
-2016-07-28 19:45:07,737 __main__                                           line:163  DEBUG    Import modules complete
-2016-07-28 19:45:07,854 __main__                                           line:189  DEBUG    Setup UI complete
-2016-07-28 19:45:07,869 __main__                                           line:269  DEBUG    Slot connection complete
-2016-07-28 19:45:07,869 __main__                                           line:273  DEBUG    Load settings complete
-2016-07-28 19:45:08,042 __main__                                           line:275  DEBUG    Setup UIContainer complete
-2016-07-28 19:45:08,043 __main__                                           line:277  DEBUG    Set column widths complete
-2016-07-28 19:45:08,045 __main__                                           line:1366 ERROR    No log database found. Load or create one from File menu
-2016-07-28 19:45:08,045 __main__                                           line:282  DEBUG    Attempt to laod model log complete
-2016-07-28 19:45:08,045 __main__                                           line:297  DEBUG    MainGui construction complete
-2016-07-28 19:45:13,752 __main__                                           line:1021 INFO     Closing program
-2016-07-28 19:45:13,752 __main__                                           line:1022 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
-2016-07-28 19:46:11,668 __main__                                           line:114  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
-2016-07-28 19:46:11,684 __main__                                           line:125  DEBUG    SQLite3 import complete
-2016-07-28 19:46:11,783 __main__                                           line:140  DEBUG    Start of Logit imports
-2016-07-28 19:46:11,783 __main__                                           line:142  DEBUG    Main Window import complete
-2016-07-28 19:46:11,900 __main__                                           line:144  DEBUG    LogBuilder import complete
-2016-07-28 19:46:11,914 __main__                                           line:146  DEBUG    Database functions import complete
-2016-07-28 19:46:11,969 __main__                                           line:148  DEBUG    Exporters import complete
-2016-07-28 19:46:12,016 Controller                                         line:88   DEBUG    Import app_metrics complete
-2016-07-28 19:46:12,016 __main__                                           line:150  DEBUG    Controller import complete
-2016-07-28 19:46:12,030 __main__                                           line:152  DEBUG    GuiStore import complete
-2016-07-28 19:46:12,030 __main__                                           line:154  DEBUG    Ief Resolver import complete
-2016-07-28 19:46:12,030 __main__                                           line:156  DEBUG    Global Settings import complete
-2016-07-28 19:46:12,069 newentry.NewEntry                                  line:66   DEBUG    NewEntry_Widget import complete
-2016-07-28 19:46:12,072 __main__                                           line:158  DEBUG    New Entry import complete
-2016-07-28 19:46:12,073 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
-2016-07-28 19:46:12,073 __main__                                           line:160  DEBUG    Extract Model import complete
-2016-07-28 19:46:12,532 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
-2016-07-28 19:46:12,568 __main__                                           line:162  DEBUG    Run Summary import complete
-2016-07-28 19:46:12,569 __main__                                           line:163  DEBUG    Import modules complete
-2016-07-28 19:46:12,700 __main__                                           line:190  DEBUG    Setup UI complete
-2016-07-28 19:46:12,700 __main__                                           line:270  DEBUG    Slot connection complete
-2016-07-28 19:46:12,700 __main__                                           line:274  DEBUG    Load settings complete
-2016-07-28 19:46:12,917 __main__                                           line:276  DEBUG    Setup UIContainer complete
-2016-07-28 19:46:12,918 __main__                                           line:278  DEBUG    Set column widths complete
-2016-07-28 19:46:12,918 __main__                                           line:1367 ERROR    No log database found. Load or create one from File menu
-2016-07-28 19:46:12,920 __main__                                           line:283  DEBUG    Attempt to laod model log complete
-2016-07-28 19:46:12,920 __main__                                           line:298  DEBUG    MainGui construction complete
-2016-07-28 19:46:15,920 __main__                                           line:1492 DEBUG    updating status bar: Run auto update stopped
-2016-07-28 19:46:17,999 __main__                                           line:1464 DEBUG    Unnamed tab has not implemented an activation notice
-2016-07-28 19:46:18,599 __main__                                           line:1464 DEBUG    Unnamed tab has not implemented an activation notice
-2016-07-28 19:46:18,599 __main__                                           line:1475 DEBUG    Unnamed tab has not implemented an deactivation notice
-2016-07-28 19:46:25,996 __main__                                           line:1022 INFO     Closing program
-2016-07-28 19:46:25,996 __main__                                           line:1023 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
-2016-08-15 09:30:43,069 __main__                                           line:114  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
-2016-08-15 09:30:43,075 __main__                                           line:125  DEBUG    SQLite3 import complete
-2016-08-15 09:30:43,193 __main__                                           line:140  DEBUG    Start of Logit imports
-2016-08-15 09:30:43,263 __main__                                           line:142  DEBUG    Main Window import complete
-2016-08-15 09:30:44,779 __main__                                           line:144  DEBUG    LogBuilder import complete
-2016-08-15 09:30:44,801 __main__                                           line:146  DEBUG    Database functions import complete
-2016-08-15 09:30:45,039 __main__                                           line:148  DEBUG    Exporters import complete
-2016-08-15 09:30:45,167 Controller                                         line:88   DEBUG    Import app_metrics complete
-2016-08-15 09:30:45,204 __main__                                           line:150  DEBUG    Controller import complete
-2016-08-15 09:30:45,282 __main__                                           line:152  DEBUG    GuiStore import complete
-2016-08-15 09:30:45,319 __main__                                           line:154  DEBUG    Ief Resolver import complete
-2016-08-15 09:30:45,321 __main__                                           line:156  DEBUG    Global Settings import complete
-2016-08-15 09:30:45,608 newentry.NewEntry                                  line:66   DEBUG    NewEntry_Widget import complete
-2016-08-15 09:30:45,608 __main__                                           line:158  DEBUG    New Entry import complete
-2016-08-15 09:30:45,780 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
-2016-08-15 09:30:45,793 __main__                                           line:160  DEBUG    Extract Model import complete
-2016-08-15 09:30:49,263 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
-2016-08-15 09:30:49,263 __main__                                           line:162  DEBUG    Run Summary import complete
-2016-08-15 09:30:49,263 __main__                                           line:163  DEBUG    Import modules complete
-2016-08-15 09:30:50,233 __main__                                           line:190  DEBUG    Setup UI complete
-2016-08-15 09:30:50,237 __main__                                           line:270  DEBUG    Slot connection complete
-2016-08-15 09:30:50,237 __main__                                           line:274  DEBUG    Load settings complete
-2016-08-15 09:30:50,721 __main__                                           line:1464 DEBUG    Unnamed tab has not implemented an activation notice
-2016-08-15 09:30:50,723 __main__                                           line:276  DEBUG    Setup UIContainer complete
-2016-08-15 09:30:50,724 __main__                                           line:278  DEBUG    Set column widths complete
-2016-08-15 09:30:50,724 __main__                                           line:1367 ERROR    No log database found. Load or create one from File menu
-2016-08-15 09:30:50,726 __main__                                           line:283  DEBUG    Attempt to laod model log complete
-2016-08-15 09:30:50,726 __main__                                           line:298  DEBUG    MainGui construction complete
-2016-08-15 09:30:52,714 __main__                                           line:1475 DEBUG    Unnamed tab has not implemented an deactivation notice
-2016-08-15 09:31:23,875 ship.utils.qtclasses                               line:140  INFO     Selected directory: Filepath = P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Technical\hydraulics\Extracted_From_Recieved
-2016-08-15 09:31:26,913 __main__                                           line:1022 INFO     Closing program
-2016-08-15 09:31:26,914 __main__                                           line:1023 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
-2016-08-15 09:31:36,605 __main__                                           line:114  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
-2016-08-15 09:31:36,614 __main__                                           line:125  DEBUG    SQLite3 import complete
-2016-08-15 09:31:36,733 __main__                                           line:140  DEBUG    Start of Logit imports
-2016-08-15 09:31:36,740 __main__                                           line:142  DEBUG    Main Window import complete
-2016-08-15 09:31:36,982 __main__                                           line:144  DEBUG    LogBuilder import complete
-2016-08-15 09:31:37,019 __main__                                           line:146  DEBUG    Database functions import complete
-2016-08-15 09:31:37,460 __main__                                           line:148  DEBUG    Exporters import complete
-2016-08-15 09:31:37,470 Controller                                         line:88   DEBUG    Import app_metrics complete
-2016-08-15 09:31:37,470 __main__                                           line:150  DEBUG    Controller import complete
-2016-08-15 09:31:37,473 __main__                                           line:152  DEBUG    GuiStore import complete
-2016-08-15 09:31:37,474 __main__                                           line:154  DEBUG    Ief Resolver import complete
-2016-08-15 09:31:37,476 __main__                                           line:156  DEBUG    Global Settings import complete
-2016-08-15 09:31:37,654 newentry.NewEntry                                  line:66   DEBUG    NewEntry_Widget import complete
-2016-08-15 09:31:37,655 __main__                                           line:158  DEBUG    New Entry import complete
-2016-08-15 09:31:37,660 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
-2016-08-15 09:31:37,661 __main__                                           line:160  DEBUG    Extract Model import complete
-2016-08-15 09:31:38,322 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
-2016-08-15 09:31:38,323 __main__                                           line:162  DEBUG    Run Summary import complete
-2016-08-15 09:31:38,323 __main__                                           line:163  DEBUG    Import modules complete
-2016-08-15 09:31:38,415 __main__                                           line:190  DEBUG    Setup UI complete
-2016-08-15 09:31:38,417 __main__                                           line:270  DEBUG    Slot connection complete
-2016-08-15 09:31:38,418 __main__                                           line:274  DEBUG    Load settings complete
-2016-08-15 09:31:38,505 __main__                                           line:276  DEBUG    Setup UIContainer complete
-2016-08-15 09:31:38,506 __main__                                           line:278  DEBUG    Set column widths complete
-2016-08-15 09:31:38,506 __main__                                           line:1367 ERROR    No log database found. Load or create one from File menu
-2016-08-15 09:31:38,507 __main__                                           line:283  DEBUG    Attempt to laod model log complete
-2016-08-15 09:31:38,507 __main__                                           line:298  DEBUG    MainGui construction complete
-2016-08-15 09:32:49,723 ship.utils.qtclasses                               line:86   INFO     Opening file: P:/00 Project Files/15009_EA_SW_TMac_Support/15009h_Portreath_FMS/Received/TUFLOW/runs/POR_018_Des_100.tcf
-2016-08-15 09:32:54,595 ship.utils.qtclasses                               line:140  INFO     Selected directory: Filepath = P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Technical\hydraulics\Extracted_From_Recieved
-2016-08-15 09:32:57,664 __main__                                           line:1492 DEBUG    updating status bar: Reading Tuflow files
-2016-08-15 09:32:57,665 ship.utils.fileloaders.tuflowloader                line:67   DEBUG    Initialising TuflowLoader
-2016-08-15 09:32:57,667 ship.utils.fileloaders.tuflowloader                line:123  INFO     Loading Tuflow model
-2016-08-15 09:32:57,667 ship.utils.utilfunctions                           line:52   INFO     File ext = .tcf
-2016-08-15 09:32:57,815 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\POR_018_Des_100.tcf
-2016-08-15 09:32:57,839 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\..\model\POR_Defended_008.tgc
-2016-08-15 09:32:57,861 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\..\model\POR_Defended_005.tbc
-2016-08-15 09:32:57,868 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\POR_018_Des_100.ecf
-2016-08-15 09:35:15,252 extractmodel.ModelExtractor                        line:657  DEBUG    Datafile = 1d_xs_POR_R2_007
-2016-08-15 09:35:15,479 extractmodel.ModelExtractor                        line:657  DEBUG    Datafile = 1d_xs_POR_R1_001
-2016-08-15 09:35:15,575 extractmodel.ModelExtractor                        line:657  DEBUG    Datafile = bc_dbase_POR_R2_Des_100_003
-2016-08-15 09:35:15,576 ship.tuflow.data_files.datafileloader              line:359  INFO     Loading data file contents from disc - P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\..\bc_dbase\bc_dbase_POR_R2_Des_100_003.csv
-2016-08-15 09:35:15,641 extractmodel.ModelExtractor                        line:657  DEBUG    Datafile = bc_dbase_POR_R2_Des_100_003
-2016-08-15 09:35:15,641 ship.tuflow.data_files.datafileloader              line:359  INFO     Loading data file contents from disc - P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\..\bc_dbase\bc_dbase_POR_R2_Des_100_003.csv
-2016-08-15 09:35:15,691 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 1 of 6 (Some results can take a while)
-2016-08-15 09:35:16,601 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 2 of 6 (Some results can take a while)
-2016-08-15 09:35:16,608 extractmodel.ModelExtractor                        line:441  WARNING  Could not copy results from: D:\281047_Portreath\TUFLOW\results\POR_018_Des_100
-2016-08-15 09:35:16,611 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 3 of 6 (Some results can take a while)
-2016-08-15 09:35:16,624 extractmodel.ModelExtractor                        line:441  WARNING  Could not copy results from: D:\281047_Portreath\TUFLOW\checks\POR_018_Des_100
-2016-08-15 09:35:16,628 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 4 of 6 (Some results can take a while)
-2016-08-15 09:35:16,790 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 5 of 6 (Some results can take a while)
-2016-08-15 09:35:16,799 extractmodel.ModelExtractor                        line:441  WARNING  Could not copy results from: D:\281047_Portreath\TUFLOW\results\POR_018_Des_100
-2016-08-15 09:35:16,801 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 6 of 6 (Some results can take a while)
-2016-08-15 09:35:16,809 extractmodel.ModelExtractor                        line:441  WARNING  Could not copy results from: D:\281047_Portreath\TUFLOW\checks\POR_018_Des_100
-2016-08-15 09:35:16,812 __main__                                           line:1492 DEBUG    updating status bar: Copying model files...
-2016-08-15 09:35:19,941 __main__                                           line:1492 DEBUG    updating status bar: 
-2016-08-15 09:35:37,325 __main__                                           line:1492 DEBUG    updating status bar: Reading Tuflow files
-2016-08-15 09:35:37,328 ship.utils.fileloaders.tuflowloader                line:67   DEBUG    Initialising TuflowLoader
-2016-08-15 09:35:37,328 ship.utils.fileloaders.tuflowloader                line:123  INFO     Loading Tuflow model
-2016-08-15 09:35:37,328 ship.utils.utilfunctions                           line:52   INFO     File ext = .tcf
-2016-08-15 09:35:37,331 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\POR_018_Des_100.tcf
-2016-08-15 09:35:37,359 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\..\model\POR_Defended_008.tgc
-2016-08-15 09:35:37,394 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\..\model\POR_Defended_005.tbc
-2016-08-15 09:35:37,404 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\POR_018_Des_100.ecf
-2016-08-15 09:39:37,901 extractmodel.ModelExtractor                        line:657  DEBUG    Datafile = 1d_xs_POR_R2_007
-2016-08-15 09:40:20,484 extractmodel.ModelExtractor                        line:657  DEBUG    Datafile = 1d_xs_POR_R1_001
-2016-08-15 09:40:46,667 extractmodel.ModelExtractor                        line:657  DEBUG    Datafile = bc_dbase_POR_R2_Des_100_003
-2016-08-15 09:40:46,670 ship.tuflow.data_files.datafileloader              line:359  INFO     Loading data file contents from disc - P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\..\bc_dbase\bc_dbase_POR_R2_Des_100_003.csv
-2016-08-15 09:40:46,769 extractmodel.ModelExtractor                        line:657  DEBUG    Datafile = bc_dbase_POR_R2_Des_100_003
-2016-08-15 09:40:46,772 ship.tuflow.data_files.datafileloader              line:359  INFO     Loading data file contents from disc - P:\00 Project Files\15009_EA_SW_TMac_Support\15009h_Portreath_FMS\Received\TUFLOW\runs\..\bc_dbase\bc_dbase_POR_R2_Des_100_003.csv
-2016-08-15 09:40:46,839 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 1 of 6 (Some results can take a while)
-2016-08-15 09:40:47,575 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 2 of 6 (Some results can take a while)
-2016-08-15 09:40:47,578 extractmodel.ModelExtractor                        line:441  WARNING  Could not copy results from: D:\281047_Portreath\TUFLOW\results\POR_018_Des_100
-2016-08-15 09:40:47,579 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 3 of 6 (Some results can take a while)
-2016-08-15 09:40:47,582 extractmodel.ModelExtractor                        line:441  WARNING  Could not copy results from: D:\281047_Portreath\TUFLOW\checks\POR_018_Des_100
-2016-08-15 09:40:47,584 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 4 of 6 (Some results can take a while)
-2016-08-15 09:40:47,714 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 5 of 6 (Some results can take a while)
-2016-08-15 09:40:47,716 extractmodel.ModelExtractor                        line:441  WARNING  Could not copy results from: D:\281047_Portreath\TUFLOW\results\POR_018_Des_100
-2016-08-15 09:40:47,717 __main__                                           line:1492 DEBUG    updating status bar: Copying output folder 6 of 6 (Some results can take a while)
-2016-08-15 09:40:47,720 extractmodel.ModelExtractor                        line:441  WARNING  Could not copy results from: D:\281047_Portreath\TUFLOW\checks\POR_018_Des_100
-2016-08-15 09:40:47,721 __main__                                           line:1492 DEBUG    updating status bar: Copying model files...
-2016-08-15 09:40:51,766 __main__                                           line:1492 DEBUG    updating status bar: 
-2016-08-15 09:41:00,157 __main__                                           line:1022 INFO     Closing program
-2016-08-15 09:41:00,157 __main__                                           line:1023 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
+2016-09-10 11:04:02,505 ship.utils.utilfunctions                           line:52   INFO     File ext = .tcf
+2016-09-10 11:04:02,516 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009g_Exton_FMS\Technical\hydraulics\tuflow\runs\Exton_036_4%AEP.tcf
+2016-09-10 11:04:02,542 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009g_Exton_FMS\Technical\hydraulics\tuflow\runs\..\model\Exton_036.tgc
+2016-09-10 11:04:02,552 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009g_Exton_FMS\Technical\hydraulics\tuflow\runs\..\model\Exton_036.tbc
+2016-09-10 11:04:02,605 ship.tuflow.data_files.datafileloader              line:359  INFO     Loading data file contents from disc - P:\00 Project Files\15009_EA_SW_TMac_Support\15009g_Exton_FMS\Technical\hydraulics\tuflow\runs\..\bc_dbase\bc_dbase_Exton_009.csv
+2016-09-10 11:04:02,611 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "run" AS t1 WHERE ("t1"."run_hash" = ?) LIMIT 1 OFFSET 0', [u'19f2db75fe01286971cbcaae517be45ca3f0d932'])
+2016-09-10 11:04:02,621 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036_4%AEP.tcf'])
+2016-09-10 11:04:02,622 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036.tgc'])
+2016-09-10 11:04:02,625 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036.tbc'])
+2016-09-10 11:04:02,625 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'bc_dbase_Exton_009.csv'])
+2016-09-10 11:04:02,628 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "dat" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_Baseline_1%AEP_v3-5.dat'])
+2016-09-10 11:04:02,684 __main__                                           line:1553 DEBUG    updating status bar: Loaded model at: P:/00 Project Files/15009_EA_SW_TMac_Support/15009g_Exton_FMS/Technical/hydraulics/fmp/iefs/Baseline/Exton_Baseline_4%AEP_036.ief
+2016-09-10 11:04:04,989 __main__                                           line:1525 DEBUG    Unnamed tab has not implemented an activation notice
+2016-09-10 11:04:06,069 __main__                                           line:1536 DEBUG    Unnamed tab has not implemented an deactivation notice
+2016-09-10 11:04:59,881 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-09-10 11:04:59,887 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-09-10 11:04:59,971 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-09-10 11:04:59,973 __main__                                           line:156  DEBUG    Main Window import complete
+2016-09-10 11:05:00,078 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-09-10 11:05:00,078 __main__                                           line:160  DEBUG    Database functions import complete
+2016-09-10 11:05:00,130 __main__                                           line:162  DEBUG    Exporters import complete
+2016-09-10 11:05:00,178 Controller                                         line:94   DEBUG    Import app_metrics complete
+2016-09-10 11:05:00,326 __main__                                           line:164  DEBUG    Controller import complete
+2016-09-10 11:05:00,329 __main__                                           line:166  DEBUG    GuiStore import complete
+2016-09-10 11:05:00,332 __main__                                           line:168  DEBUG    Ief Resolver import complete
+2016-09-10 11:05:00,332 __main__                                           line:170  DEBUG    Global Settings import complete
+2016-09-10 11:05:00,342 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-09-10 11:05:00,344 __main__                                           line:172  DEBUG    New Entry import complete
+2016-09-10 11:05:00,348 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-09-10 11:05:00,349 __main__                                           line:174  DEBUG    Extract Model import complete
+2016-09-10 11:05:00,714 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-09-10 11:05:00,716 __main__                                           line:176  DEBUG    Run Summary import complete
+2016-09-10 11:05:00,717 __main__                                           line:180  DEBUG    Import modules complete
+2016-09-10 11:05:00,770 __main__                                           line:205  DEBUG    Setup UI complete
+2016-09-10 11:05:00,775 __main__                                           line:263  DEBUG    Load settings complete
+2016-09-10 11:05:00,871 __main__                                           line:265  DEBUG    Add Widgets complete
+2016-09-10 11:05:00,878 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."dat_id", "t1"."run_hash", "t1"."setup", "t1"."comments", "t1"."ief", "t1"."tcf", "t1"."isis_results", "t1"."tuflow_results", "t1"."estry_results", "t1"."event_duration", "t1"."run_status", "t1"."mb", "t1"."modeller", "t1"."isis_version", "t1"."tuflow_version", "t1"."event_name", "t1"."ief_dir", "t1"."tcf_dir", "t1"."log_dir", "t1"."run_options", "t1"."timestamp" FROM "run" AS t1', [])
+2016-09-10 11:05:00,892 __main__                                           line:275  DEBUG    Attempt to laod model log complete
+2016-09-10 11:05:00,892 __main__                                           line:290  DEBUG    MainGui construction complete
+2016-09-10 11:05:05,946 __main__                                           line:1536 DEBUG    Unnamed tab has not implemented an deactivation notice
+2016-09-10 11:05:10,128 ship.utils.qtclasses                               line:86   INFO     Opening file: P:/00 Project Files/15009_EA_SW_TMac_Support/15009g_Exton_FMS/Technical/hydraulics/fmp/iefs/Baseline/Exton_Baseline_4%AEP_036.ief
+2016-09-10 11:05:10,131 LogBuilder                                         line:119  INFO     loading model at filepath: P:/00 Project Files/15009_EA_SW_TMac_Support/15009g_Exton_FMS/Technical/hydraulics/fmp/iefs/Baseline/Exton_Baseline_4%AEP_036.ief
+2016-09-10 11:05:10,131 ship.utils.utilfunctions                           line:52   INFO     File ext = .ief
+2016-09-10 11:05:10,131 ship.utils.fileloaders.iefloader                   line:52   DEBUG    Initialising IEFLoader
+2016-09-10 11:05:10,131 ship.utils.utilfunctions                           line:52   INFO     File ext = .ief
+2016-09-10 11:05:10,131 ship.utils.fileloaders.iefloader                   line:217  INFO     loading File: P:/00 Project Files/15009_EA_SW_TMac_Support/15009g_Exton_FMS/Technical/hydraulics/fmp/iefs/Baseline/Exton_Baseline_4%AEP_036.ief
+2016-09-10 11:05:10,137 ship.utils.utilfunctions                           line:52   INFO     File ext = .tcf
+2016-09-10 11:05:10,137 ship.utils.fileloaders.tuflowloader                line:67   DEBUG    Initialising TuflowLoader
+2016-09-10 11:05:10,138 ship.utils.fileloaders.tuflowloader                line:123  INFO     Loading Tuflow model
+2016-09-10 11:05:10,138 ship.utils.utilfunctions                           line:52   INFO     File ext = .tcf
+2016-09-10 11:05:10,141 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009g_Exton_FMS\Technical\hydraulics\tuflow\runs\Exton_036_4%AEP.tcf
+2016-09-10 11:05:10,148 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009g_Exton_FMS\Technical\hydraulics\tuflow\runs\..\model\Exton_036.tgc
+2016-09-10 11:05:10,157 ship.utils.fileloaders.tuflowloader                line:1139 DEBUG    loading File: P:\00 Project Files\15009_EA_SW_TMac_Support\15009g_Exton_FMS\Technical\hydraulics\tuflow\runs\..\model\Exton_036.tbc
+2016-09-10 11:05:10,164 ship.tuflow.data_files.datafileloader              line:359  INFO     Loading data file contents from disc - P:\00 Project Files\15009_EA_SW_TMac_Support\15009g_Exton_FMS\Technical\hydraulics\tuflow\runs\..\bc_dbase\bc_dbase_Exton_009.csv
+2016-09-10 11:05:10,168 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "run" AS t1 WHERE ("t1"."run_hash" = ?) LIMIT 1 OFFSET 0', [u'19f2db75fe01286971cbcaae517be45ca3f0d932'])
+2016-09-10 11:05:10,180 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036_4%AEP.tcf'])
+2016-09-10 11:05:10,183 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036.tgc'])
+2016-09-10 11:05:10,184 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036.tbc'])
+2016-09-10 11:05:10,186 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'bc_dbase_Exton_009.csv'])
+2016-09-10 11:05:10,187 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "dat" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_Baseline_1%AEP_v3-5.dat'])
+2016-09-10 11:05:10,230 __main__                                           line:1553 DEBUG    updating status bar: Loaded model at: P:/00 Project Files/15009_EA_SW_TMac_Support/15009g_Exton_FMS/Technical/hydraulics/fmp/iefs/Baseline/Exton_Baseline_4%AEP_036.ief
+2016-09-10 11:05:14,707 __main__                                           line:1553 DEBUG    updating status bar: Updating edit 1 of 1
+2016-09-10 11:05:14,711 peewee                                             line:3672 DEBUG    ('UPDATE "run" SET "run_hash" = ?, "setup" = ?, "comments" = ?, "ief" = ?, "tcf" = ?, "isis_results" = ?, "tuflow_results" = ?, "estry_results" = ?, "event_duration" = ?, "run_status" = ?, "mb" = ?, "modeller" = ?, "isis_version" = ?, "tuflow_version" = ?, "event_name" = ?, "ief_dir" = ?, "tcf_dir" = ?, "log_dir" = ?, "run_options" = ?, "timestamp" = ? WHERE ("run"."id" = ?)', [u'36e49e2e88fba1c040ce763a60cde9ce35d84a53', u'asdhfg', u'', u'Exton_Baseline_50%AEP_036.ief', u'Exton_036_50%AEP.tcf', u'P:\\00 Project Files\\15009_EA_SW_TMac_Support\\15009g_Exton_FMS\\Technical\\hydraulics\\tuflow\\results\\1d\\fmp\\EXTON_BASELINE_50%AEP_036', u'S:\\15009g\\results\\', u'', 12.0, u'Finished', 0.01, u'', u'', u'', u'', u'P:/00 Project Files/15009_EA_SW_TMac_Support/15009g_Exton_FMS/Technical/hydraulics/fmp/iefs/Baseline', u'P:\\00 Project Files\\15009_EA_SW_TMac_Support\\15009g_Exton_FMS\\Technical\\hydraulics\\tuflow\\runs', u'P:\\00 Project Files\\15009_EA_SW_TMac_Support\\15009g_Exton_FMS\\Technical\\hydraulics\\tuflow\\runs\\log\\', u'', '2016-09-10 10:43:15', 1])
+2016-09-10 11:05:14,888 __main__                                           line:1553 DEBUG    updating status bar: 
+2016-09-10 11:05:14,911 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."dat_id", "t1"."run_hash", "t1"."setup", "t1"."comments", "t1"."ief", "t1"."tcf", "t1"."isis_results", "t1"."tuflow_results", "t1"."estry_results", "t1"."event_duration", "t1"."run_status", "t1"."mb", "t1"."modeller", "t1"."isis_version", "t1"."tuflow_version", "t1"."event_name", "t1"."ief_dir", "t1"."tcf_dir", "t1"."log_dir", "t1"."run_options", "t1"."timestamp" FROM "run" AS t1', [])
+2016-09-10 11:05:14,931 peewee                                             line:3672 DEBUG    ('BEGIN DEFERRED', None)
+2016-09-10 11:05:14,934 peewee                                             line:3672 DEBUG    ('INSERT INTO "dat" ("name", "amendments", "comments", "timestamp") VALUES (?, ?, ?, ?)', [u'Exton_Baseline_1%AEP_v3-5.dat', u'None', u'None', datetime.datetime(2016, 9, 10, 11, 5, 14, 933000)])
+2016-09-10 11:05:14,936 peewee                                             line:3672 DEBUG    ('SELECT "t1"."name", "t1"."amendments", "t1"."comments", "t1"."timestamp" FROM "dat" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_Baseline_1%AEP_v3-5.dat'])
+2016-09-10 11:05:14,940 peewee                                             line:3672 DEBUG    ('INSERT INTO "run" ("dat_id", "run_hash", "setup", "comments", "ief", "tcf", "isis_results", "tuflow_results", "estry_results", "event_duration", "run_status", "mb", "modeller", "isis_version", "tuflow_version", "event_name", "ief_dir", "tcf_dir", "log_dir", "run_options", "timestamp") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [u'Exton_Baseline_1%AEP_v3-5.dat', u'19f2db75fe01286971cbcaae517be45ca3f0d932', u'', u'', u'Exton_Baseline_4%AEP_036.ief', u'Exton_036_4%AEP.tcf', u'P:\\00 Project Files\\15009_EA_SW_TMac_Support\\15009g_Exton_FMS\\Technical\\hydraulics\\tuflow\\results\\1d\\fmp\\EXTON_BASELINE_4%AEP_036', u'S:\\15009g\\results\\', u'', 12.0, u'Finished', 0.09, u'', u'', u'', u'', u'P:/00 Project Files/15009_EA_SW_TMac_Support/15009g_Exton_FMS/Technical/hydraulics/fmp/iefs/Baseline', u'P:\\00 Project Files\\15009_EA_SW_TMac_Support\\15009g_Exton_FMS\\Technical\\hydraulics\\tuflow\\runs', u'P:\\00 Project Files\\15009_EA_SW_TMac_Support\\15009g_Exton_FMS\\Technical\\hydraulics\\tuflow\\runs\\log\\', u'', datetime.datetime(2016, 9, 10, 11, 5, 14, 938000)])
+2016-09-10 11:05:15,183 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036_4%AEP.tcf'])
+2016-09-10 11:05:15,191 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t2 ON ("t1"."sub_file_id" = "t2"."name") INNER JOIN "modelfile" AS t3 ON ("t1"."model_file_id" = "t3"."name") WHERE (("t3"."model_type" = ?) AND ("t2"."name" = ?)) LIMIT 1 OFFSET 0', [u'TCF', u'Projection.prj'])
+2016-09-10 11:05:15,193 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "subfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Projection.prj'])
+2016-09-10 11:05:15,194 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 WHERE (("t1"."model_file_id" = ?) AND ("t1"."sub_file_id" = ?)) LIMIT 1 OFFSET 0', [u'Exton_036_4%AEP.tcf', u'Projection.prj'])
+2016-09-10 11:05:15,197 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t2 ON ("t1"."sub_file_id" = "t2"."name") INNER JOIN "modelfile" AS t3 ON ("t1"."model_file_id" = "t3"."name") WHERE (("t3"."model_type" = ?) AND ("t2"."name" = ?)) LIMIT 1 OFFSET 0', [u'TCF', u'Materials.csv'])
+2016-09-10 11:05:15,197 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "subfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Materials.csv'])
+2016-09-10 11:05:15,198 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 WHERE (("t1"."model_file_id" = ?) AND ("t1"."sub_file_id" = ?)) LIMIT 1 OFFSET 0', [u'Exton_036_4%AEP.tcf', u'Materials.csv'])
+2016-09-10 11:05:15,201 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t2 ON ("t1"."sub_file_id" = "t2"."name") INNER JOIN "modelfile" AS t3 ON ("t1"."model_file_id" = "t3"."name") WHERE (("t3"."model_type" = ?) AND ("t2"."name" = ?)) LIMIT 1 OFFSET 0', [u'TCF', u'1d_nodes_Exton_036_P.shp'])
+2016-09-10 11:05:15,203 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "subfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'1d_nodes_Exton_036_P.shp'])
+2016-09-10 11:05:15,204 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 WHERE (("t1"."model_file_id" = ?) AND ("t1"."sub_file_id" = ?)) LIMIT 1 OFFSET 0', [u'Exton_036_4%AEP.tcf', u'1d_nodes_Exton_036_P.shp'])
+2016-09-10 11:05:15,207 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t2 ON ("t1"."sub_file_id" = "t2"."name") INNER JOIN "modelfile" AS t3 ON ("t1"."model_file_id" = "t3"."name") WHERE (("t3"."model_type" = ?) AND ("t2"."name" = ?)) LIMIT 1 OFFSET 0', [u'TCF', u'1d_nwk_Exton_036_L.shp'])
+2016-09-10 11:05:15,209 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "subfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'1d_nwk_Exton_036_L.shp'])
+2016-09-10 11:05:15,210 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 WHERE (("t1"."model_file_id" = ?) AND ("t1"."sub_file_id" = ?)) LIMIT 1 OFFSET 0', [u'Exton_036_4%AEP.tcf', u'1d_nwk_Exton_036_L.shp'])
+2016-09-10 11:05:15,211 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t2 ON ("t1"."sub_file_id" = "t2"."name") INNER JOIN "modelfile" AS t3 ON ("t1"."model_file_id" = "t3"."name") WHERE (("t3"."model_type" = ?) AND ("t2"."name" = ?)) LIMIT 1 OFFSET 0', [u'TCF', u'bc_dbase_Exton_009.csv'])
+2016-09-10 11:05:15,213 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "subfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'bc_dbase_Exton_009.csv'])
+2016-09-10 11:05:15,214 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 WHERE (("t1"."model_file_id" = ?) AND ("t1"."sub_file_id" = ?)) LIMIT 1 OFFSET 0', [u'Exton_036_4%AEP.tcf', u'bc_dbase_Exton_009.csv'])
+2016-09-10 11:05:15,217 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t2 ON ("t1"."sub_file_id" = "t2"."name") INNER JOIN "modelfile" AS t3 ON ("t1"."model_file_id" = "t3"."name") WHERE (("t3"."model_type" = ?) AND ("t2"."name" = ?)) LIMIT 1 OFFSET 0', [u'TCF', u'Exton_036.tgc'])
+2016-09-10 11:05:15,217 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "subfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036.tgc'])
+2016-09-10 11:05:15,219 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 WHERE (("t1"."model_file_id" = ?) AND ("t1"."sub_file_id" = ?)) LIMIT 1 OFFSET 0', [u'Exton_036_4%AEP.tcf', u'Exton_036.tgc'])
+2016-09-10 11:05:15,220 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t2 ON ("t1"."sub_file_id" = "t2"."name") INNER JOIN "modelfile" AS t3 ON ("t1"."model_file_id" = "t3"."name") WHERE (("t3"."model_type" = ?) AND ("t2"."name" = ?)) LIMIT 1 OFFSET 0', [u'TCF', u'Exton_036.tbc'])
+2016-09-10 11:05:15,221 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "subfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036.tbc'])
+2016-09-10 11:05:15,223 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile_subfile" AS t1 WHERE (("t1"."model_file_id" = ?) AND ("t1"."sub_file_id" = ?)) LIMIT 1 OFFSET 0', [u'Exton_036_4%AEP.tcf', u'Exton_036.tbc'])
+2016-09-10 11:05:15,224 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036.tgc'])
+2016-09-10 11:05:15,226 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'Exton_036.tbc'])
+2016-09-10 11:05:15,226 peewee                                             line:3672 DEBUG    ('SELECT 1 FROM "modelfile" AS t1 WHERE ("t1"."name" = ?) LIMIT 1 OFFSET 0', [u'bc_dbase_Exton_009.csv'])
+2016-09-10 11:05:15,227 peewee                                             line:3672 DEBUG    ('BEGIN DEFERRED', None)
+2016-09-10 11:05:15,229 peewee                                             line:3672 DEBUG    ('INSERT INTO "modelfile" ("name", "model_type", "comments", "timestamp") VALUES (?, ?, ?, ?)', [u'Exton_036_4%AEP.tcf', u'TCF', u'None', datetime.datetime(2016, 9, 10, 11, 5, 15, 229000)])
+2016-09-10 11:05:15,250 peewee                                             line:3672 DEBUG    ('INSERT INTO "modelfile_subfile" ("model_file_id", "sub_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [u'Exton_036_4%AEP.tcf', u'Projection.prj', False, datetime.datetime(2016, 9, 10, 11, 5, 15, 250000)])
+2016-09-10 11:05:15,252 peewee                                             line:3672 DEBUG    ('INSERT INTO "modelfile_subfile" ("model_file_id", "sub_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [u'Exton_036_4%AEP.tcf', u'Materials.csv', False, datetime.datetime(2016, 9, 10, 11, 5, 15, 252000)])
+2016-09-10 11:05:15,253 peewee                                             line:3672 DEBUG    ('INSERT INTO "modelfile_subfile" ("model_file_id", "sub_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [u'Exton_036_4%AEP.tcf', u'1d_nodes_Exton_036_P.shp', False, datetime.datetime(2016, 9, 10, 11, 5, 15, 253000)])
+2016-09-10 11:05:15,256 peewee                                             line:3672 DEBUG    ('INSERT INTO "modelfile_subfile" ("model_file_id", "sub_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [u'Exton_036_4%AEP.tcf', u'1d_nwk_Exton_036_L.shp', False, datetime.datetime(2016, 9, 10, 11, 5, 15, 255000)])
+2016-09-10 11:05:15,256 peewee                                             line:3672 DEBUG    ('INSERT INTO "modelfile_subfile" ("model_file_id", "sub_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [u'Exton_036_4%AEP.tcf', u'bc_dbase_Exton_009.csv', False, datetime.datetime(2016, 9, 10, 11, 5, 15, 256000)])
+2016-09-10 11:05:15,257 peewee                                             line:3672 DEBUG    ('INSERT INTO "modelfile_subfile" ("model_file_id", "sub_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [u'Exton_036_4%AEP.tcf', u'Exton_036.tgc', False, datetime.datetime(2016, 9, 10, 11, 5, 15, 257000)])
+2016-09-10 11:05:15,259 peewee                                             line:3672 DEBUG    ('INSERT INTO "modelfile_subfile" ("model_file_id", "sub_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [u'Exton_036_4%AEP.tcf', u'Exton_036.tbc', False, datetime.datetime(2016, 9, 10, 11, 5, 15, 259000)])
+2016-09-10 11:05:15,260 peewee                                             line:3672 DEBUG    ('INSERT INTO "run_modelfile" ("run_id", "model_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [3, u'Exton_036_4%AEP.tcf', True, datetime.datetime(2016, 9, 10, 11, 5, 15, 260000)])
+2016-09-10 11:05:15,262 peewee                                             line:3672 DEBUG    ('INSERT INTO "run_modelfile" ("run_id", "model_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [3, u'Exton_036.tgc', False, datetime.datetime(2016, 9, 10, 11, 5, 15, 261000)])
+2016-09-10 11:05:15,263 peewee                                             line:3672 DEBUG    ('INSERT INTO "run_modelfile" ("run_id", "model_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [3, u'Exton_036.tbc', False, datetime.datetime(2016, 9, 10, 11, 5, 15, 262000)])
+2016-09-10 11:05:15,263 peewee                                             line:3672 DEBUG    ('INSERT INTO "run_modelfile" ("run_id", "model_file_id", "new_file", "timestamp") VALUES (?, ?, ?, ?)', [3, u'bc_dbase_Exton_009.csv', False, datetime.datetime(2016, 9, 10, 11, 5, 15, 264000)])
+2016-09-10 11:05:15,492 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."dat_id", "t1"."run_hash", "t1"."setup", "t1"."comments", "t1"."ief", "t1"."tcf", "t1"."isis_results", "t1"."tuflow_results", "t1"."estry_results", "t1"."event_duration", "t1"."run_status", "t1"."mb", "t1"."modeller", "t1"."isis_version", "t1"."tuflow_version", "t1"."event_name", "t1"."ief_dir", "t1"."tcf_dir", "t1"."log_dir", "t1"."run_options", "t1"."timestamp" FROM "run" AS t1', [])
+2016-09-10 11:05:15,509 __main__                                           line:1022 INFO     Log Database successfully updated
+2016-09-10 11:05:17,486 __main__                                           line:1525 DEBUG    Unnamed tab has not implemented an activation notice
+2016-09-10 11:05:27,503 peewee                                             line:3672 DEBUG    ('SELECT "t1"."name", "t1"."model_type", "t1"."comments", "t1"."timestamp" FROM "modelfile" AS t1 WHERE ("t1"."model_type" = ?)', [u'TBC'])
+2016-09-10 11:06:01,944 __main__                                           line:1553 DEBUG    updating status bar: Updating edit 1 of 1
+2016-09-10 11:06:01,948 peewee                                             line:3672 DEBUG    ('UPDATE "modelfile" SET "name" = ?, "comments" = ?, "timestamp" = ? WHERE ("modelfile"."name" = ?)', [u'Exton_036.tbc', u'tbccccc', '2016-09-10 10:43:16', u'Exton_036.tbc'])
+2016-09-10 11:06:02,131 __main__                                           line:1553 DEBUG    updating status bar: 
+2016-09-10 11:06:02,142 peewee                                             line:3672 DEBUG    ('SELECT "t1"."name", "t1"."model_type", "t1"."comments", "t1"."timestamp" FROM "modelfile" AS t1 WHERE ("t1"."model_type" = ?)', [u'TBC'])
+2016-09-10 11:06:05,954 __main__                                           line:1553 DEBUG    updating status bar: Updating edit 1 of 1
+2016-09-10 11:06:05,960 peewee                                             line:3672 DEBUG    ('UPDATE "run" SET "run_hash" = ?, "setup" = ?, "comments" = ?, "ief" = ?, "tcf" = ?, "isis_results" = ?, "tuflow_results" = ?, "estry_results" = ?, "event_duration" = ?, "run_status" = ?, "mb" = ?, "modeller" = ?, "isis_version" = ?, "tuflow_version" = ?, "event_name" = ?, "ief_dir" = ?, "tcf_dir" = ?, "log_dir" = ?, "run_options" = ?, "timestamp" = ? WHERE ("run"."id" = ?)', [u'0306da0cb9dd884cda8ccd88f54b0f14a0bc1a88', u'asdfa', u'', u'Exton_Baseline_10%AEP_036.ief', u'Exton_036_10%AEP.tcf', u'P:\\00 Project Files\\15009_EA_SW_TMac_Support\\15009g_Exton_FMS\\Technical\\hydraulics\\tuflow\\results\\1d\\fmp\\EXTON_BASELINE_10%AEP_036', u'S:\\15009g\\results\\', u'', 12.0, u'Finished', 0.12, u'', u'', u'', u'', u'P:/00 Project Files/15009_EA_SW_TMac_Support/15009g_Exton_FMS/Technical/hydraulics/fmp/iefs/Baseline', u'P:\\00 Project Files\\15009_EA_SW_TMac_Support\\15009g_Exton_FMS\\Technical\\hydraulics\\tuflow\\runs', u'P:\\00 Project Files\\15009_EA_SW_TMac_Support\\15009g_Exton_FMS\\Technical\\hydraulics\\tuflow\\runs\\log\\', u'', '2016-09-10 10:55:19', 2])
+2016-09-10 11:06:06,131 __main__                                           line:1553 DEBUG    updating status bar: 
+2016-09-10 11:06:06,145 peewee                                             line:3672 DEBUG    ('SELECT "t1"."name", "t1"."model_type", "t1"."comments", "t1"."timestamp" FROM "modelfile" AS t1 WHERE ("t1"."model_type" = ?)', [u'TBC'])
+2016-09-10 11:06:06,153 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."dat_id", "t1"."run_hash", "t1"."setup", "t1"."comments", "t1"."ief", "t1"."tcf", "t1"."isis_results", "t1"."tuflow_results", "t1"."estry_results", "t1"."event_duration", "t1"."run_status", "t1"."mb", "t1"."modeller", "t1"."isis_version", "t1"."tuflow_version", "t1"."event_name", "t1"."ief_dir", "t1"."tcf_dir", "t1"."log_dir", "t1"."run_options", "t1"."timestamp" FROM "run" AS t1', [])
+2016-09-10 11:06:06,164 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."dat_id", "t1"."run_hash", "t1"."setup", "t1"."comments", "t1"."ief", "t1"."tcf", "t1"."isis_results", "t1"."tuflow_results", "t1"."estry_results", "t1"."event_duration", "t1"."run_status", "t1"."mb", "t1"."modeller", "t1"."isis_version", "t1"."tuflow_version", "t1"."event_name", "t1"."ief_dir", "t1"."tcf_dir", "t1"."log_dir", "t1"."run_options", "t1"."timestamp" FROM "run" AS t1', [])
+2016-09-10 11:06:06,176 __main__                                           line:1170 INFO     Closing program
+2016-09-10 11:06:06,177 __main__                                           line:1171 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
+2016-09-10 11:08:47,723 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-09-10 11:08:47,729 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-09-10 11:08:47,815 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-09-10 11:08:47,816 __main__                                           line:156  DEBUG    Main Window import complete
+2016-09-10 11:08:47,927 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-09-10 11:08:47,927 __main__                                           line:160  DEBUG    Database functions import complete
+2016-09-10 11:08:47,983 __main__                                           line:162  DEBUG    Exporters import complete
+2016-09-10 11:08:48,026 Controller                                         line:94   DEBUG    Import app_metrics complete
+2016-09-10 11:08:48,194 __main__                                           line:164  DEBUG    Controller import complete
+2016-09-10 11:08:48,197 __main__                                           line:166  DEBUG    GuiStore import complete
+2016-09-10 11:08:48,198 __main__                                           line:168  DEBUG    Ief Resolver import complete
+2016-09-10 11:08:48,198 __main__                                           line:170  DEBUG    Global Settings import complete
+2016-09-10 11:08:48,213 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-09-10 11:08:48,213 __main__                                           line:172  DEBUG    New Entry import complete
+2016-09-10 11:08:48,220 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-09-10 11:08:48,220 __main__                                           line:174  DEBUG    Extract Model import complete
+2016-09-10 11:08:48,677 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-09-10 11:08:48,678 __main__                                           line:176  DEBUG    Run Summary import complete
+2016-09-10 11:08:48,680 __main__                                           line:180  DEBUG    Import modules complete
+2016-09-10 11:08:48,753 __main__                                           line:205  DEBUG    Setup UI complete
+2016-09-10 11:08:48,757 __main__                                           line:263  DEBUG    Load settings complete
+2016-09-10 11:08:48,884 __main__                                           line:265  DEBUG    Add Widgets complete
+2016-09-10 11:08:48,894 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."dat_id", "t1"."run_hash", "t1"."setup", "t1"."comments", "t1"."ief", "t1"."tcf", "t1"."isis_results", "t1"."tuflow_results", "t1"."estry_results", "t1"."event_duration", "t1"."run_status", "t1"."mb", "t1"."modeller", "t1"."isis_version", "t1"."tuflow_version", "t1"."event_name", "t1"."ief_dir", "t1"."tcf_dir", "t1"."log_dir", "t1"."run_options", "t1"."timestamp" FROM "run" AS t1', [])
+2016-09-10 11:08:48,915 __main__                                           line:275  DEBUG    Attempt to laod model log complete
+2016-09-10 11:08:48,917 __main__                                           line:290  DEBUG    MainGui construction complete
+2016-09-10 11:08:55,009 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."run_id", "t1"."model_file_id", "t1"."new_file", "t1"."timestamp", "t3"."id", "t3"."dat_id", "t3"."run_hash", "t3"."setup", "t3"."comments", "t3"."ief", "t3"."tcf", "t3"."isis_results", "t3"."tuflow_results", "t3"."estry_results", "t3"."event_duration", "t3"."run_status", "t3"."mb", "t3"."modeller", "t3"."isis_version", "t3"."tuflow_version", "t3"."event_name", "t3"."ief_dir", "t3"."tcf_dir", "t3"."log_dir", "t3"."run_options", "t3"."timestamp", "t2"."name", "t2"."model_type", "t2"."comments", "t2"."timestamp" FROM "run_modelfile" AS t1 INNER JOIN "modelfile" AS t2 ON ("t1"."model_file_id" = "t2"."name") INNER JOIN "run" AS t3 ON ("t1"."run_id" = "t3"."id") WHERE ("t3"."id" = ?)', [2])
+2016-09-10 11:09:02,947 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."run_id", "t1"."model_file_id", "t1"."new_file", "t1"."timestamp", "t3"."id", "t3"."dat_id", "t3"."run_hash", "t3"."setup", "t3"."comments", "t3"."ief", "t3"."tcf", "t3"."isis_results", "t3"."tuflow_results", "t3"."estry_results", "t3"."event_duration", "t3"."run_status", "t3"."mb", "t3"."modeller", "t3"."isis_version", "t3"."tuflow_version", "t3"."event_name", "t3"."ief_dir", "t3"."tcf_dir", "t3"."log_dir", "t3"."run_options", "t3"."timestamp", "t2"."name", "t2"."model_type", "t2"."comments", "t2"."timestamp" FROM "run_modelfile" AS t1 INNER JOIN "modelfile" AS t2 ON ("t1"."model_file_id" = "t2"."name") INNER JOIN "run" AS t3 ON ("t1"."run_id" = "t3"."id") WHERE (("t1"."new_file" = ?) AND ("t3"."id" = ?))', [True, 2])
+2016-09-10 11:09:07,045 peewee                                             line:3672 DEBUG    ('SELECT "t1"."name", "t1"."model_type", "t1"."comments", "t1"."timestamp" FROM "modelfile" AS t1 WHERE ("t1"."model_type" = ?)', [u'TGC'])
+2016-09-10 11:09:09,096 peewee                                             line:3672 DEBUG    ('SELECT "t1"."name", "t1"."amendments", "t1"."comments", "t1"."timestamp" FROM "dat" AS t1', [])
+2016-09-10 11:09:11,974 peewee                                             line:3672 DEBUG    ('SELECT "t1"."name", "t1"."model_type", "t1"."comments", "t1"."timestamp" FROM "modelfile" AS t1 WHERE ("t1"."model_type" = ?)', [u'TCF'])
+2016-09-10 11:09:16,457 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."model_file_id", "t1"."sub_file_id", "t1"."new_file", "t1"."timestamp", "t3"."name", "t3"."model_type", "t3"."comments", "t3"."timestamp", "t2"."name", "t2"."timestamp" FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t2 ON ("t1"."sub_file_id" = "t2"."name") INNER JOIN "modelfile" AS t3 ON ("t1"."model_file_id" = "t3"."name") WHERE (("t3"."model_type" = ?) AND ("t3"."name" LIKE ?))', [u'TCF', u'Exton_036_10%AEP.tcf'])
+2016-09-10 11:09:21,687 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."model_file_id", "t1"."sub_file_id", "t1"."new_file", "t1"."timestamp", "t3"."name", "t3"."model_type", "t3"."comments", "t3"."timestamp", "t2"."name", "t2"."timestamp" FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t2 ON ("t1"."sub_file_id" = "t2"."name") INNER JOIN "modelfile" AS t3 ON ("t1"."model_file_id" = "t3"."name") WHERE ((("t3"."model_type" = ?) AND ("t3"."name" LIKE ?)) AND ("t1"."new_file" = ?))', [u'TCF', u'Exton_036_10%AEP.tcf', True])
+2016-09-10 11:09:43,105 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."model_file_id", "t1"."sub_file_id", "t1"."new_file", "t1"."timestamp", "t2"."name", "t2"."model_type", "t2"."comments", "t2"."timestamp", "t4"."name", "t4"."timestamp", "t3"."id", "t3"."run_id", "t3"."model_file_id", "t3"."new_file", "t3"."timestamp" FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t4 ON ("t1"."sub_file_id" = "t4"."name") INNER JOIN "modelfile" AS t2 ON ("t1"."model_file_id" = "t2"."name") INNER JOIN "run_modelfile" AS t3 ON ("t2"."name" = "t3"."model_file_id") WHERE (((("t2"."model_type" = ?) AND ("t2"."name" LIKE ?)) AND ("t1"."new_file" = ?)) AND ("t3"."run_id" = ?))', [u'TGC', u'Exton_036_10%AEP.tcf', True, 2])
+2016-09-10 11:09:47,069 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."model_file_id", "t1"."sub_file_id", "t1"."new_file", "t1"."timestamp", "t2"."name", "t2"."model_type", "t2"."comments", "t2"."timestamp", "t4"."name", "t4"."timestamp", "t3"."id", "t3"."run_id", "t3"."model_file_id", "t3"."new_file", "t3"."timestamp" FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t4 ON ("t1"."sub_file_id" = "t4"."name") INNER JOIN "modelfile" AS t2 ON ("t1"."model_file_id" = "t2"."name") INNER JOIN "run_modelfile" AS t3 ON ("t2"."name" = "t3"."model_file_id") WHERE (((("t2"."model_type" = ?) AND ("t2"."name" LIKE ?)) AND ("t1"."new_file" = ?)) AND ("t3"."run_id" = ?))', [u'TCF', u'Exton_036_10%AEP.tcf', True, 2])
+2016-09-10 11:09:52,852 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."model_file_id", "t1"."sub_file_id", "t1"."new_file", "t1"."timestamp", "t2"."name", "t2"."model_type", "t2"."comments", "t2"."timestamp", "t4"."name", "t4"."timestamp", "t3"."id", "t3"."run_id", "t3"."model_file_id", "t3"."new_file", "t3"."timestamp" FROM "modelfile_subfile" AS t1 INNER JOIN "subfile" AS t4 ON ("t1"."sub_file_id" = "t4"."name") INNER JOIN "modelfile" AS t2 ON ("t1"."model_file_id" = "t2"."name") INNER JOIN "run_modelfile" AS t3 ON ("t2"."name" = "t3"."model_file_id") WHERE ((("t2"."model_type" = ?) AND ("t2"."name" LIKE ?)) AND ("t3"."run_id" = ?))', [u'TCF', u'Exton_036_10%AEP.tcf', 2])
+2016-09-10 11:10:27,010 __main__                                           line:1536 DEBUG    Unnamed tab has not implemented an deactivation notice
+2016-09-10 11:10:33,923 __main__                                           line:1525 DEBUG    Unnamed tab has not implemented an activation notice
+2016-09-10 11:10:34,062 __main__                                           line:1553 DEBUG    updating status bar: Run auto update stopped
+2016-09-10 11:10:34,717 __main__                                           line:1525 DEBUG    Unnamed tab has not implemented an activation notice
+2016-09-10 11:10:34,717 __main__                                           line:1536 DEBUG    Unnamed tab has not implemented an deactivation notice
+2016-09-10 11:10:43,282 __main__                                           line:1553 DEBUG    updating status bar: Updating row 0 of 3
+2016-09-10 11:10:43,285 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."dat_id", "t1"."run_hash", "t1"."setup", "t1"."comments", "t1"."ief", "t1"."tcf", "t1"."isis_results", "t1"."tuflow_results", "t1"."estry_results", "t1"."event_duration", "t1"."run_status", "t1"."mb", "t1"."modeller", "t1"."isis_version", "t1"."tuflow_version", "t1"."event_name", "t1"."ief_dir", "t1"."tcf_dir", "t1"."log_dir", "t1"."run_options", "t1"."timestamp" FROM "run" AS t1 WHERE ("t1"."id" = ?) LIMIT 1 OFFSET 0', [1])
+2016-09-10 11:10:43,299 peewee                                             line:3672 DEBUG    ('UPDATE "run" SET "run_status" = ?, "mb" = ? WHERE ("run"."id" = ?)', [u'Finished', 0.01, 1])
+2016-09-10 11:10:43,464 __main__                                           line:1553 DEBUG    updating status bar: Updating row 1 of 3
+2016-09-10 11:10:43,490 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."dat_id", "t1"."run_hash", "t1"."setup", "t1"."comments", "t1"."ief", "t1"."tcf", "t1"."isis_results", "t1"."tuflow_results", "t1"."estry_results", "t1"."event_duration", "t1"."run_status", "t1"."mb", "t1"."modeller", "t1"."isis_version", "t1"."tuflow_version", "t1"."event_name", "t1"."ief_dir", "t1"."tcf_dir", "t1"."log_dir", "t1"."run_options", "t1"."timestamp" FROM "run" AS t1 WHERE ("t1"."id" = ?) LIMIT 1 OFFSET 0', [2])
+2016-09-10 11:10:43,497 peewee                                             line:3672 DEBUG    ('UPDATE "run" SET "run_status" = ?, "mb" = ? WHERE ("run"."id" = ?)', [u'Finished', 0.12, 2])
+2016-09-10 11:10:43,664 __main__                                           line:1553 DEBUG    updating status bar: Updating row 2 of 3
+2016-09-10 11:10:43,667 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."dat_id", "t1"."run_hash", "t1"."setup", "t1"."comments", "t1"."ief", "t1"."tcf", "t1"."isis_results", "t1"."tuflow_results", "t1"."estry_results", "t1"."event_duration", "t1"."run_status", "t1"."mb", "t1"."modeller", "t1"."isis_version", "t1"."tuflow_version", "t1"."event_name", "t1"."ief_dir", "t1"."tcf_dir", "t1"."log_dir", "t1"."run_options", "t1"."timestamp" FROM "run" AS t1 WHERE ("t1"."id" = ?) LIMIT 1 OFFSET 0', [3])
+2016-09-10 11:10:43,674 peewee                                             line:3672 DEBUG    ('UPDATE "run" SET "run_status" = ?, "mb" = ? WHERE ("run"."id" = ?)', [u'Finished', 0.09, 3])
+2016-09-10 11:10:43,891 peewee                                             line:3672 DEBUG    ('SELECT "t1"."name", "t1"."model_type", "t1"."comments", "t1"."timestamp" FROM "modelfile" AS t1 WHERE ("t1"."model_type" = ?)', [u'TCF'])
+2016-09-10 11:10:43,898 peewee                                             line:3672 DEBUG    ('SELECT "t1"."id", "t1"."dat_id", "t1"."run_hash", "t1"."setup", "t1"."comments", "t1"."ief", "t1"."tcf", "t1"."isis_results", "t1"."tuflow_results", "t1"."estry_results", "t1"."event_duration", "t1"."run_status", "t1"."mb", "t1"."modeller", "t1"."isis_version", "t1"."tuflow_version", "t1"."event_name", "t1"."ief_dir", "t1"."tcf_dir", "t1"."log_dir", "t1"."run_options", "t1"."timestamp" FROM "run" AS t1', [])
+2016-09-10 11:10:43,913 __main__                                           line:1553 DEBUG    updating status bar: 
+2016-09-10 11:11:03,996 __main__                                           line:1170 INFO     Closing program
+2016-09-10 11:11:03,997 __main__                                           line:1171 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset

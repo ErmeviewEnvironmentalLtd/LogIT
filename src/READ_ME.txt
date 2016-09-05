@@ -402,6 +402,31 @@ v0.8.4-Beta:
       edits. This offers to save any changes before they are lost.
     - [Bugfix] Issue with updating .ieds files in the Ief Resolver tool.
 
+v1.0.0-Beta:
+     - New Database setup people. We are officially moving up to 1.0!
+     - MASSIVE rewrite of basically everything. 
+     - NOTE THIS HAS MEANT THAT IT CANNOT BE BACKWARD COMPATIBLE WITH PREVIOUS 
+       VERSION OF THE DATABASE. If you have a database from a version of LogIT
+       that is less than 1.0.0 you will need to use an older version. 
+     - The way to many tableitis has been dealt with and we are now down to only
+       three tabs on the View Log, which is nice. These are the run tab, a catch
+       all selection tab for the model files and a query tab for everything else.
+     - There is a completely different database setup that uses a new library
+       to help manage querying and dealing with the tables. This should make the
+       DB code much easier to maintain and will make it possible for logit to
+       keep getting better.
+     - Lots of lovely stuff:
+     - Advanced querying of the database to find out basically whatever you want
+       more to be added to this in the future.
+     - You can hide/show column headers in the run table so you only need to look
+       at the info that you think will be useful.
+     - Right click menus for common queries on both the Run table and the model 
+       tables. These allow you to quickly see the model files of other files
+       associated with them. The query form will be setup automatically for these
+       as well so you can see how it works.
+     - All the other bits and pieces that you know and love are still there :)
+
+
 ##~##
 
 LICENSE

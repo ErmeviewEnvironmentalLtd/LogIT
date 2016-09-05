@@ -79,6 +79,12 @@
          Added LOG_DIR, RUN_STATUS and MB to run table and added update Run
          Status to context and settings menu. Also added Add to Run Summary
          option to context menu.
+    DR - 08/09/2016:
+        Massive rework of the way that the logs are stored and displayed. The
+        peewee library is now used for all database interactions.
+        The increasingly large number of tables to display log info has been
+        reduced to 3. One for the run log one to be shared between the 
+        model logs and one to show the results of querying the other two.
 
   TODO:
      
@@ -87,6 +93,7 @@
 
 # Python standard modules
 import os
+import shutil
 import sys
 import cPickle
 import logging
@@ -120,6 +127,13 @@ except:
     logger.warning('Unable to create log file directory')
     CONSOLE_ONLY_LOG = True
 
+TEMP_PATH = os.path.join(cur_location, 'temp')
+try:
+    if not os.path.exists(TEMP_PATH):
+        os.mkdir(TEMP_PATH)
+except:
+    TEMP_PATH = None
+
 
 from _sqlite3 import Error
 logger.debug('SQLite3 import complete')
@@ -142,7 +156,7 @@ from LogIT_UI import Ui_MainWindow
 logger.debug('Main Window import complete')
 import LogBuilder
 logger.debug('LogBuilder import complete')
-import DatabaseFunctions
+#import DatabaseFunctions
 logger.debug('Database functions import complete')
 import Exporters
 logger.debug('Exporters import complete')
@@ -160,7 +174,11 @@ from extractmodel import ModelExtractor
 logger.debug('Extract Model import complete')
 from runsummary import RunSummary
 logger.debug('Run Summary import complete')
+
+import peeweemodels as pm
+import peeweeviews as pv
 logger.debug('Import modules complete')
+
 
 
 class MainGui(QtGui.QMainWindow):
@@ -174,15 +192,12 @@ class MainGui(QtGui.QMainWindow):
         # Setup some variables
         self._TEST_MODE = False
         self.settings = cur_settings
+        
         self.model_log = None
         self._previous_widget = None
         self._unsaved_entries = {}
         self._on_viewlog = False
         
-        # Database tables that should be exported to Excel
-        self.export_tables = ['RUN', 'TCF', 'ECF', 'TGC', 'TBC', 'DAT', 
-                              'BC_DBASE', 'TEF' 'TRD']
-            
         icon_path = os.path.join(self.settings.cur_settings_path, 'Logit_Logo.ico')
         QtGui.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow() # ~
@@ -196,23 +211,25 @@ class MainGui(QtGui.QMainWindow):
         self.progress_bar.setValue(0)
 
         # Connect the slots
-        self.ui.actionLoad.triggered.connect(self.fileMenuActions)
-        self.ui.actionExportToExcel.triggered.connect(self.fileMenuActions)
-        self.ui.actionNewModelLog.triggered.connect(self.fileMenuActions)
-        self.ui.actionUpdateDatabaseSchema.triggered.connect(self._updateDatabaseVersion)
+        self.ui.actionLoad.triggered.connect(self._loadNewModelLog)
+        self.ui.actionExportToExcel.triggered.connect(self._exportDatabase)
+        self.ui.actionNewModelLog.triggered.connect(self._createNewLogDatabase)
+#         self.ui.actionUpdateDatabaseSchema.triggered.connect(self._updateDatabaseVersion)
+        self.ui.actionCleanDatabase.triggered.connect(self.cleanDatabase)
         self.ui.actionSaveSetupAs.triggered.connect(self._saveSetup)
         self.ui.actionLoadSetup.triggered.connect(self._loadSetup)
         self.ui.actionLogWarning.triggered.connect(self._updateLoggingLevel)
         self.ui.actionLogDebug.triggered.connect(self._updateLoggingLevel)
         self.ui.actionLogInfo.triggered.connect(self._updateLoggingLevel)
-        self.ui.actionReloadDatabase.triggered.connect(self.loadModelLog)
+        self.ui.actionReloadDatabase.triggered.connect(self._loadModelLog)
         self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
         self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdatesTrue)
         self.ui.actionResolveIefFiles.triggered.connect(self._resolveIefs)
         self.ui.actionExit.triggered.connect(self.close)
         self.ui.actionUpdateAllRunStatus.triggered.connect(self._updateAllRowStatus)
         self.ui.tabWidget.currentChanged.connect(self._tabChanged)
-        
+        self.ui.queryFileCheck.stateChanged.connect(self._queryIncludeFilesChange)
+
         # Keyboard shortcuts
         # Quit
         self.ui.actionExit.setToolTip('Exit Application')
@@ -239,47 +256,22 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionUpdateAllRunStatus.setToolTip('Update all run status information')
         self.ui.actionUpdateAllRunStatus.setShortcut("Ctrl+U")
         
-        # Set the context menu and connect the tables
-        self.ui.runEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.runEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
-        self.ui.runEntryViewTable.cellChanged.connect(self._highlightEditRow)
-        self.ui.tgcEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.tgcEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
-        self.ui.tgcEntryViewTable.itemChanged.connect(self._highlightEditRow)
-        self.ui.tbcEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.tbcEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
-        self.ui.tbcEntryViewTable.itemChanged.connect(self._highlightEditRow)
-        self.ui.datEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.datEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
-        self.ui.datEntryViewTable.itemChanged.connect(self._highlightEditRow)
-        self.ui.bcEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.bcEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
-        self.ui.bcEntryViewTable.itemChanged.connect(self._highlightEditRow)
-        self.ui.ecfEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.ecfEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
-        self.ui.ecfEntryViewTable.itemChanged.connect(self._highlightEditRow)
-        self.ui.tcfEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.tcfEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
-        self.ui.tcfEntryViewTable.itemChanged.connect(self._highlightEditRow)
-        self.ui.tefEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.tefEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
-        self.ui.tefEntryViewTable.itemChanged.connect(self._highlightEditRow)
-        self.ui.trdEntryViewTable.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.ui.trdEntryViewTable.customContextMenuRequested.connect(self._tablePopup)
-        self.ui.trdEntryViewTable.itemChanged.connect(self._highlightEditRow)
-        logger.debug('Slot connection complete')
-        
         # Load the user settings from the last time the software was used 
         self._loadSettings()
+        lpath, e = gs.getPath('last_path')
+        if not e: gs.path_holder['last_path'] = self.settings.cur_settings_path
         logger.debug('Load settings complete')
-        self._setupUiContainer()
-        logger.debug('Setup UIContainer complete')
-        self._setColumnWidths()
-        logger.debug('Set column widths complete')
+        self._addWidgets()
+        logger.debug('Add Widgets complete')
+#         self._setColumnWidths()
+#         logger.debug('Set column widths complete')
         
         # Use those settings to get the file path and try and load the last log
         # database that the user had open
-        self.loadModelLog()
+        self.table_info = {}
+        self._setupDbTabs()
+        if self.checkDbLoaded(False) and self.checkDatabaseVersion(gs.path_holder['log']):
+            self._loadModelLog()
         logger.debug('Attempt to laod model log complete')
         self.all_logs = None
         
@@ -297,46 +289,541 @@ class MainGui(QtGui.QMainWindow):
         self._previous_widget = self.ui.tabWidget.currentWidget()
         logger.debug('MainGui construction complete')
 
+
+    def _setupDbTabs(self):
+        """Adds Run Tab to the Log View tab holder and sets up table refs.
         
+        Sets up the Run Log tab and table and connects all neccessary slots.
+        Also sets up defaults for the MODEL and QUERY tables for when needed.
+        """
+        tchoice = pv.getTableChoice()
+        tchoice[0] = 'All Modelfiles'
+        tchoice.append('RUN Event')
+        tchoice.append('RUN Options')
+        self.ui.modelSelectCbox.addItems(pv.getTableChoice())
+        self.ui.modelSelectCbox.currentIndexChanged.connect(self.loadModelDb)
+        self.ui.queryTableCbox.addItems(tchoice)
+        self.ui.queryTableCbox.currentIndexChanged.connect(self.changeSimpleQueryStatus)
+        self.ui.runSimpleQueryBut.clicked.connect(self.runSimpleQuery)
+        
+        run_table = GuiStore.TableWidgetDb('RUN', 0, 0, hidden_cols=self.settings.main['run_hidden_cols'], parent=self)
+        self.connect(run_table, QtCore.SIGNAL("statusUpdate"), self._updateStatusBar)
+        self.connect(run_table, QtCore.SIGNAL("setRange"), self._updateMaxProgress)
+        self.connect(run_table, QtCore.SIGNAL("updateProgress"), self._updateCurrentProgress)
+        self.connect(run_table, QtCore.SIGNAL("dbUpdated"), self._loadModelLog)
+        self.connect(run_table, QtCore.SIGNAL("runTableContextTool"), self.runTableContextTool)
+        self.connect(run_table, QtCore.SIGNAL("runTableContextPathUpdate"), self.runTableContextPathUpdate)
+        self.connect(run_table, QtCore.SIGNAL("runTableContextStatusUpdate"), self.runTableContextStatusUpdate)
+        self.connect(run_table, QtCore.SIGNAL("queryRunTable"), self.queryRunTable)
+        self.table_info['RUN'] = {'table': run_table}
+        self.ui.logViewTab.insertTab(0, run_table, 'Runs')
+        self.ui.logViewTab.widget(0).setLayout(QtGui.QVBoxLayout())
+        self.ui.logViewTab.setCurrentIndex(0)
+        
+        self.table_info['MODEL'] = {'table': None}
+        query_table = GuiStore.TableWidgetDb('QUERY', 0, 0)
+        self.table_info['QUERY'] = {'table': query_table}
+        self.ui.tableQueryGroup.layout().addWidget(query_table)
+    
+    
+    def _updateAllRowStatus(self):
+        """Update the RUN_STATUS and MB of all rows in RUN table."""
+        
+        failures = []
+        row_count = self.table_info['RUN']['table'].rowCount()
+        self._updateMaxProgress(row_count+1)
+        errors = []
+        for row in range(0, row_count):
+            self._updateStatusBar('Updating row %s of %s' % (row, row_count))
+            self._updateCurrentProgress(row)
+            run_id = self.table_info['RUN']['table'].item(row, self.table_info['RUN']['table'].id_col).text()
+            errors = self.runTableContextStatusUpdate(run_id, errors, show_error=False)
+        if errors:
+            errors.insert(0, 'The following updates failed:')
+            msg = '\n'.join(errors)
+            self.launchQMsgBox('Update Failure', msg)
+
+        self._loadModelLog()
+        self._updateStatusBar('')
+        self._updateCurrentProgress(0)
+
+    @QtCore.pyqtSlot(int)
+    def runTableContextStatusUpdate(self, run_id, errors=[], show_error=True):
+        """Update the status of a Run table entry.
+        
+        Args:
+            run_id(int): the Run record to update.
+            errors=[](list): will be appended with any errors and returned.
+            show_error=True(bool): if True msgbox will be launched on error.
+        
+        Return:
+            list - containing any errors.
+        """
+        run_data = pv.getRunRow(run_id)
+        
+        # Find the latest values and update the RUN table
+        results = Controller.getRunStatusInfo(run_data['tcf_dir'], run_data['tcf'])
+        if not results[0] and not results[1]:
+            msg = "- Failed to update status (ID=%s).\n  Is the TCF_DIR correct and does in contain '_ TUFLOW Simulations.log' file?" % (run_id)
+            if show_error:
+                self.launchQMsgBox('Update Failed', msg)
+            errors.append(msg)
+        elif not results[0]:
+            msg = "- Run is not yet complete(ID=%s).\n  You can only update status for a completed run" % (run_id)
+            if show_error:
+                self.launchQMsgBox('Update Failed', msg)
+            errors.append(msg)
+        else:
+            vals = {'run_status': results[1], 'mb': results[2]}
+            pv.updateRunRow(vals, run_id)
+        
+        return errors
+
+    @QtCore.pyqtSlot(str, int)
+    def runTableContextPathUpdate(self, context_text, run_id):
+        """Update the path variables in a Run table record.
+        
+        Args:
+            context_text(str): the text clicked on the context menu.
+            run_id(int): the Run record id to update.
+        """
+        if 'model' in gs.path_holder.keys():
+            p = gs.path_holder['model']
+        elif 'log' in gs.path_holder.keys():
+            p = gs.path_holder['log']
+        else:
+            p = cur_location
+            
+        d = MyFileDialogs(parent=self)
+        open_path = False
+        if context_text == 'Update Ief location' or context_text == 'Update Tcf location':
+            if context_text == 'Update Ief location':
+                file_types = 'IEF(*.ief)'
+                lookup_name = 'ief_dir'
+            else:
+                file_types = 'TCF(*.tcf)'
+                lookup_name = 'tcf_dir'
+                
+            open_path = d.openFileDialog(p, file_types=file_types, 
+                                             multi_file=False)
+            
+        elif context_text == 'Update Logs location':
+            open_path = d.dirFileDialog(p)
+            lookup_name = 'log_dir'
+        
+        if not open_path == False:
+            open_path = str(open_path)
+            p = os.path.split(open_path)[0]
+            row_dict = {lookup_name: p}
+            pv.updateRunRow(row_dict, run_id)
+            gs.setPath('model', p)
+            
+        
+    @QtCore.pyqtSlot(str, int)
+    def runTableContextTool(self, context_text, run_id):
+        """Sets up and call any tools on the context menu.
+        
+        Args:
+            context_text(str): the text clicked on the context menu.
+            run_id(int): the Run record id to use.
+        """
+        if context_text == 'Extract Model':
+            if not 'Model Extractor' in self.widgets.keys(): return
+            errors = GuiStore.ErrorHolder()
+            run_data = pv.getRunRow(run_id)
+            row_dict = {'IEF': run_data['ief'], 'TCF': run_data['tcf'],
+                        'IEF_DIR': run_data['ief_dir'], 'TCF_DIR': run_data['tcf_dir'],
+                        'RUN_OPTIONS': run_data['run_options']}
+            errors, in_path = Controller.extractModel(
+                                            self.settings.cur_settings_path, 
+                                            row_dict, errors)
+            if errors.has_errors:
+                if errors.msgbox_error:
+                    self.launchQMsgBox(errors.msgbox_error.title, 
+                                   errors.msgbox_error.message)
+            else:
+                self.widgets['Model Extractor'].resetForm()
+                options = row_dict['RUN_OPTIONS']
+                if not options == 'None':
+                    self.widgets['Model Extractor'].extractRunOptionsTextbox.setText(options)
+                self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
+                self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
+                
+        elif context_text == 'Run Summary':
+            if not 'Run Summary' in self.widgets.keys(): return
+            run_data = pv.getRunRow(run_id)
+            isis_results = str(run_data['isis_results'])
+            if isis_results == '': isis_results = None
+
+            tcf = run_data['tcf']
+            tcf_name = os.path.splitext(tcf)[0]
+            
+            option_name = tcf_name
+            if not run_data['run_options'] == '':
+                option_name = Controller.resolveFilenameSEVals(tcf_name, 
+                                                run_data['run_options'])
+            
+            tlf_file = str(os.path.join(run_data['log_dir'], option_name + '.tlf'))
+            if os.path.exists(tlf_file):
+                self.ui.tabWidget.setCurrentWidget(self.widgets['Run Summary'])
+                self.widgets['Run Summary'].loadIntoTable(tlf_file, isis_results)
+            else:
+                msg = ("Cannot find .tlf file in LOG_DIR does it exist?\n" +
+                       "Search here:" + tlf_file)
+                self.launchQMsgBox('File Error', msg) 
+    
+    
+    def clearQueryForm(self):
+        """Reset the Query tab form to default."""
+        self.ui.queryNewModelOnlyCheck.setChecked(False)
+        self.ui.queryNewSubOnlyCheck.setChecked(False)
+        self.ui.queryFileCheck.setChecked(False)
+        self.ui.queryFilterRunCbox.setChecked(False)
+        self.ui.queryModelTextbox.setText('')
+        self.ui.queryFileTextbox.setText('')
+        self.ui.queryTableCbox.setCurrentIndex(0)
+    
+    
+    @QtCore.pyqtSlot(str, str, str)
+    def queryModelTable(self, table_type, query_type, id):
+        """Run a query on the Models tab table.
+        
+        Args:
+            table_type(str): TGC, TBC, TEF, etc.
+            query_type(str): the text value of the context menu.
+            id(str): the ModelFile.name value to query.
+        """
+        # setup the form values
+        self.clearQueryForm()
+        self.ui.logViewTab.setCurrentIndex(2)
+        self.ui.queryTabWidget.setCurrentIndex(0)
+        self.ui.queryModelTextbox.setText(id)
+        self.ui.queryFilterRunCbox.setChecked(False)
+        self.ui.queryNewModelOnlyCheck.setChecked(False)
+        index = self.ui.queryTableCbox.findText(table_type, QtCore.Qt.MatchFixedString)
+        if index >= 0: self.ui.queryTableCbox.setCurrentIndex(index)
+        self.ui.queryFileCheck.setChecked(True)
+        
+        # Setup form based on query_type
+        with_files = True
+        new_model_only = False
+        if query_type == 'Subfiles':
+            self.ui.queryNewSubOnlyCheck.setChecked(False)
+            new_sub_only = False
+
+        elif query_type == 'Subfiles - New only':
+            self.ui.queryNewSubOnlyCheck.setChecked(True)
+            new_sub_only = True
+        
+        # Run the simple query and add the returned rows to the QUERY table
+        cols, rows = pv.getSimpleQuery(table_type, id, with_files, new_sub_only, new_model_only, -1)
+        self.table_info['QUERY']['table'].addRows(cols, rows)
+        
+    
+    @QtCore.pyqtSlot(str, int)
+    def queryRunTable(self, query_type, id):
+        """Run a query on the Run log tab table.
+        
+        Args:
+            query_type(str): the text value of the context menu.
+            id(int): the Run.id value to query.
+        """
+        # Setup the simple query forms
+        self.clearQueryForm()
+        self.ui.logViewTab.setCurrentIndex(2)
+        self.ui.queryTabWidget.setCurrentIndex(0)
+        self.ui.queryFilterRunCbox.setChecked(True)
+        self.ui.queryRunIdSbox.setValue(id)
+        index = self.ui.queryTableCbox.findText('All Modelfiles', QtCore.Qt.MatchFixedString)
+        if index >= 0: self.ui.queryTableCbox.setCurrentIndex(index)
+        table = 'All Modelfiles'
+        new_sub_only = False
+        new_model_only = False
+        with_files = False
+        
+        # Setup form based on query_type
+        if query_type == 'Dat file':
+            index = self.ui.queryTableCbox.findText('DAT', QtCore.Qt.MatchFixedString)
+            if index >= 0: self.ui.queryTableCbox.setCurrentIndex(index)
+            table = 'DAT'
+        
+        elif query_type == 'Modelfiles':
+            self.ui.queryFileCheck.setChecked(False)
+            self.ui.queryNewSubOnlyCheck.setChecked(False)
+            self.ui.queryNewModelOnlyCheck.setChecked(False)
+        
+        elif query_type == 'Modelfiles - New only':
+            self.ui.queryFileCheck.setChecked(False)
+            self.ui.queryNewModelOnlyCheck.setChecked(True)
+            self.ui.queryNewSubOnlyCheck.setChecked(False)
+            new_sub_only = False
+            new_model_only = True
+
+        elif query_type == 'Modelfiles with Subfiles':
+            self.ui.queryFileCheck.setChecked(True)
+            self.ui.queryNewModelOnlyCheck.setChecked(False)
+            self.ui.queryNewSubOnlyCheck.setChecked(False)
+            with_files = True
+            new_sub_only = False
+            new_model_only = False
+
+        elif query_type == 'New Modelfiles with Subfiles':
+            self.ui.queryFileCheck.setChecked(True)
+            self.ui.queryNewModelOnlyCheck.setChecked(True)
+            self.ui.queryNewSubOnlyCheck.setChecked(False)
+            new_sub_only = False
+            new_model_only = True
+            with_files = True
+
+        # Run the simple query and add the returned rows to the QUERY table
+        cols, rows = pv.getSimpleQuery(table, '', with_files, new_sub_only, new_model_only, id)
+        self.table_info['QUERY']['table'].addRows(cols, rows)
+  
+    
+    def _queryIncludeFilesChange(self, state):
+        """Change the enabled status of New only on simple query form.
+        
+        Sets enabled status of the new model only and new subfile only boxes.
+        """
+        if state == QtCore.Qt.Unchecked:
+            self.ui.queryNewModelOnlyCheck.setEnabled(True)
+            self.ui.queryNewSubOnlyCheck.setEnabled(False)
+        else:
+            self.ui.queryNewModelOnlyCheck.setEnabled(False)
+            self.ui.queryNewSubOnlyCheck.setEnabled(True)
+    
+    def changeSimpleQueryStatus(self):
+        """Sets include subfiles and filter by run id enabled status.
+        
+        Called when a change is made to the queryTableCbox (table combo).
+        """
+        txt = str(self.ui.queryTableCbox.currentText())
+        if txt == 'DAT' or txt == 'RUN Options' or txt == 'RUN Event':
+            self.ui.queryFileCheck.setChecked(False)
+            if txt != 'DAT':
+                self.ui.queryFilterRunCbox.setChecked(False)
+            
+        
+    def runSimpleQuery(self):
+        """Run a query on the simple query tab.
+        
+        Called by the Run Query button on the simple query tab.
+        Takes the current values of the form and runs calls the getSimpleQuery
+        function in peeweeviews.
+        """
+        table = str(self.ui.queryTableCbox.currentText())
+        q1_vtext = str(self.ui.queryModelTextbox.text())
+        q2_vtext = str(self.ui.queryFileTextbox.text())
+        with_files = self.ui.queryFileCheck.isChecked()
+        new_sub_only = self.ui.queryNewSubOnlyCheck.isChecked()
+        new_model_only = self.ui.queryNewModelOnlyCheck.isChecked()
+        use_runid = self.ui.queryFilterRunCbox.isChecked()
+        run_id = -1
+        if use_runid: run_id = self.ui.queryRunIdSbox.value()
+        if self.ui.queryFileTextbox.isEnabled() and table != 'DAT' and\
+                                table != 'Run Options' and table != 'Run Event':
+            cols, rows = pv.getSimpleQuery(table, q1_vtext, with_files, new_sub_only, new_model_only, run_id, q2_vtext)
+        else:
+            cols, rows = pv.getSimpleQuery(table, q1_vtext, with_files, new_sub_only, new_model_only, run_id)
+        self.table_info['QUERY']['table'].addRows(cols, rows)
+        
+    def checkUnsavedEntries(self, table, include_cancel_button=True):
+        """Checks the unsaved entry status of open tables.
+        
+        Check the RUN and current MODEL tables to see if they have any user
+        changes that have not been saved to the database. If they do it will
+        warn the user and ask to save updates.
+        
+        If include_cancel_button==True return values are False if cancel selected or
+        True otherwise.
+        If it equals False return values are True for Yes, False for No.
+        
+        Args:
+            table(str): TableWidgetDb.name.
+        
+        Return:
+            bool.
+        """
+        if not table in self.table_info.keys(): return
+        if not self.table_info[table]['table'] is None:
+            if self.table_info[table]['table']._unsaved_entries:
+
+                message = 'There are unsaved edits for %s table that will be lost\nSave Now?' % str(table)
+                if include_cancel_button:
+                    answer = QtGui.QMessageBox.question(self, 'Unsaved Edits', message, 
+                                    QtGui.QMessageBox.Yes | QtGui.QMessageBox.No | QtGui.QMessageBox.Cancel)
+                    if answer == QtGui.QMessageBox.Yes:
+                        self.table_info[table]['table'].saveTableEdits()
+                    elif answer == QtGui.QMessageBox.Cancel:
+                        return False
+                else:
+                    answer = QtGui.QMessageBox.question(self, 'Unsaved Edits', message, 
+                                    QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
+                    if answer == QtGui.QMessageBox.Yes:
+                        self.table_info[table]['table'].saveTableEdits()
+                    elif answer == QtGui.QMessageBox.No:
+                        return False
+        
+        return True
+
+    
+    def checkDatabaseVersion(self, dbpath):
+        """Test the database version and check compatibility.
+        
+        Ensures that the database at dbpath is compatible with this version
+        of logit.
+        """
+        try:
+            version = pv.checkDatabaseVersion(dbpath)
+        except:
+            msg = 'Could not connect to database. Please try again.'
+            self.launchQMsgBox('Connection Error', msg)
+            return False
+
+        success =True
+        if version == pm.DATABASE_VERSION_OLD:
+            msg = ('This database was created with a LogIT version < 1.0.0\n' +
+                   'You will need to use an older version of LogIT!')
+            success = False
+        elif version == pm.DATABASE_VERSION_HIGH:
+            msg = ('This database was created with a newer version of LogIT\n'+
+                   'Please upgrade to a newer version.')
+            success = False
+        elif version == pm.DATABASE_VERSION_LOW:
+            msg = ('This database needs upgrading. Please contact anyone but Duncan.')
+            success = False
+        
+        if not success:
+            self.launchQMsgBox('Database version error', msg)
+        
+        return success
+    
+    def _loadNewModelLog(self):
+        """Asks user for an existing .logdb file and loads."""
+        path, exists = gs.getPath('log')
+        if exists:
+            p = path
+        else:
+            p = gs.path_holder['last_path']
+        d = MyFileDialogs(parent=self)
+        open_path = d.openFileDialog(path=p, file_types='LogIT database(*.logdb)')
+        if open_path != False: 
+            open_path = str(open_path)
+            gs.setPath('log', open_path)
+            success = self.checkDatabaseVersion(open_path)
+            if success:
+                self._loadModelLog()
+            
+    def _loadModelLog(self):
+        """Reload the Run and Model tables."""
+        loaded = self.checkDbLoaded()
+        if loaded:
+            self.loadModelDb()
+            self.loadRunDb()
+    
+    def checkDbLoaded(self, show_dialog=True):
+        """Check if there's a database filepath set.
+        
+        If a path is set it will initiate the database.
+        """
+        path, exists = gs.getPath('log')
+        if not exists:
+            if show_dialog:
+                QtGui.QMessageBox.warning(self, "No Database Loaded",
+                        "No log database active. Please load or create one from the file menu.")
+            logger.error('No log database found. Load or create one from File menu')
+            return False
+         
+        else:
+            pm.logit_db.init(path)
+            return True 
+
+    def loadModelDb(self, index=None):
+        """Load table data for the Model log tab on view logs.
+        
+        Assigns the ModelFile.model_type taken from the combo box to the
+        table_info dict and creates a new TableWidgetDb and connects the signals.
+        Then makes a call to get the data from the ModelFile table with the
+        model_type and adds the returned rows to the new table. 
+        """
+        cur_text = self.ui.modelSelectCbox.currentText()
+        if not cur_text == '':
+            if not self.table_info['MODEL']['table'] is None:
+                self.checkUnsavedEntries('MODEL', False)
+                w = self.ui.tableModelGroupLayout.takeAt(0).widget()
+                if w is not None:
+                    w.deleteLater()
+                    self.table_info['MODEL']['table'] = None
+                
+            model_table = GuiStore.TableWidgetDb('MODEL', 0, 0, subname=cur_text, parent=self)
+            self.connect(model_table, QtCore.SIGNAL("statusUpdate"), self._updateStatusBar)
+            self.connect(model_table, QtCore.SIGNAL("setRange"), self._updateMaxProgress)
+            self.connect(model_table, QtCore.SIGNAL("updateProgress"), self._updateCurrentProgress)
+            self.connect(model_table, QtCore.SIGNAL("dbUpdated"), self._loadModelLog)
+            self.connect(model_table, QtCore.SIGNAL("queryModelTable"), self.queryModelTable)
+            self.table_info['MODEL'] = {'table': model_table}
+            self.ui.tableModelGroupLayout.addWidget(model_table)
+            cols, rows = pv.getModelData(cur_text)
+            self.table_info['MODEL']['table'].addRows(cols, rows)
+    
+    def loadRunDb(self):
+        """Loads the Run table database data into the Run log tab table."""
+        if not self.table_info['RUN']['table'] is None:
+            if not self.checkUnsavedEntries('RUN'):
+                return
+        cols, rows = pv.getRunData()
+        self.table_info['RUN']['table'].addRows(cols, rows)
+        
+    def _createNewLogDatabase(self):
+        """Create a new .logdb database.
+        
+        Asks user for a filepath to create the new db.
+        """
+#         QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+#         QtGui.QApplication.restoreOverrideCursor()
+        
+        d = MyFileDialogs(parent=self)
+        path, exists = gs.getPath('log')
+        if exists:
+            save_path = d.saveFileDialog(path=path, file_types='LogIT database(*.logdb)')
+        else:
+            save_path = d.saveFileDialog(path=cur_location, file_types='LogIT database(*.logdb)')
+
+        if save_path != False:
+            if os.path.exists(save_path):
+                os.remove(save_path)
+        else:
+            return
+        
+        if not pm.createNewDb(save_path):
+            msg = ('Failed to create new database. If this continues please\n' +
+                  'report it as a bug.')
+            self.launchQMsgBox('Database Error', msg)
+
+        tables = pm.getAllTables()
+                
+        # Setup the progress monitor. It updates prgress bars etc
+        total = len(tables)
+        prog_count = 1
+        self._updateMaxProgress(total)
+         
+        for t in tables:
+            self._updateStatusBar('Creating table %s of %s' % (prog_count, total))
+            self._updateCurrentProgress(prog_count)
+            prog_count += 1
+            pm.createTable(t, False)
+        
+        gs.setPath('log', save_path)
+        self._loadModelLog()
+        self._updateStatusBar('New database created: %s' % save_path)
+        self._updateCurrentProgress(0)
+        
+    
     def startupChecks(self):
         """Check for new versions and show release notes if needed."""
         self._showReleaseNotes()
         self._checkUpdatesFalse()
         
-    
-    def _setupUiContainer(self):
-        """Create a convenient holding object for the gui inputs.
-        """
-        self.view_tables = GuiStore.TableHolder(GuiStore.TableHolder.VIEW_LOG)
-        self.view_tables.addTable(GuiStore.TableWidget('RUN', 
-                            'runEntryViewTable', self.ui.runEntryViewTable))
-        self._unsaved_entries['runEntryViewTable'] = []
-        self.view_tables.addTable(GuiStore.TableWidget('TCF', 
-                            'tcfEntryViewTable', self.ui.tcfEntryViewTable))
-        self._unsaved_entries['tcfEntryViewTable'] = []
-        self.view_tables.addTable(GuiStore.TableWidget('ECF', 
-                            'ecfEntryViewTable', self.ui.ecfEntryViewTable))
-        self._unsaved_entries['ecfEntryViewTable'] = []
-        self.view_tables.addTable(GuiStore.TableWidget('TGC', 
-                            'tgcEntryViewTable', self.ui.tgcEntryViewTable))
-        self._unsaved_entries['tgcEntryViewTable'] = []
-        self.view_tables.addTable(GuiStore.TableWidget('TBC', 
-                            'tbcEntryViewTable', self.ui.tbcEntryViewTable))
-        self._unsaved_entries['tbcEntryViewTable'] = []
-        self.view_tables.addTable(GuiStore.TableWidget('BC_DBASE', 
-                            'bcEntryViewTable', self.ui.bcEntryViewTable))
-        self._unsaved_entries['bcEntryViewTable'] = []
-        self.view_tables.addTable(GuiStore.TableWidget('DAT', 
-                            'datEntryViewTable', self.ui.datEntryViewTable))
-        self._unsaved_entries['datEntryViewTable'] = []
-        self.view_tables.addTable(GuiStore.TableWidget('TEF', 
-                            'tefEntryViewTable', self.ui.tefEntryViewTable))
-        self._unsaved_entries['tefEntryViewTable'] = []
-        self.view_tables.addTable(GuiStore.TableWidget('TRD', 
-                            'trdEntryViewTable', self.ui.trdEntryViewTable))
-        self._unsaved_entries['trdEntryViewTable'] = []
-        self._addWidgets()
-    
     
     def _addWidgets(self):
         """Adds tool widgets to the tabbed interface."""
@@ -424,21 +911,6 @@ class MainGui(QtGui.QMainWindow):
                     self.launchQMsgBox('Update Success', msg)
     
     
-    @QtCore.pyqtSlot()
-    def _highlightEditRow(self):
-        """Highlightes the calling cell in the View Tables."""
-        sender = self.sender()
-        s_name = str(sender.objectName())
-        item = sender.currentItem()
-        if not item is None:
-            id = str(sender.item(item.row(), 0).text())
-            # Need to do this because it keeps calling the slot twice
-            if not id in self._unsaved_entries[s_name]:
-                print id
-                self._unsaved_entries[s_name].append(id)
-                item.setBackgroundColor(QtGui.QColor(178, 255, 102)) # Light Green
-         
-    
     def _updateLoggingLevel(self):
         """Alters to logging level based on the name of the calling action
         
@@ -486,391 +958,43 @@ class MainGui(QtGui.QMainWindow):
         """
         caller = self.sender()
         call_name = caller.objectName()
-    
-    
-    def saveTableEdits(self, table_obj=None): 
-        """Save the active edits in the view tables.
-        
-        Clears the self._unsaved_entries lists after updating.
-        
-        Args:
-            table_obj=None(TableWidget): table to update. If None all will be 
-                updated.
-        """
-        total_updates = 0
-        cur_prog = 1
-        for v in self._unsaved_entries.values():
-            total_updates += len(v)
-        self._updateMaxProgress(total_updates)
-        
-        # Update just the table provided
-        if not table_obj is None:
-            if self._unsaved_entries[table_obj.name]:
-                for row in range(table_obj.ref.rowCount()):
-                    if str(table_obj.ref.item(row, 0).text()) in self._unsaved_entries[table_obj.name]:
-                        self._updateStatusBar('Updating edit %s of %s' % (cur_prog, total_updates))
-                        self._saveViewChangesToDatabase(table_obj, row)
-                        cur_prog += 1
-                        self._updateCurrentProgress(cur_prog)
-            self._unsaved_entries[table_obj.name] = []
-        
-        # Update all tables
-        else:
-            for k, v in self._unsaved_entries.items():
-                if v:
-                    table_obj = self.view_tables.getTable(name=k)
-                    for row in range(table_obj.ref.rowCount()):
-                        if str(table_obj.ref.item(row, 0).text()) in v:
-                            self._updateStatusBar('Updating edit %s of %s' % (cur_prog, total_updates))
-                            self._saveViewChangesToDatabase(table_obj, row)
-                            cur_prog += 1
-                            self._updateCurrentProgress(cur_prog)
-                self._unsaved_entries[k] = []
-                
-        self._updateStatusBar('')
-        self._updateCurrentProgress(0)
-        self._updateMaxProgress(1)
-        self.loadModelLog()  
-        
-    
-    def _tablePopup(self, pos):
-        """This is the action performed when the user opens the context menu
-        with right click on on of the tables in the View Log tab.
-        
-        Finds out what the user selected from the menu and then performs the
-        appropriate action.
-        Actions:
-            - Update Row: Updates the database with any changes made to the row
-              in the View Log table tab. Calls the _saveViewChangesToDatabase()
-              function.
-            - Delete Row: Deletes the row selected in the table from both the
-              database and the table widget. The removal is based on the 'ID'
-              value in the row which is supposedly kept in sync with the
-              database whenever any changes are made so should be safe?
-        
-        :param pos: the QPoint of the mouse cursor when clicked.
-        """
-        menu = QtGui.QMenu()
-        updateCurrentRowAction = menu.addAction("Update Current Table Row(s)")
-        updateAllRowAction = menu.addAction("Update All Table Row(s)")
-        deleteRowAction = menu.addAction("Delete Row")
-        
-        # Find who called us and get the object that the name refers to.
-        sender = self.sender()
-        sender = str(sender.objectName())
-        has_extras = False
-        if sender == self.view_tables.tables['RUN'].name:
-            deleteAllRowAction = menu.addAction("Delete Associated Entries")
-            paths_menu = menu.addMenu('Update Paths')
-            updateIefRowAction = paths_menu.addAction("Update Ief Location")
-            updateTcfRowAction = paths_menu.addAction("Update Tcf Location")
-            updateLogRowAction = paths_menu.addAction("Update Logs Location")
-            updateStatusAction = menu.addAction("Update Status")
-            tools_menu = menu.addMenu('Send to Tool')
-            extractRowAction = tools_menu.addAction("Extract Model")
-            addToRunSummaryAction = tools_menu.addAction("Run Summary")
-            has_extras = True
-        
-        # lookup the table and database table name
-        table_obj = self.view_tables.getTable(name=sender)
-        
-        # Get the action and do whatever it says
-        action = menu.exec_(table_obj.ref.viewport().mapToGlobal(pos))
-             
-        if action == updateCurrentRowAction:
-            self.saveTableEdits(table_obj)
-            
-        elif action == updateAllRowAction:
-            self.saveTableEdits()
-            
-        elif action == deleteRowAction:
-            self._deleteRowFromDatabase(table_obj, False)
-        
-        # These are only available on the RUN table
-        elif has_extras:
-        
-            if action == deleteAllRowAction:
-                self._deleteRowFromDatabase(table_obj, True)
-            
-            # Send model path to ModelExtractor
-            elif action == extractRowAction:
-                if not 'Model Extractor' in self.widgets.keys(): return
-                errors = GuiStore.ErrorHolder()
-                row = table_obj.currentRow()
-                row_dict = table_obj.getValues(row=row, names=['ID', 'IEF', 'IEF_DIR', 
-                                                               'TCF', 'TCF_DIR', 
-                                                               'RUN_OPTIONS'])
-                errors, in_path = Controller.extractModel(
-                                                self.settings.cur_settings_path, 
-                                                row_dict, errors)
-                
-                if errors.has_errors:
-                    if errors.msgbox_error:
-                        self.launchQMsgBox(errors.msgbox_error.title, 
-                                       errors.msgbox_error.message)
-                else:
-                    self.widgets['Model Extractor'].resetForm()
-                    options = row_dict['RUN_OPTIONS']
-                    if not options == 'None':
-                        self.widgets['Model Extractor'].extractRunOptionsTextbox.setText(options)
-                    self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
-                    self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
-            
-            # Send log path to RunSummary tool
-            elif action == addToRunSummaryAction:
-                if not 'Run Summary' in self.widgets.keys(): return
-                row = table_obj.currentRow()
-                row_dict = table_obj.getValues(row=row, names=['ID', 'LOG_DIR', 
-                                                               'TCF', 'RUN_OPTIONS',
-                                                               'RESULTS_LOCATION_1D'])
-                isis_results = row_dict['RESULTS_LOCATION_1D']
-                if isis_results == 'None': isis_results = None
-                tcf = row_dict['TCF'][1:-1]
-                tcf = tcf.split(',')[0]
-                tcf_name = os.path.splitext(tcf)[0]
-                
-                option_name = tcf_name
-                if not row_dict['RUN_OPTIONS'] == 'None':
-                    option_name = Controller.resolveFilenameSEVals(tcf_name, 
-                                                    row_dict['RUN_OPTIONS'])
-                
-                tlf_file = os.path.join(row_dict['LOG_DIR'], option_name + '.tlf')
-                
-                if os.path.exists(tlf_file):
-                    self.ui.tabWidget.setCurrentWidget(self.widgets['Run Summary'])
-                    self.widgets['Run Summary'].loadIntoTable(tlf_file, isis_results)
-                else:
-                    msg = ("Cannot find .tlf file in LOG_DIR does it exist?\n" +
-                           "Search here:" + tlf_file)
-                    self.launchQMsgBox('File Error', msg) 
-            
-            # Update IEF_DIR, TCF_DIR, or LOG_DIR
-            elif action == updateIefRowAction or action == updateTcfRowAction or action == updateLogRowAction:
-                if 'model' in gs.path_holder.keys():
-                    p = gs.path_holder['model']
-                elif 'log' in gs.path_holder.keys():
-                    p = gs.path_holder['log']
-                else:
-                    p = cur_location
-                    
-                d = MyFileDialogs(parent=self)
-                if action == updateIefRowAction or action == updateTcfRowAction:
-                    if action == updateIefRowAction:
-                        file_types = 'IEF(*.ief)'
-                        lookup_name = 'IEF_DIR'
-                    else:
-                        file_types = 'TCF(*.tcf)'
-                        lookup_name = 'TCF_DIR'
-                        
-                    open_path = d.openFileDialog(p, file_types=file_types, 
-                                                     multi_file=False)
-                else:
-                    open_path = d.dirFileDialog(p)
-                    lookup_name = 'LOG_DIR'
-                    
-                if not open_path == False:
-                    open_path = str(open_path)
-                    p = os.path.split(open_path)[0]
-                    row = table_obj.currentRow()
-                    row_dict = table_obj.getValues(row=row, names=['ID', lookup_name])
-                    row_dict[lookup_name] = p
-                    table_obj.addRowValues(row_dict, row)
-                    self._saveViewChangesToDatabase(table_obj, row)
-                    self.loadModelLog()
-                    gs.setPath('model', p)
-            
-            # Update the MB and RUN_STATUS values
-            elif action == updateStatusAction:
-                # Get the tcf dir path and tcf name
-                row = table_obj.currentRow()
-                row_dict = table_obj.getValues(row=row, names=['ID', 'TCF_DIR', 'TCF'])
-                tcf = row_dict['TCF'][1:-1]
-                tcf = tcf.split(',')[0]
-                
-                # Find the latest values and update the RUN table
-                results = Controller.getRunStatusInfo(row_dict['TCF_DIR'], tcf)
-                if not results[0] and not results[1]:
-                    msg = "Failed to update status (ID=%s).\nIs the TCF_DIR correct and does in contain '_ TUFLOW Simulations.log' file?" % (row_dict['ID'])
-                    self.launchQMsgBox('Update Failed', msg)
-                elif not results[0]:
-                    msg = "Run is not yet complete(ID=%s).\nYou can only update status for a completed run" % (row_dict['ID'])
-                    self.launchQMsgBox('Update Failed', msg)
-                else:
-                    del row_dict['TCF_DIR']
-                    row_dict['RUN_STATUS'] = results[1]
-                    row_dict['MB'] = results[2]
-                    table_obj.addRowValues(row_dict, row)
-                    self._saveViewChangesToDatabase(table_obj, row)
-                    self.loadModelLog()
-            
-    
-    def _updateAllRowStatus(self):
-        """Update the RUN_STATUS and MB of all rows in RUN table."""
-        run_table = self.view_tables.getTable('RUN')
-        
-        failures = []
-        row_count = run_table.ref.rowCount()
-        self._updateMaxProgress(row_count+1)
-        for row in range(0, run_table.ref.rowCount()):
-            self._updateStatusBar('Updating row %s of %s' % (row, row_count))
-            self._updateCurrentProgress(row)
-            row_dict = run_table.getValues(row=row, names=['ID', 'TCF_DIR', 'TCF'])
-            id = row_dict['ID']
-            tcf_dir = row_dict['TCF_DIR']
-            tcf = row_dict['TCF'][1:-1]
-            tcf = tcf.split(',')[0]
-            success, status, mb = Controller.getRunStatusInfo(tcf_dir, tcf)
-            if not success:
-                failures.append(id)
-            else:
-                row_dict['RUN_STATUS'] = status
-                row_dict['MB'] = mb
-                run_table.addRowValues(row_dict, row)
-                self._saveViewChangesToDatabase(run_table, row)
-
-        self.loadModelLog()
-        
-        if failures:
-            msg = "Failed to update status (ID(s)=%s).\nAre the TCF_DIR's correct and do they contain '_ TUFLOW Simulations.log' file(s)?" % (row_dict['ID'])
-            self.launchQMsgBox('Update Failer', msg)
-        
-        self._updateStatusBar('')
-        self._updateCurrentProgress(0)
-        
-    
-    def _deleteRowFromDatabase(self, table, all_entry):
-        """Deletes the row in the database based on the location that the mouse
-        was last clicked.
-        This is fine because this function is called from the context menu and
-        therefore relies on the user right-clicking on the correct row.
-        
-        Args:
-            table(TableWidget): to get the row data from.
-            all_entry(bool): if True deletes associated entries as well.
-        """
-        
-        # Get the currently active row in the table and find it's ID value
-        row = table.currentRow()
-        row_dict = table.getValues(row=row, names=['ID'])
-        
-        # Just make sure we meant to do this
-        if not all_entry:
-            message = "Delete this row?\nTable = %s, Row ID = %s" % (table.name, row_dict['ID'])
-        else:
-            message = "Delete this row AND all associated rows?\nTable = %s, Row ID = %s" % (table.name, row_dict['ID'])
-        answer = self.launchQtQBox('Confirm Delete?', message)            
-        if answer == False:
-            return
-        
-        # Delete from database
-        errors = GuiStore.ErrorHolder()
-        errors = Controller.deleteDatabaseRow(gs.path_holder['log'],
-                                table.key, row_dict['ID'], errors, all_entry)
-        # and then from the table
-        if errors.has_errors:
-            if errors.msgbox_error:
-                self.launchQMsgBox(errors.msgbox_error.title, 
-                                   errors.msgbox_error.message)
-            logger.error('Failed to delete row(s)')
-        else:
-            self.loadModelLog()
-            logger.info('Row ID=%s deleted successfully' % (row_dict['ID']))
-    
-    
-    def _saveViewChangesToDatabase(self, table, row=None):
-        """Saves the edits made to the row in the View Log table to the database
-        based on the id value in the row that was clicked to launch the context
-        menu.
-        
-        :param table: the table in the user form to takes  updates from.
-        """
-        if row is None:
-            row = table.currentRow()
-        
-        # Search through the current row and get the values in the columns that
-        # we are going to allow the user to update.
-        save_dict = table.getValues(row=row, names='*')
-        id_key = save_dict['ID']
-        
-        # Add the updates to the database
-        errors = GuiStore.ErrorHolder()
-        errors = Controller.editDatabaseRow(gs.path_holder['log'], 
-                                        table.key, id_key, save_dict, errors)
-        
-        if errors.has_errors:
-            logger.error('Row ID=%s failed to update' % (id_key))
-            if errors.msgbox_error:
-                self.launchQMsgBox(errors.msgbox_error.title, 
-                                   errors.msgbox_error.message)
-        else:
-            logger.info('Row ID=%s updated successfully' % (id_key))
-            self.ui.statusbar.showMessage(
-                                "Log entry (Table=%s : ID=%s) has been"
-                                " updated" % (table.key, id_key))
-                
-        
-    def loadModelLog(self):
-        """If there is a model log to load we do it.
-        """
-        if self.checkDbLoaded(False):
-            errors = GuiStore.ErrorHolder()
-            errors = Controller.checkDatabaseVersion(gs.path_holder['log'], errors)
-            if errors.has_errors:
-                if errors.msgbox_error:
-                    self.launchQMsgBox(errors.msgbox_error.title,
-                                                errors.msgbox_error.message)
-                return
-            
-            self.view_tables.clearAll()
-            self.all_logs = None
-             
-            # load each of the tables from the database
-            table_list = []
-            for table in self.view_tables.tables.values():
-                table_list.append([table.key, table.name])
-            
-            entries, errors = Controller.fetchTableValues(gs.path_holder['log'],
-                                                          table_list, errors)
-            
-            if errors.has_errors:
-                if errors.msgbox_error:
-                    self.launchQMsgBox(errors.msgbox_error.title,
-                                                errors.msgbox_error.msg) 
-                return
-             
-            # Add the results to the database tables
-            for entry in entries:
-                if entry[2]:
-                    table = self.view_tables.getTable(name=entry[1])
-                    table.ref.setRowCount(entry[3])
-                    table.addRows(entry[4], 0)
             
 
     def _createLogEntry(self):
         """Take the updated data in the provisional table and load it into the
         model log.
         """
+        temp_copy = os.path.join(TEMP_PATH, os.path.basename(gs.path_holder['log']))
         # Check that we have a database
-        if not self.checkDbLoaded(): return
+        if not self.checkDbLoaded(): 
+            self.launchQMsgBox('No Database', 'Please load a log database first')
+            return
+        
+        # Check we don't have any unsaved data in the tables first
+        if not self.checkUnsavedEntries('RUN'): return
+        if not self.checkUnsavedEntries('MODEL'): return
         
         all_logs = self.widgets['New Entry'].getSingleLogEntry()
-        if not all_logs == None:
+        if not all_logs is None:
             
             try:
-                errors = GuiStore.ErrorHolder()
-                errors, all_logs = Controller.updateLog(
-                            gs.path_holder['log'], all_logs, errors) 
-                
-                if errors.has_errors:
-                    if errors.msgbox_error:
-                        self.launchQMsgBox(errors.msgbox_error.title, 
-                                            errors.msgbox_error.message)
-                    del errors
-                    return
-                
+                shutil.copy(gs.path_holder['log'], temp_copy)
+            except IOError, err:
+                logger.warning('Cound not create temp backup')
+            
+            try:
+                if all_logs.dat is not None:
+                    dat = pv.addDat(all_logs.dat)
+                else:
+                    dat = None
+                run = pv.addRun(all_logs.run, all_logs.run_hash, all_logs.ief_dir, 
+                                all_logs.tcf_dir, dat)
+                pv.addAllModel(all_logs.models, run)
+
                 # Add the new entries to the view table as well
-                self.loadModelLog()
+                self._loadModelLog()
             except Exception, err:
+                
                 self._updateStatusBar('')
                 msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
                        "all gone terribly wrong. You're on your own dude.\n" +
@@ -879,18 +1003,35 @@ class MainGui(QtGui.QMainWindow):
                 logger.error('Critical error in create log entry')
                 logger.exception(err)
                 self.launchQMsgBox('Critical Error', msg)
+                try:
+                    os.remove(gs.path_holder['log'])
+                    shutil.copy(temp_copy, gs.path_holder['log'])
+                except IOError, err:
+                    logger.warning('Could not reinstate backup!')
+                    p = os.normpath(TEMP_PATH)
+                    msg = "Couln't auto-reinstate the backup, but you can find\nit here and do it manually:\n" + p
+                    self.launchQMsgBox('Backup failure', msg)
                 return
+            try:
+                os.remove(temp_copy)
+            except IOError, err:
+                logger.warning('Cound not delete temp backup')
             
             # Update the status bar message
             self.ui.statusbar.showMessage("Log Database successfully updated")
             logger.info('Log Database successfully updated')
-            del errors
             
     
     def _createMultipleLogEntry(self):
         """Takes all the files in the multiple model list, load them and add
         them to the database.        
         """
+        temp_copy = os.path.join(TEMP_PATH, os.path.basename(gs.path_holder['log']))
+        try:
+            shutil.copy(gs.path_holder['log'], temp_copy)
+        except IOError, err:
+            logger.warning('Cound not create temp backup')
+                
         errors = GuiStore.ErrorHolder()
         # Check that we have a database
         if not self.checkDbLoaded(): 
@@ -898,18 +1039,16 @@ class MainGui(QtGui.QMainWindow):
             else:
                 self.launchQMsgBox('No Database', 'Please load a log database first')
                 return
-        errors = Controller.checkDatabaseVersion(gs.path_holder['log'], errors)
-        if errors.has_errors:
-            if errors.msgbox_error and not self._TEST_MODE:
-                self.launchQMsgBox(errors.msgbox_error.title,
-                                            errors.msgbox_error.message)
-            return errors
         
+        # Check we don't have any unsaved data in the tables first
+        if not self.checkUnsavedEntries('RUN'): return
+        if not self.checkUnsavedEntries('MODEL'): return
+            
         # Get all of the file paths from the list
         model_paths, run_options = self.widgets['New Entry'].getMultipleModelPaths()
         if not model_paths: return errors
         
-        # Setup the progress monitor. It updates prgress bars etc
+        # Setup the progress stuff
         total = len(model_paths)
         prog_count = 1
         self._updateMaxProgress(total)
@@ -923,35 +1062,31 @@ class MainGui(QtGui.QMainWindow):
                 self._updateStatusBar('Loading model %s of %s' % (prog_count, total))
                 self._updateCurrentProgress(prog_count)
                 prog_count += 1
-                errors, all_logs = Controller.fetchAndCheckModel(
-                                        gs.path_holder['log'], path, run_options, errors)
+                errors, all_logs = Controller.fetchAndCheckModel(path, run_options, errors)
                 
                 if errors.has_local_errors:
                     errors.has_local_errors = False
                     continue
                 
-                run = all_logs.getLogEntryContents('RUN', 0)
-                run['MODELLER'] = input_vars['MODELLER']
-                run['TUFLOW_BUILD'] = input_vars['TUFLOW_BUILD'] 
-                run['ISIS_BUILD'] = input_vars['ISIS_BUILD'] 
-                run['EVENT_NAME'] = input_vars['EVENT_NAME'] 
+                all_logs.run['MODELLER'] = input_vars['MODELLER']
+                all_logs.run['TUFLOW_BUILD'] = input_vars['TUFLOW_BUILD'] 
+                all_logs.run['ISIS_BUILD'] = input_vars['ISIS_BUILD']
+                all_logs.run['EVENT_NAME'] = input_vars['EVENT_NAME'] 
+                all_logs.run['RUN_OPTIONS'] = run_options 
 
-                errors, all_logs = Controller.updateLog(gs.path_holder['log'], 
-                                    all_logs, errors, check_new_entries=True)
-                
-                # If there was an issue updating the database drop out now and 
-                # launch the error.
-                if errors.msgbox_error and errors.msgbox_error.title == errors.DB_UPDATE:
-                    if not self._TEST_MODE:
-                        self.launchQMsgBox(errors.msgbox_error.title, 
-                                                errors.msgbox_error.message)
-                    break
-                
+                if all_logs.dat is not None:
+                    dat = pv.addDat(all_logs.dat)
+                else:
+                    dat = None
+                run = pv.addRun(all_logs.run, all_logs.run_hash, all_logs.ief_dir, 
+                                all_logs.tcf_dir, dat)
+                pv.addAllModel(all_logs.models, run)
+
                 if errors.has_local_errors:
                     errors.has_local_errors = False
                     continue
 
-            self.loadModelLog()
+            self._loadModelLog()
         except Exception, err:
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
@@ -961,6 +1096,14 @@ class MainGui(QtGui.QMainWindow):
                    "Game over man, I'm outta here <-((+_+))->")
             logger.error('Critical error in multiple model load.')
             logger.exception(err)
+            try:
+                os.remove(gs.path_holder['log'])
+                shutil.copy(temp_copy, gs.path_holder['log'])
+            except IOError, err:
+                logger.error('Cound not reinstate backup!')
+                p = os.normpath(TEMP_PATH)
+                msg = "Couldn't auto-reinstate the backup, but you can find\nit here and do it manually:\n" + p
+                self.launchQMsgBox('Backup failure', msg)
             
             if self._TEST_MODE:
                 return errors
@@ -983,6 +1126,11 @@ class MainGui(QtGui.QMainWindow):
         
         # Clear the list entries
         self.widgets['New Entry'].clearMultipleModelTable()
+
+        try:
+            os.remove(temp_copy)
+        except IOError, err:
+            logger.warning('Cound not delete temp backup')
 
         if self._TEST_MODE:
             return errors
@@ -1023,8 +1171,9 @@ class MainGui(QtGui.QMainWindow):
         logger.info('Saving user settings to: ' + save_path)
         try:
             self.settings.main['cur_tab'] = self.ui.tabWidget.currentIndex()
+            self.settings.main['run_hidden_cols'] = self.table_info['RUN']['table'].hidden_columns
             self.settings.path_holder = gs.path_holder
-            self._getColumnWidths()
+#             self._getColumnWidths()
             _writeWidgetSettings()
         except:
             logger.error('Unable to save settings - resetting to new')
@@ -1072,103 +1221,20 @@ class MainGui(QtGui.QMainWindow):
     def closeEvent(self, event):
         """Do the things that need doing before closing window.
         """
+        # Make sure that all user edits are saved
+        if not self.table_info['MODEL']['table'] is None:
+            answer = self.checkUnsavedEntries('MODEL')
+        if not self.table_info['RUN']['table'] is None:
+            answer = self.checkUnsavedEntries('RUN')
+        
+        if answer == False: 
+            event.ignore()
+            return
+
         save_path = self.settings.cur_settings_path
         self._writeSettings(save_path)
 
  
-    def _updateDatabaseVersion(self): 
-        """Checks if the databse at the given path is compatible with the
-        latest version of LogIT.
-        """
-        d = MyFileDialogs(parent=self)
-        if not self.checkDbLoaded():
-            p = os.path.splitext(self.settings.cur_settings_path)[0]
-            open_path = d.openFileDialog(path=p, 
-                                        file_types='LogIT database(*.logdb)')
-        else:
-            open_path = d.openFileDialog(path=gs.path_holder['log'], 
-                                        file_types='LogIT database(*.logdb)')
-        if open_path == False:
-            return None
-        open_path = str(open_path)
-        errors = GuiStore.ErrorHolder()
-        errors = Controller.updateDatabaseVersion(open_path, errors)
-        if errors.has_errors:
-            if errors.msgbox_error:
-                self.launchQMsgBox(errors.msgbox_error.title, 
-                                            errors.msgbox_error.message)
-        else:
-        
-            msg = "Update Successfull\nWould you like to load updated database?"
-            reply = self.launchQtQBox('Update Successful', msg)
-            if not reply == False:
-                temp = gs.path_holder['log'] = open_path
-                try:
-                    self.loadModelLog()
-                    self.ui.statusbar.showMessage("Current log: " + open_path)
-                except:
-                    logger.error('Cannot load database: see log for details')
-                    self.launchQMsgBox(errors.types[errors.DB_UPDATE].title, 
-                                       errors.types[errors.DB_UPDATE].message)
-    
-    
-    def _createNewLogDatabase(self):
-        """Create a new model log database.
-        """
-#         self.launchQMsgBox('', 'In new log create')
-        if 'log' in gs.path_holder.keys():
-            p = gs.path_holder['log']
-        else:
-            p = cur_location
-#         self.launchQMsgBox('', 'After path variable check')
-            
-        d = MyFileDialogs(parent=self)
-        save_path = d.saveFileDialog(path=p, file_types='LogIT database(*.logdb)')
-        
-        if not save_path == False:
-            try:
-                QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-                gs.setPath('log', save_path)
-                self.view_tables.clearAll()
-                self.ui.statusbar.showMessage('Building new log database...')
-                self.ui.centralwidget.setEnabled(False)
-                #DatabaseFunctions.createNewLogDatabase(str(save_path))
-                DatabaseFunctions.createNewLogDatabase(gs.path_holder['log'])
-                self.ui.centralwidget.setEnabled(True)
-                self.ui.statusbar.showMessage("Current log: " + save_path)
-            except Exception, err:
-                logger.error('Problem loading cache: ' + err)
-            finally:
-                self.emit(QtCore.SIGNAL("statusUpdate"), '')
-                self.emit(QtCore.SIGNAL("updateProgress"), 0)
-                QtGui.QApplication.restoreOverrideCursor()
-    
-    
-    def _loadDatabaseFromUser(self):
-        """Load database chosen by user in dialog.
-        """
-        d = MyFileDialogs(parent=self)
-        if self.checkDbLoaded(False):
-            open_path = d.openFileDialog(path=gs.path_holder['log'],
-                                        file_types='LogIT database(*.logdb)')
-        else:
-            open_path = d.openFileDialog(path=cur_location,
-                                        file_types='LogIT database(*.logdb)')
-        if open_path == False:
-            return
-        open_path = str(open_path)
-        
-        if self.settings == False:
-            self.settings = LogitSettings()
-        
-        gs.setPath('log', open_path)
-        try:
-            self.loadModelLog()
-            self.ui.statusbar.showMessage("Current log: " + open_path)
-        except:
-            logger.error('Cannot load database: see log for details')
-    
-    
     def _exportDatabase(self, call_name):
         """Exports the database based on calling action.
         """
@@ -1180,23 +1246,33 @@ class MainGui(QtGui.QMainWindow):
                                          file_types='Excel File (*.xls)')
             if save_path == False:
                 return
-
+ 
             save_path = str(save_path)
             gs.setPath('export', save_path)
             errors = GuiStore.ErrorHolder()
-            errors = Controller.exportToExcel(gs.path_holder['log'],
-                                              self.export_tables, save_path,
-                                                                    errors)
-            if errors.has_errors:
-                if errors.msgbox_error:
-                    self.launchQMsgBox(errors.msgbox_error.title, 
-                                   errors.msgbox_error.message)
-                self.ui.statusbar.showMessage(errors.msgbox_error.status_bar)
-            else:
-                self.launchQMsgBox('Export Complete', 
-                    'Database exported to Excel (.xls) at:\n%s' % (save_path), 
-                                                                    'info')
-                self.ui.statusbar.showMessage('Database exported to Excel')
+#             save_path = r'C:/Users/duncan.runnacles/Desktop/TEMP/logit/db/excel_out.xls'
+
+            try:
+                # Setup the progress stuff
+                self._updateMaxProgress(4)
+                self._updateCurrentProgress(1)
+                self._updateStatusBar('Exporting Model Files ...')
+                model_out = pv.createModelExport()
+                self._updateCurrentProgress(2)
+                self._updateStatusBar('Exporting Run Files ...')
+                run_out, run_header, dat_out, dat_header = pv.createRunDatExport()
+                self._updateCurrentProgress(3)
+                self._updateStatusBar('Writing to Excel ...')
+                Exporters.newExportToExcel(run_out, run_header, dat_out, dat_header, model_out, save_path)
+                self._updateCurrentProgress(0)
+                self._updateStatusBar('Export Complete')
+            
+            except Exception, err:
+                self._updateCurrentProgress(0)
+                self._updateStatusBar('Export Failed')
+                logger.exception(err)
+                QtGui.QMessageBox.warning(self, "Export Failed",
+                                      "Export to Excel failed!")
                 
         else:
             logger.warning('Cannot export log - no database loaded')
@@ -1204,23 +1280,6 @@ class MainGui(QtGui.QMainWindow):
                                       "There is no log database loaded")
         
 
-    def fileMenuActions(self):
-        """Respond to actions that occur on the file menu
-        """
-        caller = self.sender()
-        call_name = caller.objectName()
-        logger.debug('Caller = ' + call_name)
-        
-        if call_name == 'actionNewModelLog':
-            self._createNewLogDatabase()
-        
-        elif call_name == 'actionLoad':
-            self._loadDatabaseFromUser()
-                                    
-        elif call_name == 'actionExportToExcel':
-            self._exportDatabase(call_name)
-            
-            
     def _getModelFileDialog(self, multi_paths=False, path=None):
         """Launches an open file dialog to get .ief or .tcf files.
         
@@ -1242,6 +1301,23 @@ class MainGui(QtGui.QMainWindow):
                                                   self.settings.cur_settings_path)
         return open_path
     
+    
+    def cleanDatabase(self):
+         
+        try:
+            self._updateMaxProgress(3)
+            self._updateCurrentProgress(1)
+            self._updateStatusBar('Removing orphaned files ...')
+            pv.deleteOrphanFiles()
+            self._updateCurrentProgress(2)
+            self._updateStatusBar('Recalculating file status ...')
+            pv.updateNewStatus()
+            self._updateCurrentProgress(0)
+            self._updateStatusBar('Cleanup complete')
+
+        except Exception, err:
+            logger.warning('Cleanup database fail')
+            logger.exception(err)
           
     def _resolveIefs(self):
         """Attempt to automatically update ief files references to current dir.
@@ -1332,7 +1408,7 @@ class MainGui(QtGui.QMainWindow):
         ief_dialog.setWindowIcon(icon)
         ief_dialog.exec_()
         finalize() 
-        
+     
 
     def launchQtQBox(self, title, message):
         """Launch QtQMessageBox.
@@ -1356,21 +1432,6 @@ class MainGui(QtGui.QMainWindow):
             QtGui.QMessageBox.information(self, title, message)
     
     
-    def checkDbLoaded(self, show_dialog=True):
-        """Check if there's a database filepath set.
-        """
-        path, exists = gs.getPath('log')
-        if not exists:
-            if show_dialog:
-                QtGui.QMessageBox.warning(self, "No Database Loaded",
-                        "No log database active. Please load or create one from the file menu.")
-            logger.error('No log database found. Load or create one from File menu')
-            return False
-        
-        else:
-            return True
-    
-    
     def _copyLogs(self):
         """Zip up all of the log file and copy them to the system clipbaord."""
         zip_log = Controller.prepLogsForCopy(log_path)
@@ -1380,25 +1441,25 @@ class MainGui(QtGui.QMainWindow):
         QtGui.QApplication.clipboard().setMimeData(data)
     
     
-    def _getColumnWidths(self):
-        """Store the current column widths for the view tables."""
-        for key, table in self.view_tables.tables.iteritems():
-            self.settings.main['column_widths'][key] = []
-            count = table.ref.columnCount()
-            for i in range(0, count):
-                self.settings.main['column_widths'][key].append(table.ref.columnWidth(i))
+#     def _getColumnWidths(self):
+#         """Store the current column widths for the view tables."""
+#         for key, table in self.view_tables.tables.iteritems():
+#             self.settings.main['column_widths'][key] = []
+#             count = table.ref.columnCount()
+#             for i in range(0, count):
+#                 self.settings.main['column_widths'][key].append(table.ref.columnWidth(i))
 
 
-    def _setColumnWidths(self):
-        """Load the saved column widths for the view tables."""
-        for key, table in self.view_tables.tables.iteritems():
-            count = table.ref.columnCount()
-            for i in range(0, count):
-                if key in self.settings.main['column_widths'].keys():
-                    try:
-                        table.ref.setColumnWidth(i, self.settings.main['column_widths'][key][i])
-                    except IndexError:
-                        pass # If we've added new columns since save state
+#     def _setColumnWidths(self):
+#         """Load the saved column widths for the view tables."""
+#         for key, table in self.view_tables.tables.iteritems():
+#             count = table.ref.columnCount()
+#             for i in range(0, count):
+#                 if key in self.settings.main['column_widths'].keys():
+#                     try:
+#                         table.ref.setColumnWidth(i, self.settings.main['column_widths'][key][i])
+#                     except IndexError:
+#                         pass # If we've added new columns since save state
     
     
     def _showReleaseNotes(self):
@@ -1520,7 +1581,10 @@ class LogitSettings(object):
     
     def getMainToolSettings(self):
         """"""
-        return {'release_notes_version': '', 'column_widths': {}, 'cur_tab': 0}
+        return {
+                'release_notes_version': '', 'column_widths': {}, 'cur_tab': 0,
+                'run_hidden_cols': {}
+                }
     
     
     def copySettings(self, existing_settings):
@@ -1534,7 +1598,7 @@ class LogitSettings(object):
         Args:
             existing_settings(LogitSettings): 
         """
-        settings_attrs = [s for s in dir(self) if not s.startswith('__') and not s == 'copySettings' and not s == 'getMainToolSettings']
+        settings_attrs = [s for s in dir(self) if not s.startswith('__') and not s == 'copySettings' and not s == 'getMainToolSettings' and not s == 'main']
         for s in settings_attrs:
             if hasattr(existing_settings, s):
                 setattr(self, s, getattr(existing_settings, s))
@@ -1564,15 +1628,13 @@ def main():
         # Check that this version of the settings has all the necessary
         # attributes, and if not add the missing ones
         new_set.copySettings(cur_settings)
-        cur_settings = new_set
     except:
         print 'Unable to load user defined settings'
-    cur_settings = new_set
-    cur_settings.cur_settings_path = settings_path
+    new_set.cur_settings_path = settings_path
          
     # Launch the user interface.
     app = QtGui.QApplication(sys.argv)
-    myapp = MainGui(cur_settings)
+    myapp = MainGui(new_set)
     icon_path = os.path.join(settings_path, 'Logit_Logo.ico')
     app.setWindowIcon(QtGui.QIcon(':images/Logit_Logo.png'))
     myapp.show()

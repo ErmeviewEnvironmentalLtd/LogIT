@@ -8,12 +8,12 @@
     easily get out of sync when harcoded into many places.
 """
 
-__VERSION__ = 'v0.8.4-Beta'
-__APPID__ = 'LogIT.0-7-Beta'
+__VERSION__ = 'v1.0.0-Beta'
+__APPID__ = 'LogIT.1-0-Beta'
 __SERVER_PATH__ = r'P:\04 IT\utils\beta\LogIT'
 __DOWNLOAD_FILENAME__ = 'Logit_'
-__VERSION_CHECKPATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\versioninfo.ver'
-__RELEASE_NOTES_PATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\Release_Notes_'
+__VERSION_CHECKPATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\v1\versioninfo.ver'
+__RELEASE_NOTES_PATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\v1\Release_Notes_'
 
 __DEV_MODE__ = True
 
@@ -36,6 +36,7 @@ path_holder = {}
 def setPath(key, path):
     """Sets a path and converts to str in case of QString."""
     path_holder[key] = str(path)
+    path_holder['last_path'] = str(path)
 
 def getPath(key):
     """Check if path variable sets and checks it exists if requested.

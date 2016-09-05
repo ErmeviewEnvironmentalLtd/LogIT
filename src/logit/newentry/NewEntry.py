@@ -42,6 +42,9 @@
          should cause less hassle when additional variables need to be added.
          Also now shares the path_holder dict in globalsettings.py.
          Now using the AWidget interface.
+    DR (08/09/2016):
+         Big rewrite to use the new database backend (peewee). Model load and
+         data display code updated to work with the new setup.
     
 
  TODO:
@@ -66,6 +69,8 @@ import NewEntry_Widget as newentrywidget
 logger.debug('NewEntry_Widget import complete')
 # from app_metrics import utils as applog
 import globalsettings as gs
+
+import peeweeviews as pv
 
 
 class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
@@ -153,7 +158,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         self.loadMultiModelTable.setRowCount(0)
         
     
-    def _updateNewEntryTree(self, entry_status):
+    def _updateNewEntryTree(self):
         """Update the single entry TreeView with the contents of all_logs.
         
         Creates a TreeView separated by the different log types and the names
@@ -167,90 +172,81 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 files, indicating whether they are new or already exist in the
                 database. 
         """
+        
+        def createEntry(entry, model_items, name, check_exists=True):
+            """
+            """ 
+            if not entry['TYPE'] in model_items.keys():
+                model_items[entry['TYPE'] + 'TOP'] = []
+                model_items[entry['TYPE'] + 'ITEM'] = QtGui.QStandardItem(entry['TYPE'])
+                model_items[entry['TYPE'] + 'TOP'].append( model_items[entry['TYPE'] + 'ITEM'])
+                self.tree_model.appendRow(model_items[entry['TYPE'] + 'TOP'])
+            else:
+                 model_items[entry['TYPE'] + 'ITEM'] = model_items[entry['TYPE']]
+            
+            entry_item = QtGui.QStandardItem(name)
+            model_items[entry['TYPE'] + 'ITEM'].appendRow(entry_item)
+            do_update = True
+            
+            if check_exists == True and entry['EXISTS'] == True:
+                entry_item.setBackground(brush_red)
+                do_update = False
+                
+            # Create an entry for each item in the log
+            for data_key, data in entry.items():
+                child = []
+                item1 = QtGui.QStandardItem(data_key)
+                item2 = QtGui.QStandardItem(str(data))
+                item1.setFlags(QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+
+                # If the entry is editable by user mark it so and color
+                # it green
+                if do_update and data_key in self.all_logs.editing_allowed:
+                    item1.setBackground(brush_green)
+                else:
+                    item2.setFlags(QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
+                
+                child.append(item1)
+                child.append(item2)
+                entry_item.appendRow(child)
+        
+        ''' END OF INNER FUNCTION '''
+        
+        model_items = {}
         brush_green = QtGui.QBrush(QtGui.QColor(204, 255, 153)) # Light green
         brush_red = QtGui.QBrush(QtGui.QColor(255, 204, 204)) # Light red
-        
         self.tree_model = QtGui.QStandardItemModel()
         self.tree_model.setColumnCount(2)
         self.tree_model.setHorizontalHeaderLabels(['Log Type', 'Variables'])
 
-        # Create an entry for each log type that exist in the model
-        for key, log_type in self.all_logs.log_pages.iteritems():
-            if not log_type.has_contents: continue
+        # RUN
+        self.all_logs.run['TYPE'] = 'RUN'
+        createEntry(self.all_logs.run, model_items, self.all_logs.run_hash, check_exists=False)  
 
-            top = []
-            top_item = QtGui.QStandardItem(log_type.name)
-            top.append(top_item)
-            self.tree_model.appendRow(top)
-            
-            # Create child for each list item under log type
-            for entry in log_type.contents:
-                
-                do_update = True
-                
-                if log_type.name == 'RUN':
-                    entry_item = QtGui.QStandardItem('RUN')
-                else:
-                    entry_item = QtGui.QStandardItem(entry[log_type.name])
-                
-                # Mark red if it won't be loaded into database. This is 
-                # because that file is already in there
-                if not log_type.name == 'RUN' and not entry_status[log_type.name][entry[log_type.name]]['Do Update']:
-                    entry_item.setBackground(brush_red)
-                    do_update = False
-                top_item.appendRow(entry_item)
-            
-                # Create an entry for each item in the log
-                for data_key, data in entry.iteritems():
-                    child = []
-                    item1 = QtGui.QStandardItem(data_key)
-                    item2 = QtGui.QStandardItem(str(data))
-                    item1.setFlags(QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-
-                    # If the entry is editable by user mark it so and color
-                    # it green
-                    if do_update and data_key in self.all_logs.editing_allowed:
-                        item1.setBackground(brush_green)
-                    else:
-                        item2.setFlags(QtCore.Qt.ItemIsSelectable |  QtCore.Qt.ItemIsEnabled )
-                    
-                    child.append(item1)
-                    child.append(item2)
-                    
-                    entry_item.appendRow(child)
+        # DAT
+        if self.all_logs.dat is not None:
+            self.all_logs.dat['TYPE'] = 'DAT'
+            createEntry(self.all_logs.dat, model_items, self.all_logs.dat['NAME'])    
         
+        # MODEL FILES
+        for entry in self.all_logs.models:
+            createEntry(entry, model_items, entry['NAME'])
+            
         self.modelEntryTreeView.setModel(self.tree_model)
         self.modelEntryTreeView.expandAll()
         self.modelEntryTreeView.setColumnWidth(0, self.settings['singleload_column_width'])
-    
-    
-    def _loadSingleLogEntry(self, testpath=''):
-        """Loads a model and checkes the contents against the database.
-        
-        Calls LogBuilder to load the model from file. Then checks the loaded
-        filenames against those in the database and flags them if they already
-        exist.
-        
-        Finally gets the user entered main variables and calls the 
-        updateNewTree method to display the data to the user.
-        """
-        if self._TEST_MODE:
-            open_path = testpath
-        else:
-            path, exists = gs.getPath('log')
-            if not exists:
-                self.launchQMsgBox('No log Database', ('There is no log database ' +
-                                   'loaded.\nPlease load one first.'))
-                return
             
-            # Launch dialog and get a file
-            chosen_path = self.cur_location
-            if 'model' in gs.path_holder.keys():
-                chosen_path = gs.path_holder['model']
-            d = MyFileDialogs(parent=self)
-            open_path = d.openFileDialog(path=chosen_path, 
-                                         file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)', 
-                                         multi_file=False)
+
+    def _loadSingleLogEntry(self, testpath=''):
+
+        # Launch dialog and get a file
+        chosen_path = self.cur_location
+        if 'model' in gs.path_holder.keys():
+            chosen_path = gs.path_holder['model']
+        d = MyFileDialogs(parent=self)
+        open_path = d.openFileDialog(path=chosen_path, 
+                                     file_types='ISIS/TUFLOW (*.ief *.IEF *.tcf *.TCF)', 
+                                     multi_file=False)
         
         # If the user doesn't cancel
         if not open_path == False:
@@ -262,39 +258,33 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 
                 run_options = str(self.runOptionsTextbox.text())
                 errors = GuiStore.ErrorHolder()
-                errors, self.all_logs = Controller.fetchAndCheckModel(gs.path_holder['log'], open_path, run_options, errors)
+                errors, self.all_logs = Controller.fetchAndCheckModel(open_path, run_options, errors)
                 
                 # They might have been collected from .ief so get them again here
-                run_options = self.all_logs.getLogEntryContents('RUN', 0)['RUN_OPTIONS']
+                run_options = self.all_logs.run['RUN_OPTIONS']
                 
-                # Init a dict to hold the exists/not exists status of the data
-                # being loaded
+                # Check what's already in the database
                 if not errors.has_errors:
-                    entry_dict = {}
-                    for log_key, log in self.all_logs.log_pages.iteritems(): 
-                        if log_key == 'RUN' or log.has_contents == False: continue
-                        entry_dict[log_key] = {}
-                        for item in log.contents:
-                            entry_dict[log_key][item[log_key]] = {}
-                     
-                    # check the new entries against the database and return them with
-                    # flags set for whether they are new entries or already exist
-                    errors = GuiStore.ErrorHolder()
-                    entry_status, errors = Controller.loadEntrysWithStatus(
-                            gs.path_holder['log'], self.all_logs, entry_dict, errors)
-
+                    for i, m in enumerate(self.all_logs.models):
+                        if pv.modelExists(m['NAME']):
+                            self.all_logs.models[i]['EXISTS'] = True
+                    
+                    if self.all_logs.dat is not None:
+                        if pv.datExists(self.all_logs.dat['NAME']):
+                            self.all_logs.dat['EXISTS'] = True
+                                    
                 if errors.has_errors:
-                    self.launchQMsgBox("Load Error", errors.formatErrors())
+                        self.launchQMsgBox("Load Error", errors.formatErrors())
                 else:
                     self.emit(QtCore.SIGNAL("statusUpdate"), 'Loaded model at: %s' % (open_path))
                     input_vars = self.getInputVars()
-                    run = self.all_logs.getLogEntryContents('RUN', 0)
-                    run['MODELLER'] = self.settings['modeller'] = input_vars['MODELLER']
-                    run['TUFLOW_BUILD'] = self.settings['tuflow_model'] = input_vars['TUFLOW_BUILD'] 
-                    run['ISIS_BUILD'] = self.settings['isis_build'] = input_vars['ISIS_BUILD']
-                    run['EVENT_NAME'] = self.settings['event_name'] = input_vars['EVENT_NAME'] 
-                    run['RUN_OPTIONS'] = self.settings['run_options'] = run_options 
-                    self._updateNewEntryTree(entry_status)
+                    self.all_logs.run['MODELLER'] = self.settings['modeller'] = input_vars['MODELLER']
+                    self.all_logs.run['TUFLOW_BUILD'] = self.settings['tuflow_model'] = input_vars['TUFLOW_BUILD'] 
+                    self.all_logs.run['ISIS_BUILD'] = self.settings['isis_build'] = input_vars['ISIS_BUILD']
+                    self.all_logs.run['EVENT_NAME'] = self.settings['event_name'] = input_vars['EVENT_NAME'] 
+                    self.all_logs.run['RUN_OPTIONS'] = self.settings['run_options'] = run_options 
+                    
+                    self._updateNewEntryTree()
                     self.submitSingleModelGroup.setEnabled(True)
                     
             except Exception, err:
@@ -305,7 +295,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                        "Game over man, I'm outta here <-((+_+))->")
                 logger.error(msg)
                 logger.exception(err)
-    
+        
     
     def getSingleLogEntry(self):
         """Get the data loaded into the single log entry tab.
@@ -342,7 +332,9 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         
         # Update the log pages with any user corrections
         for log_key, log in data.iteritems():
-            self.all_logs.updateSubLog(log, log_key)
+            for i in log:
+                self.all_logs.updateLogEntry(log_key, i)
+#             self.all_logs.updateSubLog(log, log_key)
         
         # Reset the tree
         self.clearSingleModelTable()
