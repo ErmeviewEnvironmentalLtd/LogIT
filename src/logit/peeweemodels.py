@@ -25,7 +25,7 @@
  Module:          peeweemodels.py 
  Date:            09/08/2016
  Author:          Duncan Runnacles
- Since-Version:   1.0
+ Since-Version:   1.0.0
  
  Summary:
      All of the peewee database models.

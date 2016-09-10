@@ -62,8 +62,7 @@
         and in the peeweemodels module instead.
 
  TODO:
-    AddedRows class may not be needed now that there is a bulk insert statement
-    used (it can use connection.rollback() if needed.
+    
 
 ###############################################################################
 """
@@ -84,8 +83,6 @@ from ship.utils.qtclasses import MyFileDialogs
 from ship.utils import utilfunctions as uf
 
 # Local modules
-import DatabaseFunctions
-# logger.debug('Import DatabaseFunctions complete')
 import LogBuilder
 # logger.debug('Import LogBuilder complete')
 import Exporters
@@ -185,7 +182,7 @@ def fetchAndCheckModel(open_path, run_options, errors):
         return message
         
     
-    loader = LogBuilder.NewModelLoader()
+    loader = LogBuilder.ModelLoader()
     all_logs = loader.loadModel(open_path, run_options)
     
     # Deal with any loading errors

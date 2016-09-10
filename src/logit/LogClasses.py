@@ -33,7 +33,9 @@
     for easily access the data and converting it.
 
  UPDATES:
-   
+     DR - 08/09/2016:
+       Complete re-write and simplification of the AllLogs class.
+       Includes removal of SubLogs.
 
  TODO:
 
@@ -50,14 +52,20 @@ EDITING_ALLOWED = ['COMMENTS', 'MODELLER', 'SETUP', 'DESCRIPTION',
                    'EVENT_NAME', 'EVENT_DURATION', 'ISIS_BUILD',
                    'TUFLOW_BUILD', 'AMENDMENTS', 'RUN_OPTIONS', 'MB',
                    'RUN_STATUS']
+"""AllLogs keys for which value editing is permitted."""
 
 class AllLogs(object):
+    """Holder for the log data when loaded.
+    
+    Used by the LogBuilder module to store the data and return it to the
+    calling class.
+    
+    Contains methods for storing, accessing, and updating log data.
+    """
     
     TYPES = ['RUN', 'MODEL', 'DAT', 'SUBFILE']
     
     def __init__(self, run_filename, tcf_dir='', ief_dir=''):
-        '''
-        '''
         self.editing_allowed = EDITING_ALLOWED
         self.tcf_dir = tcf_dir
         self.ief_dir = ief_dir
@@ -69,7 +77,10 @@ class AllLogs(object):
         
     
     def addLogEntry(self, entry, type=None):
-        """
+        """Add a new entry to the log.
+        
+        Args:
+            entry(str): LOG, 'DAT', or 'MODEL'
         """
         for e in entry:
             if e['TYPE'] == 'RUN':
@@ -83,6 +94,17 @@ class AllLogs(object):
                 self.models[-1]['INDEX'] = len(self.models) - 1
     
     def _buildRunName(self):
+        """Creates a run hash str for this run.
+        
+        Creates a unique hash code for the run. This is unique to a set of run
+        variables NOT unique everytime. It is used to check that the run 
+        doesn't already exist in the database.
+        
+        The hash uses a salt made up of:  
+            tcf name + ief name + run options
+            
+        This combination of variables should not exist in two different runs.
+        """
         rn = []
         if not self.run['TCF'].strip() == '':
             rn.append(self.run['TCF'].strip())
@@ -95,7 +117,14 @@ class AllLogs(object):
     
     
     def updateLogEntry(self, entry, values, index=None):
+        """Update the values in an existing log entry.
         
+        Only values that can be edited will be updated.
+        
+        Args:
+            entry(str): RUN, DAT or MODEL.
+            values(dict): key, value pairs for those needing updating.
+        """        
         if entry == 'RUN':
             for k, v in values.items():
                 if k in self.editing_allowed:

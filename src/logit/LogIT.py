@@ -156,8 +156,6 @@ from LogIT_UI import Ui_MainWindow
 logger.debug('Main Window import complete')
 import LogBuilder
 logger.debug('LogBuilder import complete')
-#import DatabaseFunctions
-logger.debug('Database functions import complete')
 import Exporters
 logger.debug('Exporters import complete')
 import Controller
@@ -328,7 +326,7 @@ class MainGui(QtGui.QMainWindow):
     
     def _updateAllRowStatus(self):
         """Update the RUN_STATUS and MB of all rows in RUN table."""
-        
+        if not self.checkDbLoaded(): return
         failures = []
         row_count = self.table_info['RUN']['table'].rowCount()
         self._updateMaxProgress(row_count+1)
@@ -493,6 +491,7 @@ class MainGui(QtGui.QMainWindow):
             query_type(str): the text value of the context menu.
             id(str): the ModelFile.name value to query.
         """
+        if not self.checkDbLoaded(): return
         # setup the form values
         self.clearQueryForm()
         self.ui.logViewTab.setCurrentIndex(2)
@@ -528,6 +527,7 @@ class MainGui(QtGui.QMainWindow):
             query_type(str): the text value of the context menu.
             id(int): the Run.id value to query.
         """
+        if not self.checkDbLoaded(): return
         # Setup the simple query forms
         self.clearQueryForm()
         self.ui.logViewTab.setCurrentIndex(2)
@@ -611,6 +611,8 @@ class MainGui(QtGui.QMainWindow):
         Takes the current values of the form and runs calls the getSimpleQuery
         function in peeweeviews.
         """
+        if not self.checkDbLoaded():return
+        
         table = str(self.ui.queryTableCbox.currentText())
         q1_vtext = str(self.ui.queryModelTextbox.text())
         q2_vtext = str(self.ui.queryFileTextbox.text())
@@ -644,6 +646,7 @@ class MainGui(QtGui.QMainWindow):
         Return:
             bool.
         """
+        
         if not table in self.table_info.keys(): return
         if not self.table_info[table]['table'] is None:
             if self.table_info[table]['table']._unsaved_entries:
@@ -716,10 +719,9 @@ class MainGui(QtGui.QMainWindow):
             
     def _loadModelLog(self):
         """Reload the Run and Model tables."""
-        loaded = self.checkDbLoaded()
-        if loaded:
-            self.loadModelDb()
-            self.loadRunDb()
+        if not self.checkDbLoaded(): return
+        self.loadModelDb()
+        self.loadRunDb()
     
     def checkDbLoaded(self, show_dialog=True):
         """Check if there's a database filepath set.
@@ -746,6 +748,7 @@ class MainGui(QtGui.QMainWindow):
         Then makes a call to get the data from the ModelFile table with the
         model_type and adds the returned rows to the new table. 
         """
+        if not self.checkDbLoaded(): return
         cur_text = self.ui.modelSelectCbox.currentText()
         if not cur_text == '':
             if not self.table_info['MODEL']['table'] is None:
@@ -768,6 +771,7 @@ class MainGui(QtGui.QMainWindow):
     
     def loadRunDb(self):
         """Loads the Run table database data into the Run log tab table."""
+        if not self.checkDbLoaded(): return
         if not self.table_info['RUN']['table'] is None:
             if not self.checkUnsavedEntries('RUN'):
                 return
@@ -967,7 +971,6 @@ class MainGui(QtGui.QMainWindow):
         temp_copy = os.path.join(TEMP_PATH, os.path.basename(gs.path_holder['log']))
         # Check that we have a database
         if not self.checkDbLoaded(): 
-            self.launchQMsgBox('No Database', 'Please load a log database first')
             return
         
         # Check we don't have any unsaved data in the tables first
@@ -1026,6 +1029,12 @@ class MainGui(QtGui.QMainWindow):
         """Takes all the files in the multiple model list, load them and add
         them to the database.        
         """
+        # Check that we have a database
+        if not self.checkDbLoaded(): 
+            if self._TEST_MODE: return errors
+            else:
+                return
+            
         temp_copy = os.path.join(TEMP_PATH, os.path.basename(gs.path_holder['log']))
         try:
             shutil.copy(gs.path_holder['log'], temp_copy)
@@ -1033,12 +1042,7 @@ class MainGui(QtGui.QMainWindow):
             logger.warning('Cound not create temp backup')
                 
         errors = GuiStore.ErrorHolder()
-        # Check that we have a database
-        if not self.checkDbLoaded(): 
-            if self._TEST_MODE: return errors
-            else:
-                self.launchQMsgBox('No Database', 'Please load a log database first')
-                return
+        
         
         # Check we don't have any unsaved data in the tables first
         if not self.checkUnsavedEntries('RUN'): return
@@ -1238,46 +1242,41 @@ class MainGui(QtGui.QMainWindow):
     def _exportDatabase(self, call_name):
         """Exports the database based on calling action.
         """
-        if self.checkDbLoaded():
-            p = gs.path_holder['log']
-            if 'export' in gs.path_holder.keys(): p = gs.path_holder['export']
-            d = MyFileDialogs(parent=self)
-            save_path = d.saveFileDialog(path=gs.path_holder['log'], 
-                                         file_types='Excel File (*.xls)')
-            if save_path == False:
-                return
- 
-            save_path = str(save_path)
-            gs.setPath('export', save_path)
-            errors = GuiStore.ErrorHolder()
+        if not self.checkDbLoaded(): return
+        p = gs.path_holder['log']
+        if 'export' in gs.path_holder.keys(): p = gs.path_holder['export']
+        d = MyFileDialogs(parent=self)
+        save_path = d.saveFileDialog(path=gs.path_holder['log'], 
+                                     file_types='Excel File (*.xls)')
+        if save_path == False:
+            return
+
+        save_path = str(save_path)
+        gs.setPath('export', save_path)
+        errors = GuiStore.ErrorHolder()
 #             save_path = r'C:/Users/duncan.runnacles/Desktop/TEMP/logit/db/excel_out.xls'
 
-            try:
-                # Setup the progress stuff
-                self._updateMaxProgress(4)
-                self._updateCurrentProgress(1)
-                self._updateStatusBar('Exporting Model Files ...')
-                model_out = pv.createModelExport()
-                self._updateCurrentProgress(2)
-                self._updateStatusBar('Exporting Run Files ...')
-                run_out, run_header, dat_out, dat_header = pv.createRunDatExport()
-                self._updateCurrentProgress(3)
-                self._updateStatusBar('Writing to Excel ...')
-                Exporters.newExportToExcel(run_out, run_header, dat_out, dat_header, model_out, save_path)
-                self._updateCurrentProgress(0)
-                self._updateStatusBar('Export Complete')
-            
-            except Exception, err:
-                self._updateCurrentProgress(0)
-                self._updateStatusBar('Export Failed')
-                logger.exception(err)
-                QtGui.QMessageBox.warning(self, "Export Failed",
-                                      "Export to Excel failed!")
-                
-        else:
-            logger.warning('Cannot export log - no database loaded')
-            QtGui.QMessageBox.warning(self, "Cannot Export Log",
-                                      "There is no log database loaded")
+        try:
+            # Setup the progress stuff
+            self._updateMaxProgress(4)
+            self._updateCurrentProgress(1)
+            self._updateStatusBar('Exporting Model Files ...')
+            model_out = pv.createModelExport()
+            self._updateCurrentProgress(2)
+            self._updateStatusBar('Exporting Run Files ...')
+            run_out, run_header, dat_out, dat_header = pv.createRunDatExport()
+            self._updateCurrentProgress(3)
+            self._updateStatusBar('Writing to Excel ...')
+            Exporters.newExportToExcel(run_out, run_header, dat_out, dat_header, model_out, save_path)
+            self._updateCurrentProgress(0)
+            self._updateStatusBar('Export Complete')
+        
+        except Exception, err:
+            self._updateCurrentProgress(0)
+            self._updateStatusBar('Export Failed')
+            logger.exception(err)
+            QtGui.QMessageBox.warning(self, "Export Failed",
+                                  "Export to Excel failed!")
         
 
     def _getModelFileDialog(self, multi_paths=False, path=None):

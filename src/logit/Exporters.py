@@ -37,6 +37,12 @@
     DR - 19/11/2014
         Changed the way that column data is written to worksheets. Now uses
         DatabaseFunctions.cur_tables order rather than database order.
+    DR - 08/09/2016:
+       Complete re-write and simplification to use the new style outputs from
+       the new peewee database backend.
+       No longer writes the sqlite tables directly to worksheets. Now takes 
+       formatted dicts and list for the required tables and writes them
+       instead.
 
  TODO:
 
@@ -47,7 +53,6 @@
 import sqlite3 as sqlite
 import os
 import logging
-import DatabaseFunctions
 logger = logging.getLogger(__name__)
 
 # Import Excel writer
@@ -57,94 +62,29 @@ except:
     logger.error('Cannot import xlwt (is it installed?):\n'+
                   'Cannot export database to Excel')  
 
-def sqlite_get_col_names(cur, table):
-    """Get the names of the columns in the given table.
-    
-    :param cur: the cursor to the currently connected database.
-    :param table: the table to be queried.
-    :return: the column names.
-    """
-    query = 'select * from  %s' % table
-    cur.execute(query)
-    return [tuple[0] for tuple in cur.description]  
-  
-def sqlite_query(cur,  table, col = '*', where = ''):  
-    """Run an sql query with the given parameters.
-    
-    :param cur: the cursor to the currently connected database.
-    :param table: the table to be queried.
-    :param col: the column(s) to return.
-    :param where: the WHERE criteria for the sql connection.
-    """
-    if where != '':  
-        query = 'select %s from %s where %s' % (col, table, where)  
-    else:  
-        query = 'select %s from %s ' % (col, table)  
-    cur.execute(query)  
-    return cur.fetchall()  
-  
-
-def sqlite_to_workbook(cur, table, workbook, keep_tables):  
-    """convert Sqlite3 data base to an excel workbook.
-    Converts the sqlite3 table at the given database cursor to an Excel (.xls)
-    Worksheet. This Worksheet will then be added to the given Workbook object.
-    
-    :param cur: the cursor to the currently connected database.
-    :param table: the table to convert to a worksheet.
-    :param workbook: the workbook to which the worksheet will be added.
-    """
-    if table in keep_tables:
-        ws = workbook.add_sheet(table)  
-        logger.info('create Worksheet %s.'  % table)
-    
-        for colx, heading in enumerate(sqlite_get_col_names(cur, table)):  
-                ws.write(0,colx, heading)  
-        for rowy,row in enumerate(sqlite_query(cur, table)):  
-            for colx, text in enumerate(row):  
-                ws.write(rowy+ 1, colx, text)
-#         for colx, heading in enumerate(DatabaseFunctions.cur_tables[table]):
-#                 ws.write(0,colx, heading)
-#         for rowy,row in enumerate(sqlite_query(cur, table)):  
-#             for colx, text in enumerate(row):  
-#                 ws.write(rowy+ 1, colx, text)  
-  
-
-def exportToExcel(dbpath, keep_tables, excel_path=None):  
-    """Convert the database at the given path to an Excel (.xls) Workbook where
-    each table in the database if a different Worksheet.
-    The newly created Excel Workbook will be saved in the same location as the
-    database.
-    
-    :param dbpath: the path to the sqlite3 database to be converted to Excel.
-    """
-    if excel_path == None:
-        dir_path, fname = os.path.split(dbpath)
-        fname = os.path.splitext(fname)[0]
-        xlspath = os.path.join(dir_path, fname + '.xls')
-    else:
-        xlspath = excel_path
-        
-    logger.info("Converting <%s> --> <%s>"% (dbpath, xlspath))
-  
-    db = sqlite.connect(dbpath)  
-    cur = db.cursor()  
-    w = xlwt.Workbook()  
-    for tbl_name in [row[0] for row in sqlite_query(cur, 'sqlite_master', 'tbl_name', 'type = \'table\'')]:  
-        sqlite_to_workbook(cur,tbl_name, w, keep_tables)
-          
-    cur.close()  
-    db.close()  
-    if tbl_name !=[]: w.save(xlspath)  
-    
 
 def newExportToExcel(run, runh, dat, dath, model, xlspath):
+    """Export database data to Excel .xls format.
     
+    Args:
+        run(dict): containing lists with output variables for each run id.
+        runh(list): column headers for run data.
+        dat(dict): containing lists with output variables for each dat id.
+        dath(list): column headers for dat data.
+        model(dict): containing sub-dicts for each model_type (TGC, etc) which
+            in turn contain sub-dicts for ModelFile columns.
+        xlspath(str): path to write the workbook to.
+    """
+    # Create a workbook and add the Run worksheet
     w = xlwt.Workbook()
     ws = w.add_sheet('Run')  
+    
+    # Write the run headers
     logger.info('create Worksheet: Run')
     for i, h in enumerate(runh): 
         ws.write(0, i, h)
     
+    # Write the run data for each entry in the dict
     count = 1
     for k, v in run.items():
         max = len(v) - 1
@@ -155,23 +95,30 @@ def newExportToExcel(run, runh, dat, dath, model, xlspath):
                 ws.write(count, j, r)
         count += 1
     
+    # Write the Dat headers
+    logger.info('create Worksheet: Dat')
     ws = w.add_sheet('Dat')
     for i, h in enumerate(dath, 0): 
         ws.write(0, i, h)
     
+    # Write the dat data for each entry in the dict
     count = 1
     for k, v in dat.items():
         for j, d in enumerate(v, 0):
             ws.write(count, j, d)
         count += 1
     
+    # Create a different worksheet for each model_type (TGC, TBC, etc)
     headers = ['Name', 'Date', 'Comments', 'Files', 'New Files']
     for mtype, models in model.items():
         ws = w.add_sheet(mtype)
         
+        # Write the ModelFile headers
+        logger.info('create Worksheet: Dat')
         for i, h in enumerate(headers, 0):
             ws.write(0, i, h)
         
+        # Write the row data for each entry in this model_type
         count = 1
         for k, m in models.items():
             ws.write(count, 0, k)

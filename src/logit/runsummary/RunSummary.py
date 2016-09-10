@@ -162,6 +162,8 @@ class RunSummary_UI(summarywidget.Ui_RunSummaryWidget, AWidget):
     
     def _tablePopup(self, pos):
         """Called by items on the right-click context menu."""
+        index = self.runStatusTable.itemAt(pos)
+        if index is None: return
 
         menu = QtGui.QMenu()
         updateEntryAction = menu.addAction("Update Entry")

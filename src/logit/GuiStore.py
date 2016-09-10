@@ -116,8 +116,11 @@ class TableWidgetDb(QtGui.QTableWidget):
         
         self.setSortingEnabled(False)
         self.setColumnCount(len(cols))
-        self.horizontalHeader().setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.horizontalHeader().customContextMenuRequested.connect(self.showHeaderMenu)
+        
+        # For show/hide columns on RUN table (not available on others)
+        if self.name == 'RUN':
+            self.horizontalHeader().setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+            self.horizontalHeader().customContextMenuRequested.connect(self.showHeaderMenu)
         for k, c in enumerate(cols):
             item = QtGui.QTableWidgetItem()
             item.setTextAlignment(QtCore.Qt.AlignCenter|QtCore.Qt.AlignVCenter)
@@ -326,31 +329,35 @@ class TableWidgetDb(QtGui.QTableWidget):
         Args:
             pos(QPoint): the QPoint of the mouse cursor when clicked.
         """
-        if self.name == 'QUERY': return # At least for the moment
+        index = self.itemAt(pos)
+        if index is None: return
         
         menu = QtGui.QMenu()
-        updateCurrentRowAction = menu.addAction("Save updated row(s)")
-        deleteRowAction = menu.addAction("Delete row")
         
-        # Find who called us and get the object that the name refers to.
-        has_run = False
-        if self.name == "RUN":
-            deleteAllRowAction = menu.addAction("Delete associated entries")
-            updateStatusAction = menu.addAction("Update status")
-            query_menu = menu.addMenu("Query")
-            queryRunDatAction = query_menu.addAction("Dat file")
-            queryRunModelAction = query_menu.addAction("Modelfiles")
-            queryRunModelFilesAction = query_menu.addAction("Modelfiles with Subfiles")
-            queryRunModelNewAction = query_menu.addAction("Modelfiles - New only")
-            queryRunModelFilesNewAction = query_menu.addAction("New Modelfiles with Subfiles")
-            paths_menu = menu.addMenu('Update paths')
-            updateIefRowAction = paths_menu.addAction("Update Ief location")
-            updateTcfRowAction = paths_menu.addAction("Update Tcf location")
-            updateLogRowAction = paths_menu.addAction("Update Logs location")
-            tools_menu = menu.addMenu('Send to tool')
-            extractRowAction = tools_menu.addAction("Extract Model")
-            addToRunSummaryAction = tools_menu.addAction("Run Summary")
-            has_run = True
+        copyAction = menu.addAction("Copy")
+        if not self.name == 'QUERY':
+            updateRowsAction = menu.addAction("Save updates")
+            deleteRowAction = menu.addAction("Delete row")
+            
+            # Find who called us and get the object that the name refers to.
+            has_run = False
+            if self.name == "RUN":
+                deleteAllRowAction = menu.addAction("Delete associated entries")
+                updateStatusAction = menu.addAction("Update status")
+                query_menu = menu.addMenu("Query")
+                queryRunDatAction = query_menu.addAction("Dat file")
+                queryRunModelAction = query_menu.addAction("Modelfiles")
+                queryRunModelFilesAction = query_menu.addAction("Modelfiles with Subfiles")
+                queryRunModelNewAction = query_menu.addAction("Modelfiles - New only")
+                queryRunModelFilesNewAction = query_menu.addAction("New Modelfiles with Subfiles")
+                paths_menu = menu.addMenu('Update paths')
+                updateIefRowAction = paths_menu.addAction("Update Ief location")
+                updateTcfRowAction = paths_menu.addAction("Update Tcf location")
+                updateLogRowAction = paths_menu.addAction("Update Logs location")
+                tools_menu = menu.addMenu('Send to tool')
+                extractRowAction = tools_menu.addAction("Extract Model")
+                addToRunSummaryAction = tools_menu.addAction("Run Summary")
+                has_run = True
         
         has_model = False
         if self.name == 'MODEL' and self.subname != 'DAT':
@@ -362,8 +369,13 @@ class TableWidgetDb(QtGui.QTableWidget):
         
         # Get the action and do whatever it says
         action = menu.exec_(self.viewport().mapToGlobal(pos))
-             
-        if action == updateCurrentRowAction:
+        if action is None: return
+        
+        if action == copyAction:
+            clipboard = QtGui.QApplication.clipboard()
+            clipboard.setText(self.currentItem().text())
+            
+        elif action == updateRowsAction:
             self.saveTableEdits()
             
         elif action == deleteRowAction:

@@ -239,6 +239,9 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
 
     def _loadSingleLogEntry(self, testpath=''):
 
+        if not self.checkDbLoaded():
+            return
+
         # Launch dialog and get a file
         chosen_path = self.cur_location
         if 'model' in gs.path_holder.keys():
@@ -373,6 +376,9 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         choice file dialog by the former or remove the selected items by the
         latter.
         """
+        if not self.checkDbLoaded():
+            return
+        
         if not self._TEST_MODE:
             caller = self.sender()
             call_name = caller.objectName()
@@ -439,6 +445,23 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         
         else:
             logger.info('Caller %s not recongnised' % call_name)
+    
+    
+    def checkDbLoaded(self, show_dialog=True):
+        """Check if there's a database filepath set.
+        
+        If a path is set it will initiate the database.
+        """
+        path, exists = gs.getPath('log')
+        if not exists:
+            if show_dialog:
+                QtGui.QMessageBox.warning(self, "No Database Loaded",
+                        "No log database active. Please load or create one from the file menu.")
+            logger.error('No log database found. Load or create one from File menu')
+            return False
+         
+        else:
+            return True 
     
     
     def _clearMultiErrorText(self):

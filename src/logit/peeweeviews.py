@@ -25,7 +25,7 @@
  Module:          peeweeviews.py 
  Date:            09/08/2016
  Author:          Duncan Runnacles
- Since-Version:   1.0
+ Since-Version:   1.0.0
  
  Summary:
      All of the model view for interacting with the peewee database models.
@@ -107,18 +107,18 @@ def addRun(run, run_hash, ief_dir, tcf_dir, dat=None):
     pm.logit_db.connect()
     # DEBUG
     if dat is not None:
-        r = pm.Run(dat=dat, run_hash=run_hash, setup=run['SETUP'], 
+        r = pm.Run(dat=dat, run_hash=run_hash, setup=run['SETUP'], modeller=run['MODELLER'],
                 ief=run['IEF'], tcf=run['TCF'], isis_results=run['ISIS_RESULTS'], tuflow_results=run['TUFLOW_RESULTS'],
                 estry_results=run['ESTRY_RESULTS'], event_duration=run['EVENT_DURATION'],
-                comments=run['COMMENTS'], isis_version=run['ISIS_BUILD'],
+                comments=run['COMMENTS'], isis_version=run['ISIS_BUILD'], tuflow_version=run['TUFLOW_BUILD'],
                 event_name=run['EVENT_NAME'], ief_dir=ief_dir, tcf_dir=tcf_dir,
                 log_dir=run['LOG_DIR'], run_options=run['RUN_OPTIONS'], 
                 run_status=run['RUN_STATUS'], mb=run['MB'])
     else:
-        r = pm.Run(run_hash=run_hash, setup=run['SETUP'], 
+        r = pm.Run(run_hash=run_hash, setup=run['SETUP'], modeller=run['MODELLER'],
                 ief=run['IEF'], tcf=run['TCF'], isis_results=run['ISIS_RESULTS'], tuflow_results=run['TUFLOW_RESULTS'],
                 estry_results=run['ESTRY_RESULTS'], event_duration=run['EVENT_DURATION'],
-                comments=run['COMMENTS'], isis_version=run['ISIS_BUILD'],
+                comments=run['COMMENTS'], isis_version=run['ISIS_BUILD'], tuflow_version=run['TUFLOW_BUILD'],
                 event_name=run['EVENT_NAME'], ief_dir=ief_dir, tcf_dir=tcf_dir,
                 log_dir=run['LOG_DIR'], run_options=run['RUN_OPTIONS'],
                 run_status=run['RUN_STATUS'], mb=run['MB'])
