@@ -1,3 +1,7 @@
+ - [BUGFIX] Ief files with paths containing =.
+ - [BUGFIX] Run status updates for tcf paths containing run options placeholders.
+ - Updated to SHIP version 0.2.4.
+ - Previous release notes below:
  - New Database setup people. We are officially moving up to 1.0!
  - MASSIVE rewrite of basically everything. 
  - NOTE THIS HAS MEANT THAT IT CANNOT BE BACKWARD COMPATIBLE WITH PREVIOUS 
