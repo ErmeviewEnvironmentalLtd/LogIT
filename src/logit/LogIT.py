@@ -360,7 +360,7 @@ class MainGui(QtGui.QMainWindow):
         run_data = pv.getRunRow(run_id)
         
         # Find the latest values and update the RUN table
-        results = Controller.getRunStatusInfo(run_data['tcf_dir'], run_data['tcf'])
+        results = Controller.getRunStatusInfo(run_data['tcf_dir'], run_data['tcf'], run_data['run_options'])
         if not results[0] and not results[1]:
             msg = "- Failed to update status (ID=%s).\n  Is the TCF_DIR correct and does in contain '_ TUFLOW Simulations.log' file?" % (run_id)
             if show_error:

@@ -221,7 +221,7 @@ def fetchAndCheckModel(open_path, run_options, errors):
         return errors, all_logs
  
     
-def getRunStatusInfo(tcf_dir, tcf_name):
+def getRunStatusInfo(tcf_dir, tcf_name, run_options):
     """Get the status and MB of a simulation.
     
     Checks the tuflow _ TUFLOW Simulations.log file to see if the run has
@@ -239,6 +239,10 @@ def getRunStatusInfo(tcf_dir, tcf_name):
             updated. Or if there was a failure: (False, False, False) for a
             unfound path and (False, True, False) for an incomplete run.  
     """
+    if not run_options.strip() == '':
+        t = os.path.splitext(tcf_name)[0]
+        tcf_name = str(resolveFilenameSEVals(t, run_options))
+    
     sim_file = os.path.join(tcf_dir, '_ TUFLOW Simulations.log')
     if not os.path.exists(sim_file): return False, False, False
     
@@ -248,12 +252,8 @@ def getRunStatusInfo(tcf_dir, tcf_name):
             for line in f:
                 
                 if not 'Licence Change' in line and not 'Started' in line:
-                    vals = line.split('  ') # Two spaces minimum
-                    for v in vals:
-                        item = v.strip()
-                        if item == tcf_name:
-                            tcf_line = line
-                        
+                    if tcf_name.upper() in line.upper():
+                        tcf_line = line
         
     except IOError:
         logger.warning('Could not load _TUFLOW Simulations.log file')
