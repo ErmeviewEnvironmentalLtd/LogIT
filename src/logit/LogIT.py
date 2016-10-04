@@ -1011,7 +1011,7 @@ class MainGui(QtGui.QMainWindow):
                     shutil.copy(temp_copy, gs.path_holder['log'])
                 except IOError, err:
                     logger.warning('Could not reinstate backup!')
-                    p = os.normpath(TEMP_PATH)
+                    p = os.path.normpath(TEMP_PATH)
                     msg = "Couln't auto-reinstate the backup, but you can find\nit here and do it manually:\n" + p
                     self.launchQMsgBox('Backup failure', msg)
                 return
@@ -1030,10 +1030,8 @@ class MainGui(QtGui.QMainWindow):
         them to the database.        
         """
         # Check that we have a database
-        if not self.checkDbLoaded(): 
-            if self._TEST_MODE: return errors
-            else:
-                return
+        if not self.checkDbLoaded():
+            return
             
         temp_copy = os.path.join(TEMP_PATH, os.path.basename(gs.path_holder['log']))
         try:
@@ -1076,7 +1074,7 @@ class MainGui(QtGui.QMainWindow):
                 all_logs.run['TUFLOW_BUILD'] = input_vars['TUFLOW_BUILD'] 
                 all_logs.run['ISIS_BUILD'] = input_vars['ISIS_BUILD']
                 all_logs.run['EVENT_NAME'] = input_vars['EVENT_NAME'] 
-                all_logs.run['RUN_OPTIONS'] = run_options 
+                all_logs.run['RUN_OPTIONS'] = all_logs.run['RUN_OPTIONS'] 
 
                 if all_logs.dat is not None:
                     dat = pv.addDat(all_logs.dat)
@@ -1105,7 +1103,7 @@ class MainGui(QtGui.QMainWindow):
                 shutil.copy(temp_copy, gs.path_holder['log'])
             except IOError, err:
                 logger.error('Cound not reinstate backup!')
-                p = os.normpath(TEMP_PATH)
+                p = os.path.normpath(TEMP_PATH)
                 msg = "Couldn't auto-reinstate the backup, but you can find\nit here and do it manually:\n" + p
                 self.launchQMsgBox('Backup failure', msg)
             

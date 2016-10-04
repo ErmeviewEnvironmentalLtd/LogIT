@@ -211,9 +211,9 @@ def fetchAndCheckModel(open_path, run_options, errors):
         all_logs.run['RUN_STATUS'] = 'Unknown'
         all_logs.run['MB'] = -9999.0
         if not all_logs.run['TCF'].strip() == '':
-            tcf_name = all_logs.run['TCF']
-            tcf_dir = all_logs.tcf_dir
-            outputs = getRunStatusInfo(all_logs.tcf_dir, all_logs.run['TCF'])
+#             tcf_name = all_logs.run['TCF']
+#             tcf_dir = all_logs.tcf_dir
+            outputs = getRunStatusInfo(all_logs.tcf_dir, all_logs.run['TCF'], all_logs.run['RUN_OPTIONS'])
             if outputs[0]:
                 all_logs.run['RUN_STATUS'] = outputs[1]
                 all_logs.run['MB'] = outputs[2]
@@ -295,21 +295,6 @@ def loadSetup(settings_path, errors):
         logger.error('Could not load settings file')
         return cur_settings, errors
     
-    
-def exportToExcel(): #db_path, export_tables, save_path, errors):
-    """Export database to Excel (.xls) format at user chosen location.
-    :param cur_log_path: the current log database file path.
-    :param export_tables: list with order to create worksheet.
-    :return dictionary containing error_details (or success details if
-            error_details['Success'] is True.
-    :note: launches file dialog.
-    """
-    xlspath = r'C:/Users/duncan.runnacles/Desktop/TEMP/logit/db/excel_out.xls'
-    run_out, run_header, dat_out, dat_header, model_out = pv.createModelSubFileTable()
-    Exporters.newExportToExcel(run_out, run_header, dat_out, dat_header, model_out, xlspath)
-    
-
-
 
 def checkVersionInfo(version, version_path):
     """Tests whether this is up to date with the version info on the server."""

@@ -309,6 +309,7 @@ class ModelLoader(object):
         
         if self.log_type == TYPE_TUFLOW:
             run_cols = self.buildTuflowRun(run_cols)
+            run_cols['RUN_OPTIONS'] = self.run_options
             
         return [run_cols], dat
     
