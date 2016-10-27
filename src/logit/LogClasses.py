@@ -73,6 +73,7 @@ class AllLogs(object):
         self.run_hash = None
         self.run = None
         self.dat = None
+        self.ieds = []
         self.models = []
         
     
@@ -89,6 +90,9 @@ class AllLogs(object):
             elif e['TYPE'] == 'DAT':
                 if e['NAME'].strip() != '':
                     self.dat = e
+            elif e['TYPE'] == 'IED':
+                self.ieds.append(e)
+                self.ieds[-1]['INDEX'] = len(self.ieds) - 1
             else:
                 self.models.append(e)
                 self.models[-1]['INDEX'] = len(self.models) - 1
@@ -134,6 +138,11 @@ class AllLogs(object):
             for k, v in values.items():
                 if k in self.editing_allowed:
                     self.dat[k] = v
+        
+        elif entry == 'IED':
+            for k, v in values.items():
+                if k in self.editing_allowed:
+                    self.ieds[int(values['INDEX'])][k] = v
             
         else:
             for k, v in values.items():

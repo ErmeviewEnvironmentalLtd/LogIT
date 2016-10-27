@@ -194,6 +194,8 @@ class TableWidgetDb(QtGui.QTableWidget):
                     elif self.name == 'MODEL':
                         if self.subname == 'DAT':
                             pv.updateDatRow(keep_cells, id)
+                        if self.subname == 'IED':
+                            pv.updateIedRow(keep_cells, id)
                         else:
                             pv.updateModelRow(keep_cells, id)
                     
@@ -241,7 +243,7 @@ class TableWidgetDb(QtGui.QTableWidget):
                 self.emit(QtCore.SIGNAL("statusUpdate"), 'Deleting Run and Model files ...')
                 pv.deleteRunRow(int(row_id), delete_recursive=all_entry)
                 self.emit(QtCore.SIGNAL("statusUpdate"), 'Deleting orphaned files ...')
-                pv.deleteOrphanFiles()
+                pv.deleteOrphanFiles(int(row_id))
                 self.emit(QtCore.SIGNAL("updateProgress"), 2)
                 self.emit(QtCore.SIGNAL("statusUpdate"), 'Recalculating file status ...')
                 pv.updateNewStatus()
@@ -249,6 +251,8 @@ class TableWidgetDb(QtGui.QTableWidget):
                 self.emit(QtCore.SIGNAL("updateProgress"), 0)
 
             except Exception, err:
+                self.emit(QtCore.SIGNAL("statusUpdate"), 'Delete failed')
+                self.emit(QtCore.SIGNAL("updateProgress"), 0)
                 msg = ('There was an issue deleting some of the components of ' +
                        'this run.\nYou should run the Clean Database tool to ' +
                        'make sure all orphaned files have been removed.')
@@ -346,6 +350,7 @@ class TableWidgetDb(QtGui.QTableWidget):
                 updateStatusAction = menu.addAction("Update status")
                 query_menu = menu.addMenu("Query")
                 queryRunDatAction = query_menu.addAction("Dat file")
+                queryRunIedAction = query_menu.addAction("Ied files")
                 queryRunModelAction = query_menu.addAction("Modelfiles")
                 queryRunModelFilesAction = query_menu.addAction("Modelfiles with Subfiles")
                 queryRunModelNewAction = query_menu.addAction("Modelfiles - New only")
@@ -360,7 +365,7 @@ class TableWidgetDb(QtGui.QTableWidget):
                 has_run = True
         
         has_model = False
-        if self.name == 'MODEL' and self.subname != 'DAT':
+        if self.name == 'MODEL' and self.subname != 'DAT' and self.subname != 'IED':
             query_menu = menu.addMenu("Query")
             queryModelFilesAction = query_menu.addAction("Subfiles")
             queryModelFilesNewAction = query_menu.addAction("Subfiles - New only")
@@ -394,7 +399,7 @@ class TableWidgetDb(QtGui.QTableWidget):
             
             if action == queryRunModelFilesNewAction or action == queryRunModelFilesAction or \
                         action == queryRunModelAction  or action == queryRunModelNewAction  or \
-                        action == queryRunDatAction:
+                        action == queryRunDatAction or action == queryRunIedAction:
                 row = self.currentRow()
                 id = str(self.item(row, self.id_col).text())
                 self.emit(QtCore.SIGNAL("queryRunTable"), str(action.text()), int(id))

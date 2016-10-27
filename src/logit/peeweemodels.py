@@ -39,6 +39,7 @@
 ###############################################################################
 """
 import  sqlite3
+import traceback
 
 import logging
 logger = logging.getLogger(__name__)
@@ -50,7 +51,7 @@ from datetime import datetime as dt
 logit_db = SqliteDatabase(None)
 """ Database object """
 
-DATABASE_VERSION_NO = 20
+DATABASE_VERSION_NO = 21
 """ Database version number """
 
 NEW_DB_START = 20
@@ -74,6 +75,7 @@ DATABASE_VERSION_OLD = 3
 class LogitModel(Model):
     class Meta:
         database = logit_db
+        
 
 class Dat(LogitModel):
     name = CharField(primary_key=True, index=True)
@@ -89,6 +91,7 @@ class Run(LogitModel):
     comments = TextField(default='')
     ief = CharField(default='')
     tcf = CharField(default='')
+    initial_conditions = CharField(default='')
     isis_results = CharField(default='')
     tuflow_results = CharField(default='')
     estry_results = CharField(default='')
@@ -107,7 +110,6 @@ class Run(LogitModel):
     
 
 class ModelFile(LogitModel):
-    
     name = CharField(primary_key=True, index=True)
     model_type = CharField()
     comments = TextField(default='')
@@ -116,6 +118,14 @@ class ModelFile(LogitModel):
 
 class SubFile(LogitModel):
     name = CharField(primary_key=True, index=True)
+    timestamp = DateTimeField(default=dt.now)
+    
+    
+class Ied(LogitModel):
+    name = CharField(primary_key=True, index=True)
+    ref = CharField(default='')
+    amendments = TextField(default='')
+    comments = TextField(default='')
     timestamp = DateTimeField(default=dt.now)
 
     
@@ -133,11 +143,24 @@ class Run_ModelFile(LogitModel):
     timestamp = DateTimeField(default=dt.now)
 
 
+class Run_SubFile(LogitModel):
+    run = ForeignKeyField(Run, index=True)
+    sub_file = ForeignKeyField(SubFile, index=True)
+    timestamp = DateTimeField(default=dt.now)
+
+
+class Run_Ied(LogitModel):
+    run = ForeignKeyField(Run, index=True)
+    ied = ForeignKeyField(Ied, index=True)
+    timestamp = DateTimeField(default=dt.now)
+
+
+
 '''
  Functions
 '''
 def getAllTables():
-    return [Run, Dat, ModelFile, SubFile, Run_ModelFile, ModelFile_SubFile]
+    return [Run, Dat, Ied, ModelFile, SubFile, Run_ModelFile, ModelFile_SubFile, Run_SubFile, Run_Ied]
 
 def createTable(table, connect_db=True):
     """Create a single table."""
@@ -151,6 +174,18 @@ def createTableList(tables, connect_db=True):
     logit_db.connect()
     logit_db.create_tables(tables)
     logit_db.close()
+    
+
+# def updatePragmaUserVersion(db_path):
+#     """Sets the pragma version tag to current database value"""
+#     
+#     conn = None
+#     success = True
+#     try:
+#         conn = sqlite3.connect(dbpath)
+#         cur = conn.cursor() 
+#         cur.execute("pragma user_version = %s" % DATABASE_VERSION_NO)
+#         logger.info("Database user_version updated to: %s" % (DATABASE_VERSION_NO))
 
 
 def createNewDb(db_path):

@@ -172,6 +172,8 @@ from extractmodel import ModelExtractor
 logger.debug('Extract Model import complete')
 from runsummary import RunSummary
 logger.debug('Run Summary import complete')
+import dbmigrations
+logger.debug('db migrations import complete')
 
 import peeweemodels as pm
 import peeweeviews as pv
@@ -212,7 +214,7 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionLoad.triggered.connect(self._loadNewModelLog)
         self.ui.actionExportToExcel.triggered.connect(self._exportDatabase)
         self.ui.actionNewModelLog.triggered.connect(self._createNewLogDatabase)
-#         self.ui.actionUpdateDatabaseSchema.triggered.connect(self._updateDatabaseVersion)
+        self.ui.actionUpdateDatabaseSchema.triggered.connect(self._updateDatabaseVersion)
         self.ui.actionCleanDatabase.triggered.connect(self.cleanDatabase)
         self.ui.actionSaveSetupAs.triggered.connect(self._saveSetup)
         self.ui.actionLoadSetup.triggered.connect(self._loadSetup)
@@ -546,6 +548,11 @@ class MainGui(QtGui.QMainWindow):
             index = self.ui.queryTableCbox.findText('DAT', QtCore.Qt.MatchFixedString)
             if index >= 0: self.ui.queryTableCbox.setCurrentIndex(index)
             table = 'DAT'
+
+        if query_type == 'Ied files':
+            index = self.ui.queryTableCbox.findText('IED', QtCore.Qt.MatchFixedString)
+            if index >= 0: self.ui.queryTableCbox.setCurrentIndex(index)
+            table = 'IED'
         
         elif query_type == 'Modelfiles':
             self.ui.queryFileCheck.setChecked(False)
@@ -598,9 +605,9 @@ class MainGui(QtGui.QMainWindow):
         Called when a change is made to the queryTableCbox (table combo).
         """
         txt = str(self.ui.queryTableCbox.currentText())
-        if txt == 'DAT' or txt == 'RUN Options' or txt == 'RUN Event':
+        if txt == 'DAT' or txt =='IED' or txt == 'RUN Options' or txt == 'RUN Event':
             self.ui.queryFileCheck.setChecked(False)
-            if txt != 'DAT':
+            if txt != 'DAT' and txt != 'IED':
                 self.ui.queryFilterRunCbox.setChecked(False)
             
         
@@ -622,7 +629,8 @@ class MainGui(QtGui.QMainWindow):
         use_runid = self.ui.queryFilterRunCbox.isChecked()
         run_id = -1
         if use_runid: run_id = self.ui.queryRunIdSbox.value()
-        if self.ui.queryFileTextbox.isEnabled() and table != 'DAT' and\
+        if self.ui.queryFileTextbox.isEnabled() and table != 'DAT' and \
+                                table != 'IED' and \
                                 table != 'Run Options' and table != 'Run Event':
             cols, rows = pv.getSimpleQuery(table, q1_vtext, with_files, new_sub_only, new_model_only, run_id, q2_vtext)
         else:
@@ -693,10 +701,11 @@ class MainGui(QtGui.QMainWindow):
                    'Please upgrade to a newer version.')
             success = False
         elif version == pm.DATABASE_VERSION_LOW:
-            msg = ('This database needs upgrading. Please contact anyone but Duncan.')
+            msg = ('This database needs updating. Please contact anyone but Duncan.')
             success = False
         
         if not success:
+            del gs.path_holder['log']
             self.launchQMsgBox('Database version error', msg)
         
         return success
@@ -720,8 +729,18 @@ class MainGui(QtGui.QMainWindow):
     def _loadModelLog(self):
         """Reload the Run and Model tables."""
         if not self.checkDbLoaded(): return
-        self.loadModelDb()
-        self.loadRunDb()
+        
+        try:
+            self.loadModelDb()
+            self.loadRunDb()
+        except Exception, err:
+            logger.error("Critical error loading database")
+            logger.exception(err)
+            pm.logit_db.init(None)
+            gs.path_holder['last_path'] = gs.path_holder['log']
+            del gs.path_holder['log']
+            msg = "Critical error accessing database! - please check it exists and/or contact distributor"
+            self.launchQMsgBox('DB Load Error', msg)
     
     def checkDbLoaded(self, show_dialog=True):
         """Check if there's a database filepath set.
@@ -992,6 +1011,7 @@ class MainGui(QtGui.QMainWindow):
                     dat = None
                 run = pv.addRun(all_logs.run, all_logs.run_hash, all_logs.ief_dir, 
                                 all_logs.tcf_dir, dat)
+                pv.addAllIed(all_logs.ieds, run)
                 pv.addAllModel(all_logs.models, run)
 
                 # Add the new entries to the view table as well
@@ -1002,7 +1022,7 @@ class MainGui(QtGui.QMainWindow):
                 msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
                        "all gone terribly wrong. You're on your own dude.\n" +
                        "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
-                       "Game over man, I'm outta here <-((+_+))->")
+                       "<-((+_+))->")
                 logger.error('Critical error in create log entry')
                 logger.exception(err)
                 self.launchQMsgBox('Critical Error', msg)
@@ -1082,6 +1102,7 @@ class MainGui(QtGui.QMainWindow):
                     dat = None
                 run = pv.addRun(all_logs.run, all_logs.run_hash, all_logs.ief_dir, 
                                 all_logs.tcf_dir, dat)
+                pv.addAllIed(all_logs.ieds, run)
                 pv.addAllModel(all_logs.models, run)
 
                 if errors.has_local_errors:
@@ -1095,7 +1116,7 @@ class MainGui(QtGui.QMainWindow):
             msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
                    "all gone terribly wrong. You're on your own dude.\n" +
                    "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
-                   "Game over man, I'm outta here <-((+_+))->")
+                   "<-((+_+))->")
             logger.error('Critical error in multiple model load.')
             logger.exception(err)
             try:
@@ -1315,6 +1336,85 @@ class MainGui(QtGui.QMainWindow):
         except Exception, err:
             logger.warning('Cleanup database fail')
             logger.exception(err)
+    
+    
+    def _updateDatabaseVersion(self):
+        """Update to the latest version of the database.
+        
+        A backup copy is created at the start and restored if the upgrade fails.
+        
+        Collects a list of all of the migration functions from the dbmigrations
+        module and then loops them calling each one in order.
+        """
+        # Get the database to update
+        current_log = None
+        p = gs.path_holder['last_path']
+        path, exists = gs.getPath('log')
+        if exists: 
+            current_log = path
+            p = path
+        d = MyFileDialogs(parent=self)
+        dbpath = d.openFileDialog(path=p, 
+                file_types='Logit Database (*.logdb)')
+        if dbpath == False:
+            return
+        
+        # Get the migration we need to apply
+        pm.logit_db.init(None)
+        update_funcs = dbmigrations.getRequiredUpdates(dbpath)
+        # Check that we can update it
+        if update_funcs == pm.DATABASE_VERSION_HIGH:
+            msg = "This datatbase was made with a newer version of logit please update the software"
+        elif update_funcs == pm.DATABASE_VERSION_OLD:
+            msg = "This database was made with logit version < 1.0 and cannot be updated."
+        elif update_funcs == pm.DATABASE_VERSION_SAME:
+            msg = "This database is already up to date"
+            msg = "This database is already the latest version"
+            self.launchQMsgBox('DB Update', msg)
+            return
+        
+        total_updates = len(update_funcs)
+        update_count = 1
+        pm.logit_db.init(dbpath)
+        self._updateMaxProgress(5)
+        
+        # Create a backup copy
+        self._updateCurrentProgress(1)
+        self._updateStatusBar('Creating backup copy of database')
+        path_vars = os.path.split(dbpath)
+        name_vars = os.path.splitext(path_vars[1])
+        backup_name = os.path.join(path_vars[0], name_vars[0] + 'backup' + name_vars[1])
+        try:
+            shutil.copyfile(dbpath, backup_name)
+        except Exception, err:
+            logger.exception(err)
+            self.launchQMsgBox('Backup Failed', "Could not backup database is it open?\nUpdate Terminated.")
+            self._updateCurrentProgress(0)
+            self._updateStatusBar('Update Failed')
+            return
+        
+        # Run the database migrations
+        try:
+            for func in update_funcs:
+                self._updateCurrentProgress(update_count + 1)
+                self._updateStatusBar('Applying update %s of %s' % (update_count, total_updates))
+                func()
+                update_count += 1
+            
+            # Update the database version number
+            pm.logit_db.init(None)
+            pm.createNewDb(dbpath)
+            pm.logit_db.init(dbpath)
+            self._loadModelLog()
+        except Exception, err:
+            logger.exception(err)
+            # Restore the backup copy if it fails
+            shutil.copyfile(backup_name, dbpath)
+            self.launchQMsgBox('Update Failed', "Could not complete update.\nlogdb file reset with backup.")
+        finally:
+            self._updateCurrentProgress(0)
+            self._updateStatusBar('Update complete')
+        
           
     def _resolveIefs(self):
         """Attempt to automatically update ief files references to current dir.

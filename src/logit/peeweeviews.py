@@ -52,7 +52,7 @@ from playhouse import shortcuts
 import peeweemodels as pm
 
 
-TABLE_CHOICE = ['', 'DAT', 'TCF', 'ECF', 'TGC', 'TBC', 'BC_DBASE', 'TEF', 'TRD']
+TABLE_CHOICE = ['', 'DAT', 'IED', 'TCF', 'ECF', 'TGC', 'TBC', 'BC_DBASE', 'TEF', 'TRD']
 QUERY_CHOICE = ['', 'TCF', 'ECF', 'TGC', 'TBC', 'BC_DBASE', 'TEF', 'TRD']
 DAT_FIELDS = {'name': pm.Dat.name, 'amendments': pm.Dat.amendments, 'comments': pm.Dat.comments}
 MODEL_FIELDS = {'name': pm.ModelFile.name, 'model_type': pm.ModelFile.model_type, 'comments': pm.ModelFile.comments, 'files': None}
@@ -108,7 +108,8 @@ def addRun(run, run_hash, ief_dir, tcf_dir, dat=None):
     # DEBUG
     if dat is not None:
         r = pm.Run(dat=dat, run_hash=run_hash, setup=run['SETUP'], modeller=run['MODELLER'],
-                ief=run['IEF'], tcf=run['TCF'], isis_results=run['ISIS_RESULTS'], tuflow_results=run['TUFLOW_RESULTS'],
+                ief=run['IEF'], tcf=run['TCF'], initial_conditions=run['INITIAL_CONDITIONS'], 
+                isis_results=run['ISIS_RESULTS'], tuflow_results=run['TUFLOW_RESULTS'],
                 estry_results=run['ESTRY_RESULTS'], event_duration=run['EVENT_DURATION'],
                 comments=run['COMMENTS'], isis_version=run['ISIS_BUILD'], tuflow_version=run['TUFLOW_BUILD'],
                 event_name=run['EVENT_NAME'], ief_dir=ief_dir, tcf_dir=tcf_dir,
@@ -116,7 +117,8 @@ def addRun(run, run_hash, ief_dir, tcf_dir, dat=None):
                 run_status=run['RUN_STATUS'], mb=run['MB'])
     else:
         r = pm.Run(run_hash=run_hash, setup=run['SETUP'], modeller=run['MODELLER'],
-                ief=run['IEF'], tcf=run['TCF'], isis_results=run['ISIS_RESULTS'], tuflow_results=run['TUFLOW_RESULTS'],
+                ief=run['IEF'], tcf=run['TCF'], initial_conditions=run['INITIAL_CONDITIONS'], 
+                isis_results=run['ISIS_RESULTS'], tuflow_results=run['TUFLOW_RESULTS'],
                 estry_results=run['ESTRY_RESULTS'], event_duration=run['EVENT_DURATION'],
                 comments=run['COMMENTS'], isis_version=run['ISIS_BUILD'], tuflow_version=run['TUFLOW_BUILD'],
                 event_name=run['EVENT_NAME'], ief_dir=ief_dir, tcf_dir=tcf_dir,
@@ -125,6 +127,40 @@ def addRun(run, run_hash, ief_dir, tcf_dir, dat=None):
     r.save()
     pm.logit_db.close()
     return r
+
+
+def addAllIed(ieds, run):
+    """Add all of the provided Ied files to the database.
+    
+    Updates the Ied entries and Run_Ied many to many entries.
+    
+    Will only add a new entry to the Ied table if the name doesn't already
+    exist.
+    
+    Args:
+        ieds(list): containing dictionaries with values to update with.
+        run(int): the Run.id to use as foreign key in the Run_ModelFile table.
+    """
+    ied_datasource = []
+    ri_datasource = []
+    found_ieds = []
+    
+    for i in ieds:
+        if not i['NAME'] in found_ieds and not iedExists(i['NAME']):
+            ied_datasource.append({'name': i['NAME'], 'ref': i['REF'], 'amendments': i['AMENDMENTS'], 'comments': i['COMMENTS']})
+            found_ieds.append(i['NAME'])
+            ri_datasource.append({'run': run, 'ied': i['NAME'], 'new_file': True})
+        else:
+            ri_datasource.append({'run': run, 'ied': i['NAME'], 'new_file': False})
+    
+    # Use atomic for create calls - MASSIVE write speed increase.
+    if ied_datasource or ri_datasource:
+        with pm.logit_db.atomic():
+            for data_dict in ied_datasource:
+                pm.Ied.create(**data_dict)
+            for data_dict in ri_datasource:
+                pm.Run_Ied.create(**data_dict)
+        
 
 def addAllModel(mfiles, run):
     """Add all of the provided models to the database.
@@ -154,13 +190,15 @@ def addAllModel(mfiles, run):
     """    
     model_datasource = []
     files_datasource = []
-    mf_datasource = []
-    rm_datasource = []
+    mf_datasource = []      # Modelfile_SubFile
+    rm_datasource = []      # Run_ModelFile
+    rs_datasource = []      # Run_SubFile
     
     found_models = []
     found_files = []
     found_modelfiles = []
-    found_runmodels = []
+    
+    # Loop all of the model files
     for m in mfiles:
         if not m['NAME'] in found_models and not modelExists(m['NAME']): 
             model_datasource.append({'name': m['NAME'], 'model_type': m['TYPE'], 'comments': m['COMMENTS']})
@@ -168,20 +206,27 @@ def addAllModel(mfiles, run):
             rm_datasource.append({'run': run, 'model_file': m['NAME'], 'new_file': True})
         else:
             rm_datasource.append({'run': run, 'model_file': m['NAME'], 'new_file': False})
-            continue
         
+        # Loop all of the subfiles
         for f in m['FILES']:
             first_time = False
+            
+            # Add to Run_SubFile list and check new status
+            rs_datasource.append({'run': run, 'sub_file': f})
             if subFileIsNew(m['TYPE'], f):
                 first_time = True
+            
+            # Add to SubFile list
             if not f in found_files and not subfileExists(f):
                 files_datasource.append({'name': f})
                 found_files.append(f)
+            
+            # Add to ModelFile_Subfile list
             if not ((m['NAME'] + f) in found_modelfiles) and  not modelSubfileExists(m['NAME'], f):
                 mf_datasource.append({'model_file': m['NAME'], 'sub_file': f, 'new_file': first_time})
                 found_modelfiles.append(m['NAME'] + f)
             
-        
+    # Use atomic for create calls - MASSIVE write speed increase.
     with pm.logit_db.atomic():
         for data_dict in model_datasource:
             pm.ModelFile.create(**data_dict)
@@ -191,6 +236,8 @@ def addAllModel(mfiles, run):
             pm.ModelFile_SubFile.create(**data_dict)
         for data_dict in rm_datasource:
             pm.Run_ModelFile.create(**data_dict)
+        for data_dict in rs_datasource:
+            pm.Run_SubFile.create(**data_dict)
             
 
 def subFileIsNew(mtype, fname):
@@ -237,7 +284,14 @@ def datExists(name):
     else:
         return False
 
-def allModelsExists(names):
+def iedExists(name):
+    query = pm.Ied.select().where(pm.Ied.name == name)
+    if query.exists():
+        return True
+    else:
+        return False
+
+def allModelsExists(name):
     
     query = pm.ModelFile.select().where(pm.ModelFile.name == name)
     if query.exists():
@@ -269,6 +323,13 @@ def runModelFileExists(r, m):
 
 def modelSubfileExists(m, s):
     query = pm.ModelFile_SubFile.select().where((pm.ModelFile_SubFile.model_file_id == m) & (pm.ModelFile_SubFile.sub_file_id == s))
+    if query.exists():
+        return True
+    else:
+        return False
+
+def RunSubfileExists(r, s):
+    query = pm.Run_SubFile.select().where((pm.Run_SubFile.run_file_id == r) & (pm.Run_SubFile.sub_file_id == s))
     if query.exists():
         return True
     else:
@@ -314,8 +375,10 @@ def deleteRunRow(run_id, delete_recursive=False):
     """
     pm.logit_db.connect()
     
-    mdel = []
+    model_del = []
+    ied_del = []
     dat = None
+    r = None
     try:
         r = pm.Run.get(pm.Run.id == run_id)
     except Exception, err:
@@ -331,6 +394,9 @@ def deleteRunRow(run_id, delete_recursive=False):
             # If that dat isn't referenced in any other runs
             if pm.Run.select().filter(dat=run_d.name).count() < 2:
                 dat = run_d.name
+        
+#         # Get all the run_subfile's referenced
+#         sq = pm.Run_SubFile.select().where(pm.Run_SubFile.run_id == run_id)
 
         # Get all modelfile's and a count of how many times there are referenced
         mq = (pm.Run_ModelFile
@@ -341,15 +407,27 @@ def deleteRunRow(run_id, delete_recursive=False):
         # TODO: VERY slow. Must try harder
         for m in mq:
             if m.count < 2 and m.run_id == run_id:
-                mdel.append(m.model_file_id)
+                model_del.append(m.model_file_id)
+        
+        # Do the same for ied files
+        iq = (pm.Run_Ied
+                .select(pm.Run_Ied.run_id, pm.Run_Ied.ied_id, fn.Count(pm.Run_Ied.ied_id).alias('count'))
+                .group_by(pm.Run_Ied.ied_id)
+             )
+        for i in iq:
+            if i.count < 2 and i.run_id == run_id:
+                ied_del.append(i.ied_id)
+        
 
     r.delete_instance(recursive=delete_recursive)
     
     with pm.logit_db.atomic():
         if dat is not None: 
             deleteDatRow(dat)
-        for m in mdel:
+        for m in model_del:
             deleteModelRow(m, remove_orphans=False)
+        for i in ied_del:
+            deleteIedRow(i, remove_orphans=False)
 
     pm.logit_db.close()
     
@@ -368,6 +446,20 @@ def deleteDatRow(dat_name):
     pm.logit_db.close()
     
 
+def deleteIedRow(ied_name, remove_orphans=True):
+    """Delete a record in the Ied table.
+    
+    Deletes the specified Ied record.
+    
+    Args:
+        ied_name(str): the Ied.name to query against.
+    """
+    pm.logit_db.connect()
+    i = pm.Ied.get(pm.Ied.name == ied_name)
+    i.delete_instance()
+    pm.logit_db.close()
+    
+
 def deleteModelRow(model_name, remove_orphans=True):
     """Delete a record in the ModelFile table.
     
@@ -383,12 +475,12 @@ def deleteModelRow(model_name, remove_orphans=True):
     
     # Delete any orphaned subfiles
     if remove_orphans:
-        delete_orphans(execute=True)
+        deleteOrphanFiles(execute=True)
     
     pm.logit_db.close()
 
 
-def deleteOrphanFiles(execute=True):
+def deleteOrphanFiles(run_id=-1, execute=True):
     """Find any orphaned file references and delete them from the database.
     
     Checks the SubFile table for and SubFile.name values that aren't in the
@@ -404,6 +496,22 @@ def deleteOrphanFiles(execute=True):
     q = pm.SubFile.delete().where(~(pm.SubFile.name << subs))
     if execute:
         q.execute()
+    # Need to clean up the subfile entries as well
+    subs = pm.Run_SubFile.select(pm.Run_SubFile.sub_file_id)
+    q = pm.SubFile.delete().where(~(pm.SubFile.name << subs))
+    if execute:
+        q.execute()
+    
+    if not run_id == -1:
+        # Delete all of the run references subfile (Run_SubFile)
+        rsquery = pm.Run_SubFile.delete().where(pm.Run_SubFile.run_id == run_id)
+        if execute:
+            rsquery.execute()
+    
+        # Delete all of the run referencd ied files (Run_Ied)
+        iquery = pm.Run_Ied.delete().where(pm.Run_Ied.run_id == run_id)
+        if execute:
+            iquery.execute()
     
     pm.logit_db.close()
     
@@ -498,6 +606,19 @@ def updateDatRow(updateDict, dat_name):
     pm.logit_db.close()
     
 
+def updateIedRow(updateDict, ied_name):
+    """Update values in the Ied table.
+    
+    Args:
+        updateDict(dict): containing {fieldname: value} pairs for updating.
+        ied_name(str): the Ied.name value to query.
+    """
+    pm.logit_db.connect()
+    query = pm.Ied.update(**updateDict).where(pm.Ied.name == ied_name)
+    query.execute()
+    pm.logit_db.close()
+
+
 def updateModelRow(updateDict, model_name):
     """Update values in the ModelFile table.
     
@@ -522,10 +643,10 @@ def getRunData():
     
     cols = [
         'id', 'timestamp', 'run_hash', 'run_options', 'event_name', 
-        'setup', 'comments', 'ief', 'tcf', 'isis_results', 'tuflow_results', 
-        'estry_results', 'event_duration', 'modeller', 'isis_version',
-        'tuflow_version', 'ief_dir', 'tcf_dir', 'log_dir', 'run_status',
-        'mb'
+        'setup', 'comments', 'ief', 'tcf', 'initial_conditions', 'isis_results', 
+        'tuflow_results', 'estry_results', 'event_duration', 'modeller', 
+        'isis_version', 'tuflow_version', 'ief_dir', 'tcf_dir', 'log_dir', 
+        'run_status', 'mb'
     ]
     rows = []
     for r in rquery:
@@ -533,7 +654,7 @@ def getRunData():
             [
              r.id, r.timestamp.strftime("%Y-%m-%d %H:%M:%S"), r.run_hash,
              r.run_options, r.event_name, r.setup, r.comments, r.ief, r.tcf, 
-             r.isis_results, r.tuflow_results, r.estry_results, 
+             r.initial_conditions, r.isis_results, r.tuflow_results, r.estry_results, 
              r.event_duration, r.modeller, 
              r.isis_version, r.tuflow_version, r.ief_dir,
              r.tcf_dir, r.log_dir, r.run_status, r.mb
@@ -560,6 +681,13 @@ def getModelData(model):
         rows = []
         for r in mquery:
             rows.append([r.timestamp.strftime("%Y-%m-%d %H:%M:%S"), r.name, r.amendments, r.comments])
+    
+    elif model == 'IED':
+        mquery = pm.Ied.select()
+        cols = ['timestamp', 'name', 'ref', 'amendments', 'comments']
+        rows = []
+        for r in mquery:
+            rows.append([r.timestamp.strftime("%Y-%m-%d %H:%M:%S"), r.name, r.ref, r.amendments, r.comments])
     
     else:
         mquery = pm.ModelFile.select().where(pm.ModelFile.model_type == model)
@@ -619,6 +747,26 @@ def getSimpleQuery(table, value1, with_files, new_sub_only, new_model_only, run_
             for r in query:
                 rows.append([r.timestamp.strftime("%Y-%m-%d %H:%M:%S"), r.name, r.amendments, r.comments])
     
+    elif table == 'IED':
+        rows = []
+        
+        # If using a run_id we need to join the Run_ModelFile table too
+        if run_id != -1:
+            query = (pm.Run_Ied
+                    .select(pm.Run_Ied, pm.Ied)
+                    .join(pm.Ied)
+                    .switch(pm.Run_Ied)
+                    .where(pm.Run_Ied.run_id == run_id)
+                    )
+            cols = ['Run ID', 'Date', 'Name', 'Ref', 'Amendments', 'Comments']
+            for r in query:
+                rows.append([r.run_id, r.timestamp.strftime("%Y-%m-%d %H:%M:%S"), r.ied.name, r.ied.ref, r.ied.amendments, r.ied.comments])
+        else:
+            query = pm.Ied.select()
+            cols = ['Date', 'Name', 'Ref', 'Amendments', 'Comments']
+            for r in query:
+                rows.append([r.timestamp.strftime("%Y-%m-%d %H:%M:%S"), r.name, r.ref, r.amendments, r.comments])
+    
     elif table == 'RUN Options' or table == 'RUN Event':
 
         query = pm.Run.select()
@@ -638,14 +786,17 @@ def getSimpleQuery(table, value1, with_files, new_sub_only, new_model_only, run_
         # value2 param will be needed
         if with_files:
            
-            # If using a run_id we need to join the Run_ModelFile table too
+            # If using a run_id we need to join the Run_ModelFile and Run_Subfile 
+            # tables too
             if run_id != -1:
                 query = (pm.ModelFile_SubFile
-                        .select(pm.ModelFile_SubFile, pm.ModelFile, pm.SubFile, pm.Run_ModelFile)
+                        .select(pm.ModelFile_SubFile, pm.ModelFile, pm.SubFile, pm.Run_ModelFile, pm.Run_SubFile)
                         .join(pm.SubFile)
                         .switch(pm.ModelFile_SubFile)
                         .join(pm.ModelFile)
                         .join(pm.Run_ModelFile)
+                        .switch(pm.SubFile)
+                        .join(pm.Run_SubFile)
                         )
             else:
                 query = (pm.ModelFile_SubFile
@@ -670,8 +821,11 @@ def getSimpleQuery(table, value1, with_files, new_sub_only, new_model_only, run_
 
                 if new_model_only:
                     query = query.where(pm.Run_ModelFile.new_file == True)
-
+                
+                # Filter model files by run id
                 query = query.where(pm.Run_ModelFile.run_id == run_id)
+                # Filter subfiles by run id
+                query = query .where(pm.Run_SubFile.run_id == run_id)
                 cols = ['Run ID', 'Modelfile Timestamp', 'Model Type', 'Modelfile', 'Modelfile New', 'Comments', 'Subfile', 'Subfile Timestamp', 'Subfile New']
                 for r in query:
                     rows.append([r.model_file.run_modelfile.run_id, r.timestamp.strftime("%Y-%m-%d %H:%M:%S"), r.model_file.model_type, r.model_file.name, r.model_file.run_modelfile.new_file, r.model_file.comments, r.sub_file.name, r.sub_file.timestamp.strftime("%Y-%m-%d %H:%M:%S"), r.new_file])
@@ -825,14 +979,21 @@ def createRunDatExport():
     return run_out, run_header, dat_out, dat_header
  
 
-def checkDatabaseVersion(db_path):
+def checkDatabaseVersion(db_path, return_version=False):
     """Check the database version number to make sure it is the same as the
     current version of the software. If it's not we return False because the
     user needs to either update the database settings or use an older version.
     
     Args:
         db_path: path to an existing database.
+        return_version=False: if True will return a tuple of (status, version)
     
+    Return:
+        int - of database comparison status using the peeweemodels constants
+            of DATABASE_VERSION_HIGH, LOW, SAME.
+            If return_version==True it will return a tuple containing the 
+            status and the actual version number.
+            
     Raises:
         IOError: if db_path does not point to a database or it is not a
             LogIT database file.
@@ -853,15 +1014,27 @@ def checkDatabaseVersion(db_path):
             # If the VERSION_NO doesn't match the current one.
             if not db_version == pm.DATABASE_VERSION_NO:
                 if db_version > pm.DATABASE_VERSION_NO:
-                    return pm.DATABASE_VERSION_HIGH
+                    if return_version:
+                        return pm.DATABASE_VERSION_HIGH, db_version
+                    else:
+                        return pm.DATABASE_VERSION_HIGH
                 
                 if db_version < pm.DATABASE_VERSION_NO:
                     if db_version < pm.NEW_DB_START:
-                        return pm.DATABASE_VERSION_OLD
+                        if return_version:
+                            return pm.DATABASE_VERSION_OLD, db_version
+                        else:
+                            return pm.DATABASE_VERSION_OLD
                     else:
-                        return pm.DATABASE_VERSION_LOW
+                        if return_version:
+                            return pm.DATABASE_VERSION_LOW, db_version
+                        else:
+                            return pm.DATABASE_VERSION_LOW
             else:
-                return pm.DATABASE_VERSION_SAME       
+                if return_version:
+                    return pm.DATABASE_VERSION_SAME, db_version
+                else:
+                    return pm.DATABASE_VERSION_SAME       
             
         except conn.error:
             logger.error('Sql query error')

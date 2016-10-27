@@ -182,7 +182,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 model_items[entry['TYPE'] + 'TOP'].append( model_items[entry['TYPE'] + 'ITEM'])
                 self.tree_model.appendRow(model_items[entry['TYPE'] + 'TOP'])
             else:
-                 model_items[entry['TYPE'] + 'ITEM'] = model_items[entry['TYPE']]
+                model_items[entry['TYPE'] + 'ITEM'] = model_items[entry['TYPE']]
             
             entry_item = QtGui.QStandardItem(name)
             model_items[entry['TYPE'] + 'ITEM'].appendRow(entry_item)
@@ -226,7 +226,11 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         # DAT
         if self.all_logs.dat is not None:
             self.all_logs.dat['TYPE'] = 'DAT'
-            createEntry(self.all_logs.dat, model_items, self.all_logs.dat['NAME'])    
+            createEntry(self.all_logs.dat, model_items, self.all_logs.dat['NAME'])   
+        
+        # IED
+        for ied in self.all_logs.ieds:
+            createEntry(ied, model_items, ied['NAME'])
         
         # MODEL FILES
         for entry in self.all_logs.models:

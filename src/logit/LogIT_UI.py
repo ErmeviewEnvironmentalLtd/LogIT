@@ -214,7 +214,7 @@ class Ui_MainWindow(object):
         self.actionExit = QtGui.QAction(MainWindow)
         self.actionExit.setObjectName(_fromUtf8("actionExit"))
         self.actionUpdateDatabaseSchema = QtGui.QAction(MainWindow)
-        self.actionUpdateDatabaseSchema.setEnabled(False)
+        self.actionUpdateDatabaseSchema.setEnabled(True)
         self.actionUpdateDatabaseSchema.setObjectName(_fromUtf8("actionUpdateDatabaseSchema"))
         self.actionSaveSetupAs = QtGui.QAction(MainWindow)
         self.actionSaveSetupAs.setObjectName(_fromUtf8("actionSaveSetupAs"))
@@ -278,7 +278,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuTools_2.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         self.logViewTab.setCurrentIndex(1)
         self.queryTabWidget.setCurrentIndex(0)
         QtCore.QObject.connect(self.queryFileCheck, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.queryFileTextbox.setEnabled)
@@ -293,7 +293,7 @@ class Ui_MainWindow(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Arial\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><img src=\":/icons/images/Logit_Logo2_75x75.png\" /></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><img src=\":/icons/Logit_Logo2_75x75.png\" /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt; font-weight:600; color:#0055ff;\">LogIT ~VERSION~</span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;\"><br /></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-weight:600; text-decoration: underline;\"><br /></p>\n"
@@ -497,3 +497,4 @@ class Ui_MainWindow(object):
         self.actionSetdb.setText(_translate("MainWindow", "setdb", None))
         self.actionCleanDatabase.setText(_translate("MainWindow", "Clean Database", None))
 
+import LogIT_RC_rc

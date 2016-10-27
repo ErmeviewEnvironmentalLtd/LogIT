@@ -247,7 +247,7 @@ class ModelLoader(object):
 
         if self.run_options == {}: self.run_options = ''
 
-        run, dat = self.buildRunRowFromModel()
+        run, dat, ieds = self.buildRunRowFromModel()
         log_pages.addLogEntry(run)
         
         if self.log_type != TYPE_ISIS:
@@ -264,6 +264,7 @@ class ModelLoader(object):
         
         if self.log_type != TYPE_ESTRY:
             log_pages.addLogEntry(self.buildDatRowFromModel(dat))
+            log_pages.addLogEntry(ieds)
         
         return log_pages
     
@@ -299,19 +300,21 @@ class ModelLoader(object):
                     'TUFLOW_RESULTS': '', 'ISIS_RESULTS': '', 
                     'ESTRY_RESULTS': '', 'EVENT_DURATION': -9999.0,  
                     'COMMENTS': '', 'SETUP': '', 'ISIS_BUILD': '', 
-                    'IEF': '', 'TCF': self.tcf, 'TUFLOW_BUILD': 'None', 
-                    'EVENT_NAME': '', 'RUN_OPTIONS': '', 'LOG_DIR': ''}
+                    'IEF': '', 'TCF': self.tcf, 'INITIAL_CONDITIONS': '', 
+                    'TUFLOW_BUILD': 'None', 'EVENT_NAME': '', 'RUN_OPTIONS': '', 
+                    'LOG_DIR': ''}
         
         dat = ''
+        ieds = []
         if not self.log_type == TYPE_ESTRY and not self.ief is None:
-            run_cols, options, dat = self.buildIsisRun(run_cols)
+            run_cols, options, dat, ieds = self.buildIsisRun(run_cols)
             run_cols['RUN_OPTIONS'] = self.run_options
         
         if self.log_type == TYPE_TUFLOW:
             run_cols = self.buildTuflowRun(run_cols)
             run_cols['RUN_OPTIONS'] = self.run_options
             
-        return [run_cols], dat
+        return [run_cols], dat, ieds
     
     
     def buildIsisRun(self, run_cols):
@@ -325,18 +328,21 @@ class ModelLoader(object):
         dat = filetools.getFileName(self.ief.getValue('Datafile'), True)
         run_cols['ISIS_RESULTS'] = self.ief.getValue('Results')
         
+        if self.ief.event_details.has_key('InitialConditions'):
+            run_cols['INITIAL_CONDITIONS'] = os.path.basename(self.ief.getValue('InitialConditions'))
+        
         if self.ief.event_details.has_key('Finish'):    
             start = self.ief.event_details['Start']
             end = self.ief.event_details['Finish']
             run_cols['EVENT_DURATION'] = str(float(end) - float(start))
             
-#         options = 'None'
-#         if self.ief.event_details.has_key('2DOptions'):
-#             options = self.ief.event_details['2DOptions']
         options = 'None'
         if self.run_options: options = self.run_options
         
-        return run_cols, options, dat
+        # Create the ied model files
+        ieds = self.buildIedRowFromModel(self.ief.getIedData())
+        
+        return run_cols, options, dat, ieds
         
     
     def buildTuflowRun(self, run_cols):
@@ -452,7 +458,20 @@ class ModelLoader(object):
         dat_cols['NAME'] = dat
         
         return [dat_cols]
-        
+    
+    
+    def buildIedRowFromModel(self, ieds):
+        """
+        """
+        out_list = []
+        if len(ieds) > 0:
+            for ied in ieds:
+                out_list.append({'TYPE': 'IED', 'NAME': os.path.basename(ied['file']),
+                                 'REF': ied['name'], 'AMENDMENTS': 'None',
+                                 'COMMENTS': 'None', 'EXISTS': False})
+            
+        return out_list
+
         
     def buildBcRowFromModel(self):
         """Create a new row for the BC Databas file page

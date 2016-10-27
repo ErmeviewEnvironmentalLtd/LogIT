@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\newentry\NewEntry_Widget.ui'
+# Form implementation generated from reading ui file 'NewEntry_Widget.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -240,7 +240,7 @@ class Ui_NewEntryWidget(object):
         self.addMultiModelButton.setMinimumSize(QtCore.QSize(0, 20))
         self.addMultiModelButton.setText(_fromUtf8(""))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/images/add_icon_25x25.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/add_icon_25x25.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.addMultiModelButton.setIcon(icon)
         self.addMultiModelButton.setObjectName(_fromUtf8("addMultiModelButton"))
         self.multipleModelLayoutV.addWidget(self.addMultiModelButton)
@@ -253,7 +253,7 @@ class Ui_NewEntryWidget(object):
         self.removeMultiModelButton.setMinimumSize(QtCore.QSize(0, 20))
         self.removeMultiModelButton.setText(_fromUtf8(""))
         icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/images/delete_icon_25x25.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon1.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/delete_icon_25x25.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         self.removeMultiModelButton.setIcon(icon1)
         self.removeMultiModelButton.setObjectName(_fromUtf8("removeMultiModelButton"))
         self.multipleModelLayoutV.addWidget(self.removeMultiModelButton)
@@ -340,7 +340,7 @@ class Ui_NewEntryWidget(object):
         self.verticalLayout.addWidget(self.loadModelTab)
 
         self.retranslateUi(NewEntryWidget)
-        self.loadModelTab.setCurrentIndex(0)
+        self.loadModelTab.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(NewEntryWidget)
 
     def retranslateUi(self, NewEntryWidget):
@@ -349,9 +349,9 @@ class Ui_NewEntryWidget(object):
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Arial\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><img src=\":/icons/images/Logit_Logo2_75x75.png\" /><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:8pt;\">  </span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><img src=\":/icons/Logit_Logo2_75x75.png\" /></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">LogIT is an automatic logging tool for ISIS/Flood Modeller Pro and TUFLOW.</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">Duncan R. 2015.</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\';\">Duncan R. 2016.</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:6pt; font-weight:600; color:#ffffff;\">l</span></p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'MS Shell Dlg 2\'; font-size:14pt; font-weight:600; color:#0055ff;\">Using LogIT</span><span style=\" font-family:\'MS Shell Dlg 2\'; font-weight:600; color:#0055ff;\"> </span></p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:\'MS Shell Dlg 2\'; font-weight:600;\"><br /></p>\n"
@@ -379,7 +379,7 @@ class Ui_NewEntryWidget(object):
         self.isisVersionLabel.setText(_translate("NewEntryWidget", "Isis Version", None))
         self.tuflowVersionLabel.setText(_translate("NewEntryWidget", "Tuflow Version", None))
         self.eventNameLabel.setText(_translate("NewEntryWidget", "Event Name", None))
-        self.isisVersionLabel_2.setText(_translate("NewEntryWidget", "Scenario Vals", None))
+        self.isisVersionLabel_2.setText(_translate("NewEntryWidget", "Run Options", None))
         self.loadModelGroup.setTitle(_translate("NewEntryWidget", "Load Model ", None))
         self.loadModelButton.setToolTip(_translate("NewEntryWidget", "Load an IEF or TCF file (Ctrl-L)", None))
         self.loadModelButton.setText(_translate("NewEntryWidget", "Load Model...", None))

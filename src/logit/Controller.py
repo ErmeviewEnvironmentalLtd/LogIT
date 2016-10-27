@@ -211,8 +211,6 @@ def fetchAndCheckModel(open_path, run_options, errors):
         all_logs.run['RUN_STATUS'] = 'Unknown'
         all_logs.run['MB'] = -9999.0
         if not all_logs.run['TCF'].strip() == '':
-#             tcf_name = all_logs.run['TCF']
-#             tcf_dir = all_logs.tcf_dir
             outputs = getRunStatusInfo(all_logs.tcf_dir, all_logs.run['TCF'], all_logs.run['RUN_OPTIONS'])
             if outputs[0]:
                 all_logs.run['RUN_STATUS'] = outputs[1]
