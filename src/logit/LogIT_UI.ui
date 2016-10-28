@@ -58,7 +58,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="helpTab">
        <attribute name="title">
@@ -311,7 +311,7 @@ p, li { white-space: pre-wrap; }
                </size>
               </property>
               <property name="currentIndex">
-               <number>0</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="simpleQueryTab">
                <attribute name="title">
@@ -443,6 +443,167 @@ p, li { white-space: pre-wrap; }
                    </size>
                   </property>
                  </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="FileSummaryTab">
+               <attribute name="title">
+                <string>File Summary Query</string>
+               </attribute>
+               <layout class="QGridLayout" name="gridLayout_3">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_8">
+                  <property name="text">
+                   <string>Available Run Id's</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="2">
+                 <widget class="QLabel" name="label_9">
+                  <property name="text">
+                   <string>Selected Run ID's</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0" rowspan="4">
+                 <widget class="QListWidget" name="fileQueryAvailableList">
+                  <property name="maximumSize">
+                   <size>
+                    <width>82</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="selectionMode">
+                   <enum>QAbstractItemView::ExtendedSelection</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QPushButton" name="fileQueryAddAllBut">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Add all</string>
+                  </property>
+                  <property name="text">
+                   <string>&gt;&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="2" rowspan="4">
+                 <widget class="QListWidget" name="fileQuerySelectedList">
+                  <property name="minimumSize">
+                   <size>
+                    <width>0</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>82</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="selectionMode">
+                   <enum>QAbstractItemView::ExtendedSelection</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QPushButton" name="fileQueryAddSelectedBut">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Add selected</string>
+                  </property>
+                  <property name="text">
+                   <string>&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="3">
+                 <widget class="QLabel" name="label_10">
+                  <property name="text">
+                   <string>Tcf</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="4">
+                 <widget class="QLineEdit" name="fileQueryTcfLine"/>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QPushButton" name="fileQueryRemoveSelectedBut">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Remove selected</string>
+                  </property>
+                  <property name="text">
+                   <string>&lt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="3">
+                 <widget class="QLabel" name="label_11">
+                  <property name="text">
+                   <string>Ief</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="4">
+                 <widget class="QLineEdit" name="fileQueryIefLine"/>
+                </item>
+                <item row="4" column="1">
+                 <widget class="QPushButton" name="fileQueryRemoveAllBut">
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="toolTip">
+                   <string>Remove all</string>
+                  </property>
+                  <property name="text">
+                   <string>&lt;&lt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="3">
+                 <widget class="QLabel" name="label_12">
+                  <property name="text">
+                   <string>Run Options</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="4">
+                 <widget class="QLineEdit" name="fileQueryRunOptionsLine"/>
+                </item>
+                <item row="4" column="5">
+                 <widget class="QPushButton" name="fileQueryRunBut">
+                  <property name="text">
+                   <string>Run Query</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="4">
+                 <widget class="QLabel" name="label_13">
+                  <property name="text">
+                   <string>Click ID in list boxes to show summary details</string>
+                  </property>
+                 </widget>
                 </item>
                </layout>
               </widget>

@@ -3,6 +3,11 @@
 - Added Ied table and with support for recording IED files.
 - [Feature] support for database updates and migrations. This was broken when
   the database was updated to the new version, but is now included again.
+- [Feature] Added File Summary query tab. This allows you to view all of the
+  model files associated with one or more runs. To use it select one of more
+  of the rows on the RUN table and choose "File Summary" from the right-click 
+  query menu. This item is also available when viewing run info under the 
+  'RUN Event' and 'RUN Options' tables on the simple query tab.
 - [Bugfix] Better support for event/scenario logic. 
 - Currently, when a file containing event logic is loaded into the database 
   it will include only the files that fall within the provided run options. 

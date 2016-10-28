@@ -339,7 +339,12 @@ class TableWidgetDb(QtGui.QTableWidget):
         menu = QtGui.QMenu()
         
         copyAction = menu.addAction("Copy")
-        if not self.name == 'QUERY':
+        has_query = False
+        if self.name == 'QUERY':
+            if self.subname == 'EventOptions':
+                queryFileAction = menu.addAction("File Summary")
+                has_query = True
+        else:
             updateRowsAction = menu.addAction("Save updates")
             deleteRowAction = menu.addAction("Delete row")
             
@@ -349,6 +354,7 @@ class TableWidgetDb(QtGui.QTableWidget):
                 deleteAllRowAction = menu.addAction("Delete associated entries")
                 updateStatusAction = menu.addAction("Update status")
                 query_menu = menu.addMenu("Query")
+                queryFileAction = query_menu.addAction("File Summary")
                 queryRunDatAction = query_menu.addAction("Dat file")
                 queryRunIedAction = query_menu.addAction("Ied files")
                 queryRunModelAction = query_menu.addAction("Modelfiles")
@@ -371,10 +377,18 @@ class TableWidgetDb(QtGui.QTableWidget):
             queryModelFilesNewAction = query_menu.addAction("Subfiles - New only")
             has_model = True
         
-        
         # Get the action and do whatever it says
         action = menu.exec_(self.viewport().mapToGlobal(pos))
         if action is None: return
+        
+        if has_query:
+            if action == queryFileAction:
+                selected = self.selectionModel().selectedRows()
+                ids = []
+                for s in selected:
+                    ids.append(int(self.item(s.row(), 0).text()))
+                self.emit(QtCore.SIGNAL("queryFileSummary"), ids)
+                return
         
         if action == copyAction:
             clipboard = QtGui.QApplication.clipboard()
@@ -393,9 +407,17 @@ class TableWidgetDb(QtGui.QTableWidget):
                 row = self.currentRow()
                 id = str(self.item(row, self.id_col).text())
                 self.emit(QtCore.SIGNAL("queryModelTable"), self.subname, str(action.text()), id)
-            
+        
         # These are only available on the RUN table
         elif has_run:
+            
+            if action == queryFileAction:
+                selected = self.selectionModel().selectedRows()
+                ids = []
+                for s in selected:
+                    ids.append(int(self.item(s.row(), 0).text()))
+                self.emit(QtCore.SIGNAL("queryFileSummary"), ids)
+                
             
             if action == queryRunModelFilesNewAction or action == queryRunModelFilesAction or \
                         action == queryRunModelAction  or action == queryRunModelNewAction  or \

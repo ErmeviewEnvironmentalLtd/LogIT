@@ -229,7 +229,14 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionUpdateAllRunStatus.triggered.connect(self._updateAllRowStatus)
         self.ui.tabWidget.currentChanged.connect(self._tabChanged)
         self.ui.queryFileCheck.stateChanged.connect(self._queryIncludeFilesChange)
-
+        self.ui.fileQueryAddSelectedBut.clicked.connect(self._updateFileSummaryQueryLists)
+        self.ui.fileQueryAddAllBut.clicked.connect(self._updateFileSummaryQueryLists)
+        self.ui.fileQueryRemoveSelectedBut.clicked.connect(self._updateFileSummaryQueryLists)
+        self.ui.fileQueryRemoveAllBut.clicked.connect(self._updateFileSummaryQueryLists)
+        self.ui.fileQueryAvailableList.itemClicked.connect(self._showFileSummaryIdDetails)
+        self.ui.fileQuerySelectedList.itemClicked.connect(self._showFileSummaryIdDetails)
+        self.ui.fileQueryRunBut.clicked.connect(self.runFileSummaryQuery)
+        
         # Keyboard shortcuts
         # Quit
         self.ui.actionExit.setToolTip('Exit Application')
@@ -314,7 +321,9 @@ class MainGui(QtGui.QMainWindow):
         self.connect(run_table, QtCore.SIGNAL("runTableContextTool"), self.runTableContextTool)
         self.connect(run_table, QtCore.SIGNAL("runTableContextPathUpdate"), self.runTableContextPathUpdate)
         self.connect(run_table, QtCore.SIGNAL("runTableContextStatusUpdate"), self.runTableContextStatusUpdate)
+        self.connect(run_table, QtCore.SIGNAL("queryFileSummary"), self._queryFileSummary)
         self.connect(run_table, QtCore.SIGNAL("queryRunTable"), self.queryRunTable)
+
         self.table_info['RUN'] = {'table': run_table}
         self.ui.logViewTab.insertTab(0, run_table, 'Runs')
         self.ui.logViewTab.widget(0).setLayout(QtGui.QVBoxLayout())
@@ -322,10 +331,76 @@ class MainGui(QtGui.QMainWindow):
         
         self.table_info['MODEL'] = {'table': None}
         query_table = GuiStore.TableWidgetDb('QUERY', 0, 0)
+        self.connect(query_table, QtCore.SIGNAL("queryFileSummary"), self._queryFileSummary)
         self.table_info['QUERY'] = {'table': query_table}
         self.ui.tableQueryGroup.layout().addWidget(query_table)
     
+    def _queryFileSummary(self, ids):
+        self._updateFileSummaryQueryList(ids)
+        self.runFileSummaryQuery()
+        self.ui.logViewTab.setCurrentIndex(2)
+        self.ui.queryTabWidget.setCurrentIndex(1)
     
+    def _updateFileSummaryQueryList(self, ids=[]):
+        """"""
+        if not self.checkDbLoaded(): return
+        
+        self.ui.fileQueryAvailableList.clear()
+        self.ui.fileQuerySelectedList.clear()
+        cols, rows = pv.getRunData()
+        if ids:
+            for r in rows:
+                id = int(r[0])
+                if id in ids:
+                    self.ui.fileQuerySelectedList.addItem(str(id))
+                else:
+                    self.ui.fileQueryAvailableList.addItem(str(id))
+        else:
+            for r in rows:
+                id = str(r[0])
+                self.ui.fileQueryAvailableList.addItem(id)
+    
+    def _updateFileSummaryQueryLists(self):
+        """"""
+        caller = self.sender()
+        call_name = caller.objectName()
+        
+        if call_name == 'fileQueryAddSelectedBut':
+            # sort rows in descending order in order to compensate shifting due to takeItem
+            rows = sorted([index.row() for index in self.ui.fileQueryAvailableList.selectedIndexes()],
+                          reverse=True)
+            for row in rows:
+                self.ui.fileQuerySelectedList.addItem(self.ui.fileQueryAvailableList.takeItem(row))
+            
+        elif call_name == 'fileQueryAddAllBut':
+            for row in reversed(range(self.ui.fileQueryAvailableList.count())):
+                self.ui.fileQuerySelectedList.addItem(self.ui.fileQueryAvailableList.takeItem(row))
+        
+        elif call_name == 'fileQueryRemoveSelectedBut':
+            rows = sorted([index.row() for index in self.ui.fileQuerySelectedList.selectedIndexes()],
+                          reverse=True)
+            for row in rows:
+                self.ui.fileQueryAvailableList.addItem(self.ui.fileQuerySelectedList.takeItem(row))
+
+        elif call_name == 'fileQueryRemoveAllBut':
+            for row in reversed(range(self.ui.fileQuerySelectedList.count())):
+                self.ui.fileQueryAvailableList.addItem(self.ui.fileQuerySelectedList.takeItem(row))
+        
+        self.ui.fileQuerySelectedList.sortItems()
+        self.ui.fileQueryAvailableList.sortItems()
+    
+    def _showFileSummaryIdDetails(self, item):
+        """"""
+        
+        id = item.text()
+        run = pv.getRunRow(id)
+        tcf = run['tcf']
+        ief = run['ief']
+        run_options = run['run_options']
+        self.ui.fileQueryTcfLine.setText(tcf)
+        self.ui.fileQueryIefLine.setText(ief)
+        self.ui.fileQueryRunOptionsLine.setText(run_options)
+        
     def _updateAllRowStatus(self):
         """Update the RUN_STATUS and MB of all rows in RUN table."""
         if not self.checkDbLoaded(): return
@@ -635,6 +710,26 @@ class MainGui(QtGui.QMainWindow):
             cols, rows = pv.getSimpleQuery(table, q1_vtext, with_files, new_sub_only, new_model_only, run_id, q2_vtext)
         else:
             cols, rows = pv.getSimpleQuery(table, q1_vtext, with_files, new_sub_only, new_model_only, run_id)
+        
+        if table == 'RUN Options' or table == 'RUN Event':
+            self.table_info['QUERY']['table'].subname = 'EventOptions'
+        else:
+            self.table_info['QUERY']['table'].subname = ''
+        self.table_info['QUERY']['table'].addRows(cols, rows)
+        
+    def runFileSummaryQuery(self):
+        """Run a query on the File Summary query tab.
+        
+        Called by the file summary query button. Takes the id values that are 
+        currently in the selected list widget populates the query table with
+        a summary of all the files in the chosen runs.
+        """
+#         ids = [1, 2, 3]
+        ids = []
+        for index in xrange(self.ui.fileQuerySelectedList.count()):
+            ids.append(self.ui.fileQuerySelectedList.item(index).text())
+        
+        cols, rows = pv.getFileSummaryQuery(ids)
         self.table_info['QUERY']['table'].addRows(cols, rows)
         
     def checkUnsavedEntries(self, table, include_cancel_button=True):
@@ -733,6 +828,7 @@ class MainGui(QtGui.QMainWindow):
         try:
             self.loadModelDb()
             self.loadRunDb()
+            self._updateFileSummaryQueryList()
         except Exception, err:
             logger.error("Critical error loading database")
             logger.exception(err)

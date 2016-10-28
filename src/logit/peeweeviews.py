@@ -663,7 +663,7 @@ def getRunData():
     pm.logit_db.close()
     
     return cols, rows
- 
+
 
 def getModelData(model):
     """Return records for the ModelFile or Dat tables.
@@ -698,6 +698,55 @@ def getModelData(model):
     pm.logit_db.close()
     
     return cols, rows
+
+
+def getFileSummaryQuery(ids):
+    """
+    """
+    cols = ['ID', 'RUN OPTIONS', 'IEF', 'TCF', 'ECF', 'TGC', 'TBC', 'BC_DBASE',
+            'TEF', 'TRD']
+
+    query = (pm.Run_ModelFile
+            .select(pm.Run_ModelFile, pm.Run, pm.ModelFile)
+            .join(pm.ModelFile)
+            .switch(pm.Run_ModelFile)
+            .join(pm.Run)
+            .where(pm.Run.id << ids)
+            )
+    found_runs = {}
+    output = []
+    for q in query:
+        if not q.run_id in found_runs.keys():
+            cur_index = len(output) - 1
+            found_runs[q.run_id] = cur_index
+            output.append({'id': q.run_id, 'run_options': q.run.run_options,
+                           'ief': q.run.ief, 'TCF': [], 'ECF': [], 'TGC': [],
+                           'TBC': [], 'BC_DBASE': [], 'TEF': [], 'TRD': [],
+                           'NEW_TCF': False, 'NEW_ECF': False, 'NEW_TGC': False,
+                           'NEW_TBC': False, 'NEW_BC_DBASE': False, 'NEW_TEF': False,
+                           'NEW_TRD': False})
+        else:
+            cur_index = found_runs[q.run_id]
+        
+        if not q.model_file.name in output[cur_index][q.model_file.model_type]:
+            output[cur_index][q.model_file.model_type].append(q.model_file.name)
+        if q.new_file == True:
+            output[cur_index]['NEW_' + q.model_file.model_type] = True
+    
+    new_output = []
+    for o in output:
+        new_output.append([o['id'], o['run_options'], o['ief'],
+                          ', '.join(o['TCF']),
+                          ', '.join(o['ECF']),
+                          ', '.join(o['TGC']),
+                          ', '.join(o['TBC']),
+                          ', '.join(o['BC_DBASE']),
+                          ', '.join(o['TEF']),
+                          ', '.join(o['TRD']),
+                          ])
+    
+    return cols, new_output 
+    
 
 def getSimpleQuery(table, value1, with_files, new_sub_only, new_model_only, run_id, value2=''):
     """Get the results of a query from the database.
@@ -775,10 +824,10 @@ def getSimpleQuery(table, value1, with_files, new_sub_only, new_model_only, run_
         else:
             query = checkWildcard(query, pm.Run.run_options, value1)
    
-        cols = ['Date', 'Event Name', 'Run Options', 'Comments', 'Status', 'MB']
+        cols = ['Run ID', 'Date', 'Event Name', 'Run Options', 'Comments', 'Status', 'MB']
         rows = []
         for r in query:
-            rows.append([r.timestamp.strftime("%Y-%m-%d %H:%M:%S"), r.event_name, r.run_options, r.comments, r.run_status, r.mb])
+            rows.append([str(r.id), r.timestamp.strftime("%Y-%m-%d %H:%M:%S"), r.event_name, r.run_options, r.comments, r.run_status, r.mb])
 
     
     else:
