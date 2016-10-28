@@ -916,22 +916,26 @@ def createModelExport():
             .join(pm.SubFile)
             .switch(pm.ModelFile_SubFile)
             .join(pm.ModelFile)
+            .order_by(pm.ModelFile.model_type.asc(), pm.ModelFile.timestamp.asc(), pm.ModelFile.name.asc())
+            .aggregate_rows()
             )
     
     model_out = {}
+    found_models = {}
     for q in query:
-        t = q.model_file.model_type
-        if not t in model_out.keys():
-            model_out[t] = {}
-        else:
+        
+        if not q.model_file.model_type in model_out.keys():
+            model_out[q.model_file.model_type] = []
             
-            if not q.model_file.name in model_out[t].keys():
-                model_out[t][q.model_file.name] = {'type': q.model_file.model_type, 'comments': q.model_file.comments, 'files': [], 'new_files': [], 'date': q.model_file.timestamp.strftime("%Y-%m-%d")}
-                model_out[t][q.model_file.name]['files'].append(q.sub_file.name)
-                if q.new_file == True: model_out[t][q.model_file.name]['new_files'].append(q.sub_file.name)
-            else:
-                model_out[t][q.model_file.name]['files'].append(q.sub_file.name)
-                if q.new_file == True: model_out[t][q.model_file.name]['new_files'].append(q.sub_file.name)
+        if not q.model_file.name in found_models.keys():
+            model_out[q.model_file.model_type].append({'name': q.model_file.name, 'type': q.model_file.model_type, 'comments': q.model_file.comments, 'date': q.model_file.timestamp.strftime("%Y-%m-%d"), 'files': [], 'new_files': []})
+            cur_index = len(model_out[q.model_file.model_type]) - 1
+            found_models[q.model_file.name] = {'type': q.model_file.model_type, 'index': cur_index}
+        else:
+            cur_index = found_models[q.model_file.name]['index']
+        
+        model_out[q.model_file.model_type][cur_index]['files'].append(q.sub_file.name)
+        if q.new_file == True: model_out[q.model_file.model_type][cur_index]['new_files'].append(q.sub_file.name)
     
     return model_out 
     
@@ -954,29 +958,54 @@ def createRunDatExport():
             .switch(pm.Run_ModelFile)
             .join(pm.Run))
     
-    run_header = ['id', 'date', 'dat','setup', 'ief', 'isis_results','tuflow_results', 
+    run_header = ['id', 'date', 'modeller', 'event_name', 'setup', 'ief', 'dat', 
+                  'initial_conditions', 'isis_results', 'tuflow_results', 
                   'estry_results', 'event_duration', 'comments', 'isis_version', 
-                  'event_name', 'run_options', 'run_status', 'mb', 'files'
+                  'tuflow_version', 'run_options', 'run_status', 'mb', 'files'
                  ]
     dat_header = ['name', 'date', 'amendments', 'comments']
     run_out = {}
-    dat_out = {}
+    dat_out = []
+    found_dats = []
     for q in query:
         r = q.run
         if not r.id in run_out.keys():
-            if not r.dat.name in dat_out.keys():
-                dat_out[r.dat.name] = [r.dat.name, r.dat.timestamp.strftime("%Y-%m-%d"),
-                                       r.dat.amendments, r.dat.comments]
-            run_out[r.id] = [r.id, r.timestamp.strftime("%Y-%m-%d"), r.dat.name,
-                             r.setup, r.ief, r.isis_results, r.tuflow_results, 
+            if not r.dat.name in found_dats:
+                dat_out.append([r.dat.name, r.dat.timestamp.strftime("%Y-%m-%d"),
+                                       r.dat.amendments, r.dat.comments])
+                found_dats.append(r.dat.name)
+
+            run_out[r.id] = [r.id, r.timestamp.strftime("%Y-%m-%d"), r.modeller, 
+                             r.event_name, r.setup, r.ief,  r.dat.name, 
+                             r.initial_conditions, r.isis_results, r.tuflow_results, 
                              r.estry_results, r.event_duration, r.comments, 
-                             r.isis_version, r.event_name, r.run_options, 
+                             r.isis_version, r.tuflow_version, r.run_options, 
                              r.run_status, r.mb, []]
         else:
             if not q.model_file.name in run_out[r.id][-1]:
                 run_out[r.id][-1].append(q.model_file.name)
             
     return run_out, run_header, dat_out, dat_header
+
+
+def createIedExport():
+    """Get the Ied data table formatted for writing to file.
+    
+    Used for collecting all of the data into a list for exporting to another
+    medium, such as a the Excel exporting funcationality.
+    
+    Return:
+    
+    """
+    ied_header = ['name', 'date', 'ammendments', 'comments']
+    query = pm.Ied.select()
+    ied_out = {}
+    for q in query:
+        ied_out[q.name] = [q.name, q.timestamp.strftime("%Y-%m-%d"),
+                           q.amendments, q.comments]
+    
+    return ied_out, ied_header
+        
  
 
 def checkDatabaseVersion(db_path, return_version=False):

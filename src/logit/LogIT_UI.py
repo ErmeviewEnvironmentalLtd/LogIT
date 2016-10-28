@@ -34,7 +34,7 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(QtCore.QSize(450, 550))
         MainWindow.setMaximumSize(QtCore.QSize(16777215, 16777215))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/images/Logit_Logo2_25x25.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(":/icons/Logit_Logo2_25x25.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setIconSize(QtCore.QSize(25, 25))
         self.centralwidget = QtGui.QWidget(MainWindow)

@@ -63,7 +63,7 @@ except:
                   'Cannot export database to Excel')  
 
 
-def newExportToExcel(run, runh, dat, dath, model, xlspath):
+def newExportToExcel(run, runh, dat, dath, model, ied, iedh, xlspath):
     """Export database data to Excel .xls format.
     
     Args:
@@ -73,14 +73,16 @@ def newExportToExcel(run, runh, dat, dath, model, xlspath):
         dath(list): column headers for dat data.
         model(dict): containing sub-dicts for each model_type (TGC, etc) which
             in turn contain sub-dicts for ModelFile columns.
+        ied(dict): containing lists with output variables for each ied id.
+        iedh(list): column headers for ied data.
         xlspath(str): path to write the workbook to.
     """
     # Create a workbook and add the Run worksheet
     w = xlwt.Workbook()
-    ws = w.add_sheet('Run')  
+    ws = w.add_sheet('RUN')  
     
     # Write the run headers
-    logger.info('create Worksheet: Run')
+    logger.info('create Worksheet: RUN')
     for i, h in enumerate(runh): 
         ws.write(0, i, h)
     
@@ -96,16 +98,30 @@ def newExportToExcel(run, runh, dat, dath, model, xlspath):
         count += 1
     
     # Write the Dat headers
-    logger.info('create Worksheet: Dat')
-    ws = w.add_sheet('Dat')
+    logger.info('create Worksheet: DAT')
+    ws = w.add_sheet('DAT')
     for i, h in enumerate(dath, 0): 
         ws.write(0, i, h)
     
     # Write the dat data for each entry in the dict
     count = 1
-    for k, v in dat.items():
+#     for k, v in dat.items():
+    for v in dat:
         for j, d in enumerate(v, 0):
             ws.write(count, j, d)
+        count += 1
+    
+    # Write the Ied headers
+    logger.info('Create Worksheet: IED')
+    ws = w.add_sheet('IED')
+    for i, h in enumerate(iedh, 0):
+        ws.write(0, i, h)
+    
+    # Write the ied data for each entry
+    count = 1
+    for k, v in ied.items():
+        for j, i in enumerate(v, 0):
+            ws.write(count, j, i)
         count += 1
     
     # Create a different worksheet for each model_type (TGC, TBC, etc)
@@ -114,18 +130,18 @@ def newExportToExcel(run, runh, dat, dath, model, xlspath):
         ws = w.add_sheet(mtype)
         
         # Write the ModelFile headers
-        logger.info('create Worksheet: Dat')
+        logger.info('create Worksheet: ' + str(mtype))
         for i, h in enumerate(headers, 0):
             ws.write(0, i, h)
         
         # Write the row data for each entry in this model_type
         count = 1
-        for k, m in models.items():
-            ws.write(count, 0, k)
-            ws.write(count, 1, models[k]['date'])
-            ws.write(count, 2, models[k]['comments'])
-            ws.write(count, 3, ', '.join(models[k]['files']))
-            ws.write(count, 4, ', '.join(models[k]['new_files']))
+        for m in models:
+            ws.write(count, 0, m['name'])
+            ws.write(count, 1, m['date'])
+            ws.write(count, 2, m['comments'])
+            ws.write(count, 3, ', '.join(m['files']))
+            ws.write(count, 4, ', '.join(m['new_files']))
             count += 1
         
     w.save(xlspath) 

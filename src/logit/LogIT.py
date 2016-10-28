@@ -1277,7 +1277,7 @@ class MainGui(QtGui.QMainWindow):
 
         try:
             # Setup the progress stuff
-            self._updateMaxProgress(4)
+            self._updateMaxProgress(5)
             self._updateCurrentProgress(1)
             self._updateStatusBar('Exporting Model Files ...')
             model_out = pv.createModelExport()
@@ -1285,8 +1285,12 @@ class MainGui(QtGui.QMainWindow):
             self._updateStatusBar('Exporting Run Files ...')
             run_out, run_header, dat_out, dat_header = pv.createRunDatExport()
             self._updateCurrentProgress(3)
+            self._updateStatusBar('Exporting Ied Files ...')
+            ied_out, ied_header = pv.createIedExport()
+            self._updateCurrentProgress(4)
             self._updateStatusBar('Writing to Excel ...')
-            Exporters.newExportToExcel(run_out, run_header, dat_out, dat_header, model_out, save_path)
+            Exporters.newExportToExcel(run_out, run_header, dat_out, dat_header, 
+                                       model_out, ied_out, ied_header, save_path)
             self._updateCurrentProgress(0)
             self._updateStatusBar('Export Complete')
         

@@ -1,88 +1,405 @@
-2016-10-27 16:11:05,974 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
-2016-10-27 16:11:05,996 __main__                                           line:139  DEBUG    SQLite3 import complete
-2016-10-27 16:11:06,092 __main__                                           line:154  DEBUG    Start of Logit imports
-2016-10-27 16:11:06,094 __main__                                           line:156  DEBUG    Main Window import complete
-2016-10-27 16:11:06,223 __main__                                           line:158  DEBUG    LogBuilder import complete
-2016-10-27 16:11:06,282 __main__                                           line:160  DEBUG    Exporters import complete
-2016-10-27 16:11:06,384 Controller                                         line:91   DEBUG    Import app_metrics complete
-2016-10-27 16:11:06,559 __main__                                           line:162  DEBUG    Controller import complete
-2016-10-27 16:11:06,563 __main__                                           line:164  DEBUG    GuiStore import complete
-2016-10-27 16:11:06,565 __main__                                           line:166  DEBUG    Ief Resolver import complete
-2016-10-27 16:11:06,565 __main__                                           line:168  DEBUG    Global Settings import complete
-2016-10-27 16:11:06,595 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
-2016-10-27 16:11:06,596 __main__                                           line:170  DEBUG    New Entry import complete
-2016-10-27 16:11:06,602 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
-2016-10-27 16:11:06,604 __main__                                           line:172  DEBUG    Extract Model import complete
-2016-10-27 16:11:07,135 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
-2016-10-27 16:11:07,138 __main__                                           line:174  DEBUG    Run Summary import complete
-2016-10-27 16:11:07,144 __main__                                           line:176  DEBUG    db migrations import complete
-2016-10-27 16:11:07,145 __main__                                           line:180  DEBUG    Import modules complete
-2016-10-27 16:11:07,227 __main__                                           line:205  DEBUG    Setup UI complete
-2016-10-27 16:12:20,815 __main__                                           line:1193 INFO     Closing program
-2016-10-27 16:12:20,828 __main__                                           line:1194 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
-2016-10-27 16:12:25,855 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
-2016-10-27 16:12:25,862 __main__                                           line:139  DEBUG    SQLite3 import complete
-2016-10-27 16:12:25,948 __main__                                           line:154  DEBUG    Start of Logit imports
-2016-10-27 16:12:25,950 __main__                                           line:156  DEBUG    Main Window import complete
-2016-10-27 16:12:26,065 __main__                                           line:158  DEBUG    LogBuilder import complete
-2016-10-27 16:12:26,115 __main__                                           line:160  DEBUG    Exporters import complete
-2016-10-27 16:12:26,158 Controller                                         line:91   DEBUG    Import app_metrics complete
-2016-10-27 16:12:26,326 __main__                                           line:162  DEBUG    Controller import complete
-2016-10-27 16:12:26,331 __main__                                           line:164  DEBUG    GuiStore import complete
-2016-10-27 16:12:26,332 __main__                                           line:166  DEBUG    Ief Resolver import complete
-2016-10-27 16:12:26,332 __main__                                           line:168  DEBUG    Global Settings import complete
-2016-10-27 16:12:26,368 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
-2016-10-27 16:12:26,369 __main__                                           line:170  DEBUG    New Entry import complete
-2016-10-27 16:12:26,377 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
-2016-10-27 16:12:26,378 __main__                                           line:172  DEBUG    Extract Model import complete
-2016-10-27 16:12:26,872 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
-2016-10-27 16:12:26,875 __main__                                           line:174  DEBUG    Run Summary import complete
-2016-10-27 16:12:26,877 __main__                                           line:176  DEBUG    db migrations import complete
-2016-10-27 16:12:26,877 __main__                                           line:180  DEBUG    Import modules complete
-2016-10-27 16:12:26,956 __main__                                           line:205  DEBUG    Setup UI complete
-2016-10-27 16:12:44,526 __main__                                           line:1193 INFO     Closing program
-2016-10-27 16:12:44,528 __main__                                           line:1194 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
-2016-10-27 16:13:59,371 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
-2016-10-27 16:13:59,378 __main__                                           line:139  DEBUG    SQLite3 import complete
-2016-10-27 16:13:59,459 __main__                                           line:154  DEBUG    Start of Logit imports
-2016-10-27 16:13:59,486 __main__                                           line:156  DEBUG    Main Window import complete
-2016-10-27 16:13:59,594 __main__                                           line:158  DEBUG    LogBuilder import complete
-2016-10-27 16:13:59,644 __main__                                           line:160  DEBUG    Exporters import complete
-2016-10-27 16:13:59,690 Controller                                         line:91   DEBUG    Import app_metrics complete
-2016-10-27 16:13:59,875 __main__                                           line:162  DEBUG    Controller import complete
-2016-10-27 16:13:59,878 __main__                                           line:164  DEBUG    GuiStore import complete
-2016-10-27 16:13:59,881 __main__                                           line:166  DEBUG    Ief Resolver import complete
-2016-10-27 16:13:59,881 __main__                                           line:168  DEBUG    Global Settings import complete
-2016-10-27 16:13:59,895 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
-2016-10-27 16:13:59,898 __main__                                           line:170  DEBUG    New Entry import complete
-2016-10-27 16:13:59,904 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
-2016-10-27 16:13:59,905 __main__                                           line:172  DEBUG    Extract Model import complete
-2016-10-27 16:14:00,421 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
-2016-10-27 16:14:00,424 __main__                                           line:174  DEBUG    Run Summary import complete
-2016-10-27 16:14:00,424 __main__                                           line:176  DEBUG    db migrations import complete
-2016-10-27 16:14:00,426 __main__                                           line:180  DEBUG    Import modules complete
-2016-10-27 16:14:00,509 __main__                                           line:205  DEBUG    Setup UI complete
-2016-10-27 16:14:08,819 __main__                                           line:1193 INFO     Closing program
-2016-10-27 16:14:08,821 __main__                                           line:1194 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
-2016-10-27 16:15:07,499 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
-2016-10-27 16:15:07,506 __main__                                           line:139  DEBUG    SQLite3 import complete
-2016-10-27 16:15:07,605 __main__                                           line:154  DEBUG    Start of Logit imports
-2016-10-27 16:15:07,608 __main__                                           line:156  DEBUG    Main Window import complete
-2016-10-27 16:15:07,734 __main__                                           line:158  DEBUG    LogBuilder import complete
-2016-10-27 16:15:07,793 __main__                                           line:160  DEBUG    Exporters import complete
-2016-10-27 16:15:07,852 Controller                                         line:91   DEBUG    Import app_metrics complete
-2016-10-27 16:15:08,055 __main__                                           line:162  DEBUG    Controller import complete
-2016-10-27 16:15:08,061 __main__                                           line:164  DEBUG    GuiStore import complete
-2016-10-27 16:15:08,062 __main__                                           line:166  DEBUG    Ief Resolver import complete
-2016-10-27 16:15:08,062 __main__                                           line:168  DEBUG    Global Settings import complete
-2016-10-27 16:15:08,096 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
-2016-10-27 16:15:08,098 __main__                                           line:170  DEBUG    New Entry import complete
-2016-10-27 16:15:08,105 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
-2016-10-27 16:15:08,108 __main__                                           line:172  DEBUG    Extract Model import complete
-2016-10-27 16:15:08,640 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
-2016-10-27 16:15:08,641 __main__                                           line:174  DEBUG    Run Summary import complete
-2016-10-27 16:15:08,642 __main__                                           line:176  DEBUG    db migrations import complete
-2016-10-27 16:15:08,642 __main__                                           line:180  DEBUG    Import modules complete
-2016-10-27 16:15:08,726 __main__                                           line:205  DEBUG    Setup UI complete
-2016-10-27 16:15:26,744 __main__                                           line:1193 INFO     Closing program
-2016-10-27 16:15:26,746 __main__                                           line:1194 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
+2016-10-28 08:01:11,276 Exporters                                          line:132  INFO     create Worksheet: Dat
+2016-10-28 08:04:48,926 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 08:04:49,213 Exporters                                          line:85   INFO     create Worksheet: Run
+2016-10-28 08:04:49,230 Exporters                                          line:101  INFO     create Worksheet: Dat
+2016-10-28 08:04:49,232 Exporters                                          line:114  INFO     Create Worksheet: Ied
+2016-10-28 08:04:49,233 Exporters                                          line:132  INFO     create Worksheet: Dat
+2016-10-28 08:04:49,256 Exporters                                          line:132  INFO     create Worksheet: Dat
+2016-10-28 08:04:49,257 Exporters                                          line:132  INFO     create Worksheet: Dat
+2016-10-28 08:04:49,260 Exporters                                          line:132  INFO     create Worksheet: Dat
+2016-10-28 08:13:19,690 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 08:13:20,206 Exporters                                          line:85   INFO     create Worksheet: Run
+2016-10-28 08:13:20,229 Exporters                                          line:101  INFO     create Worksheet: Dat
+2016-10-28 08:13:20,230 Exporters                                          line:114  INFO     Create Worksheet: Ied
+2016-10-28 08:13:20,233 Exporters                                          line:132  INFO     create Worksheet: Dat
+2016-10-28 08:13:20,234 __main__                                           line:1300 ERROR    global name 'write' is not defined
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1293, in _exportDatabase
+    model_out, ied_out, ied_header, save_path)
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\Exporters.py", line 139, in newExportToExcel
+    ws/write(count, 0, models[k]['timestamp'])
+NameError: global name 'write' is not defined
+2016-10-28 08:13:43,868 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 08:13:44,354 Exporters                                          line:85   INFO     create Worksheet: Run
+2016-10-28 08:13:44,388 Exporters                                          line:101  INFO     create Worksheet: Dat
+2016-10-28 08:13:44,395 Exporters                                          line:114  INFO     Create Worksheet: Ied
+2016-10-28 08:13:44,398 Exporters                                          line:132  INFO     create Worksheet: Dat
+2016-10-28 08:13:44,407 Exporters                                          line:132  INFO     create Worksheet: Dat
+2016-10-28 08:13:44,411 Exporters                                          line:132  INFO     create Worksheet: Dat
+2016-10-28 08:13:44,417 Exporters                                          line:132  INFO     create Worksheet: Dat
+2016-10-28 08:15:09,288 __main__                                           line:1193 INFO     Closing program
+2016-10-28 08:15:09,289 __main__                                           line:1194 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
+2016-10-28 08:18:04,186 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 08:18:04,196 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 08:18:04,308 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 08:18:04,313 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 08:18:04,446 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 08:18:04,556 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 08:18:04,576 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 08:18:04,891 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 08:18:04,900 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 08:18:04,903 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 08:18:04,904 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 08:18:04,918 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 08:18:04,921 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 08:18:04,930 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 08:18:04,933 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 08:18:05,517 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 08:18:05,519 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 08:18:05,523 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 08:18:05,523 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 08:18:05,598 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 08:18:13,980 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 08:23:52,611 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 08:23:52,621 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 08:23:52,730 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 08:23:52,736 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 08:23:52,869 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 08:23:52,976 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 08:23:52,993 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 08:23:53,286 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 08:23:53,292 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 08:23:53,295 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 08:23:53,344 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 08:23:53,358 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 08:23:53,359 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 08:23:53,371 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 08:23:53,372 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 08:23:54,013 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 08:23:54,015 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 08:23:54,017 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 08:23:54,019 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 08:23:54,096 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 08:24:00,911 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 08:28:55,242 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 08:28:55,246 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 08:28:55,301 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 08:28:55,302 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 08:28:55,364 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 08:28:55,413 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 08:28:55,421 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 08:28:55,556 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 08:28:55,562 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 08:28:55,565 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 08:28:55,565 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 08:28:55,572 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 08:28:55,573 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 08:28:55,578 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 08:28:55,578 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 08:28:55,911 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 08:28:55,913 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 08:28:55,914 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 08:28:55,914 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 08:28:55,953 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 08:29:03,473 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 08:29:03,516 __main__                                           line:1300 ERROR    'ModelFile' object has no attribute 'time_stamp'
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1283, in _exportDatabase
+    model_out = pv.createModelExport()
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\peeweeviews.py", line 926, in createModelExport
+    grabber.append({'name': q.model_file.name, 'timestamp': q.model_file.time_stamp})
+AttributeError: 'ModelFile' object has no attribute 'time_stamp'
+2016-10-28 08:29:21,529 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 08:30:10,684 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 08:30:10,693 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 08:30:10,783 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 08:30:10,789 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 08:30:10,904 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 08:30:11,009 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 08:30:11,026 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 08:30:11,282 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 08:30:11,288 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 08:30:11,290 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 08:30:11,292 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 08:30:11,305 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 08:30:11,306 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 08:30:11,316 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 08:30:11,319 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 08:30:11,924 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 08:30:11,926 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 08:30:11,928 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 08:30:11,930 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 08:30:12,009 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 08:30:19,688 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 08:31:01,710 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 08:31:01,719 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 08:31:01,825 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 08:31:01,862 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 08:31:01,993 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 08:31:02,096 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 08:31:02,115 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 08:31:02,395 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 08:31:02,401 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 08:31:02,404 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 08:31:02,404 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 08:31:02,418 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 08:31:02,421 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 08:31:02,430 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 08:31:02,431 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 08:31:03,069 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 08:31:03,072 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 08:31:03,075 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 08:31:03,075 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 08:31:03,151 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 08:31:09,772 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 08:51:26,776 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 08:51:26,785 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 08:51:26,898 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 08:51:26,904 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 08:51:27,038 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 08:51:27,137 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 08:51:27,157 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 08:51:27,423 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 08:51:27,427 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 08:51:27,431 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 08:51:27,433 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 08:51:27,447 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 08:51:27,448 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 08:51:27,457 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 08:51:27,460 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 08:51:28,099 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 08:51:28,101 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 08:51:28,105 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 08:51:28,105 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 08:51:28,187 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 08:51:37,424 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:04:03,447 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 09:04:03,456 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 09:04:03,578 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 09:04:03,584 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 09:04:03,721 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 09:04:03,825 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 09:04:03,845 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 09:04:04,147 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 09:04:04,151 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 09:04:04,154 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 09:04:04,155 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 09:04:04,171 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 09:04:04,173 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 09:04:04,184 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 09:04:04,186 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 09:04:04,828 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 09:04:04,831 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 09:04:04,832 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 09:04:04,834 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 09:04:04,908 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 09:04:11,505 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:04:11,529 __main__                                           line:1300 ERROR    list indices must be integers, not dict
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1283, in _exportDatabase
+    model_out = pv.createModelExport()
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\peeweeviews.py", line 931, in createModelExport
+    new_model_out[{'name': q.model_file.name, 'comments': q.model_file.comments, 'date': q.model_file.timestamp.strftime("%Y-%m-%d"), 'files': [], 'new_files': []}]
+TypeError: list indices must be integers, not dict
+2016-10-28 09:05:06,914 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:05:06,948 __main__                                           line:1300 ERROR    list assignment index out of range
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1283, in _exportDatabase
+    model_out = pv.createModelExport()
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\peeweeviews.py", line 931, in createModelExport
+    new_model_out[cur_index] = {'name': q.model_file.name, 'comments': q.model_file.comments, 'date': q.model_file.timestamp.strftime("%Y-%m-%d"), 'files': [], 'new_files': []}
+IndexError: list assignment index out of range
+2016-10-28 09:06:26,180 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:06:26,233 __main__                                           line:1300 ERROR    'ModelFile' object has no attribute 'type'
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1283, in _exportDatabase
+    model_out = pv.createModelExport()
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\peeweeviews.py", line 932, in createModelExport
+    found_models[q.model_file.name] = {'type': q.model_file.type, 'index': cur_index}
+AttributeError: 'ModelFile' object has no attribute 'type'
+2016-10-28 09:06:51,753 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:06:51,773 __main__                                           line:1300 ERROR    list index out of range
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1283, in _exportDatabase
+    model_out = pv.createModelExport()
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\peeweeviews.py", line 936, in createModelExport
+    new_model_out[cur_index]['files'].append(q.sub_file.name)
+IndexError: list index out of range
+2016-10-28 09:07:11,729 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:07:37,542 __main__                                           line:1300 ERROR    list index out of range
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1283, in _exportDatabase
+    model_out = pv.createModelExport()
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\peeweeviews.py", line 936, in createModelExport
+    new_model_out[cur_index]['files'].append(q.sub_file.name)
+IndexError: list index out of range
+2016-10-28 09:07:47,217 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:07:59,928 __main__                                           line:1300 ERROR    'index'
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1283, in _exportDatabase
+    model_out = pv.createModelExport()
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\peeweeviews.py", line 934, in createModelExport
+    cur_index = found_models['index']
+KeyError: 'index'
+2016-10-28 09:09:00,572 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:16:55,221 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 09:16:55,232 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 09:16:55,339 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 09:16:55,345 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 09:16:55,480 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 09:16:55,585 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 09:16:55,625 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 09:16:55,923 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 09:16:55,927 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 09:16:55,930 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 09:16:55,931 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 09:16:55,947 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 09:16:55,948 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 09:16:55,957 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 09:16:55,960 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 09:16:56,592 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 09:16:56,595 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 09:16:56,598 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 09:16:56,599 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 09:16:56,683 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 09:17:09,482 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:17:17,700 __main__                                           line:1300 ERROR    list index out of range
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1283, in _exportDatabase
+    model_out = pv.createModelExport()
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\peeweeviews.py", line 949, in createModelExport
+    new_model_out[q.model_file.model_type][cur_index]['files'].append(q.sub_file.name)
+IndexError: list index out of range
+2016-10-28 09:18:24,295 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:23:36,789 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 09:23:36,799 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 09:23:36,910 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 09:23:36,915 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 09:23:37,063 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 09:23:37,181 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 09:23:37,203 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 09:23:37,492 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 09:23:37,496 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 09:23:37,500 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 09:23:37,500 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 09:23:37,515 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 09:23:37,516 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 09:23:37,526 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 09:23:37,529 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 09:23:38,176 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 09:23:38,177 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 09:23:38,180 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 09:23:38,180 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 09:23:38,263 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 09:23:45,696 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:23:46,209 Exporters                                          line:85   INFO     create Worksheet: Run
+2016-10-28 09:23:46,226 Exporters                                          line:101  INFO     create Worksheet: Dat
+2016-10-28 09:23:46,226 Exporters                                          line:114  INFO     Create Worksheet: Ied
+2016-10-28 09:23:46,227 Exporters                                          line:132  INFO     create Worksheet: TCF
+2016-10-28 09:23:46,230 __main__                                           line:1300 ERROR    string indices must be integers
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1293, in _exportDatabase
+    model_out, ied_out, ied_header, save_path)
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\Exporters.py", line 140, in newExportToExcel
+    ws.write(count, 1, m['name'])
+TypeError: string indices must be integers
+2016-10-28 09:24:19,437 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:24:20,104 Exporters                                          line:85   INFO     create Worksheet: Run
+2016-10-28 09:24:20,157 Exporters                                          line:101  INFO     create Worksheet: Dat
+2016-10-28 09:24:20,163 Exporters                                          line:114  INFO     Create Worksheet: Ied
+2016-10-28 09:24:20,165 Exporters                                          line:132  INFO     create Worksheet: TCF
+2016-10-28 09:25:36,148 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 09:25:36,161 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 09:25:36,272 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 09:25:36,289 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 09:25:36,421 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 09:25:36,522 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 09:25:36,532 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 09:25:36,838 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 09:25:36,855 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 09:25:36,858 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 09:25:36,859 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 09:25:36,875 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 09:25:36,877 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 09:25:36,878 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 09:25:36,888 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 09:25:37,540 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 09:25:37,543 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 09:25:37,546 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 09:25:37,562 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 09:25:37,657 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 09:25:44,904 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:25:45,607 Exporters                                          line:85   INFO     create Worksheet: Run
+2016-10-28 09:25:45,661 Exporters                                          line:101  INFO     create Worksheet: Dat
+2016-10-28 09:25:45,664 Exporters                                          line:114  INFO     Create Worksheet: Ied
+2016-10-28 09:26:18,365 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:26:18,994 Exporters                                          line:85   INFO     create Worksheet: Run
+2016-10-28 09:26:19,049 Exporters                                          line:101  INFO     create Worksheet: Dat
+2016-10-28 09:26:19,052 Exporters                                          line:114  INFO     Create Worksheet: Ied
+2016-10-28 09:26:59,109 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:26:59,634 Exporters                                          line:85   INFO     create Worksheet: Run
+2016-10-28 09:26:59,657 Exporters                                          line:101  INFO     create Worksheet: Dat
+2016-10-28 09:26:59,660 Exporters                                          line:114  INFO     Create Worksheet: Ied
+2016-10-28 09:27:02,917 Exporters                                          line:132  INFO     create Worksheet: TCF
+2016-10-28 09:27:30,503 Exporters                                          line:132  INFO     create Worksheet: TGC
+2016-10-28 09:27:30,509 Exporters                                          line:132  INFO     create Worksheet: TBC
+2016-10-28 09:27:30,513 Exporters                                          line:132  INFO     create Worksheet: BC_DBASE
+2016-10-28 09:29:35,417 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:29:36,082 Exporters                                          line:85   INFO     create Worksheet: RUN
+2016-10-28 09:29:36,134 Exporters                                          line:101  INFO     create Worksheet: DAT
+2016-10-28 09:29:36,140 Exporters                                          line:114  INFO     Create Worksheet: IED
+2016-10-28 09:29:36,142 Exporters                                          line:132  INFO     create Worksheet: TCF
+2016-10-28 09:30:23,670 Exporters                                          line:132  INFO     create Worksheet: TGC
+2016-10-28 09:30:23,674 Exporters                                          line:132  INFO     create Worksheet: TBC
+2016-10-28 09:30:23,680 Exporters                                          line:132  INFO     create Worksheet: BC_DBASE
+2016-10-28 09:38:56,180 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 09:38:56,190 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 09:38:56,308 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 09:38:56,313 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 09:38:56,454 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 09:38:56,569 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 09:38:56,588 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 09:38:56,891 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 09:38:56,897 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 09:38:56,901 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 09:38:56,901 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 09:38:56,917 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 09:38:56,918 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 09:38:56,930 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 09:38:56,933 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 09:38:57,648 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 09:38:57,651 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 09:38:57,654 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 09:38:57,654 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 09:38:57,744 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 09:39:09,121 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:39:09,555 __main__                                           line:1300 ERROR    'list' object has no attribute 'keys'
+Traceback (most recent call last):
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\LogIT.py", line 1286, in _exportDatabase
+    run_out, run_header, dat_out, dat_header = pv.createRunDatExport()
+  File "C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\peeweeviews.py", line 972, in createRunDatExport
+    if not r.dat.name in dat_out.keys():
+AttributeError: 'list' object has no attribute 'keys'
+2016-10-28 09:40:18,305 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 09:40:18,907 Exporters                                          line:85   INFO     create Worksheet: RUN
+2016-10-28 09:40:18,944 Exporters                                          line:101  INFO     create Worksheet: DAT
+2016-10-28 09:40:18,947 Exporters                                          line:115  INFO     Create Worksheet: IED
+2016-10-28 09:40:18,950 Exporters                                          line:133  INFO     create Worksheet: TCF
+2016-10-28 09:40:18,957 Exporters                                          line:133  INFO     create Worksheet: TGC
+2016-10-28 09:40:18,963 Exporters                                          line:133  INFO     create Worksheet: TBC
+2016-10-28 09:40:19,217 Exporters                                          line:133  INFO     create Worksheet: BC_DBASE
+2016-10-28 09:50:36,812 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/newdb_v21_2.logdb
+2016-10-28 09:50:37,085 peeweemodels                                       line:200  INFO     Database successfully Updated - Current DB version = 21
+2016-10-28 09:52:48,355 ship.utils.qtclasses                               line:100  INFO     User cancelled file open process
+2016-10-28 09:54:01,953 ship.utils.qtclasses                               line:86   INFO     Opening file: C:/Users/duncan.runnacles/Desktop/TEMP/logit/newdb_v21_1.logdb
+2016-10-28 09:54:32,960 ship.utils.qtclasses                               line:86   INFO     Opening file: C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb
+2016-10-28 10:01:31,644 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 10:01:31,648 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 10:01:31,698 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 10:01:31,700 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 10:01:31,766 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 10:01:31,796 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 10:01:31,822 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 10:01:31,924 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 10:01:31,926 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 10:01:31,927 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 10:01:31,927 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 10:01:31,934 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 10:01:31,934 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 10:01:31,937 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 10:01:31,938 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 10:01:32,194 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 10:01:32,194 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 10:01:32,194 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 10:01:32,196 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 10:01:32,233 __main__                                           line:205  DEBUG    Setup UI complete

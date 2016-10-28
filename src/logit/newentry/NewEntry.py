@@ -267,11 +267,11 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 errors = GuiStore.ErrorHolder()
                 errors, self.all_logs = Controller.fetchAndCheckModel(open_path, run_options, errors)
                 
-                # They might have been collected from .ief so get them again here
-                run_options = self.all_logs.run['RUN_OPTIONS']
                 
                 # Check what's already in the database
                 if not errors.has_errors:
+                    # They might have been collected from .ief so get them again here
+                    run_options = self.all_logs.run['RUN_OPTIONS']
                     for i, m in enumerate(self.all_logs.models):
                         if pv.modelExists(m['NAME']):
                             self.all_logs.models[i]['EXISTS'] = True

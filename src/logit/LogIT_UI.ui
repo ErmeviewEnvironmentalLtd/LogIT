@@ -32,8 +32,8 @@
    <string>LogIT</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>:/icons/images/Logit_Logo2_25x25.png</normaloff>:/icons/images/Logit_Logo2_25x25.png</iconset>
+   <iconset resource="LogIT_RC.qrc">
+    <normaloff>:/icons/Logit_Logo2_25x25.png</normaloff>:/icons/Logit_Logo2_25x25.png</iconset>
   </property>
   <property name="iconSize">
    <size>
