@@ -119,7 +119,7 @@ def newExportToExcel(run, runh, dat, dath, model, ied, iedh, xlspath):
     
     # Write the ied data for each entry
     count = 1
-    for k, v in ied.items():
+    for v in ied:
         for j, i in enumerate(v, 0):
             ws.write(count, j, i)
         count += 1

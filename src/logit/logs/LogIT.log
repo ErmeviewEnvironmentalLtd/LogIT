@@ -184,3 +184,33 @@
 2016-10-28 17:17:11,102 __main__                                           line:205  DEBUG    Setup UI complete
 2016-10-28 17:17:49,006 __main__                                           line:1289 INFO     Closing program
 2016-10-28 17:17:49,007 __main__                                           line:1290 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset
+2016-10-28 17:32:46,286 __main__                                           line:121  INFO     Logs will be written to file at: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\logs
+2016-10-28 17:32:46,292 __main__                                           line:139  DEBUG    SQLite3 import complete
+2016-10-28 17:32:46,378 __main__                                           line:154  DEBUG    Start of Logit imports
+2016-10-28 17:32:46,407 __main__                                           line:156  DEBUG    Main Window import complete
+2016-10-28 17:32:46,532 __main__                                           line:158  DEBUG    LogBuilder import complete
+2016-10-28 17:32:46,628 __main__                                           line:160  DEBUG    Exporters import complete
+2016-10-28 17:32:46,674 Controller                                         line:91   DEBUG    Import app_metrics complete
+2016-10-28 17:32:46,882 __main__                                           line:162  DEBUG    Controller import complete
+2016-10-28 17:32:46,887 __main__                                           line:164  DEBUG    GuiStore import complete
+2016-10-28 17:32:46,888 __main__                                           line:166  DEBUG    Ief Resolver import complete
+2016-10-28 17:32:46,888 __main__                                           line:168  DEBUG    Global Settings import complete
+2016-10-28 17:32:46,901 newentry.NewEntry                                  line:69   DEBUG    NewEntry_Widget import complete
+2016-10-28 17:32:46,903 __main__                                           line:170  DEBUG    New Entry import complete
+2016-10-28 17:32:46,910 extractmodel.ModelExtractor                        line:73   DEBUG    ModelExtractor_Widget import complete
+2016-10-28 17:32:46,911 __main__                                           line:172  DEBUG    Extract Model import complete
+2016-10-28 17:32:47,407 runsummary.RunSummary                              line:62   DEBUG    RunSummary_Widget import complete
+2016-10-28 17:32:47,407 __main__                                           line:174  DEBUG    Run Summary import complete
+2016-10-28 17:32:47,410 __main__                                           line:176  DEBUG    db migrations import complete
+2016-10-28 17:32:47,410 __main__                                           line:180  DEBUG    Import modules complete
+2016-10-28 17:32:47,483 __main__                                           line:205  DEBUG    Setup UI complete
+2016-10-28 17:35:15,165 ship.utils.qtclasses                               line:119  INFO     Saving file: Filename = C:/Users/duncan.runnacles/Desktop/TEMP/logit/NewDB_v20.logdb.xls
+2016-10-28 17:35:15,420 Exporters                                          line:85   INFO     create Worksheet: RUN
+2016-10-28 17:35:15,428 Exporters                                          line:101  INFO     create Worksheet: DAT
+2016-10-28 17:35:15,430 Exporters                                          line:115  INFO     Create Worksheet: IED
+2016-10-28 17:35:15,430 Exporters                                          line:133  INFO     create Worksheet: TCF
+2016-10-28 17:35:15,433 Exporters                                          line:133  INFO     create Worksheet: TGC
+2016-10-28 17:35:15,434 Exporters                                          line:133  INFO     create Worksheet: TBC
+2016-10-28 17:35:15,436 Exporters                                          line:133  INFO     create Worksheet: BC_DBASE
+2016-10-28 17:35:45,665 __main__                                           line:1289 INFO     Closing program
+2016-10-28 17:35:45,667 __main__                                           line:1290 INFO     Saving user settings to: C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\LogIt\src\logit\settings.logset

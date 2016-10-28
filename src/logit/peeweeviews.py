@@ -1048,10 +1048,10 @@ def createIedExport():
     """
     ied_header = ['name', 'date', 'ammendments', 'comments']
     query = pm.Ied.select()
-    ied_out = {}
+    ied_out = []
     for q in query:
-        ied_out[q.name] = [q.name, q.timestamp.strftime("%Y-%m-%d"),
-                           q.amendments, q.comments]
+        ied_out.append([q.name, q.timestamp.strftime("%Y-%m-%d"),
+                        q.amendments, q.comments])
     
     return ied_out, ied_header
         

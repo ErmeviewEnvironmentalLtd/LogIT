@@ -447,6 +447,27 @@ v1.1.2-Beta:
        of IF, ELSE IF, ELSE, and DEFINE in event logic.
 
 
+v1.2.0-Beta:
+    - Updated database version to v21 YOU WILL NEED TO UPDATE DATABASE.
+    - Added Initial Conditions column on RUN table.
+    - Added Ied table and with support for recording IED files.
+    - [Feature] support for database updates and migrations. This was broken when
+      the database was updated to the new version, but is now included again.
+    - [Feature] Added File Summary query tab. This allows you to view all of the
+      model files associated with one or more runs. To use it select one of more
+      of the rows on the RUN table and choose "File Summary" from the right-click 
+      query menu. This item is also available when viewing run info under the 
+      'RUN Event' and 'RUN Options' tables on the simple query tab.
+    - [Bugfix] Better support for event/scenario logic. 
+    - Currently, when a file containing event logic is loaded into the database 
+      it will include only the files that fall within the provided run options. 
+      When that files is loaded with different run options it will not be added a 
+      second time and the additional files are missed. Fix allows for additional 
+      files to be added and those files are referenced against a specific run as 
+      well as the model file for identification when querying.
+    - Changed the Scenario vals box text to "Run Options" for consistency.
+
+
 ##~##
 
 LICENSE
