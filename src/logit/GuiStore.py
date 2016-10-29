@@ -104,7 +104,7 @@ class TableWidgetDb(QtGui.QTableWidget):
             self.cellChanged.connect(self._highlightEditRow)
             self.horizontalHeader().setStretchLastSection(True)
     
-    def addRows(self, cols, rows):
+    def addRows(self, cols, rows, sort_col=None, custom_highlight=[]):
         """Add row data to this table.
         
         Uses the TableWidgetItemDb class to create the QTableWidgetItem's.
@@ -112,8 +112,13 @@ class TableWidgetDb(QtGui.QTableWidget):
         Args:
             cols(list): columns header strings.
             rows(list): containing lists of cell data to be added to rows.
+            sort_col(int)=None: column used to sort the data by. If left at
+                default no sorting will be done.
+            custom_highlight(list): contains booleans corresponding to each
+                item in rows setting whether to highlight or not highlight the
+                QTableWidgetItem. Must be the same dimensions as rows or an
+                IndexError will be thrown.
         """
-        
         self.setSortingEnabled(False)
         self.setColumnCount(len(cols))
         
@@ -137,6 +142,10 @@ class TableWidgetDb(QtGui.QTableWidget):
                     item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable)
                 else:
                     item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
+                if custom_highlight:
+                    if custom_highlight[i][j]:
+                        item.setBackgroundColor(QtGui.QColor(178, 255, 102)) # Light Green
+                    
                 self.setItem(i, j, item)
         
         if self.name == 'MODEL' or self.name == 'QUERY':
@@ -148,6 +157,8 @@ class TableWidgetDb(QtGui.QTableWidget):
                 
         self.blockSignals(False)
         self.setSortingEnabled(True)
+        if not sort_col is None:
+            self.sortItems(sort_col)
     
 
     @QtCore.pyqtSlot()

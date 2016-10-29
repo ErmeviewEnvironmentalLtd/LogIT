@@ -729,8 +729,10 @@ class MainGui(QtGui.QMainWindow):
         for index in xrange(self.ui.fileQuerySelectedList.count()):
             ids.append(self.ui.fileQuerySelectedList.item(index).text())
         
-        cols, rows = pv.getFileSummaryQuery(ids)
-        self.table_info['QUERY']['table'].addRows(cols, rows)
+        cols, rows, new_status = pv.getFileSummaryQuery(ids)
+        if not self.ui.queryFilesHighlightCbox.isChecked(): new_status = []
+        self.table_info['QUERY']['table'].addRows(cols, rows, sort_col=0, 
+                                                  custom_highlight=new_status)
         
     def checkUnsavedEntries(self, table, include_cancel_button=True):
         """Checks the unsaved entry status of open tables.
@@ -793,10 +795,10 @@ class MainGui(QtGui.QMainWindow):
             success = False
         elif version == pm.DATABASE_VERSION_HIGH:
             msg = ('This database was created with a newer version of LogIT\n'+
-                   'Please upgrade to a newer version.')
+                   'Please upgrade to the latest version.')
             success = False
         elif version == pm.DATABASE_VERSION_LOW:
-            msg = ('This database needs updating. Please contact anyone but Duncan.')
+            msg = ('This database needs updating.\nUse Settings > Tools > Update Database Schema.')
             success = False
         
         if not success:
@@ -808,8 +810,10 @@ class MainGui(QtGui.QMainWindow):
     def _loadNewModelLog(self):
         """Asks user for an existing .logdb file and loads."""
         path, exists = gs.getPath('log')
+        cur_log = None
         if exists:
             p = path
+            cur_log = path
         else:
             p = gs.path_holder['last_path']
         d = MyFileDialogs(parent=self)
@@ -820,6 +824,8 @@ class MainGui(QtGui.QMainWindow):
             success = self.checkDatabaseVersion(open_path)
             if success:
                 self._loadModelLog()
+            elif not success and not cur_log is None:
+                gs.setPath('log', cur_log)
             
     def _loadModelLog(self):
         """Reload the Run and Model tables."""
@@ -835,7 +841,7 @@ class MainGui(QtGui.QMainWindow):
             pm.logit_db.init(None)
             gs.path_holder['last_path'] = gs.path_holder['log']
             del gs.path_holder['log']
-            msg = "Critical error accessing database! - please check it exists and/or contact distributor"
+            msg = "Critical error accessing database! - please check it exists and/or contact support"
             self.launchQMsgBox('DB Load Error', msg)
     
     def checkDbLoaded(self, show_dialog=True):
@@ -882,7 +888,7 @@ class MainGui(QtGui.QMainWindow):
             self.table_info['MODEL'] = {'table': model_table}
             self.ui.tableModelGroupLayout.addWidget(model_table)
             cols, rows = pv.getModelData(cur_text)
-            self.table_info['MODEL']['table'].addRows(cols, rows)
+            self.table_info['MODEL']['table'].addRows(cols, rows, sort_col=0)
     
     def loadRunDb(self):
         """Loads the Run table database data into the Run log tab table."""
@@ -891,7 +897,7 @@ class MainGui(QtGui.QMainWindow):
             if not self.checkUnsavedEntries('RUN'):
                 return
         cols, rows = pv.getRunData()
-        self.table_info['RUN']['table'].addRows(cols, rows)
+        self.table_info['RUN']['table'].addRows(cols, rows, sort_col=0)
         
     def _createNewLogDatabase(self):
         """Create a new .logdb database.
@@ -1369,7 +1375,6 @@ class MainGui(QtGui.QMainWindow):
         save_path = str(save_path)
         gs.setPath('export', save_path)
         errors = GuiStore.ErrorHolder()
-#             save_path = r'C:/Users/duncan.runnacles/Desktop/TEMP/logit/db/excel_out.xls'
 
         try:
             # Setup the progress stuff
@@ -1421,7 +1426,7 @@ class MainGui(QtGui.QMainWindow):
     
     
     def cleanDatabase(self):
-         
+        """Removes any orphaned Many-to-many table files from database.""" 
         try:
             self._updateMaxProgress(3)
             self._updateCurrentProgress(1)
@@ -1505,7 +1510,9 @@ class MainGui(QtGui.QMainWindow):
             pm.logit_db.init(None)
             pm.createNewDb(dbpath)
             pm.logit_db.init(dbpath)
+            gs.setPath('log', dbpath)
             self._loadModelLog()
+            self.launchQMsgBox('Update Successfull', 'Your database has been updated and loaded into logit')
         except Exception, err:
             logger.exception(err)
             # Restore the backup copy if it fails
@@ -1543,11 +1550,6 @@ class MainGui(QtGui.QMainWindow):
         for i in ief_paths:
             file_list.append(str(i))
             gs.setPath('ief', i)
-        # DEBUG
-#         file_list = [r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief',
-#                  r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\kennford_1%AEP_FINAL_v5.18_dsbd-20%.ief',
-#                  r'C:\Users\duncan.runnacles.KEN\Desktop\Temp\logit_test\model\isis\iefs\Kennford_1%AEP_FINAL_v5.18_ExeRd_b25%.ief'
-#                 ]
         
         self._updateStatusBar('Attempting to automatically resolve ief file...')
         self._updateMaxProgress(4)

@@ -717,7 +717,7 @@ def getFileSummaryQuery(ids):
     output = []
     for q in query:
         if not q.run_id in found_runs.keys():
-            cur_index = len(output) - 1
+            cur_index = len(output) 
             found_runs[q.run_id] = cur_index
             output.append({'id': q.run_id, 'run_options': q.run.run_options,
                            'ief': q.run.ief, 'TCF': [], 'ECF': [], 'TGC': [],
@@ -734,6 +734,7 @@ def getFileSummaryQuery(ids):
             output[cur_index]['NEW_' + q.model_file.model_type] = True
     
     new_output = []
+    new_status = []
     for o in output:
         new_output.append([o['id'], o['run_options'], o['ief'],
                           ', '.join(o['TCF']),
@@ -744,8 +745,11 @@ def getFileSummaryQuery(ids):
                           ', '.join(o['TEF']),
                           ', '.join(o['TRD']),
                           ])
+        new_status.append([False, False, False, o['NEW_TCF'], o['NEW_ECF'], 
+                          o['NEW_TGC'], o['NEW_TBC'], o['NEW_BC_DBASE'],
+                          o['NEW_TEF'], o['NEW_TRD']])
     
-    return cols, new_output 
+    return cols, new_output, new_status
     
 
 def getSimpleQuery(table, value1, with_files, new_sub_only, new_model_only, run_id, value2=''):
