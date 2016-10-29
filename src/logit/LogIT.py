@@ -1023,9 +1023,22 @@ class MainGui(QtGui.QMainWindow):
             
             response = self.launchQtQBox('New version available', msg)
             if not response == False:
-                success = Controller.downloadNewVersion(cur_location,
-                                                        gs.__SERVER_PATH__,
-                                                        download_filename)
+                try:
+                    self._updateStatusBar('Downloading LogIT version %s' % is_latest[1])
+                    self._updateMaxProgress(0)
+                    self._updateCurrentProgress(0)
+                    QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+                    success = Controller.downloadNewVersion(cur_location,
+                                                            gs.__SERVER_PATH__,
+                                                            download_filename)
+                except Exception, err:
+                    logger.exception(err)
+                finally:
+                    QtGui.QApplication.restoreOverrideCursor()
+                    self._updateStatusBar('')
+                    self._updateMaxProgress(1)
+                    self._updateCurrentProgress(0)
+                    
                 if not success:
                     msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + gs.__SERVER_PATH__
                     self.launchQMsgBox('Update Failure', msg)
