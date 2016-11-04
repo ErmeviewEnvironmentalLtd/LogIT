@@ -93,6 +93,15 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
 
         self.complexScriptList.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.complexScriptList.customContextMenuRequested.connect(self._listPopup)
+
+        font = QtGui.QFont()
+        font.setFamily( "Courier" )
+        font.setFixedPitch( True )
+        font.setPointSize( 10 )
+        self.complexScriptText = QtGui.QTextEdit()
+        self.complexScriptText.setFont( font )
+        highlighter = MyHighlighter( self.complexScriptText, "Classic" )
+        self.editorLayout.addWidget(self.complexScriptText)
         self.complexScriptText.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.complexScriptText.customContextMenuRequested.connect(self._scriptPopup)
 
@@ -223,7 +232,6 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
             if str(self.complexScriptList.item(i).text()) == name:
                 self.complexScriptList.setItemSelected(self.complexScriptList.item(i), True)
                 self.complexScriptList.setCurrentRow(i)
-        self.complexScriptText.setEnabled(False)
         self.do_update = True
     
     
@@ -349,12 +357,18 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
         raw_query = str(self.complexScriptText.toPlainText())
         
         if not self.checkDbLoaded(): return
+        if 'ORDER BY' in raw_query.upper():
+            self.query_table.setSortingEnabled(False)
         cols, rows, error = pv.complexQuery(gs.path_holder['log'], raw_query)
         
         if cols is None:
             self.launchQMsgBox('Query Error', error)
         else:
             self.query_table.addRows(cols, rows)
+        
+        if 'ORDER BY' in raw_query.upper():
+            self.query_table.setSortingEnabled(True)
+            
         
 
     def _queryFileSummary(self, ids):
@@ -731,5 +745,131 @@ class DbDesignLabel(QtGui.QDialog):
         event.ignore()
 
         
+class MyHighlighter(QtGui.QSyntaxHighlighter):
+
+    def __init__( self, parent, theme ):
+        QtGui.QSyntaxHighlighter.__init__( self, parent )
+        self.parent = parent
+        keyword = QtGui.QTextCharFormat()
+        reservedClasses = QtGui.QTextCharFormat()
+        fields = QtGui.QTextCharFormat()
+        assignmentOperator = QtGui.QTextCharFormat()
+        delimiter = QtGui.QTextCharFormat()
+        number = QtGui.QTextCharFormat()
+        string = QtGui.QTextCharFormat()
+        singleQuotedString = QtGui.QTextCharFormat()
+
+        self.highlightingRules = []
+
+        # keyword
+        brush = QtGui.QBrush(QtCore.Qt.darkRed, QtCore.Qt.SolidPattern )
+        keyword.setForeground( brush )
+        keyword.setFontWeight( QtGui.QFont.Bold )
+        keywords = QtCore.QStringList( ["where", "like", "on", "select", "from",
+                                        "insert", "delete", "drop", "truncate",
+                                        "and", "or", "join", "create", "alter",
+                                        "into", "in", "inner join", "outer join",
+                                        "max", "min", "group by", "avg", "count",
+                                        "sum", "escape", "as", "order by",
+                                        "WHERE", "LIKE", "ON", "SELECT", "FROM",
+                                        "INSERT", "DELETE", "DROP", "TRUNCATE",
+                                        "AND", "OR", "JOIN", "CREATE", "ALTER",
+                                        "INTO", "IN", "INNER JOIN", "OUTER JOIN",
+                                        "MAX", "MIN", "GROUP BY", "AVG", "COUNT",
+                                        "SUM", "ESCAPE", "AS", "ORDER BY"] )
+        for word in keywords:
+            pattern = QtCore.QRegExp("\\b" + word + "\\b")
+            rule = HighlightingRule( pattern, keyword )
+            self.highlightingRules.append( rule )
+
+        # reservedClasses
+        brush = QtGui.QBrush(QtCore.Qt.darkBlue, QtCore.Qt.SolidPattern )
+        reservedClasses.setForeground( brush )
+        reservedClasses.setFontWeight( QtGui.QFont.Bold )
+        keywords = QtCore.QStringList(["run", "run_modelfile", "run_subfile",
+                                       "run_ied", "modelfile", "modelfile_subfile",
+                                       "subfile", "dat", "ied"])
+        for word in keywords:
+            pattern = QtCore.QRegExp("\\b" + word + "\\b")
+            rule = HighlightingRule( pattern, reservedClasses )
+            self.highlightingRules.append( rule )
+
+        # fields
+        brush = QtGui.QBrush(QtCore.Qt.darkCyan, QtCore.Qt.SolidPattern )
+        fields.setForeground( brush )
+        fields.setFontWeight( QtGui.QFont.Bold )
+        keywords = QtCore.QStringList(["id", "dat_id", "run_hash", "setup",
+                                       "comments", "ief", "tcf", "initial_conditions",
+                                       "isis_results", "tuflow_results", 
+                                       "event_duration", "run_Status", "mb",
+                                       "modeller", "isis_version", "tuflow_version", 
+                                       "event_name", "ief_dir", "tcf_dir", 
+                                       "log_dir", "run_options", "timestamp",
+                                       "run_id", "ied_id", "model_file_id",
+                                       "new_file", "sub_file_id", "name",
+                                       "amendments", "comments", "ref",
+                                       "model_type" 
+                                      ])
+        
+        for word in keywords:
+            pattern = QtCore.QRegExp("\\b" + word + "\\b")
+            rule = HighlightingRule( pattern, fields )
+            self.highlightingRules.append( rule )
+
+        # assignmentOperator
+        brush = QtGui.QBrush( QtCore.Qt.magenta, QtCore.Qt.SolidPattern )
+        pattern = QtCore.QRegExp("[\.=%\-\+\\\\/\<\>]")
+        assignmentOperator.setForeground( brush )
+        assignmentOperator.setFontWeight( QtGui.QFont.Bold )
+        rule = HighlightingRule( pattern, assignmentOperator )
+        self.highlightingRules.append( rule )
+
+        # delimiter
+        pattern = QtCore.QRegExp( "[\)\(]+|[\{\}]+|[][]+" )
+        delimiter.setForeground( brush )
+        delimiter.setFontWeight( QtGui.QFont.Bold )
+        rule = HighlightingRule( pattern, delimiter )
+        self.highlightingRules.append( rule )
+
+        # number
+        brush = QtGui.QBrush( QtCore.Qt.red, QtCore.Qt.SolidPattern )
+        pattern = QtCore.QRegExp( "[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?" )
+        pattern.setMinimal( True )
+        number.setForeground( brush )
+        rule = HighlightingRule( pattern, number )
+        self.highlightingRules.append( rule )
+
+        # string
+        brush = QtGui.QBrush( QtCore.Qt.green, QtCore.Qt.SolidPattern )
+        pattern = QtCore.QRegExp( "\".*\"" )
+        pattern.setMinimal( True )
+        string.setForeground( brush )
+        rule = HighlightingRule( pattern, string )
+        self.highlightingRules.append( rule )
+
+        # singleQuotedString
+        pattern = QtCore.QRegExp( "\'.*\'" )
+        pattern.setMinimal( True )
+        singleQuotedString.setForeground( brush )
+        rule = HighlightingRule( pattern, singleQuotedString )
+        self.highlightingRules.append( rule )
+        
+        
+
+    def highlightBlock( self, text ):
+        for rule in self.highlightingRules:
+            expression = QtCore.QRegExp( rule.pattern )
+            index = expression.indexIn( text )
+            while index >= 0:
+                length = expression.matchedLength()
+                self.setFormat( index, length, rule.format )
+                index = text.indexOf( expression, index + length )
+        self.setCurrentBlockState( 0 )
+
+
+class HighlightingRule():
+    def __init__(self, pattern, format):
+        self.pattern = pattern
+        self.format = format 
         
         

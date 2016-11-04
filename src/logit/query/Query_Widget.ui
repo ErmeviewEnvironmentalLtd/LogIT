@@ -23,7 +23,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="simpleQueryTab">
       <attribute name="title">
@@ -337,20 +337,11 @@
      </widget>
      <widget class="QWidget" name="complexQueryTab">
       <attribute name="title">
-       <string>Complex Query</string>
+       <string>Custom Query</string>
       </attribute>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QPlainTextEdit" name="complexScriptText">
-         <property name="font">
-          <font>
-           <family>Courier</family>
-           <pointsize>11</pointsize>
-           <weight>50</weight>
-           <bold>false</bold>
-          </font>
-         </property>
-        </widget>
+        <layout class="QVBoxLayout" name="editorLayout"/>
        </item>
        <item>
         <widget class="QListWidget" name="complexScriptList">

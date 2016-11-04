@@ -46,6 +46,10 @@
     DR - 08/09/2016:
         Cleared out the old table holder classes. All functionality is now
         catered for in the TableWidgetDb class with subclasses QTableWidget
+    DR - 20/10/2016:
+        Subclassed the TableWidgetDb table into three different classes for the
+        Run table, Models table and Query table. The logic was getting a bit
+        confusing and it is now much neater.
         
 
  TODO:
@@ -95,14 +99,6 @@ class TableWidgetDb(QtGui.QTableWidget):
         self.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
         self._unsaved_entries = []
         
-#         if name == 'MODEL':
-#             self.id_col = 1
-#         else:
-#             self.id_col = 0
-        
-#         if not name == "QUERY":
-#             self.cellChanged.connect(self._highlightEditRow)
-#             self.horizontalHeader().setStretchLastSection(True)
     
     def addRows(self, cols, rows, sort_col=None, custom_highlight=[]):
         """Add row data to this table.
@@ -122,10 +118,6 @@ class TableWidgetDb(QtGui.QTableWidget):
         self.setSortingEnabled(False)
         self.setColumnCount(len(cols))
         
-        # For show/hide columns on RUN table (not available on others)
-#         if self.name == 'RUN':
-#             self.horizontalHeader().setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-#             self.horizontalHeader().customContextMenuRequested.connect(self.showHeaderMenu)
         for k, c in enumerate(cols):
             item = QtGui.QTableWidgetItem()
             item.setTextAlignment(QtCore.Qt.AlignCenter|QtCore.Qt.AlignVCenter)
@@ -148,13 +140,6 @@ class TableWidgetDb(QtGui.QTableWidget):
                     
                 self.setItem(i, j, item)
         
-#         if self.name == 'MODEL':# or self.name == 'QUERY':
-#             self.resizeColumnsToContents()
-#             self.horizontalHeader().setStretchLastSection(True)
-#         if self.name == 'RUN':
-#             for k, v in self.hidden_columns.items():
-#                 self.horizontalHeader().hideSection(v)
-                
         self.blockSignals(False)
         self.setSortingEnabled(True)
         if not sort_col is None:
@@ -176,10 +161,14 @@ class TableWidgetDb(QtGui.QTableWidget):
                     self.item(row, x).setBackgroundColor(QtGui.QColor(178, 255, 102)) # Light Green
                 
                 
-    def saveTableEdits(self): 
+    def saveTableEdits(self, callback): 
         """Save the active edits in the table.
         
         Clears the self._unsaved_entries lists after updating.
+        
+        Args:
+            callback(function): the function that will be called with the
+                keep_cells and row_id arguments if an unsaved entry is found.
         """
         total_updates = 0
         cur_prog = 1
@@ -200,15 +189,8 @@ class TableWidgetDb(QtGui.QTableWidget):
                         if not headertext == 'id':
                             keep_cells[headertext] = str(self.item(row, x).text())
                     
-                    if self.name == 'RUN':
-                        pv.updateRunRow(keep_cells, int(id))
-                    elif self.name == 'MODEL':
-                        if self.subname == 'DAT':
-                            pv.updateDatRow(keep_cells, id)
-                        if self.subname == 'IED':
-                            pv.updateIedRow(keep_cells, id)
-                        else:
-                            pv.updateModelRow(keep_cells, id)
+                    # Callback function
+                    callback(keep_cells, id)
                     
                     cur_prog += 1
                     
@@ -228,61 +210,8 @@ class TableWidgetDb(QtGui.QTableWidget):
             table(TableWidget): to get the row data from.
             all_entry(bool): if True deletes associated entries as well.
         """
+        raise NotImplementedError
         
-        # Get the currently active row in the table and find it's ID value
-        row = self.currentRow()
-        row_id = str(self.item(row, self.id_col).text())
-        
-        # Just make sure we meant to do this
-        if self.subname == '':
-            n = self.name
-        else:
-            n = self.subname
-        
-        if self.name == 'RUN':
-            if not all_entry:
-                message = "Delete RUN entry for ID = %s" % (row_id) 
-            else:
-                message = "Delete this RUN entry AND all associated entries?\nID = %s" % (row_id)       
-            answer = self.launchQtQBox('Confirm Delete?', message)        
-            if answer == False:
-                return
-            
-            try:
-                self.emit(QtCore.SIGNAL("setRange"), 3)
-                self.emit(QtCore.SIGNAL("updateProgress"), 1)
-                self.emit(QtCore.SIGNAL("statusUpdate"), 'Deleting Run and Model files ...')
-                pv.deleteRunRow(int(row_id), delete_recursive=all_entry)
-                self.emit(QtCore.SIGNAL("statusUpdate"), 'Deleting orphaned files ...')
-                pv.deleteOrphanFiles(int(row_id))
-                self.emit(QtCore.SIGNAL("updateProgress"), 2)
-                self.emit(QtCore.SIGNAL("statusUpdate"), 'Recalculating file status ...')
-                pv.updateNewStatus()
-                self.emit(QtCore.SIGNAL("statusUpdate"), 'Delete complete')
-                self.emit(QtCore.SIGNAL("updateProgress"), 0)
-
-            except Exception, err:
-                self.emit(QtCore.SIGNAL("statusUpdate"), 'Delete failed')
-                self.emit(QtCore.SIGNAL("updateProgress"), 0)
-                msg = ('There was an issue deleting some of the components of ' +
-                       'this run.\nYou should run the Clean Database tool to ' +
-                       'make sure all orphaned files have been removed.')
-                self.launchQMsgBox('Database Error', msg)
-                logger.exception(err)
-          
-        else:
-            message = "Delete this entry?\nTable = %s, ID = %s" % (self.subname, row_id) 
-            answer = self.launchQtQBox('Confirm Delete?', message)    
-            if answer == False:
-                return
-              
-            if self.subname == 'DAT':
-                pv.deleteDatRow(row_id)
-            else:
-                pv.deleteModelRow(row_id)
-        
-        self.emit(QtCore.SIGNAL("dbUpdated"))
-    
 
     def launchQMsgBox(self, title, message, type='warning'):
         """Launch a QMessageBox
@@ -390,7 +319,6 @@ class TableWidgetModel(TableWidgetDb):
     def __init__(self, name, rows, cols, subname='', hidden_cols={}, parent=None):
         TableWidgetDb.__init__(self, name, rows, cols, subname, hidden_cols, parent)
         self.id_col = 1
-#         self._unsaved_entries = []
         self.cellChanged.connect(self._highlightEditRow)
         self.horizontalHeader().setStretchLastSection(True)
         
@@ -399,6 +327,45 @@ class TableWidgetModel(TableWidgetDb):
         super(TableWidgetModel, self).addRows(cols, rows, sort_col, custom_highlight)
         self.resizeColumnsToContents()
         self.horizontalHeader().setStretchLastSection(True)
+    
+    
+    def saveTableEdits(self):
+        if self.subname == 'DAT':
+            TableWidgetDb.saveTableEdits(self, pv.updateDatRow)
+        if self.subname == 'IED':
+            TableWidgetDb.saveTableEdits(self, pv.updateIedRow)
+        else:
+            TableWidgetDb.saveTableEdits(self, pv.updateModelRow)
+    
+    
+    def _deleteRowFromDatabase(self, all_entry):
+        """Deletes the row in the database based on the location that the mouse
+        was last clicked.
+        This is fine because this function is called from the context menu and
+        therefore relies on the user right-clicking on the correct row.
+        
+        Args:
+            table(TableWidget): to get the row data from.
+            all_entry(bool): if True deletes associated entries as well.
+        """
+        
+        # Get the currently active row in the table and find it's ID value
+        row = self.currentRow()
+        row_id = str(self.item(row, self.id_col).text())
+        
+        message = "Delete this entry?\nTable = %s, ID = %s" % (self.subname, row_id) 
+        answer = self.launchQtQBox('Confirm Delete?', message)    
+        if answer == False:
+            return
+          
+        if self.subname == 'DAT':
+            pv.deleteDatRow(row_id)
+        elif self.subname == 'IED':
+            pv.deleteIedRow(row_id)
+        else:
+            pv.deleteModelRow(row_id)
+
+        self.emit(QtCore.SIGNAL("dbUpdated"))
     
     
     def _tablePopup(self, pos):
@@ -412,7 +379,9 @@ class TableWidgetModel(TableWidgetDb):
         # Get the action and do whatever it says
         action = menu.exec_(self.viewport().mapToGlobal(pos))
 
+        is_dat_ied = False
         if self.subname != 'DAT' and self.subname != 'IED':
+            is_dat_ied = True
             query_menu = menu.addMenu("Query")
             queryModelFilesAction = query_menu.addAction("Subfiles")
             queryModelFilesNewAction = query_menu.addAction("Subfiles - New only")
@@ -428,7 +397,7 @@ class TableWidgetModel(TableWidgetDb):
         elif action == deleteRowAction:
             self._deleteRowFromDatabase(False)
             
-        if action == queryModelFilesNewAction or action == queryModelFilesAction:
+        if is_dat_ied and (action == queryModelFilesNewAction or action == queryModelFilesAction):
             row = self.currentRow()
             id = str(self.item(row, self.id_col).text())
             self.emit(QtCore.SIGNAL("queryModelTable"), self.subname, str(action.text()), id)
@@ -450,6 +419,57 @@ class TableWidgetRun(TableWidgetDb):
         super(TableWidgetRun, self).addRows(cols, rows, sort_col, custom_highlight)
         for k, v in self.hidden_columns.items():
             self.horizontalHeader().hideSection(v)
+
+            
+    def saveTableEdits(self):
+        TableWidgetDb.saveTableEdits(self, pv.updateRunRow)
+
+    
+    def _deleteRowFromDatabase(self, all_entry):
+        """Deletes the row in the database based on the location that the mouse
+        was last clicked.
+        This is fine because this function is called from the context menu and
+        therefore relies on the user right-clicking on the correct row.
+        
+        Args:
+            table(TableWidget): to get the row data from.
+            all_entry(bool): if True deletes associated entries as well.
+        """
+        
+        # Get the currently active row in the table and find it's ID value
+        row = self.currentRow()
+        row_id = str(self.item(row, self.id_col).text())
+        if not all_entry:
+            message = "Delete RUN entry for ID = %s" % (row_id) 
+        else:
+            message = "Delete this RUN entry AND all associated entries?\nID = %s" % (row_id)       
+        answer = self.launchQtQBox('Confirm Delete?', message)        
+        if answer == False:
+            return
+        
+        try:
+            self.emit(QtCore.SIGNAL("setRange"), 3)
+            self.emit(QtCore.SIGNAL("updateProgress"), 1)
+            self.emit(QtCore.SIGNAL("statusUpdate"), 'Deleting Run and Model files ...')
+            pv.deleteRunRow(int(row_id), delete_recursive=all_entry)
+            self.emit(QtCore.SIGNAL("statusUpdate"), 'Deleting orphaned files ...')
+            pv.deleteOrphanFiles(int(row_id))
+            self.emit(QtCore.SIGNAL("updateProgress"), 2)
+            self.emit(QtCore.SIGNAL("statusUpdate"), 'Recalculating file status ...')
+            pv.updateNewStatus()
+            self.emit(QtCore.SIGNAL("statusUpdate"), 'Delete complete')
+            self.emit(QtCore.SIGNAL("updateProgress"), 0)
+
+        except Exception, err:
+            self.emit(QtCore.SIGNAL("statusUpdate"), 'Delete failed')
+            self.emit(QtCore.SIGNAL("updateProgress"), 0)
+            msg = ('There was an issue deleting some of the components of ' +
+                   'this run.\nYou should run the Clean Database tool to ' +
+                   'make sure all orphaned files have been removed.')
+            self.launchQMsgBox('Database Error', msg)
+            logger.exception(err)
+        
+        self.emit(QtCore.SIGNAL("dbUpdated"))
 
     
     def _tablePopup(self, pos):

@@ -1082,7 +1082,7 @@ def complexQuery(db_path, raw_query):
             rows.append(row)
             i=0 
     except sqlite3.OperationalError, err:
-        logger.exception(err)
+#         logger.exception(err)
         return None, None, repr(err)
     except sqlite3.DatabaseError, err:
         logger.exception(err)
