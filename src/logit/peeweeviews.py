@@ -1064,7 +1064,13 @@ def complexQuery(db_path, raw_query):
     
     upper_raw = raw_query.upper()
     if 'DELETE' in upper_raw or 'DROP' in upper_raw or 'INSERT' in upper_raw or \
-                        'TRUNCATE' in upper_raw or 'UPDATE' in upper_raw:
+                        'TRUNCATE' in upper_raw or 'UPDATE' in upper_raw or \
+                        'ALTER' in upper_raw or 'CASCADE' in upper_raw or \
+                        'COMMIT' in upper_raw or 'DESTROY' in upper_raw or \
+                        'EXECUTE' in upper_raw or 'MODIFY' in upper_raw or \
+                        'PURGE' in upper_raw or 'REPLACE' in upper_raw or \
+                        'RESTORE' in upper_raw or 'ROLLBACK' in upper_raw or \
+                        'SAVE' in upper_raw or 'WRITE' in upper_raw:
         return None, None, 'Queries to update tables are not allowed.'
     
     query = ' '.join(raw_query.split())
