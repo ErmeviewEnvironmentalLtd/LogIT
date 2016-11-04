@@ -1060,6 +1060,46 @@ def createIedExport():
     return ied_out, ied_header
         
  
+def complexQuery(db_path, raw_query):
+    
+    upper_raw = raw_query.upper()
+    if 'DELETE' in upper_raw or 'DROP' in upper_raw or 'INSERT' in upper_raw or \
+                        'TRUNCATE' in upper_raw or 'UPDATE' in upper_raw:
+        return None, None, 'Queries to update tables are not allowed.'
+    
+    query = ' '.join(raw_query.split())
+    
+    conn = None
+    
+    try:
+        conn = sqlite3.connect(db_path)
+        cur = conn.cursor()
+        cur.execute(query)
+        
+        cols = [i[0] for i in cur.description]
+        rows = []
+        for row in cur:
+            rows.append(row)
+            i=0 
+    except sqlite3.OperationalError, err:
+        logger.exception(err)
+        return None, None, repr(err)
+    except sqlite3.DatabaseError, err:
+        logger.exception(err)
+        return None, None, repr(err)
+    except IOError, err:
+        logger.exception(err)
+        return None, None, repr(err)
+    except Exception, err:
+        logger.exception(err)
+        return None, None, repr(err)
+    
+    finally:
+        if not conn is None:
+            conn.close()
+    
+    return cols, rows, ''
+
 
 def checkDatabaseVersion(db_path, return_version=False):
     """Check the database version number to make sure it is the same as the

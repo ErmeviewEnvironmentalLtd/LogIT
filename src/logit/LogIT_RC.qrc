@@ -5,4 +5,7 @@
     <file>delete_icon_25x25.png</file>
     <file>add_icon_25x25.png</file>
   </qresource>
+  <qresource prefix="images">
+    <file>db_model_image.png</file>
+  </qresource>
 </RCC>

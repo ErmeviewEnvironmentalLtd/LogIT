@@ -85,6 +85,13 @@
         The increasingly large number of tables to display log info has been
         reduced to 3. One for the run log one to be shared between the 
         model logs and one to show the results of querying the other two.
+    DR - 20/10/2016:
+        Moved the Query tab into it's own widget to refactor some of the code
+        out of the MainGui class. 
+        Added a Model File Query and implemented the Complex Query tab. Model 
+        File shows all of the model files associated with a run. The Complex
+        Query contains a scripting window to allow the user to write their
+        own sql queries.
 
   TODO:
      
@@ -162,6 +169,8 @@ import Controller
 logger.debug('Controller import complete')
 import GuiStore
 logger.debug('GuiStore import complete')
+from query import Query
+logger.debug('Query import complete')
 import IefResolver
 logger.debug('Ief Resolver import complete')
 import globalsettings as gs
@@ -228,14 +237,6 @@ class MainGui(QtGui.QMainWindow):
         self.ui.actionExit.triggered.connect(self.close)
         self.ui.actionUpdateAllRunStatus.triggered.connect(self._updateAllRowStatus)
         self.ui.tabWidget.currentChanged.connect(self._tabChanged)
-        self.ui.queryFileCheck.stateChanged.connect(self._queryIncludeFilesChange)
-        self.ui.fileQueryAddSelectedBut.clicked.connect(self._updateFileSummaryQueryLists)
-        self.ui.fileQueryAddAllBut.clicked.connect(self._updateFileSummaryQueryLists)
-        self.ui.fileQueryRemoveSelectedBut.clicked.connect(self._updateFileSummaryQueryLists)
-        self.ui.fileQueryRemoveAllBut.clicked.connect(self._updateFileSummaryQueryLists)
-        self.ui.fileQueryAvailableList.itemClicked.connect(self._showFileSummaryIdDetails)
-        self.ui.fileQuerySelectedList.itemClicked.connect(self._showFileSummaryIdDetails)
-        self.ui.fileQueryRunBut.clicked.connect(self.runFileSummaryQuery)
         
         # Keyboard shortcuts
         # Quit
@@ -268,6 +269,14 @@ class MainGui(QtGui.QMainWindow):
         lpath, e = gs.getPath('last_path')
         if not e: gs.path_holder['last_path'] = self.settings.cur_settings_path
         logger.debug('Load settings complete')
+        # Add the query widget
+        self.query_widget = Query.Query_UI(cur_location)
+        self.ui.logViewTab.insertTab(self.ui.logViewTab.count(), self.query_widget, 'Query')
+        self.connect(self.query_widget, QtCore.SIGNAL("queryFileSummary"), self._queryFileSummary)
+        try:
+            self.query_widget.loadSettings(self.settings.tool_settings[self.query_widget.tool_name])
+        except:
+            logger.info('No loadSettings() found for %s' % (self.query_widget.tool_name))
         self._addWidgets()
         logger.debug('Add Widgets complete')
 #         self._setColumnWidths()
@@ -309,11 +318,8 @@ class MainGui(QtGui.QMainWindow):
         tchoice.append('RUN Options')
         self.ui.modelSelectCbox.addItems(pv.getTableChoice())
         self.ui.modelSelectCbox.currentIndexChanged.connect(self.loadModelDb)
-        self.ui.queryTableCbox.addItems(tchoice)
-        self.ui.queryTableCbox.currentIndexChanged.connect(self.changeSimpleQueryStatus)
-        self.ui.runSimpleQueryBut.clicked.connect(self.runSimpleQuery)
         
-        run_table = GuiStore.TableWidgetDb('RUN', 0, 0, hidden_cols=self.settings.main['run_hidden_cols'], parent=self)
+        run_table = GuiStore.TableWidgetRun('RUN', 0, 0, hidden_cols=self.settings.main['run_hidden_cols'], parent=self)
         self.connect(run_table, QtCore.SIGNAL("statusUpdate"), self._updateStatusBar)
         self.connect(run_table, QtCore.SIGNAL("setRange"), self._updateMaxProgress)
         self.connect(run_table, QtCore.SIGNAL("updateProgress"), self._updateCurrentProgress)
@@ -330,76 +336,19 @@ class MainGui(QtGui.QMainWindow):
         self.ui.logViewTab.setCurrentIndex(0)
         
         self.table_info['MODEL'] = {'table': None}
-        query_table = GuiStore.TableWidgetDb('QUERY', 0, 0)
-        self.connect(query_table, QtCore.SIGNAL("queryFileSummary"), self._queryFileSummary)
-        self.table_info['QUERY'] = {'table': query_table}
-        self.ui.tableQueryGroup.layout().addWidget(query_table)
-    
+        
+        
     def _queryFileSummary(self, ids):
         self._updateFileSummaryQueryList(ids)
-        self.runFileSummaryQuery()
         self.ui.logViewTab.setCurrentIndex(2)
-        self.ui.queryTabWidget.setCurrentIndex(1)
+        self.query_widget.queryTabWidget.setCurrentIndex(1)
+        self.query_widget.runFileSummaryQuery()
     
     def _updateFileSummaryQueryList(self, ids=[]):
         """"""
         if not self.checkDbLoaded(): return
-        
-        self.ui.fileQueryAvailableList.clear()
-        self.ui.fileQuerySelectedList.clear()
-        cols, rows = pv.getRunData()
-        if ids:
-            for r in rows:
-                id = int(r[0])
-                if id in ids:
-                    self.ui.fileQuerySelectedList.addItem(str(id))
-                else:
-                    self.ui.fileQueryAvailableList.addItem(str(id))
-        else:
-            for r in rows:
-                id = str(r[0])
-                self.ui.fileQueryAvailableList.addItem(id)
-    
-    def _updateFileSummaryQueryLists(self):
-        """"""
-        caller = self.sender()
-        call_name = caller.objectName()
-        
-        if call_name == 'fileQueryAddSelectedBut':
-            # sort rows in descending order in order to compensate shifting due to takeItem
-            rows = sorted([index.row() for index in self.ui.fileQueryAvailableList.selectedIndexes()],
-                          reverse=True)
-            for row in rows:
-                self.ui.fileQuerySelectedList.addItem(self.ui.fileQueryAvailableList.takeItem(row))
-            
-        elif call_name == 'fileQueryAddAllBut':
-            for row in reversed(range(self.ui.fileQueryAvailableList.count())):
-                self.ui.fileQuerySelectedList.addItem(self.ui.fileQueryAvailableList.takeItem(row))
-        
-        elif call_name == 'fileQueryRemoveSelectedBut':
-            rows = sorted([index.row() for index in self.ui.fileQuerySelectedList.selectedIndexes()],
-                          reverse=True)
-            for row in rows:
-                self.ui.fileQueryAvailableList.addItem(self.ui.fileQuerySelectedList.takeItem(row))
+        self.query_widget.updateFileSummaryQueryList(ids)
 
-        elif call_name == 'fileQueryRemoveAllBut':
-            for row in reversed(range(self.ui.fileQuerySelectedList.count())):
-                self.ui.fileQueryAvailableList.addItem(self.ui.fileQuerySelectedList.takeItem(row))
-        
-        self.ui.fileQuerySelectedList.sortItems()
-        self.ui.fileQueryAvailableList.sortItems()
-    
-    def _showFileSummaryIdDetails(self, item):
-        """"""
-        
-        id = item.text()
-        run = pv.getRunRow(id)
-        tcf = run['tcf']
-        ief = run['ief']
-        run_options = run['run_options']
-        self.ui.fileQueryTcfLine.setText(tcf)
-        self.ui.fileQueryIefLine.setText(ief)
-        self.ui.fileQueryRunOptionsLine.setText(run_options)
         
     def _updateAllRowStatus(self):
         """Update the RUN_STATUS and MB of all rows in RUN table."""
@@ -548,17 +497,6 @@ class MainGui(QtGui.QMainWindow):
                 self.launchQMsgBox('File Error', msg) 
     
     
-    def clearQueryForm(self):
-        """Reset the Query tab form to default."""
-        self.ui.queryNewModelOnlyCheck.setChecked(False)
-        self.ui.queryNewSubOnlyCheck.setChecked(False)
-        self.ui.queryFileCheck.setChecked(False)
-        self.ui.queryFilterRunCbox.setChecked(False)
-        self.ui.queryModelTextbox.setText('')
-        self.ui.queryFileTextbox.setText('')
-        self.ui.queryTableCbox.setCurrentIndex(0)
-    
-    
     @QtCore.pyqtSlot(str, str, str)
     def queryModelTable(self, table_type, query_type, id):
         """Run a query on the Models tab table.
@@ -569,32 +507,9 @@ class MainGui(QtGui.QMainWindow):
             id(str): the ModelFile.name value to query.
         """
         if not self.checkDbLoaded(): return
-        # setup the form values
-        self.clearQueryForm()
         self.ui.logViewTab.setCurrentIndex(2)
-        self.ui.queryTabWidget.setCurrentIndex(0)
-        self.ui.queryModelTextbox.setText(id)
-        self.ui.queryFilterRunCbox.setChecked(False)
-        self.ui.queryNewModelOnlyCheck.setChecked(False)
-        index = self.ui.queryTableCbox.findText(table_type, QtCore.Qt.MatchFixedString)
-        if index >= 0: self.ui.queryTableCbox.setCurrentIndex(index)
-        self.ui.queryFileCheck.setChecked(True)
-        
-        # Setup form based on query_type
-        with_files = True
-        new_model_only = False
-        if query_type == 'Subfiles':
-            self.ui.queryNewSubOnlyCheck.setChecked(False)
-            new_sub_only = False
-
-        elif query_type == 'Subfiles - New only':
-            self.ui.queryNewSubOnlyCheck.setChecked(True)
-            new_sub_only = True
-        
-        # Run the simple query and add the returned rows to the QUERY table
-        cols, rows = pv.getSimpleQuery(table_type, id, with_files, new_sub_only, new_model_only, -1)
-        self.table_info['QUERY']['table'].addRows(cols, rows)
-        
+        self.query_widget.queryModelTable(table_type, query_type, id)
+   
     
     @QtCore.pyqtSlot(str, int)
     def queryRunTable(self, query_type, id):
@@ -605,134 +520,9 @@ class MainGui(QtGui.QMainWindow):
             id(int): the Run.id value to query.
         """
         if not self.checkDbLoaded(): return
-        # Setup the simple query forms
-        self.clearQueryForm()
         self.ui.logViewTab.setCurrentIndex(2)
-        self.ui.queryTabWidget.setCurrentIndex(0)
-        self.ui.queryFilterRunCbox.setChecked(True)
-        self.ui.queryRunIdSbox.setValue(id)
-        index = self.ui.queryTableCbox.findText('All Modelfiles', QtCore.Qt.MatchFixedString)
-        if index >= 0: self.ui.queryTableCbox.setCurrentIndex(index)
-        table = 'All Modelfiles'
-        new_sub_only = False
-        new_model_only = False
-        with_files = False
-        
-        # Setup form based on query_type
-        if query_type == 'Dat file':
-            index = self.ui.queryTableCbox.findText('DAT', QtCore.Qt.MatchFixedString)
-            if index >= 0: self.ui.queryTableCbox.setCurrentIndex(index)
-            table = 'DAT'
+        self.query_widget.queryRunTable(query_type, id)
 
-        if query_type == 'Ied files':
-            index = self.ui.queryTableCbox.findText('IED', QtCore.Qt.MatchFixedString)
-            if index >= 0: self.ui.queryTableCbox.setCurrentIndex(index)
-            table = 'IED'
-        
-        elif query_type == 'Modelfiles':
-            self.ui.queryFileCheck.setChecked(False)
-            self.ui.queryNewSubOnlyCheck.setChecked(False)
-            self.ui.queryNewModelOnlyCheck.setChecked(False)
-        
-        elif query_type == 'Modelfiles - New only':
-            self.ui.queryFileCheck.setChecked(False)
-            self.ui.queryNewModelOnlyCheck.setChecked(True)
-            self.ui.queryNewSubOnlyCheck.setChecked(False)
-            new_sub_only = False
-            new_model_only = True
-
-        elif query_type == 'Modelfiles with Subfiles':
-            self.ui.queryFileCheck.setChecked(True)
-            self.ui.queryNewModelOnlyCheck.setChecked(False)
-            self.ui.queryNewSubOnlyCheck.setChecked(False)
-            with_files = True
-            new_sub_only = False
-            new_model_only = False
-
-        elif query_type == 'New Modelfiles with Subfiles':
-            self.ui.queryFileCheck.setChecked(True)
-            self.ui.queryNewModelOnlyCheck.setChecked(True)
-            self.ui.queryNewSubOnlyCheck.setChecked(False)
-            new_sub_only = False
-            new_model_only = True
-            with_files = True
-
-        # Run the simple query and add the returned rows to the QUERY table
-        cols, rows = pv.getSimpleQuery(table, '', with_files, new_sub_only, new_model_only, id)
-        self.table_info['QUERY']['table'].addRows(cols, rows)
-  
-    
-    def _queryIncludeFilesChange(self, state):
-        """Change the enabled status of New only on simple query form.
-        
-        Sets enabled status of the new model only and new subfile only boxes.
-        """
-        if state == QtCore.Qt.Unchecked:
-            self.ui.queryNewModelOnlyCheck.setEnabled(True)
-            self.ui.queryNewSubOnlyCheck.setEnabled(False)
-        else:
-            self.ui.queryNewModelOnlyCheck.setEnabled(False)
-            self.ui.queryNewSubOnlyCheck.setEnabled(True)
-    
-    def changeSimpleQueryStatus(self):
-        """Sets include subfiles and filter by run id enabled status.
-        
-        Called when a change is made to the queryTableCbox (table combo).
-        """
-        txt = str(self.ui.queryTableCbox.currentText())
-        if txt == 'DAT' or txt =='IED' or txt == 'RUN Options' or txt == 'RUN Event':
-            self.ui.queryFileCheck.setChecked(False)
-            if txt != 'DAT' and txt != 'IED':
-                self.ui.queryFilterRunCbox.setChecked(False)
-            
-        
-    def runSimpleQuery(self):
-        """Run a query on the simple query tab.
-        
-        Called by the Run Query button on the simple query tab.
-        Takes the current values of the form and runs calls the getSimpleQuery
-        function in peeweeviews.
-        """
-        if not self.checkDbLoaded():return
-        
-        table = str(self.ui.queryTableCbox.currentText())
-        q1_vtext = str(self.ui.queryModelTextbox.text())
-        q2_vtext = str(self.ui.queryFileTextbox.text())
-        with_files = self.ui.queryFileCheck.isChecked()
-        new_sub_only = self.ui.queryNewSubOnlyCheck.isChecked()
-        new_model_only = self.ui.queryNewModelOnlyCheck.isChecked()
-        use_runid = self.ui.queryFilterRunCbox.isChecked()
-        run_id = -1
-        if use_runid: run_id = self.ui.queryRunIdSbox.value()
-        if self.ui.queryFileTextbox.isEnabled() and table != 'DAT' and \
-                                table != 'IED' and \
-                                table != 'Run Options' and table != 'Run Event':
-            cols, rows = pv.getSimpleQuery(table, q1_vtext, with_files, new_sub_only, new_model_only, run_id, q2_vtext)
-        else:
-            cols, rows = pv.getSimpleQuery(table, q1_vtext, with_files, new_sub_only, new_model_only, run_id)
-        
-        if table == 'RUN Options' or table == 'RUN Event':
-            self.table_info['QUERY']['table'].subname = 'EventOptions'
-        else:
-            self.table_info['QUERY']['table'].subname = ''
-        self.table_info['QUERY']['table'].addRows(cols, rows)
-        
-    def runFileSummaryQuery(self):
-        """Run a query on the File Summary query tab.
-        
-        Called by the file summary query button. Takes the id values that are 
-        currently in the selected list widget populates the query table with
-        a summary of all the files in the chosen runs.
-        """
-#         ids = [1, 2, 3]
-        ids = []
-        for index in xrange(self.ui.fileQuerySelectedList.count()):
-            ids.append(self.ui.fileQuerySelectedList.item(index).text())
-        
-        cols, rows, new_status = pv.getFileSummaryQuery(ids)
-        if not self.ui.queryFilesHighlightCbox.isChecked(): new_status = []
-        self.table_info['QUERY']['table'].addRows(cols, rows, sort_col=0, 
-                                                  custom_highlight=new_status)
         
     def checkUnsavedEntries(self, table, include_cancel_button=True):
         """Checks the unsaved entry status of open tables.
@@ -751,7 +541,6 @@ class MainGui(QtGui.QMainWindow):
         Return:
             bool.
         """
-        
         if not table in self.table_info.keys(): return
         if not self.table_info[table]['table'] is None:
             if self.table_info[table]['table']._unsaved_entries:
@@ -879,7 +668,7 @@ class MainGui(QtGui.QMainWindow):
                     w.deleteLater()
                     self.table_info['MODEL']['table'] = None
                 
-            model_table = GuiStore.TableWidgetDb('MODEL', 0, 0, subname=cur_text, parent=self)
+            model_table = GuiStore.TableWidgetModel('MODEL', 0, 0, subname=cur_text, parent=self)
             self.connect(model_table, QtCore.SIGNAL("statusUpdate"), self._updateStatusBar)
             self.connect(model_table, QtCore.SIGNAL("setRange"), self._updateMaxProgress)
             self.connect(model_table, QtCore.SIGNAL("updateProgress"), self._updateCurrentProgress)
@@ -1303,6 +1092,11 @@ class MainGui(QtGui.QMainWindow):
                     self.settings.tool_settings[w.tool_name] = settings
                 except:
                     logger.info('No saveSettings() found for %s' % (w.tool_name))
+            try:
+                settings = self.query_widget.saveSettings()
+                self.settings.tool_settings[self.query_widget.tool_name] = settings
+            except:
+                logger.info('Unable to save Query settings')
             
          
         logger.info('Closing program')

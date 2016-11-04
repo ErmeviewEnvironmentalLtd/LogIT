@@ -93,16 +93,16 @@ class TableWidgetDb(QtGui.QTableWidget):
         
         self.horizontalHeader().setStretchLastSection(True)
         self.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
-        
-        if name == 'MODEL':
-            self.id_col = 1
-        else:
-            self.id_col = 0
-        
         self._unsaved_entries = []
-        if not name == "QUERY":
-            self.cellChanged.connect(self._highlightEditRow)
-            self.horizontalHeader().setStretchLastSection(True)
+        
+#         if name == 'MODEL':
+#             self.id_col = 1
+#         else:
+#             self.id_col = 0
+        
+#         if not name == "QUERY":
+#             self.cellChanged.connect(self._highlightEditRow)
+#             self.horizontalHeader().setStretchLastSection(True)
     
     def addRows(self, cols, rows, sort_col=None, custom_highlight=[]):
         """Add row data to this table.
@@ -123,9 +123,9 @@ class TableWidgetDb(QtGui.QTableWidget):
         self.setColumnCount(len(cols))
         
         # For show/hide columns on RUN table (not available on others)
-        if self.name == 'RUN':
-            self.horizontalHeader().setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-            self.horizontalHeader().customContextMenuRequested.connect(self.showHeaderMenu)
+#         if self.name == 'RUN':
+#             self.horizontalHeader().setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+#             self.horizontalHeader().customContextMenuRequested.connect(self.showHeaderMenu)
         for k, c in enumerate(cols):
             item = QtGui.QTableWidgetItem()
             item.setTextAlignment(QtCore.Qt.AlignCenter|QtCore.Qt.AlignVCenter)
@@ -148,12 +148,12 @@ class TableWidgetDb(QtGui.QTableWidget):
                     
                 self.setItem(i, j, item)
         
-        if self.name == 'MODEL' or self.name == 'QUERY':
-            self.resizeColumnsToContents()
-            self.horizontalHeader().setStretchLastSection(True)
-        if self.name == 'RUN':
-            for k, v in self.hidden_columns.items():
-                self.horizontalHeader().hideSection(v)
+#         if self.name == 'MODEL':# or self.name == 'QUERY':
+#             self.resizeColumnsToContents()
+#             self.horizontalHeader().setStretchLastSection(True)
+#         if self.name == 'RUN':
+#             for k, v in self.hidden_columns.items():
+#                 self.horizontalHeader().hideSection(v)
                 
         self.blockSignals(False)
         self.setSortingEnabled(True)
@@ -344,62 +344,146 @@ class TableWidgetDb(QtGui.QTableWidget):
         Args:
             pos(QPoint): the QPoint of the mouse cursor when clicked.
         """
+        raise NotImplementedError
+
+
+class TableWidgetQuery(TableWidgetDb):
+    
+    def __init__(self, name, rows, cols, subname='', hidden_cols={}, parent=None):
+        TableWidgetDb.__init__(self, name, rows, cols, subname, hidden_cols, parent)
+        self.id_col = 0
+               
+
+    def addRows(self, cols, rows, sort_col=None, custom_highlight=[]):
+        super(TableWidgetQuery, self).addRows(cols, rows, sort_col, custom_highlight)
+        self.resizeColumnsToContents()
+        self.horizontalHeader().setStretchLastSection(True)
+    
+    
+    def _tablePopup(self, pos):
+        index = self.itemAt(pos)
+        if index is None: return
+        menu = QtGui.QMenu()
+        copyAction = menu.addAction("Copy")
+
+        if self.subname == 'EventOptions':
+            queryFileAction = menu.addAction("File Summary")
+        
+        # Get the action and do whatever it says
+        action = menu.exec_(self.viewport().mapToGlobal(pos))
+
+        if action is None: return
+        if action == copyAction:
+            clipboard = QtGui.QApplication.clipboard()
+            clipboard.setText(self.currentItem().text())
+        if action == queryFileAction:
+            selected = self.selectionModel().selectedRows()
+            ids = []
+            for s in selected:
+                ids.append(int(self.item(s.row(), 0).text()))
+            self.emit(QtCore.SIGNAL("queryFileSummary"), ids)
+            return
+            
+            
+class TableWidgetModel(TableWidgetDb):
+    
+    def __init__(self, name, rows, cols, subname='', hidden_cols={}, parent=None):
+        TableWidgetDb.__init__(self, name, rows, cols, subname, hidden_cols, parent)
+        self.id_col = 1
+#         self._unsaved_entries = []
+        self.cellChanged.connect(self._highlightEditRow)
+        self.horizontalHeader().setStretchLastSection(True)
+        
+
+    def addRows(self, cols, rows, sort_col=None, custom_highlight=[]):
+        super(TableWidgetModel, self).addRows(cols, rows, sort_col, custom_highlight)
+        self.resizeColumnsToContents()
+        self.horizontalHeader().setStretchLastSection(True)
+    
+    
+    def _tablePopup(self, pos):
+        index = self.itemAt(pos)
+        if index is None: return
+        menu = QtGui.QMenu()
+        copyAction = menu.addAction("Copy")
+        updateRowsAction = menu.addAction("Save updates")
+        deleteRowAction = menu.addAction("Delete row")
+
+        # Get the action and do whatever it says
+        action = menu.exec_(self.viewport().mapToGlobal(pos))
+
+        if self.subname != 'DAT' and self.subname != 'IED':
+            query_menu = menu.addMenu("Query")
+            queryModelFilesAction = query_menu.addAction("Subfiles")
+            queryModelFilesNewAction = query_menu.addAction("Subfiles - New only")
+
+        if action is None: return
+        if action == copyAction:
+            clipboard = QtGui.QApplication.clipboard()
+            clipboard.setText(self.currentItem().text())
+            
+        elif action == updateRowsAction:
+            self.saveTableEdits()
+            
+        elif action == deleteRowAction:
+            self._deleteRowFromDatabase(False)
+            
+        if action == queryModelFilesNewAction or action == queryModelFilesAction:
+            row = self.currentRow()
+            id = str(self.item(row, self.id_col).text())
+            self.emit(QtCore.SIGNAL("queryModelTable"), self.subname, str(action.text()), id)
+            
+
+class TableWidgetRun(TableWidgetDb):
+    
+    def __init__(self, name, rows, cols, subname='', hidden_cols={}, parent=None):
+        TableWidgetDb.__init__(self, name, rows, cols, subname, hidden_cols, parent)
+        self.id_col = 0
+#         self._unsaved_entries = []
+        self.cellChanged.connect(self._highlightEditRow)
+        self.horizontalHeader().setStretchLastSection(True)
+               
+
+    def addRows(self, cols, rows, sort_col=None, custom_highlight=[]):
+        self.horizontalHeader().setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.horizontalHeader().customContextMenuRequested.connect(self.showHeaderMenu)
+        super(TableWidgetRun, self).addRows(cols, rows, sort_col, custom_highlight)
+        for k, v in self.hidden_columns.items():
+            self.horizontalHeader().hideSection(v)
+
+    
+    def _tablePopup(self, pos):
         index = self.itemAt(pos)
         if index is None: return
         
         menu = QtGui.QMenu()
         
         copyAction = menu.addAction("Copy")
-        has_query = False
-        if self.name == 'QUERY':
-            if self.subname == 'EventOptions':
-                queryFileAction = menu.addAction("File Summary")
-                has_query = True
-        else:
-            updateRowsAction = menu.addAction("Save updates")
-            deleteRowAction = menu.addAction("Delete row")
-            
-            # Find who called us and get the object that the name refers to.
-            has_run = False
-            if self.name == "RUN":
-                deleteAllRowAction = menu.addAction("Delete associated entries")
-                updateStatusAction = menu.addAction("Update status")
-                query_menu = menu.addMenu("Query")
-                queryFileAction = query_menu.addAction("File Summary")
-                queryRunDatAction = query_menu.addAction("Dat file")
-                queryRunIedAction = query_menu.addAction("Ied files")
-                queryRunModelAction = query_menu.addAction("Modelfiles")
-                queryRunModelFilesAction = query_menu.addAction("Modelfiles with Subfiles")
-                queryRunModelNewAction = query_menu.addAction("Modelfiles - New only")
-                queryRunModelFilesNewAction = query_menu.addAction("New Modelfiles with Subfiles")
-                paths_menu = menu.addMenu('Update paths')
-                updateIefRowAction = paths_menu.addAction("Update Ief location")
-                updateTcfRowAction = paths_menu.addAction("Update Tcf location")
-                updateLogRowAction = paths_menu.addAction("Update Logs location")
-                tools_menu = menu.addMenu('Send to tool')
-                extractRowAction = tools_menu.addAction("Extract Model")
-                addToRunSummaryAction = tools_menu.addAction("Run Summary")
-                has_run = True
+        updateRowsAction = menu.addAction("Save updates")
+        deleteRowAction = menu.addAction("Delete row")
         
-        has_model = False
-        if self.name == 'MODEL' and self.subname != 'DAT' and self.subname != 'IED':
-            query_menu = menu.addMenu("Query")
-            queryModelFilesAction = query_menu.addAction("Subfiles")
-            queryModelFilesNewAction = query_menu.addAction("Subfiles - New only")
-            has_model = True
+        # Find who called us and get the object that the name refers to.
+        deleteAllRowAction = menu.addAction("Delete associated entries")
+        updateStatusAction = menu.addAction("Update status")
+        query_menu = menu.addMenu("Query")
+        queryFileAction = query_menu.addAction("File Summary")
+        queryRunDatAction = query_menu.addAction("Dat file")
+        queryRunIedAction = query_menu.addAction("Ied files")
+        queryRunModelAction = query_menu.addAction("Modelfiles")
+        queryRunModelFilesAction = query_menu.addAction("Modelfiles with Subfiles")
+        queryRunModelNewAction = query_menu.addAction("Modelfiles - New only")
+        queryRunModelFilesNewAction = query_menu.addAction("New Modelfiles with Subfiles")
+        paths_menu = menu.addMenu('Update paths')
+        updateIefRowAction = paths_menu.addAction("Update Ief location")
+        updateTcfRowAction = paths_menu.addAction("Update Tcf location")
+        updateLogRowAction = paths_menu.addAction("Update Logs location")
+        tools_menu = menu.addMenu('Send to tool')
+        extractRowAction = tools_menu.addAction("Extract Model")
+        addToRunSummaryAction = tools_menu.addAction("Run Summary")
         
         # Get the action and do whatever it says
         action = menu.exec_(self.viewport().mapToGlobal(pos))
         if action is None: return
-        
-        if has_query:
-            if action == queryFileAction:
-                selected = self.selectionModel().selectedRows()
-                ids = []
-                for s in selected:
-                    ids.append(int(self.item(s.row(), 0).text()))
-                self.emit(QtCore.SIGNAL("queryFileSummary"), ids)
-                return
         
         if action == copyAction:
             clipboard = QtGui.QApplication.clipboard()
@@ -411,54 +495,42 @@ class TableWidgetDb(QtGui.QTableWidget):
         elif action == deleteRowAction:
             self._deleteRowFromDatabase(False)
         
-        # These are only available on the MODEL tables
-        elif has_model:
+        if action == queryFileAction:
+            selected = self.selectionModel().selectedRows()
+            ids = []
+            for s in selected:
+                ids.append(int(self.item(s.row(), 0).text()))
+            self.emit(QtCore.SIGNAL("queryFileSummary"), ids)
             
-            if action == queryModelFilesNewAction or action == queryModelFilesAction:
-                row = self.currentRow()
-                id = str(self.item(row, self.id_col).text())
-                self.emit(QtCore.SIGNAL("queryModelTable"), self.subname, str(action.text()), id)
         
-        # These are only available on the RUN table
-        elif has_run:
-            
-            if action == queryFileAction:
-                selected = self.selectionModel().selectedRows()
-                ids = []
-                for s in selected:
-                    ids.append(int(self.item(s.row(), 0).text()))
-                self.emit(QtCore.SIGNAL("queryFileSummary"), ids)
-                
-            
-            if action == queryRunModelFilesNewAction or action == queryRunModelFilesAction or \
-                        action == queryRunModelAction  or action == queryRunModelNewAction  or \
-                        action == queryRunDatAction or action == queryRunIedAction:
-                row = self.currentRow()
-                id = str(self.item(row, self.id_col).text())
-                self.emit(QtCore.SIGNAL("queryRunTable"), str(action.text()), int(id))
+        if action == queryRunModelFilesNewAction or action == queryRunModelFilesAction or \
+                    action == queryRunModelAction  or action == queryRunModelNewAction  or \
+                    action == queryRunDatAction or action == queryRunIedAction:
+            row = self.currentRow()
+            id = str(self.item(row, self.id_col).text())
+            self.emit(QtCore.SIGNAL("queryRunTable"), str(action.text()), int(id))
+    
+        if action == deleteAllRowAction:
+            self._deleteRowFromDatabase(True)
         
-            if action == deleteAllRowAction:
-                self._deleteRowFromDatabase(True)
+        # Send model path to ModelExtractor
+        # Send log path to RunSummary tool
+        elif action == extractRowAction or action == addToRunSummaryAction:
+            row = self.currentRow()
+            id = str(self.item(row, self.id_col).text())
+            self.emit(QtCore.SIGNAL("runTableContextTool"), str(action.text()), id)
+        
+        # Update IEF_DIR, TCF_DIR, or LOG_DIR
+        elif action == updateIefRowAction or action == updateTcfRowAction or action == updateLogRowAction:
+            row = self.currentRow()
+            id = str(self.item(row, self.id_col).text())
+            self.emit(QtCore.SIGNAL("runTableContextPathUpdate"), str(action.text()), id)
             
-            # Send model path to ModelExtractor
-            # Send log path to RunSummary tool
-            elif action == extractRowAction or action == addToRunSummaryAction:
-                row = self.currentRow()
-                id = str(self.item(row, self.id_col).text())
-                self.emit(QtCore.SIGNAL("runTableContextTool"), str(action.text()), id)
-            
-            # Update IEF_DIR, TCF_DIR, or LOG_DIR
-            elif action == updateIefRowAction or action == updateTcfRowAction or action == updateLogRowAction:
-                row = self.currentRow()
-                id = str(self.item(row, self.id_col).text())
-                self.emit(QtCore.SIGNAL("runTableContextPathUpdate"), str(action.text()), id)
-                
-            # Update the MB and RUN_STATUS values
-            elif action == updateStatusAction:
-                row = self.currentRow()
-                id = str(self.item(row, self.id_col).text())
-                self.emit(QtCore.SIGNAL("runTableContextStatusUpdate"), id)
-                
+        # Update the MB and RUN_STATUS values
+        elif action == updateStatusAction:
+            row = self.currentRow()
+            id = str(self.item(row, self.id_col).text())
+            self.emit(QtCore.SIGNAL("runTableContextStatusUpdate"), id)
 
 
 class TableWidgetItemDb(QtGui.QTableWidgetItem):
