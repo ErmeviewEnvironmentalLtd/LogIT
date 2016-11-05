@@ -88,6 +88,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
         self.runComplexQueryBut.clicked.connect(self.runComplexQuery)
         self.newQueryScriptBut.clicked.connect(self.newQueryScript)
         self.saveQueryScriptBut.clicked.connect(self.saveQueryScript)
+        self.saveAsQueryScriptBut.clicked.connect(self.saveAsQueryScript)
         self.loadQueryScriptBut.clicked.connect(self.loadQueryScript)
         self.complexScriptList.currentRowChanged.connect(self.scriptListItemChanged)
 
@@ -172,6 +173,16 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
     
     
     def saveQueryScript(self):
+        """Updates the stored query script in memory.
+        
+        Updates the value of self.settings['scripts'][name][0] where name is
+        current value of self.settings['active_script'].
+        """
+        if not self.current_script_row == -1:
+            self.settings['scripts'][self.settings['active_script']][0] = str(self.complexScriptText.toPlainText())
+                
+    
+    def saveAsQueryScript(self):
         """Saves the currently selected script to file.
         
         Launches a save file dialog to the user and writes the contents of the
@@ -311,6 +322,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
             if self.complexScriptList.count() < 1:
                 self.complexScriptText.clear()
                 self.complexScriptText.setEnabled(False)
+                self.current_script_row = -1
             self.do_update = True
 
     
@@ -354,6 +366,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
         
         Displays the sql error messages to the user if returned.
         """
+        self.saveQueryScript()
         raw_query = str(self.complexScriptText.toPlainText())
         
         if not self.checkDbLoaded(): return
@@ -770,13 +783,41 @@ class MyHighlighter(QtGui.QSyntaxHighlighter):
                                         "and", "or", "join", "create", "alter",
                                         "into", "in", "inner join", "outer join",
                                         "max", "min", "group by", "avg", "count",
-                                        "sum", "escape", "as", "order by",
+                                        "sum", "escape", "as", "order by", "left",
+                                        "right", "cross join", "not", "null",
+                                        "union", "alias", "full join", "is",
+                                        "between", "having", "subquery", "into",
+                                        "rowid", "limit", "offset", "asc", "desc",
+                                        "by", "all", "column", "current_date",
+                                        "current_time", "current_timestamp",
+                                        "distinct", "if", "each", "else", "end",
+                                        "for", "ignore", "intersect", "isnull",
+                                        "no", "of", "primary", "regexp", "row",
+                                        "unique", "using", "when", "with", 
+                                        "without", "date", "ifnull", "length",
+                                        "lower", "round", "ltrim", "rtrim",
+                                        "substr", "trim", "upper", "time",
+                                        "datetime", "strftime", "count",
                                         "WHERE", "LIKE", "ON", "SELECT", "FROM",
                                         "INSERT", "DELETE", "DROP", "TRUNCATE",
                                         "AND", "OR", "JOIN", "CREATE", "ALTER",
                                         "INTO", "IN", "INNER JOIN", "OUTER JOIN",
                                         "MAX", "MIN", "GROUP BY", "AVG", "COUNT",
-                                        "SUM", "ESCAPE", "AS", "ORDER BY"] )
+                                        "SUM", "ESCAPE", "AS", "ORDER BY", "LEFT",
+                                        "RIGHT", "CROSS JOIN", "NOT", "NULL",
+                                        "UNION", "ALIAS", "FULL JOIN", "IS",
+                                        "BETWEEN", "HAVING", "SUBQUERY", "INTO",
+                                        "ROWID", "LIMIT", "OFFSET", "ASC", "DESC",
+                                        "BY", "ALL", "COLUMN", "CURRENT_DATE",
+                                        "CURRENT_TIME", "CURRENT_TIMESTAMP",
+                                        "DISTINCT", "IF", "EACH", "ELSE", "END",
+                                        "FOR", "IGNORE", "INTERSECT", "ISNULL",
+                                        "NO", "OF", "PRIMARY", "REGEXP", "ROW",
+                                        "UNIQUE", "USING", "WHEN", "WITH", "WITHOUT",
+                                        "DATE", "IFNULL", "LENGTH","LOWER", 
+                                        "ROUND", "LTRIM", "RTRIM", "SUBSTR", 
+                                        "TRIM", "UPPER", "TIME", "DATETIME", 
+                                        "STRFTIME", "COUNT",])
         for word in keywords:
             pattern = QtCore.QRegExp("\\b" + word + "\\b")
             rule = HighlightingRule( pattern, keyword )
@@ -846,14 +887,14 @@ class MyHighlighter(QtGui.QSyntaxHighlighter):
         string.setForeground( brush )
         rule = HighlightingRule( pattern, string )
         self.highlightingRules.append( rule )
-
+        
         # singleQuotedString
         pattern = QtCore.QRegExp( "\'.*\'" )
         pattern.setMinimal( True )
         singleQuotedString.setForeground( brush )
         rule = HighlightingRule( pattern, singleQuotedString )
         self.highlightingRules.append( rule )
-        
+
         
 
     def highlightBlock( self, text ):

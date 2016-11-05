@@ -1070,7 +1070,8 @@ def complexQuery(db_path, raw_query):
                         'EXECUTE' in upper_raw or 'MODIFY' in upper_raw or \
                         'PURGE' in upper_raw or 'REPLACE' in upper_raw or \
                         'RESTORE' in upper_raw or 'ROLLBACK' in upper_raw or \
-                        'SAVE' in upper_raw or 'WRITE' in upper_raw:
+                        'SAVE' in upper_raw or 'WRITE' in upper_raw or \
+                        'CREATE' in upper_raw or 'CLONE' in upper_raw:
         return None, None, 'Queries to update tables are not allowed.'
     
     query = ' '.join(raw_query.split())
@@ -1089,16 +1090,16 @@ def complexQuery(db_path, raw_query):
             i=0 
     except sqlite3.OperationalError, err:
 #         logger.exception(err)
-        return None, None, repr(err)
+        return None, None, str(err)
     except sqlite3.DatabaseError, err:
         logger.exception(err)
-        return None, None, repr(err)
+        return None, None, str(err)
     except IOError, err:
         logger.exception(err)
-        return None, None, repr(err)
+        return None, None, str(err)
     except Exception, err:
         logger.exception(err)
-        return None, None, repr(err)
+        return None, None, str(err)
     
     finally:
         if not conn is None:

@@ -176,6 +176,9 @@ class Ui_QueryWidget(object):
         self.saveQueryScriptBut = QtGui.QPushButton(self.complexQueryTab)
         self.saveQueryScriptBut.setObjectName(_fromUtf8("saveQueryScriptBut"))
         self.verticalLayout_2.addWidget(self.saveQueryScriptBut)
+        self.saveAsQueryScriptBut = QtGui.QPushButton(self.complexQueryTab)
+        self.saveAsQueryScriptBut.setObjectName(_fromUtf8("saveAsQueryScriptBut"))
+        self.verticalLayout_2.addWidget(self.saveAsQueryScriptBut)
         self.loadQueryScriptBut = QtGui.QPushButton(self.complexQueryTab)
         self.loadQueryScriptBut.setObjectName(_fromUtf8("loadQueryScriptBut"))
         self.verticalLayout_2.addWidget(self.loadQueryScriptBut)
@@ -195,7 +198,7 @@ class Ui_QueryWidget(object):
         self.verticalLayout.addWidget(self.tableQueryGroup)
 
         self.retranslateUi(QueryWidget)
-        self.queryTabWidget.setCurrentIndex(2)
+        self.queryTabWidget.setCurrentIndex(0)
         QtCore.QObject.connect(self.queryFilterRunCbox, QtCore.SIGNAL(_fromUtf8("toggled(bool)")), self.queryRunIdSbox.setEnabled)
         QtCore.QMetaObject.connectSlotsByName(QueryWidget)
 
@@ -231,6 +234,7 @@ class Ui_QueryWidget(object):
         self.queryTabWidget.setTabText(self.queryTabWidget.indexOf(self.FileSummaryTab), _translate("QueryWidget", "Model File Query", None))
         self.newQueryScriptBut.setText(_translate("QueryWidget", "New Script", None))
         self.saveQueryScriptBut.setText(_translate("QueryWidget", "Save Script", None))
+        self.saveAsQueryScriptBut.setText(_translate("QueryWidget", "Save As Script", None))
         self.loadQueryScriptBut.setText(_translate("QueryWidget", "Load Script", None))
         self.runComplexQueryBut.setText(_translate("QueryWidget", "Run Query", None))
         self.queryTabWidget.setTabText(self.queryTabWidget.indexOf(self.complexQueryTab), _translate("QueryWidget", "Custom Query", None))

@@ -23,7 +23,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="simpleQueryTab">
       <attribute name="title">
@@ -366,6 +366,13 @@
           <widget class="QPushButton" name="saveQueryScriptBut">
            <property name="text">
             <string>Save Script</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="saveAsQueryScriptBut">
+           <property name="text">
+            <string>Save As Script</string>
            </property>
           </widget>
          </item>
