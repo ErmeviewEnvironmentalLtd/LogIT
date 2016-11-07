@@ -376,15 +376,15 @@ class TableWidgetModel(TableWidgetDb):
         updateRowsAction = menu.addAction("Save updates")
         deleteRowAction = menu.addAction("Delete row")
 
-        # Get the action and do whatever it says
-        action = menu.exec_(self.viewport().mapToGlobal(pos))
-
         is_dat_ied = False
         if self.subname != 'DAT' and self.subname != 'IED':
             is_dat_ied = True
             query_menu = menu.addMenu("Query")
             queryModelFilesAction = query_menu.addAction("Subfiles")
             queryModelFilesNewAction = query_menu.addAction("Subfiles - New only")
+
+        # Get the action and do whatever it says
+        action = menu.exec_(self.viewport().mapToGlobal(pos))
 
         if action is None: return
         if action == copyAction:

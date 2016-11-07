@@ -798,6 +798,7 @@ class MyHighlighter(QtGui.QSyntaxHighlighter):
                                         "lower", "round", "ltrim", "rtrim",
                                         "substr", "trim", "upper", "time",
                                         "datetime", "strftime", "count",
+                                        "group_concat",
                                         "WHERE", "LIKE", "ON", "SELECT", "FROM",
                                         "INSERT", "DELETE", "DROP", "TRUNCATE",
                                         "AND", "OR", "JOIN", "CREATE", "ALTER",
@@ -817,7 +818,7 @@ class MyHighlighter(QtGui.QSyntaxHighlighter):
                                         "DATE", "IFNULL", "LENGTH","LOWER", 
                                         "ROUND", "LTRIM", "RTRIM", "SUBSTR", 
                                         "TRIM", "UPPER", "TIME", "DATETIME", 
-                                        "STRFTIME", "COUNT",])
+                                        "STRFTIME", "COUNT", "GROUP_CONCAT"])
         for word in keywords:
             pattern = QtCore.QRegExp("\\b" + word + "\\b")
             rule = HighlightingRule( pattern, keyword )
