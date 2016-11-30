@@ -107,9 +107,12 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         self.setupUi(self)
         
         # Connect the slots
-        self.extractModelFileButton.clicked.connect(self._setInputFile)
+#         self.extractModelFileButton.clicked.connect(self._setInputFile)
         self.extractOutputButton.clicked.connect(self._setOutputDirectory)
         self.extractModelButton.clicked.connect(self._extractModel)
+        self.addModelBut.clicked.connect(self._dialogAddModel)
+        self.removeModelBut.clicked.connect(self._removeModels)
+        self.status_prefix = ''
         
         self.setupLookupLists()
     
@@ -120,6 +123,44 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         self.extractModelFileTextbox.setText('')
         self.extractOutputTextbox.setText('')
         self.extractOutputTextArea.setText('')
+
+    def _removeModels(self):
+        rows = []
+        for i in self.modelTable.selectedIndexes():
+            if not i in rows:
+                rows.append(i.row())
+        rows.reverse()
+        for r in rows:
+            self.modelTable.removeRow(r)
+        
+
+
+    def _dialogAddModel(self):
+
+        if 'model' in gs.path_holder.keys():
+            path = gs.path_holder['model']
+        else:
+            path = self.cur_location
+
+        d = MyFileDialogs(parent=self)
+        open_path = d.openFileDialog(path, file_types='Ief/Tcf File(*.ief;*tcf)')
+        if open_path == False:
+            return
+        
+        open_path = os.path.normpath(str(open_path))
+        gs.setPath('model', open_path)
+        self.addModel(open_path)
+        
+
+    def addModel(self, path, run_options='', name=''):
+        item1 = QtGui.QTableWidgetItem(name)
+        item2 = QtGui.QTableWidgetItem(run_options)
+        item3 = QtGui.QTableWidgetItem(path)
+        self.modelTable.insertRow(self.modelTable.rowCount())
+#         print ('row_count = ' + str(self.modelTable.rowCount()))
+        self.modelTable.setItem(self.modelTable.rowCount()-1, 0, item1)
+        self.modelTable.setItem(self.modelTable.rowCount()-1, 1, item2)
+        self.modelTable.setItem(self.modelTable.rowCount()-1, 2, item3)
 
         
     def _setInputFile(self):
@@ -167,61 +208,118 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         self.extractOutputTextbox.setText(dir_path)
         gs.setPath('output', dir_path)
     
+    
+    def _resetLoader(self, clear_text=False):
+        """Reset everything to extract a new model."""
+        self.se_vals = None
+        self._extractVars = None
+        self.extractOutputTextArea.clear()
+        
+    
     def _extractModel(self):
         """Extract the given model.
         
         Calls two functions to setup and find the file and then to write them
         to the new location.
         """
-        try:
-            in_path = str(self.extractModelFileTextbox.text())
-            out_dir = str(self.extractOutputTextbox.text())
-            
-            if not os.path.exists(in_path):
-                logger.error('Model file does not exist')
-                QtGui.QMessageBox.warning(self, "File not found",
-                                          "Model file does not exist")
+        self._resetLoader(clear_text=True)
+        inputs = []
+        for i in range(self.modelTable.rowCount()):
+            folder = str(self.modelTable.item(i, 0).text())
+            if folder.strip() == '':
+                QtGui.QMessageBox.warning(self, "Folder missing",
+                            "All Models MUST have a unique output folder name")
                 return
-                
-            if not os.path.exists(out_dir):
-                logger.error('Output directory does not exist')
-                QtGui.QMessageBox.warning(self, "Directory not found",
-                                          "Output directory does not exist")
-                return
-
-            success, tuflow_files = self._extractModelSetup(in_path, out_dir)
-            if success:
-                success = self._extractModelWrite(tuflow_files)
+            options = str(self.modelTable.item(i, 1).text())
+            path = str(self.modelTable.item(i, 2).text())
+            inputs.append((folder, options, path))
         
-        except Exception, err:
-            msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
-                   "all gone terribly wrong. You're on your own dude.\n" +
-                   "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
-                   "Game over man, I'm outta here <-((+_+))->")
-            logger.error('Critical error in model extraction - trying to exit gracefully')
-            logger.exception(err)
-            self.launchQMsgBox('Critical Error', msg)
+        main_out_dir = str(self.extractOutputTextbox.text())
+        total = len(inputs)
+        have_error = []
+        output = []
+        for i, val in enumerate(inputs):
+            self.status_prefix =('Extracting model %s of %s:  ' % ((i+1), total))
+            options = val[1]
+            in_path = val[2]
+            if not os.path.exists(in_path):
+                logger.error('Model file does not existat: ' + str(in_path))
+                have_error.append(val[2])
+                continue
+                
+            out_dir = os.path.join(main_out_dir, val[0])
+            if not os.path.exists(out_dir):
+                try:
+                    os.mkdir(out_dir)
+                except Exception as err:
+                    logger.error('Unable to make directory: ' + str(out_dir))
+                    logger.exception(err)
+                    have_error.append(val[2])
+                    continue
+            
+            try:
+#                 in_path = str(self.extractModelFileTextbox.text())
+#                 out_dir = str(self.extractOutputTextbox.text())
+                
+#                 if not os.path.exists(in_path):
+#                     logger.error('Model file does not exist')
+#                     QtGui.QMessageBox.warning(self, "File not found",
+#                                               "Model file does not exist")
+#                     return
+#                     
+#                 if not os.path.exists(out_dir):
+#                     logger.error('Output directory does not exist')
+#                     QtGui.QMessageBox.warning(self, "Directory not found",
+#                                               "Output directory does not exist")
+#                     return
+
+                success, tuflow_files = self._extractModelSetup(in_path, out_dir,
+                                                                options)
+                if success:
+                    success = self._extractModelWrite(tuflow_files)
+                else:
+                    logger.error('Failed to extract model at: ' + str(in_path))
+                    have_error.append(val[2])
+            
+            except Exception, err:
+#                 msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
+#                        "all gone terribly wrong. You're on your own dude.\n" +
+#                        "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
+#                        "Game over man, I'm outta here <-((+_+))->")
+                logger.error('Critical error in model extraction - for: ' + str(val[2]))
+                logger.exception(err)
+                have_error.append(val[2])
+#                 self.launchQMsgBox('Critical Error', msg)
+#                 self.emit(QtCore.SIGNAL("updateProgress"), 0)
+#                 self.emit(QtCore.SIGNAL("statusUpdate"), '')
+#                 return
+            output = self._addToOutput(in_path, out_dir, output)
+            
+            if have_error:
+                temp = []
+                temp.append('\n\n\nSome Model could not be extracted....')
+                for h in have_error:
+                    temp.append(input(h))
+                output = temp + output
+
+            self._displayOutput(output)
+#             self._displayOutput(in_path, out_dir)
             self.emit(QtCore.SIGNAL("updateProgress"), 0)
             self.emit(QtCore.SIGNAL("statusUpdate"), '')
-            return
-
-        self._displayOutput(in_path, out_dir)
-        self.emit(QtCore.SIGNAL("updateProgress"), 0)
-        self.emit(QtCore.SIGNAL("statusUpdate"), '')
         
         # Log use on the server
         if not gs.__DEV_MODE__:
             applog.AppLogger().write('Extractor')
     
-    def _extractModelSetup(self, in_path, out_dir):
+    def _extractModelSetup(self, in_path, out_dir, se_vals):
         """Finds all the files and re-writes the file path variables."""
 
         self._extractVars = ExtractVars()
-        self.extractOutputTextArea.clear()
+#         self.extractOutputTextArea.clear()
         self._extractVars.out_dir = out_dir
         self._extractVars.hardcode = self.extractorHardcodeFilesCbox.isChecked()
         
-        se_vals = str(self.extractRunOptionsTextbox.text())
+#         se_vals = str(self.extractRunOptionsTextbox.text())
         if not se_vals == '':
             self.se_vals = uf.convertRunOptionsToSEDict(se_vals)
         else:
@@ -231,7 +329,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         # Check if we're dealing with an ief or a tcf
         ext = os.path.splitext(in_path)[1]
         if ext == '.ief':
-            self.emit(QtCore.SIGNAL("statusUpdate"), 'Reading ISIS/FMP files')
+            self.emit(QtCore.SIGNAL("statusUpdate"), self.status_prefix + 'Reading ISIS/FMP files')
             self._extractVars.ief_path = in_path
             self._getIsisFiles()
         else:
@@ -241,7 +339,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             self.has_tcf = True
             
         if not self._extractVars.tcf_path == None:
-            self.emit(QtCore.SIGNAL("statusUpdate"), 'Reading Tuflow files')
+            self.emit(QtCore.SIGNAL("statusUpdate"), self.status_prefix + 'Reading Tuflow files')
             self._extractVars.out_dir = os.path.join(self._extractVars.out_dir, 'tuflow','runs')
             loader = FileLoader()
             self._extractVars.tuflow = loader.loadFile(self._extractVars.tcf_path,
@@ -297,11 +395,17 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         
         return True
         
+
+    def _displayOutput(self, output):
+        output = '\n'.join(output)
+        self.extractOutputTextArea.setText(output)
     
-    def _displayOutput(self, infile, outdir):
+#     def _displayOutput(self, infile, outdir):
+    def _addToOutput(self, infile, outdir, output):
         """
         """
-        output = []
+        output.append('\n*******************************************\n')
+#         output = []
         output.append('\n Model extraction complete.')
         output.append('  Input file: ' + os.path.normpath(infile))
         output.append('  Output directory: ' + os.path.normpath(outdir))
@@ -323,9 +427,11 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             output.append('The following files could not be copied:\n')
             for r in self._extractVars.missing_results_files:
                 output.append(os.path.normpath(r)) 
-                
-        output = '\n'.join(output)
-        self.extractOutputTextArea.setText(output)
+        
+        output.append('\n\n')
+        return output 
+#         output = '\n'.join(output)
+#         self.extractOutputTextArea.setText(output)
                 
     
     def _writeOutModelFiles(self, file_paths):
@@ -342,7 +448,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         not_moved = []
         no_results = len(file_paths)
 
-        self.emit(QtCore.SIGNAL("statusUpdate"), 'Copying model files...')
+        self.emit(QtCore.SIGNAL("statusUpdate"), self.status_prefix + 'Copying model files...')
         self.emit(QtCore.SIGNAL("setRange"), no_results)
         for i, p in enumerate(file_paths, 1):
             tester = os.path.exists(p[0])
@@ -368,9 +474,9 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
                         
                         extstuff = os.path.splitext(f)
                         if len(extstuff) > 1 and (extstuff[1] == '.asc' or extstuff[1] == '.txt'): 
-                            self.emit(QtCore.SIGNAL("statusUpdate"), 'Copying Grid file, this may take a while...')
+                            self.emit(QtCore.SIGNAL("statusUpdate"), self.status_prefix + 'Copying Grid file, this may take a while...')
                             shutil.copy(f, p[1])
-                            self.emit(QtCore.SIGNAL("statusUpdate"), 'Copying model files...')
+                            self.emit(QtCore.SIGNAL("statusUpdate"), self.status_prefix + 'Copying model files...')
                         else:
                             shutil.copy(f, p[1])
                 except IOError:
@@ -431,7 +537,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         no_results_folders = len(self._extractVars.results_files)
         for i, r in enumerate(self._extractVars.results_files, 1):
             self.emit(QtCore.SIGNAL("statusUpdate"), 
-                      ('Copying output folder %s of %s (Some results can take a while)' % (i, no_results_folders)))
+                      (self.status_prefix + 'Copying output folder %s of %s (Some results can take a while)' % (i, no_results_folders)))
             old_p, old_n = os.path.split(r[0])
             new_p, new_n = os.path.split(r[1])
             

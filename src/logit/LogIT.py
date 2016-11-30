@@ -466,12 +466,17 @@ class MainGui(QtGui.QMainWindow):
                     self.launchQMsgBox(errors.msgbox_error.title, 
                                    errors.msgbox_error.message)
             else:
-                self.widgets['Model Extractor'].resetForm()
                 options = row_dict['RUN_OPTIONS']
-                if not options == 'None':
-                    self.widgets['Model Extractor'].extractRunOptionsTextbox.setText(options)
-                self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
+                if options == 'None': options = ''
+                self.widgets['Model Extractor'].addModel(in_path, options)
                 self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
+                
+#                 self.widgets['Model Extractor'].resetForm()
+#                 options = row_dict['RUN_OPTIONS']
+#                 if not options == 'None':
+#                     self.widgets['Model Extractor'].extractRunOptionsTextbox.setText(options)
+#                 self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
+#                 self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
                 
         elif context_text == 'Run Summary':
             if not 'Run Summary' in self.widgets.keys(): return

@@ -81,18 +81,6 @@ p, li { white-space: pre-wrap; }
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="minimumSize">
-      <size>
-       <width>300</width>
-       <height>100</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>130</height>
-      </size>
-     </property>
      <property name="font">
       <font>
        <family>Arial</family>
@@ -115,11 +103,11 @@ p, li { white-space: pre-wrap; }
       </item>
       <item row="0" column="1">
        <widget class="QLineEdit" name="modellerTextbox">
-        <property name="maximumSize">
-         <size>
-          <width>250</width>
-          <height>16777215</height>
-         </size>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -132,11 +120,11 @@ p, li { white-space: pre-wrap; }
       </item>
       <item row="0" column="3">
        <widget class="QLineEdit" name="isisVersionTextbox">
-        <property name="maximumSize">
-         <size>
-          <width>250</width>
-          <height>16777215</height>
-         </size>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -149,11 +137,11 @@ p, li { white-space: pre-wrap; }
       </item>
       <item row="0" column="5">
        <widget class="QLineEdit" name="tuflowVersionTextbox">
-        <property name="maximumSize">
-         <size>
-          <width>250</width>
-          <height>16777215</height>
-         </size>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -179,11 +167,11 @@ p, li { white-space: pre-wrap; }
       </item>
       <item row="1" column="1">
        <widget class="QLineEdit" name="eventNameTextbox">
-        <property name="maximumSize">
-         <size>
-          <width>250</width>
-          <height>16777215</height>
-         </size>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -196,11 +184,11 @@ p, li { white-space: pre-wrap; }
       </item>
       <item row="1" column="3" colspan="3">
        <widget class="QLineEdit" name="runOptionsTextbox">
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>16777215</height>
-         </size>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -226,7 +214,7 @@ p, li { white-space: pre-wrap; }
       <enum>QTabWidget::Rounded</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="loadSingleModelTab">
       <property name="sizePolicy">
@@ -250,22 +238,10 @@ p, li { white-space: pre-wrap; }
          <item>
           <widget class="QGroupBox" name="loadModelGroup">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>100</height>
-            </size>
            </property>
            <property name="font">
             <font>
@@ -285,17 +261,11 @@ p, li { white-space: pre-wrap; }
            <layout class="QGridLayout" name="gridLayout">
             <item row="1" column="0" colspan="2">
              <widget class="QLineEdit" name="loadModelTextbox">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
              </widget>
             </item>
@@ -306,12 +276,6 @@ p, li { white-space: pre-wrap; }
                 <horstretch>55</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>90</width>
-                <height>20</height>
-               </size>
               </property>
               <property name="font">
                <font>
@@ -334,18 +298,6 @@ p, li { white-space: pre-wrap; }
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>16777215</width>
-                <height>16777215</height>
-               </size>
               </property>
               <property name="font">
                <font>
@@ -382,22 +334,10 @@ p, li { white-space: pre-wrap; }
             <bool>false</bool>
            </property>
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>150</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>300</width>
-             <height>100</height>
-            </size>
            </property>
            <property name="title">
             <string>Submit Model</string>
@@ -416,23 +356,11 @@ loaded model to the log database.</string>
             </item>
             <item>
              <widget class="QPushButton" name="addSingleLogEntryButton">
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>20</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>150</width>
-                <height>25</height>
-               </size>
-              </property>
-              <property name="sizeIncrement">
-               <size>
-                <width>50</width>
-                <height>30</height>
-               </size>
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
               </property>
               <property name="toolTip">
                <string>Add loaded model data to database (Ctrl-A)</string>
@@ -592,18 +520,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
          <property name="enabled">
           <bool>false</bool>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>160</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>360</width>
-           <height>100</height>
-          </size>
-         </property>
          <property name="toolTip">
           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button will be activated when a model has been added to the list.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
@@ -614,16 +530,10 @@ When done click the Add All Log Entries button. Any errors will be written to th
           <item row="0" column="0" colspan="2">
            <widget class="QLabel" name="submitMultiModelLabel">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>16777215</width>
-              <height>100</height>
-             </size>
             </property>
             <property name="text">
              <string>Click Button to submit all of the models in the list to the database.</string>
@@ -636,28 +546,10 @@ When done click the Add All Log Entries button. Any errors will be written to th
           <item row="1" column="0">
            <widget class="QPushButton" name="addMultiLogEntryButton">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>150</width>
-              <height>25</height>
-             </size>
-            </property>
-            <property name="sizeIncrement">
-             <size>
-              <width>50</width>
-              <height>30</height>
-             </size>
             </property>
             <property name="toolTip">
              <string>Add loaded model data to database (Ctrl-A)</string>
@@ -672,11 +564,8 @@ When done click the Add All Log Entries button. Any errors will be written to th
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>228</width>
-              <height>0</height>
-             </size>
+            <property name="sizeType">
+             <enum>QSizePolicy::Preferred</enum>
             </property>
            </spacer>
           </item>
@@ -686,7 +575,7 @@ When done click the Add All Log Entries button. Any errors will be written to th
        <item row="1" column="1">
         <widget class="QGroupBox" name="multiModelLoadErrorGroup">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -717,12 +606,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>20</height>
-               </size>
-              </property>
               <property name="text">
                <string>Copy to Clipboard</string>
               </property>
@@ -736,12 +619,6 @@ When done click the Add All Log Entries button. Any errors will be written to th
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>20</height>
-               </size>
-              </property>
               <property name="text">
                <string>Clear</string>
               </property>
@@ -752,11 +629,8 @@ When done click the Add All Log Entries button. Any errors will be written to th
               <property name="orientation">
                <enum>Qt::Horizontal</enum>
               </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>0</height>
-               </size>
+              <property name="sizeType">
+               <enum>QSizePolicy::Preferred</enum>
               </property>
              </spacer>
             </item>
@@ -764,17 +638,11 @@ When done click the Add All Log Entries button. Any errors will be written to th
           </item>
           <item>
            <widget class="QTextEdit" name="multiModelLoadErrorTextEdit">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>20</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>350</width>
-              <height>16777215</height>
-             </size>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
            </widget>
           </item>

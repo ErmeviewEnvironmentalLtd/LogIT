@@ -16,12 +16,6 @@
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QGroupBox" name="overviewGroup">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>100</height>
-      </size>
-     </property>
      <property name="font">
       <font>
        <family>Arial</family>
@@ -47,18 +41,6 @@
    </item>
    <item>
     <widget class="QGroupBox" name="runStatusGroup">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>150</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>200</height>
-      </size>
-     </property>
      <property name="font">
       <font>
        <family>Arial 12</family>
@@ -76,6 +58,12 @@
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QPushButton" name="updateAllStatusButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Update All</string>
           </property>
@@ -83,11 +71,11 @@
         </item>
         <item>
          <widget class="QPushButton" name="tlfAddButton">
-          <property name="minimumSize">
-           <size>
-            <width>80</width>
-            <height>0</height>
-           </size>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <property name="text">
            <string>Add Log</string>
@@ -96,6 +84,12 @@
         </item>
         <item>
          <widget class="QPushButton" name="autoUpdateButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Auto Update Active Run</string>
           </property>
@@ -116,6 +110,12 @@
         </item>
         <item>
          <widget class="QCheckBox" name="showFmpRunCbox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Show FMP Runform when complete</string>
           </property>
@@ -128,11 +128,11 @@
       </item>
       <item>
        <widget class="QTableWidget" name="runStatusTable">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>true</bool>
@@ -239,11 +239,11 @@
     <layout class="QHBoxLayout" name="graphLayoutH">
      <item>
       <widget class="QGroupBox" name="simGraphGroup">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>175</height>
-        </size>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
        <property name="font">
         <font>
