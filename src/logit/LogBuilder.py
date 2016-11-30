@@ -55,6 +55,9 @@
         Most of the collation work that was done here is no longer performed 
         as it is done by the database during queries, which is possible now that
         it has been normalized better.
+    DR - 29/11/2016:
+        Updated to accomadate changes in the SHIP library (v0.3.0) which 
+        rewrote large chunks of the tuflow package API and some fmp.
 
  TODO:
 
@@ -65,6 +68,7 @@
 import os
 import datetime
 from operator import attrgetter
+from collections import defaultdict
 
 import logging
 logger = logging.getLogger(__name__)
@@ -74,7 +78,7 @@ try:
     from ship.utils.fileloaders.fileloader import FileLoader
     from ship.utils import utilfunctions as ufunc
     from ship.utils import filetools
-    from ship.tuflow.data_files import datafileloader
+    from ship.tuflow.datafiles import datafileloader
     from ship.tuflow import FILEPART_TYPES as fpt
     
 except:
@@ -88,8 +92,6 @@ TYPE_ISIS = 1
 TYPE_ESTRY = 2
 
 missing_files = []
-
-
 
 
 class ModelLoader(object):
@@ -251,16 +253,10 @@ class ModelLoader(object):
         log_pages.addLogEntry(run)
         
         if self.log_type != TYPE_ISIS:
-            se_vals = self.tuflow.getCurrentSEVals()
-            tmfs = self.tuflow.getTuflowModelFiles(se_only=True, no_duplicates=True)
-            
-            log_pages.addLogEntry(self.buildModelFileRow(tmfs['ecf'], 'ECF', se_vals))
-            log_pages.addLogEntry(self.buildModelFileRow(tmfs['tcf'], 'TCF', se_vals))
-            log_pages.addLogEntry(self.buildModelFileRow(tmfs['tgc'], 'TGC', se_vals))
-            log_pages.addLogEntry(self.buildModelFileRow(tmfs['tbc'], 'TBC', se_vals))
-            log_pages.addLogEntry(self.buildModelFileRow(tmfs['tef'], 'TEF', se_vals))
-            log_pages.addLogEntry(self.buildModelFileRow(tmfs['trd'], 'TRD', se_vals))
-            log_pages.addLogEntry(self.buildBcRowFromModel())
+            se_vals = self.tuflow.user_variables.seValsToDict()
+            for ckey, cval in self.tuflow.control_files.items():
+                log_pages.addLogEntry(self.buildModelFileRow(cval, se_vals))
+            log_pages.addLogEntry(self.buildBcRowFromModel(se_vals))
         
         if self.log_type != TYPE_ESTRY:
             log_pages.addLogEntry(self.buildDatRowFromModel(dat))
@@ -324,7 +320,7 @@ class ModelLoader(object):
         :param run_cols: the log data dictionary to fill.
         :return: the updated log_files dictionary.
         """    
-        run_cols['IEF'] = self.ief.path_holder.getFileNameAndExtension()
+        run_cols['IEF'] = self.ief.path_holder.filenameAndExtension()
         dat = filetools.getFileName(self.ief.getValue('Datafile'), True)
         run_cols['ISIS_RESULTS'] = self.ief.getValue('Results')
         
@@ -361,65 +357,64 @@ class ModelLoader(object):
         Return:
             dict - updated run_cols dict.
         """
+        tcf_control = self.tuflow.control_files['TCF']
+        se_vals = self.tuflow.user_variables.seValsToDict()
         if self.ief is None:
             # If we don't have an ief we should try and get the run duration 
             # variables from the tcf files instead
             start = None
             end = None
-            variables = self.tuflow.getVariables(se_only=True, no_duplicates=True)
-            
-            # We get them in order so any later references will overwrite the
-            # previous versions
-            for v in variables:
-                if v.command.upper() == 'START TIME':
-                    start = v.raw_var
-                if v.command.upper() == 'END TIME':
-                    end = v.raw_var
-                        
-            if not (start == None or end == None):
+            stime = tcf_control.contains(command='start time')
+            etime = tcf_control.contains(command='end time')
+            if stime and etime:
+                start = stime[0].variable
+                end = etime[0].variable
                 try:
                     run_cols['EVENT_DURATION'] = str(float(end) - float(start))
-                except:
-                    pass
-        
-        # Get the results and check for the result output command
-        result_obj = None
-        log_obj = None
-        in_results = self.tuflow.getFiles(fpt.RESULT, se_only=True, no_duplicates=True)
-        for r in in_results:
-            if r.command.upper() == 'OUTPUT FOLDER' and r.modelfile_type.upper() == 'TCF':
-                result_obj = r
-            elif r.command.upper() == 'LOG FOLDER':
-                log_obj = r
-
-        # Use the global_order variable same as for the duration calls
+                except: pass
+            
+        # Tuflow results
         result = ''
-        main_tcf = self.tuflow.mainfile.getFileNameAndExtension()
-        main_tcf = os.path.splitext(main_tcf)[0]
-        result = ''
-        if not result_obj is None:
-            if result_obj.has_own_root:
-                result = result_obj.root
-            elif not result_obj.getRelativePath():
-                result = ''
-            else:
-                result = result_obj.getRelativePath()
+        result_tcf = tcf_control.contains(command='output folder')
+        if result_tcf:
+            if result_tcf[-1].has_own_root:
+#                 result = result_tcf[-1].root
+                result = result_tcf[-1].absolutePath()
+            elif result_tcf[-1].relativePath():
+                result = result_tcf[-1].relativePath()
+#             elif not result_tcf[-1].relativePath():
+#                 result = ''
+#             else:
+#                 result = result_tcf[-1].relativePath()
         run_cols['TUFLOW_RESULTS'] = result
-        
-        log = ''
-        if not log_obj is None:
-            if log_obj.has_own_root:
-                log = log_obj.root
-            elif not log_obj.getRelativePath():
-                log = self.tcf_dir
-            else:
-                log = os.path.join(self.tcf_dir, log_obj.getRelativePath())
-        run_cols['LOG_DIR'] = log
 
+        # Estry results
+        if 'ECF' in self.tuflow.control_files.keys():
+            result = ''
+            result_ecf = self.tuflow.control_files['ECF'].contains(command='output folder')
+            if result_ecf:
+                if result_ecf[-1].has_own_root:
+                    result = result_ecf[-1].absolutePath()
+                elif result_ecf[-1].relativePath():
+                    result = result_ecf[-1].relativePath()
+            run_cols['ESTRY_RESULTS'] = result
+        
+        # Log folder
+        log = tcf_control.contains(command='log folder')
+        if log:
+            result = log[-1].absolutePath()
+#             if log[-1].has_own_root:
+#                 result = result_tcf.root
+#             elif not log[-1].relativePath():
+#                 result = ''
+#             else:
+#                 log = os.path.join(self.tcf_dir, log[-1].relativePath())
+        run_cols['LOG_DIR'] = result
+        
         return run_cols
                 
 
-    def buildModelFileRow(self, model_files, mtype, se_vals):
+    def buildModelFileRow(self, control_file, se_vals): 
         """Create a new row for the model file page.
         
         Args:
@@ -431,15 +426,15 @@ class ModelLoader(object):
             list - containing the model file data for this mtype.
         """
         out_list = []
-        if len(model_files) > 0:
-            for m in model_files:
-                files = m[0].getFileNames(with_extension=True, include_results=False,
-                                         se_vals=se_vals)
-                out_list.append({'TYPE': mtype, 'NAME': m[1],
-                                 'FILES': files, 'COMMENTS': 'None', 'EXISTS': False})
-            
+        all_files = control_file.filepaths(by_parent=True)
+        for key, files in all_files.items():
+            mtype = os.path.splitext(key)[1][1:].upper()
+            out_list.append({
+                'TYPE': mtype, 'NAME': key, 
+                'FILES': files, 'COMMENTS': 'None', 'EXISTS': False
+            })
         return out_list
-    
+            
 
     def buildDatRowFromModel(self, dat):
         """Create a new row for the DAT file page
@@ -473,7 +468,7 @@ class ModelLoader(object):
         return out_list
 
         
-    def buildBcRowFromModel(self):
+    def buildBcRowFromModel(self, se_vals):
         """Create a new row for the BC Databas file page
         
         Return:
@@ -482,17 +477,26 @@ class ModelLoader(object):
         bc_list = []
         
         # Get the BC Database objects from the model
-        data = self.tuflow.getFiles(fpt.DATA, no_duplicates=True, se_only=True)
+        data = []
+        data.extend(self.tuflow.control_files['TCF'].files(fpt.DATA, 
+                                                         se_vals=se_vals))
+        if 'ECF' in self.tuflow.control_files.keys():
+            data.extend(self.tuflow.control_files['ECF'].files(fpt.DATA, 
+                                                             se_vals=se_vals))
         bc = []
+        bc_files = []
         for d in data:
             if d.command.upper() == 'BC DATABASE':
-                bc.append(d)
+                if not d.filename in bc_files:
+                    bc.append(d)
+                    bc_files.append(d.filename)
+        del bc_files
         
         if len(bc) > 0:
             for b in bc:
                 bc_obj = datafileloader.loadDataFile(b)
                 files = bc_obj.getAllPaths(include_this=False, name_only=True)
-                bc_list.append({'TYPE': 'BC_DBASE', 'NAME': b.getFileNameAndExtension(), 
+                bc_list.append({'TYPE': 'BC_DBASE', 'NAME': b.filenameAndExtension(), 
                                 'FILES': files, 'COMMENTS': 'None', 'EXISTS': False})
         
         return bc_list

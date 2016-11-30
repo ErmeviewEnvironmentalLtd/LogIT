@@ -75,6 +75,10 @@ class AllLogs(object):
         self.dat = None
         self.ieds = []
         self.models = []
+    
+    
+    def jsonify(self):
+        return self.__dict__
         
     
     def addLogEntry(self, entry, type=None):

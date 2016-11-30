@@ -1640,6 +1640,7 @@ def main():
          
     # Launch the user interface.
     app = QtGui.QApplication(sys.argv)
+    app.QT_AUTO_SCREEN_SCALE_FACTOR = "1"
     myapp = MainGui(new_set)
     icon_path = os.path.join(settings_path, 'Logit_Logo.ico')
     app.setWindowIcon(QtGui.QIcon(':images/Logit_Logo.png'))

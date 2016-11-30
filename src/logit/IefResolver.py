@@ -206,7 +206,7 @@ class IefHolder(object):
     
     def __init__(self, ief_obj):
         self.ief_obj = ief_obj
-        self.original_path = ief_obj.path_holder.getAbsolutePath()
+        self.original_path = ief_obj.path_holder.absolutePath()
         self.root_folder_old = ''
         self.root_folder_new = ''
         self.result_name = ''
@@ -226,9 +226,9 @@ class IefHolder(object):
         Return:
             Ief - updated with the path variables held by this class.
         """
-        p, e = os.path.splitext(self.ief_obj.path_holder.getAbsolutePath())
+        p, e = os.path.splitext(self.ief_obj.path_holder.absolutePath())
         p = p + '_LOGIT' + e
-        self.ief_obj.path_holder.setPathsWithAbsolutePath(p)
+        self.ief_obj.path_holder.setAbsolutePath(p)
         
         for k, v in self.single_types.iteritems():
             if k == '.dat':
