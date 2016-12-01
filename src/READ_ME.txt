@@ -483,17 +483,14 @@ v1.3.0-Beta:
 
 
 v1.3.1-Beta:
-    - [Feature] Implemented the Custom Query tab on the Query widget. This allows
-      for bespoke user SQL scripts to be written for accessing data in the
-      database. It does not except any commands that will edit or delete any of
-      the data.
-    - [Feature] Added syntax highlighting to the Custom Query tab. Inputs will
-      be highlighted for SQL terms, table names and table fields to help 
-      identify errors in the scripts. There is also an overview of the database
-      model available on the rightclick menu in the script window.
-    - [Feature] Added saving and loading of logit sql scripts to file on the
-      Custom Query tab.
-    - Tidied a few things up and sorted out the code a little.
+    - [Feature] Added multiple model selection to the model extractor tool. You
+      can now load as many models at once as you want for extracting. There are
+      still the same issues with materials and bc databse files as before. I'm
+      hoping to sort this out in the SHIP library soon.
+    - Changes to layouts. The existing layouts have been causing some problems on
+      high-res screens. I've tried to make a compromise with how they function.
+      This means they are little less tidy on normal screens, but hopefull will
+      actually be viewable in 4k now.
 
 
 ##~##

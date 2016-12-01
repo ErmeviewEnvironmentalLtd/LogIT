@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\extractmodel\ModelExtractor_Widget.ui'
+# Form implementation generated from reading ui file '.\ModelExtractor_Widget.ui'
 #
 # Created by: PyQt4 UI code generator 4.11.4
 #
@@ -49,7 +49,7 @@ class Ui_ExtractModelWidget(object):
         self.label.setFont(font)
         self.label.setFrameShape(QtGui.QFrame.NoFrame)
         self.label.setFrameShadow(QtGui.QFrame.Raised)
-        self.label.setTextFormat(QtCore.Qt.PlainText)
+        self.label.setTextFormat(QtCore.Qt.RichText)
         self.label.setScaledContents(False)
         self.label.setWordWrap(True)
         self.label.setIndent(2)
@@ -59,7 +59,7 @@ class Ui_ExtractModelWidget(object):
         self.inputBox = QtGui.QGroupBox(ExtractModelWidget)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(3)
+        sizePolicy.setVerticalStretch(4)
         sizePolicy.setHeightForWidth(self.inputBox.sizePolicy().hasHeightForWidth())
         self.inputBox.setSizePolicy(sizePolicy)
         self.inputBox.setObjectName(_fromUtf8("inputBox"))
@@ -119,6 +119,9 @@ class Ui_ExtractModelWidget(object):
         self.removeModelBut = QtGui.QPushButton(self.inputBox)
         self.removeModelBut.setObjectName(_fromUtf8("removeModelBut"))
         self.verticalLayout_3.addWidget(self.removeModelBut)
+        self.resetTableBut = QtGui.QPushButton(self.inputBox)
+        self.resetTableBut.setObjectName(_fromUtf8("resetTableBut"))
+        self.verticalLayout_3.addWidget(self.resetTableBut)
         spacerItem1 = QtGui.QSpacerItem(20, 40, QtGui.QSizePolicy.Minimum, QtGui.QSizePolicy.Expanding)
         self.verticalLayout_3.addItem(spacerItem1)
         self.gridLayout.addLayout(self.verticalLayout_3, 0, 2, 1, 1)
@@ -175,9 +178,7 @@ class Ui_ExtractModelWidget(object):
     def retranslateUi(self, ExtractModelWidget):
         ExtractModelWidget.setWindowTitle(_translate("ExtractModelWidget", "Form", None))
         self.groupBox.setTitle(_translate("ExtractModelWidget", "Overview", None))
-        self.label.setText(_translate("ExtractModelWidget", "Extract all of the files associated with a model into another directory. Either browse for a model file (.ief or .tcf) in the inputs group or right-click on an logged entry in the Run table and select \'Send to Tool > Extract model\'. If using the right-click menu any run options should be automatically written to the text box, or you can enter them manually. These will be needed if placeholders are used in filenames in order to locate results, checkfiles, and log files. If  the model contains scenario and event logic and you would like to create standard hardcoded control files for delivery check the box.\n"
-"\n"
-"Any issues with exporting the model, including missing files, or files that could not be copied, will be recorded in the text box.", None))
+        self.label.setText(_translate("ExtractModelWidget", "<html><head/><body><p>- Extract all of the files associated with a model into another directory. Either browse for a model file (.ief or .tcf) in the inputs group or right-click on an logged entry in the Run table and select \'Send to Tool &gt; Extract model\'. If using the right-click menu any run options should be automatically written to the table. These will be needed if placeholders are used in filenames in order to locate results, checkfiles, and log files. If the model contains scenario and event logic and you would like to create standard hardcoded control files for delivery check the box.<br/>- You need to provide a folder name for each model. They can have the same name if you want (when this is done any matching files will only be copied once).<br/>- Any issues with exporting the model, including missing files, or files that could not be copied, will be recorded in the text box.</p></body></html>", None))
         self.inputBox.setTitle(_translate("ExtractModelWidget", "Inputs", None))
         self.extractOutputLabel.setText(_translate("ExtractModelWidget", "Output folder", None))
         self.extractOutputButton.setText(_translate("ExtractModelWidget", "Browse...", None))
@@ -188,8 +189,9 @@ class Ui_ExtractModelWidget(object):
         item = self.modelTable.horizontalHeaderItem(2)
         item.setText(_translate("ExtractModelWidget", "Model Path", None))
         self.label_3.setText(_translate("ExtractModelWidget", "Models to extract", None))
-        self.addModelBut.setText(_translate("ExtractModelWidget", "Add Model", None))
-        self.removeModelBut.setText(_translate("ExtractModelWidget", "Remove", None))
+        self.addModelBut.setText(_translate("ExtractModelWidget", "Add model", None))
+        self.removeModelBut.setText(_translate("ExtractModelWidget", "Remove selected", None))
+        self.resetTableBut.setText(_translate("ExtractModelWidget", "Reset", None))
         self.modelExtractorGroup.setTitle(_translate("ExtractModelWidget", "Model extractor", None))
         self.extractModelButton.setText(_translate("ExtractModelWidget", "Extract Model", None))
         self.extractorHardcodeFilesCbox.setText(_translate("ExtractModelWidget", "Hardcode output files", None))

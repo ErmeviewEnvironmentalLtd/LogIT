@@ -16,6 +16,7 @@ __VERSION_CHECKPATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\v1\versioninfo.
 __RELEASE_NOTES_PATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\v1\Release_Notes_'
 
 __DEV_MODE__ = True
+__TEST_MODE__ = False
 
 
 '''

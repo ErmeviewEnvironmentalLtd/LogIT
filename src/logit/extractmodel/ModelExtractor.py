@@ -87,14 +87,13 @@ class ExtractVars(object):
         self.ief_path = None
         self.out_dir = None
         self.has_tcf = False
-        
         self.in_files = []
         self.out_files = []
         self.results_files = []
-        
         self.missing_model_files = []
         self.missing_results_files = []
         self.failed_data_files = []
+        self.all_copied_files = []
 
 
 
@@ -107,7 +106,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         self.setupUi(self)
         
         # Connect the slots
-#         self.extractModelFileButton.clicked.connect(self._setInputFile)
+        self.resetTableBut.clicked.connect(lambda: self.modelTable.setRowCount(0))
         self.extractOutputButton.clicked.connect(self._setOutputDirectory)
         self.extractModelButton.clicked.connect(self._extractModel)
         self.addModelBut.clicked.connect(self._dialogAddModel)
@@ -124,6 +123,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         self.extractOutputTextbox.setText('')
         self.extractOutputTextArea.setText('')
 
+        
     def _removeModels(self):
         rows = []
         for i in self.modelTable.selectedIndexes():
@@ -133,7 +133,6 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         for r in rows:
             self.modelTable.removeRow(r)
         
-
 
     def _dialogAddModel(self):
 
@@ -157,30 +156,11 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         item2 = QtGui.QTableWidgetItem(run_options)
         item3 = QtGui.QTableWidgetItem(path)
         self.modelTable.insertRow(self.modelTable.rowCount())
-#         print ('row_count = ' + str(self.modelTable.rowCount()))
         self.modelTable.setItem(self.modelTable.rowCount()-1, 0, item1)
         self.modelTable.setItem(self.modelTable.rowCount()-1, 1, item2)
         self.modelTable.setItem(self.modelTable.rowCount()-1, 2, item3)
 
         
-    def _setInputFile(self):
-        """Get the input model file to use."""
-
-        if 'model' in gs.path_holder.keys():
-            path = gs.path_holder['model']
-        else:
-            path = self.cur_location
-
-        d = MyFileDialogs(parent=self)
-        open_path = d.openFileDialog(path, file_types='Ief/Tcf File(*.ief;*tcf)')
-        if open_path == False:
-            return
-        
-        open_path = os.path.normpath(str(open_path))
-        self.extractModelFileTextbox.setText(open_path)
-        gs.setPath('model', open_path)
-        
-    
     def _setOutputDirectory(self):
         """Set the directory to extract the model to."""
 
@@ -209,13 +189,54 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         gs.setPath('output', dir_path)
     
     
-    def _resetLoader(self, clear_text=False):
+    def _resetLoader(self, clear_text=False, all_copied=False):
         """Reset everything to extract a new model."""
+        if clear_text:
+            self.extractOutputTextArea.clear()
+        if all_copied:
+            self.all_copied_files = []
+
         self.se_vals = None
         self._extractVars = None
-        self.extractOutputTextArea.clear()
+        self.tuflow = None
+        self.ief = None
+        self.tcf_path = None
+        self.ief_path = None
+        self.out_dir = None
+        self.has_tcf = False
+        
+        self.in_files = []
+        self.out_files = []
+        self.results_files = []
+        
+        self.missing_model_files = []
+        self.missing_results_files = []
+        self.failed_data_files = []
+        
         
     
+    def addModelTableData(self, data):
+        """Add all the data to the modelTable."""
+        for d in data:
+            self.addModel(d[2], d[1], d[0])
+
+        
+    def getModelTableData(self, do_check=False):
+        """Get all of the data form the modelTable."""
+        inputs = []
+        for i in range(self.modelTable.rowCount()):
+            folder = str(self.modelTable.item(i, 0).text())
+            if do_check and folder.strip() == '':
+                QtGui.QMessageBox.warning(self, "Folder missing",
+                            "All Models MUST have an output folder name")
+                return []
+            options = str(self.modelTable.item(i, 1).text())
+            path = str(self.modelTable.item(i, 2).text())
+            inputs.append((folder, options, path))
+        
+        return inputs
+
+        
     def _extractModel(self):
         """Extract the given model.
         
@@ -223,22 +244,17 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         to the new location.
         """
         self._resetLoader(clear_text=True)
-        inputs = []
-        for i in range(self.modelTable.rowCount()):
-            folder = str(self.modelTable.item(i, 0).text())
-            if folder.strip() == '':
-                QtGui.QMessageBox.warning(self, "Folder missing",
-                            "All Models MUST have a unique output folder name")
-                return
-            options = str(self.modelTable.item(i, 1).text())
-            path = str(self.modelTable.item(i, 2).text())
-            inputs.append((folder, options, path))
         
+        # Get the data from the table
+        inputs = self.getModelTableData(do_check=True)
         main_out_dir = str(self.extractOutputTextbox.text())
         total = len(inputs)
         have_error = []
         output = []
+        
+        # Loop through all of the inputs
         for i, val in enumerate(inputs):
+            self._resetLoader(all_copied=True)
             self.status_prefix =('Extracting model %s of %s:  ' % ((i+1), total))
             options = val[1]
             in_path = val[2]
@@ -258,21 +274,6 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
                     continue
             
             try:
-#                 in_path = str(self.extractModelFileTextbox.text())
-#                 out_dir = str(self.extractOutputTextbox.text())
-                
-#                 if not os.path.exists(in_path):
-#                     logger.error('Model file does not exist')
-#                     QtGui.QMessageBox.warning(self, "File not found",
-#                                               "Model file does not exist")
-#                     return
-#                     
-#                 if not os.path.exists(out_dir):
-#                     logger.error('Output directory does not exist')
-#                     QtGui.QMessageBox.warning(self, "Directory not found",
-#                                               "Output directory does not exist")
-#                     return
-
                 success, tuflow_files = self._extractModelSetup(in_path, out_dir,
                                                                 options)
                 if success:
@@ -282,30 +283,25 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
                     have_error.append(val[2])
             
             except Exception, err:
-#                 msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
-#                        "all gone terribly wrong. You're on your own dude.\n" +
-#                        "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
-#                        "Game over man, I'm outta here <-((+_+))->")
                 logger.error('Critical error in model extraction - for: ' + str(val[2]))
                 logger.exception(err)
                 have_error.append(val[2])
-#                 self.launchQMsgBox('Critical Error', msg)
-#                 self.emit(QtCore.SIGNAL("updateProgress"), 0)
-#                 self.emit(QtCore.SIGNAL("statusUpdate"), '')
-#                 return
             output = self._addToOutput(in_path, out_dir, output)
             
-            if have_error:
-                temp = []
-                temp.append('\n\n\nSome Model could not be extracted....')
-                for h in have_error:
-                    temp.append(input(h))
-                output = temp + output
+        if have_error:
+            temp = []
+            temp.append('\n\n\nSome Models could not be extracted....')
+            for h in have_error:
+                temp.append(input(h))
+            output = temp + output
 
-            self._displayOutput(output)
-#             self._displayOutput(in_path, out_dir)
-            self.emit(QtCore.SIGNAL("updateProgress"), 0)
-            self.emit(QtCore.SIGNAL("statusUpdate"), '')
+            QtGui.QMessageBox.warning(self, "Extraction Error",
+                "There were problem extracting some of the models. See output information.")
+
+        self._displayOutput(output)
+        self.emit(QtCore.SIGNAL("updateProgress"), 0)
+        self.emit(QtCore.SIGNAL("statusUpdate"), '')
+        self._resetLoader(all_copied=True)
         
         # Log use on the server
         if not gs.__DEV_MODE__:
@@ -315,11 +311,9 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         """Finds all the files and re-writes the file path variables."""
 
         self._extractVars = ExtractVars()
-#         self.extractOutputTextArea.clear()
         self._extractVars.out_dir = out_dir
         self._extractVars.hardcode = self.extractorHardcodeFilesCbox.isChecked()
         
-#         se_vals = str(self.extractRunOptionsTextbox.text())
         if not se_vals == '':
             self.se_vals = uf.convertRunOptionsToSEDict(se_vals)
         else:
@@ -475,10 +469,14 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
                         extstuff = os.path.splitext(f)
                         if len(extstuff) > 1 and (extstuff[1] == '.asc' or extstuff[1] == '.txt'): 
                             self.emit(QtCore.SIGNAL("statusUpdate"), self.status_prefix + 'Copying Grid file, this may take a while...')
-                            shutil.copy(f, p[1])
+                            if not p[1] in self.all_copied_files:
+                                shutil.copy(f, p[1])
+                                self.all_copied_files.append(p[1])
                             self.emit(QtCore.SIGNAL("statusUpdate"), self.status_prefix + 'Copying model files...')
                         else:
-                            shutil.copy(f, p[1])
+                            if not p[1] in self.all_copied_files:
+                                shutil.copy(f, p[1])
+                                self.all_copied_files.append(p[1])
                 except IOError:
                     self._extractVars.missing_model_files.append(p[0])
 
@@ -914,6 +912,37 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
 
         self._extractVars.ief.path_holder.root = os.path.join(self._extractVars.out_dir, 'fmp', 'iefs')
 
+    
+    def getSettingsAttrs(self):
+        """Setup the ToolSettings attributes for this widget.
+        
+        Overrides superclass method.
+        
+        Return:
+            dict - member varibles and initial state for ToolSettings.
+        """
+        attrs = {'out_path': '', 'table_data': None}
+        return attrs
+    
+    
+    def loadSettings(self, settings):
+        """Load any pre-saved settings provided."""
+        
+        AWidget.loadSettings(self, settings)
+        if self.settings['table_data'] is not None:
+            self.addModelTableData(self.settings['table_data'])
+        self.extractOutputTextbox.setText(self.settings['out_path'])
+
+    
+    def saveSettings(self):
+        """Return state of settings back to caller.
+        
+        Overrides superclass method.
+        """
+        self.settings['out_path'] = str(self.extractOutputTextbox.text())
+        self.settings['table_data'] = self.getModelTableData()
+        return self.settings
+    
 
     def setupLookupLists(self):
         """

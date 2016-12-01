@@ -31,7 +31,7 @@ class ModelExtractorTest(unittest.TestCase):
         in_path = r'C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\Regression_Test_Data\Loader\model\Kennford\isis\iefs\kennford_1%AEP_FINAL_v5.18.ief'
         out_dir = r'C:\Some\fake\folder'
          
-        success, tuflow_files = self.extractor._extractModelSetup(in_path, out_dir)
+        success, tuflow_files = self.extractor._extractModelSetup(in_path, out_dir, '')
          
         vars = self.extractor._extractVars
         failed_list = ['C:\\Users\\duncan.runnacles\\Documents\\Programming\\Python\\LogIT\\Regression_Test_Data\\Loader\\model\\Kennford\\tuflow\\model\\Materials.csv']

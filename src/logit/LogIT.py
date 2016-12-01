@@ -199,7 +199,7 @@ class MainGui(QtGui.QMainWindow):
         :param parent: Reference to the calling class.
         """        
         # Setup some variables
-        self._TEST_MODE = False
+#         self._TEST_MODE = False
         self.settings = cur_settings
         
         self.model_log = None
@@ -470,13 +470,6 @@ class MainGui(QtGui.QMainWindow):
                 if options == 'None': options = ''
                 self.widgets['Model Extractor'].addModel(in_path, options)
                 self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
-                
-#                 self.widgets['Model Extractor'].resetForm()
-#                 options = row_dict['RUN_OPTIONS']
-#                 if not options == 'None':
-#                     self.widgets['Model Extractor'].extractRunOptionsTextbox.setText(options)
-#                 self.widgets['Model Extractor'].extractModelFileTextbox.setText(in_path)
-#                 self.ui.tabWidget.setCurrentWidget(self.widgets['Model Extractor'])
                 
         elif context_text == 'Run Summary':
             if not 'Run Summary' in self.widgets.keys(): return
@@ -1037,7 +1030,8 @@ class MainGui(QtGui.QMainWindow):
                 msg = "Couldn't auto-reinstate the backup, but you can find\nit here and do it manually:\n" + p
                 self.launchQMsgBox('Backup failure', msg)
             
-            if self._TEST_MODE:
+#             if self._TEST_MODE:
+            if gs.__TEST_MODE__:
                 return errors
             else:
                 self.launchQMsgBox('Critical Error', msg)
@@ -1049,7 +1043,9 @@ class MainGui(QtGui.QMainWindow):
             text = errors.formatErrors('Some models could not be logged:')
             self.widgets['New Entry'].setMultipleErrorText(text)
             message = 'Some files could not be logged.\nSee Error Logs window for details'
-            if not self._TEST_MODE: self.launchQMsgBox('Logging Error', message)
+#             if not self._TEST_MODE: self.launchQMsgBox('Logging Error', message)
+            if not gs.__TEST_MODE__: 
+                self.launchQMsgBox('Logging Error', message)
 
         else:
             logger.info('Log Database updated successfully')
@@ -1064,7 +1060,8 @@ class MainGui(QtGui.QMainWindow):
         except IOError, err:
             logger.warning('Cound not delete temp backup')
 
-        if self._TEST_MODE:
+#         if self._TEST_MODE:
+        if gs.__TEST_MODE__:
             return errors
 
     
@@ -1255,7 +1252,7 @@ class MainGui(QtGui.QMainWindow):
             logger.exception(err)
     
     
-    def _updateDatabaseVersion(self):
+    def _updateDatabaseVersion(self, dbpath=None):
         """Update to the latest version of the database.
         
         A backup copy is created at the start and restored if the upgrade fails.
@@ -1263,18 +1260,19 @@ class MainGui(QtGui.QMainWindow):
         Collects a list of all of the migration functions from the dbmigrations
         module and then loops them calling each one in order.
         """
-        # Get the database to update
-        current_log = None
-        p = gs.path_holder['last_path']
-        path, exists = gs.getPath('log')
-        if exists: 
-            current_log = path
-            p = path
-        d = MyFileDialogs(parent=self)
-        dbpath = d.openFileDialog(path=p, 
-                file_types='Logit Database (*.logdb)')
-        if dbpath == False:
-            return
+        if not dbpath:
+            # Get the database to update
+            current_log = None
+            p = gs.path_holder['last_path']
+            path, exists = gs.getPath('log')
+            if exists: 
+                current_log = path
+                p = path
+            d = MyFileDialogs(parent=self)
+            dbpath = d.openFileDialog(path=p, 
+                    file_types='Logit Database (*.logdb)')
+            if dbpath == False:
+                return
         
         # Get the migration we need to apply
         pm.logit_db.init(None)
@@ -1287,8 +1285,11 @@ class MainGui(QtGui.QMainWindow):
         elif update_funcs == pm.DATABASE_VERSION_SAME:
             msg = "This database is already up to date"
             msg = "This database is already the latest version"
-            self.launchQMsgBox('DB Update', msg)
-            return
+            if not gs.__TEST_MODE__:
+                self.launchQMsgBox('DB Update', msg)
+                return
+            else:
+                return 'latest'
         
         total_updates = len(update_funcs)
         update_count = 1
@@ -1305,10 +1306,14 @@ class MainGui(QtGui.QMainWindow):
             shutil.copyfile(dbpath, backup_name)
         except Exception, err:
             logger.exception(err)
-            self.launchQMsgBox('Backup Failed', "Could not backup database is it open?\nUpdate Terminated.")
-            self._updateCurrentProgress(0)
-            self._updateStatusBar('Update Failed')
-            return
+            msg = "Could not backup database is it open?\nUpdate Terminated."
+            if not gs.__TEST_MODE__:
+                self.launchQMsgBox('Backup Failed', msg)
+                self._updateCurrentProgress(0)
+                self._updateStatusBar('Update Failed')
+                return
+            else:
+                return 'copy failed'
         
         # Run the database migrations
         try:
@@ -1324,12 +1329,19 @@ class MainGui(QtGui.QMainWindow):
             pm.logit_db.init(dbpath)
             gs.setPath('log', dbpath)
             self._loadModelLog()
-            self.launchQMsgBox('Update Successfull', 'Your database has been updated and loaded into logit')
+
+            if not gs.__TEST_MODE__:
+                self.launchQMsgBox('Update Successfull', 'Your database has been updated and loaded into logit')
+            else:
+                return 'success'
         except Exception, err:
             logger.exception(err)
             # Restore the backup copy if it fails
             shutil.copyfile(backup_name, dbpath)
-            self.launchQMsgBox('Update Failed', "Could not complete update.\nlogdb file reset with backup.")
+            if not gs.__TEST_MODE__:
+                self.launchQMsgBox('Update Failed', "Could not complete update.\nlogdb file reset with backup.")
+            else:
+                return 'reset with backup'
         finally:
             self._updateCurrentProgress(0)
             self._updateStatusBar('Update complete')
