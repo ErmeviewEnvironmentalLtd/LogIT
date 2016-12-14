@@ -493,6 +493,13 @@ v1.3.1-Beta:
       actually be viewable in 4k now.
 
 
+v1.3.2-Beta:
+    - [Bugfix] Crash when unable to connect the to p drive on the server. This was
+      caused by a check to getUpdates(). If the connection could not be made there 
+      was no exception to catch adn log the error. Super unhelpful. 
+      Now logs the connection error and continues as normal.
+
+
 ##~##
 
 LICENSE

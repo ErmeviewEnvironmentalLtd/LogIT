@@ -797,8 +797,13 @@ class MainGui(QtGui.QMainWindow):
         
         If it isn't it gives the user the option to download and install the
         updated version.
-        """        
-        is_latest = Controller.checkVersionInfo(gs.__VERSION__, gs.__VERSION_CHECKPATH__)
+        """
+        try: 
+            is_latest = Controller.checkVersionInfo(gs.__VERSION__, gs.__VERSION_CHECKPATH__)
+        except IOError as err:
+            logger.warning('Could not connect to updates server at: \n' + gs.__VERSION_CHECKPATH__)
+            return
+        
         if is_latest[0]:
             logger.info('Latest version of LogIT (version %s) installed' % (gs.__VERSION__))
             if show_has_latest:
