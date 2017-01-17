@@ -500,6 +500,11 @@ v1.3.2-Beta:
       Now logs the connection error and continues as normal.
 
 
+v1.3.3-Beta:
+    - [Bugfix] Issue in SHIP library when adding user variables. Fixed in SHIP and
+      also here.
+
+
 ##~##
 
 LICENSE
