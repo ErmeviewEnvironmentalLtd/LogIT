@@ -505,6 +505,16 @@ v1.3.3-Beta:
       also here.
 
 
+v1.3.4-Beta:
+    - [Feature] Added support for multiple files add to model extractor. Also 
+      tooltip added to table to show full file path when hovering mouse. 
+    - [Bugfix] Misconfiguration in source files path variables in model extractor.
+      This meant that copying of xs csv and bc csv files would always fail. Still
+      doesn't know how to identify placeholders (e.g. __event__.csv) though.
+    - [BugFix] Couldn't export log to Excel if there were no dat files for a log
+      entry.
+
+
 ##~##
 
 LICENSE

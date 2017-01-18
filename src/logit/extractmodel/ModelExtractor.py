@@ -142,19 +142,21 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             path = self.cur_location
 
         d = MyFileDialogs(parent=self)
-        open_path = d.openFileDialog(path, file_types='Ief/Tcf File(*.ief;*tcf)')
-        if open_path == False:
+        open_paths = d.openFileDialog(path, file_types='Ief/Tcf File(*.ief;*tcf)', multi_file=True)
+        if open_paths == False:
             return
         
-        open_path = os.path.normpath(str(open_path))
-        gs.setPath('model', open_path)
-        self.addModel(open_path)
+        for p in open_paths:
+            open_path = os.path.normpath(str(p))
+            gs.setPath('model', open_path)
+            self.addModel(open_path)
         
 
     def addModel(self, path, run_options='', name=''):
         item1 = QtGui.QTableWidgetItem(name)
         item2 = QtGui.QTableWidgetItem(run_options)
         item3 = QtGui.QTableWidgetItem(path)
+        item3.setToolTip(path)
         self.modelTable.insertRow(self.modelTable.rowCount())
         self.modelTable.setItem(self.modelTable.rowCount()-1, 0, item1)
         self.modelTable.setItem(self.modelTable.rowCount()-1, 1, item2)
@@ -753,14 +755,15 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
             source = dobj.row_collection.dataObjectAsList(dobj.keys.SOURCE)
             for s in source:
                 # Create a path holder
-                f = filetools.PathHolder(s, data_file.root)
-                f.relative_root = data_file.relative_root
+                f = filetools.PathHolder(s, os.path.dirname(data_file.absolutePath()))
+#                 f.relative_root = data_file.relative_root
                 subfiles_in.append(f.absolutePath())
                 
-                f.relative_root = os.path.join(model_root, source_root)
-                f.associates.parent.relative_root = rel_root
+#                 rel_root = os.path.join(model_root, source_root)
+#                 f.relative_root = os.path.join(model_root, source_root)
+#                 f.associates.parent.relative_root = rel_root
                 f.root = self._extractVars.out_dir
-                subfiles_out.append(f.absolutePath())
+                subfiles_out.append(f.absolutePath(relative_roots=[model_root, source_root]))
                 
         except (IOError, IndexError, AttributeError):
             return False, [], []

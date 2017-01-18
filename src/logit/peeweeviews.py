@@ -1023,13 +1023,16 @@ def createRunDatExport():
     for q in query:
         r = q.run
         if not r.id in run_out.keys():
-            if not r.dat.name in found_dats:
+            if r.dat and not r.dat.name in found_dats:
                 dat_out.append([r.dat.name, r.dat.timestamp.strftime("%Y-%m-%d"),
                                        r.dat.amendments, r.dat.comments])
                 found_dats.append(r.dat.name)
+                dat_name = r.dat.name
+            else:
+                dat_name = 'None'
 
             run_out[r.id] = [r.id, r.timestamp.strftime("%Y-%m-%d"), r.modeller, 
-                             r.event_name, r.setup, r.ief,  r.dat.name, 
+                             r.event_name, r.setup, r.ief,  dat_name, 
                              r.initial_conditions, r.isis_results, r.tuflow_results, 
                              r.estry_results, r.event_duration, r.comments, 
                              r.isis_version, r.tuflow_version, r.run_options, 
