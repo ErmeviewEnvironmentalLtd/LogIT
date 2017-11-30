@@ -259,7 +259,7 @@ def getRunStatusInfo(tcf_dir, tcf_name, run_options):
     if tcf_line is None: return False, True, False
     
     status = 'None'
-    mb = 'None'
+    mb = -9999.0
     contents = tcf_line.split("  ") # Two spaces minimum
     for item in contents:
         if'Finished' in item or 'UNSTABLE' in item or 'INTERRUPTED' in item:

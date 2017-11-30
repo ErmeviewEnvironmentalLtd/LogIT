@@ -1,7 +1,3 @@
-- [Feature] Added support for multiple files add to model extractor. Also 
-  tooltip added to table to show full file path when hovering mouse. 
-- [Bugfix] Misconfiguration in source files path variables in model extractor.
-  This meant that copying of xs csv and bc csv files would always fail. Still
-  doesn't know how to identify placeholders (e.g. __event__.csv) though.
-- [BugFix] Couldn't export log to Excel if there were no dat files for a log
-  entry.
+- [Bugfix] If MB value is not found in the simulations.log file a value of
+  'None' was returned. This was causing a crash when trying to convert to
+  float while saving to the database. Fixed.

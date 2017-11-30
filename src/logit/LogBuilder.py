@@ -378,14 +378,9 @@ class ModelLoader(object):
         result_tcf = tcf_control.contains(command='output folder')
         if result_tcf:
             if result_tcf[-1].has_own_root:
-#                 result = result_tcf[-1].root
                 result = result_tcf[-1].absolutePath()
             elif result_tcf[-1].relativePath():
                 result = result_tcf[-1].relativePath()
-#             elif not result_tcf[-1].relativePath():
-#                 result = ''
-#             else:
-#                 result = result_tcf[-1].relativePath()
         run_cols['TUFLOW_RESULTS'] = result
 
         # Estry results
@@ -403,12 +398,6 @@ class ModelLoader(object):
         log = tcf_control.contains(command='log folder')
         if log:
             result = log[-1].absolutePath()
-#             if log[-1].has_own_root:
-#                 result = result_tcf.root
-#             elif not log[-1].relativePath():
-#                 result = ''
-#             else:
-#                 log = os.path.join(self.tcf_dir, log[-1].relativePath())
         run_cols['LOG_DIR'] = result
         
         return run_cols

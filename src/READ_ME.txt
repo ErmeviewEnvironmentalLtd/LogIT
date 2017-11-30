@@ -515,6 +515,11 @@ v1.3.4-Beta:
       entry.
 
 
+v1.3.5-Beta:
+    - [Bugfix] If MB value is not found in the simulations.log file a value of
+      'None' was returned. This was causing a crash when trying to convert to
+      float while saving to the database. Fixed.
+
 ##~##
 
 LICENSE
