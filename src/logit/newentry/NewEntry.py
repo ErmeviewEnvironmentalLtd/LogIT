@@ -60,7 +60,7 @@ logger = logging.getLogger(__name__)
 
 from PyQt4 import QtCore, QtGui
 
-from ship.utils.filetools import MyFileDialogs
+from qtclasses import MyFileDialogs
     
 from AWidget import AWidget
 import GuiStore

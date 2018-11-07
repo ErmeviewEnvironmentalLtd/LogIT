@@ -147,7 +147,7 @@ logger.debug('SQLite3 import complete')
 
 # Fetch the ship library   
 try:
-    from ship.utils.qtclasses import MyFileDialogs
+    from qtclasses import MyFileDialogs
 except:
     logger.error('Cannot load ship (Is it installed?)')
  

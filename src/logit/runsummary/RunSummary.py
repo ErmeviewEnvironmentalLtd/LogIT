@@ -54,7 +54,7 @@ import re
 from PyQt4 import QtCore, QtGui
 import pyqtgraph as pg
 
-from ship.utils.filetools import MyFileDialogs
+from qtclasses import MyFileDialogs
 from ship.utils.fileloaders import fileloader as fl
 
 from AWidget import AWidget

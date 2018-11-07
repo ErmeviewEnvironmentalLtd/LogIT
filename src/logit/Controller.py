@@ -79,7 +79,7 @@ from PyQt4 import QtCore, QtGui
 import logging
 logger = logging.getLogger(__name__)
 
-from ship.utils.qtclasses import MyFileDialogs
+from qtclasses import MyFileDialogs
 from ship.utils import utilfunctions as uf
 
 # Local modules

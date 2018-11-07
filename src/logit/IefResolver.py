@@ -48,7 +48,7 @@ import shutil
 from PyQt4 import QtGui
 
 from ship.utils.fileloaders import fileloader as fl
-from ship.utils.qtclasses import MyFileDialogs
+from qtclasses import MyFileDialogs
 from ship.utils import filetools as ft
 
 import logging
