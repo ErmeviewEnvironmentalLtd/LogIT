@@ -254,51 +254,57 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         have_error = []
         output = []
         
-        # Loop through all of the inputs
-        for i, val in enumerate(inputs):
-            self._resetLoader(all_copied=True)
-            self.status_prefix =('Extracting model %s of %s:  ' % ((i+1), total))
-            options = val[1]
-            in_path = val[2]
-            if not os.path.exists(in_path):
-                logger.error('Model file does not existat: ' + str(in_path))
-                have_error.append(val[2])
-                continue
-                
-            out_dir = os.path.join(main_out_dir, val[0])
-            if not os.path.exists(out_dir):
-                try:
-                    os.mkdir(out_dir)
-                except Exception as err:
-                    logger.error('Unable to make directory: ' + str(out_dir))
-                    logger.exception(err)
+        if not os.path.exists(main_out_dir):
+            msg = 'Output directory does not exist at: ' + str(main_out_dir)
+            logger.error(msg)
+            have_error.append(msg)
+        else:
+            
+            # Loop through all of the inputs
+            for i, val in enumerate(inputs):
+                self._resetLoader(all_copied=True)
+                self.status_prefix =('Extracting model %s of %s:  ' % ((i+1), total))
+                options = val[1]
+                in_path = val[2]
+                if not os.path.exists(in_path):
+                    logger.error('Model file does not exist at: ' + str(in_path))
                     have_error.append(val[2])
                     continue
-            
-            try:
-                success, tuflow_files = self._extractModelSetup(in_path, out_dir,
-                                                                options)
-                if success:
-                    success = self._extractModelWrite(tuflow_files)
-                else:
-                    logger.error('Failed to extract model at: ' + str(in_path))
+                    
+                out_dir = os.path.join(main_out_dir, val[0])
+                if not os.path.exists(out_dir):
+                    try:
+                        os.mkdir(out_dir)
+                    except Exception as err:
+                        logger.error('Unable to make directory: ' + str(out_dir))
+                        logger.exception(err)
+                        have_error.append(val[2])
+                        continue
+                
+                try:
+                    success, tuflow_files = self._extractModelSetup(in_path, out_dir,
+                                                                    options)
+                    if success:
+                        success = self._extractModelWrite(tuflow_files)
+                    else:
+                        logger.error('Failed to extract model at: ' + str(in_path))
+                        have_error.append(val[2])
+                
+                except Exception, err:
+                    logger.error('Critical error in model extraction - for: ' + str(val[2]))
+                    logger.exception(err)
                     have_error.append(val[2])
-            
-            except Exception, err:
-                logger.error('Critical error in model extraction - for: ' + str(val[2]))
-                logger.exception(err)
-                have_error.append(val[2])
-            output = self._addToOutput(in_path, out_dir, output)
+                output = self._addToOutput(in_path, out_dir, output)
             
         if have_error:
             temp = []
             temp.append('\n\n\nSome Models could not be extracted....')
             for h in have_error:
-                temp.append(input(h))
+                temp.append(h)
             output = temp + output
 
             QtGui.QMessageBox.warning(self, "Extraction Error",
-                "There were problem extracting some of the models. See output information.")
+                "There were issues extracting some models. See output information.")
 
         self._displayOutput(output)
         self.emit(QtCore.SIGNAL("updateProgress"), 0)
@@ -593,7 +599,7 @@ class ModelExtractor_UI(extractwidget.Ui_ExtractModelWidget, AWidget):
         These are the result, check and log files.
         """
         output_files = cfile.contains(command='output folder')
-        check_files = cfile.contains(command='write check files')
+        check_files = cfile.contains(command='write check files', exact=True)
         log_files = cfile.contains(command='log folder')
         
         # Result files output folder
