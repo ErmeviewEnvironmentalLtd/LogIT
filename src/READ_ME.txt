@@ -520,6 +520,9 @@ v1.3.5-Beta:
       'None' was returned. This was causing a crash when trying to convert to
       float while saving to the database. Fixed.
 
+v1.3.6-Beta:
+    - [Bugfix] Checkfiles syntax problem in ship library.
+
 ##~##
 
 LICENSE
