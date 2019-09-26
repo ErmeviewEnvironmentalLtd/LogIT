@@ -57,7 +57,7 @@
 ###############################################################################
 """
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import Qt, QtCore, QtGui, QtWidgets
 
 from qtclasses import MyFileDialogs
 from qtclasses import QNumericSortTableWidgetItem
@@ -69,7 +69,7 @@ import LogClasses
 import peeweeviews as pv
 
 
-class TableWidgetDb(QtGui.QTableWidget):
+class TableWidgetDb(QtWidgets.QTableWidget):
     """Subclass of QTableWidget with Logit Log View specific behaviour."""
     
     def __init__(self, name, rows, cols, subname='', hidden_cols={}, parent=None):
@@ -81,7 +81,7 @@ class TableWidgetDb(QtGui.QTableWidget):
             subname=''(str): a subname for this table (TGC, TEF, etc).
             hidden_cols=[]: {col name: index} of columns that should be hidden.
         """
-        QtGui.QTableWidget.__init__(self, rows, cols, parent)
+        QtWidgets.QTableWidget.__init__(self, rows, cols, parent)
 
         self.name = name
         self.subname = str(subname)
@@ -96,7 +96,7 @@ class TableWidgetDb(QtGui.QTableWidget):
         ]
         
         self.horizontalHeader().setStretchLastSection(True)
-        self.setHorizontalScrollMode(QtGui.QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
         self._unsaved_entries = []
         
     
@@ -119,7 +119,7 @@ class TableWidgetDb(QtGui.QTableWidget):
         self.setColumnCount(len(cols))
         
         for k, c in enumerate(cols):
-            item = QtGui.QTableWidgetItem()
+            item = QtWidgets.QTableWidgetItem()
             item.setTextAlignment(QtCore.Qt.AlignCenter|QtCore.Qt.AlignVCenter)
             item.setBackgroundColor(QtGui.QColor(187, 185, 185)) # Light Grey
             self.setHorizontalHeaderItem(k, item)
@@ -217,18 +217,18 @@ class TableWidgetDb(QtGui.QTableWidget):
         """Launch a QMessageBox
         """
         if type == 'warning':
-            QtGui.QMessageBox.warning(self, title, message)
+            QtWidgets.QMessageBox.warning(self, title, message)
         elif type == 'critical':
-            QtGui.QMessageBox.critical(self, title, message)
+            QtWidgets.QMessageBox.critical(self, title, message)
         elif type == 'info':
-            QtGui.QMessageBox.information(self, title, message)
+            QtWidgets.QMessageBox.information(self, title, message)
     
     def launchQtQBox(self, title, message):
         """Launch QtQMessageBox.
         """
-        answer = QtGui.QMessageBox.question(self, title, message,
-                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-        if answer == QtGui.QMessageBox.No:
+        answer = QtWidgets.QMessageBox.question(self, title, message,
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if answer == QtWidgets.QMessageBox.No:
             return False
         else:
             return True
@@ -245,7 +245,7 @@ class TableWidgetDb(QtGui.QTableWidget):
         """Display the table header context menu.""" 
         
         col = self.horizontalHeader().logicalIndexAt(pos.x())
-        menu = QtGui.QMenu()
+        menu = QtWidgets.QMenu()
         hide_action = menu.addAction('Hide column')
         show_menu = menu.addMenu('Show column')
         for h in self.hidden_columns.keys():
@@ -277,6 +277,9 @@ class TableWidgetDb(QtGui.QTableWidget):
 
 
 class TableWidgetQuery(TableWidgetDb):
+
+    # Signals
+    queryFileSummary_signal = Qt.pyqtSignal(list)
     
     def __init__(self, name, rows, cols, subname='', hidden_cols={}, parent=None):
         TableWidgetDb.__init__(self, name, rows, cols, subname, hidden_cols, parent)
@@ -292,7 +295,7 @@ class TableWidgetQuery(TableWidgetDb):
     def _tablePopup(self, pos):
         index = self.itemAt(pos)
         if index is None: return
-        menu = QtGui.QMenu()
+        menu = QtWidgets.QMenu()
         copyAction = menu.addAction("Copy")
 
         if self.subname == 'EventOptions':
@@ -303,14 +306,14 @@ class TableWidgetQuery(TableWidgetDb):
 
         if action is None: return
         if action == copyAction:
-            clipboard = QtGui.QApplication.clipboard()
+            clipboard = QtWidgets.QApplication.clipboard()
             clipboard.setText(self.currentItem().text())
         if action == queryFileAction:
             selected = self.selectionModel().selectedRows()
             ids = []
             for s in selected:
                 ids.append(int(self.item(s.row(), 0).text()))
-            self.emit(QtCore.SIGNAL("queryFileSummary"), ids)
+            self.queryFileSummary_signal.emit(ids)
             return
             
             
@@ -405,6 +408,17 @@ class TableWidgetModel(TableWidgetDb):
 
 class TableWidgetRun(TableWidgetDb):
     
+    # Signals
+    statusUpdateSignal = Qt.pyqtSignal(str)
+    setRangeSignal = Qt.pyqtSignal(int)
+    updateProgressSignal = Qt.pyqtSignal(int)
+    dbUpdatedSignal = Qt.pyqtSignal()
+    runTableContextToolSignal = Qt.pyqtSignal(str, int)
+    runTableContextPathSignal = Qt.pyqtSignal(str, int)
+    runTableContextStatusSignal = Qt.pyqtSignal(int, list, bool)
+    queryFileSummarySignal = Qt.pyqtSignal(list)
+    queryRunTableSignal = Qt.pyqtSignal(str, int)
+    
     def __init__(self, name, rows, cols, subname='', hidden_cols={}, parent=None):
         TableWidgetDb.__init__(self, name, rows, cols, subname, hidden_cols, parent)
         self.id_col = 0
@@ -460,7 +474,7 @@ class TableWidgetRun(TableWidgetDb):
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Delete complete')
             self.emit(QtCore.SIGNAL("updateProgress"), 0)
 
-        except Exception, err:
+        except Exception as err:
             self.emit(QtCore.SIGNAL("statusUpdate"), 'Delete failed')
             self.emit(QtCore.SIGNAL("updateProgress"), 0)
             msg = ('There was an issue deleting some of the components of ' +
@@ -476,7 +490,7 @@ class TableWidgetRun(TableWidgetDb):
         index = self.itemAt(pos)
         if index is None: return
         
-        menu = QtGui.QMenu()
+        menu = QtWidgets.QMenu()
         
         copyAction = menu.addAction("Copy")
         updateRowsAction = menu.addAction("Save updates")
@@ -506,7 +520,7 @@ class TableWidgetRun(TableWidgetDb):
         if action is None: return
         
         if action == copyAction:
-            clipboard = QtGui.QApplication.clipboard()
+            clipboard = QtWidgets.QApplication.clipboard()
             clipboard.setText(self.currentItem().text())
             
         elif action == updateRowsAction:
@@ -553,11 +567,11 @@ class TableWidgetRun(TableWidgetDb):
             self.emit(QtCore.SIGNAL("runTableContextStatusUpdate"), id)
 
 
-class TableWidgetItemDb(QtGui.QTableWidgetItem):
+class TableWidgetItemDb(QtWidgets.QTableWidgetItem):
     """Overriddes QTableWidgetItem with Logit specific behaviour."""
     
     def __init__ (self, value):
-        super(TableWidgetItemDb, self).__init__(QtCore.QString('%s' % value))
+        super(TableWidgetItemDb, self).__init__(str(value))
 
     def __lt__ (self, other):
         """Check order of two values.
@@ -579,16 +593,16 @@ class TableWidgetItemDb(QtGui.QTableWidgetItem):
                 self_data_value  = float(self.data(QtCore.Qt.EditRole).toString())
                 other_data_value = float(other.data(QtCore.Qt.EditRole).toString())
             except:
-                return QtGui.QTableWidgetItem.__lt__(self, other)
+                return QtWidgets.QTableWidgetItem.__lt__(self, other)
             return self_data_value < other_data_value
         else:
-            return QtGui.QTableWidgetItem.__lt__(self, other)
+            return QtWidgets.QTableWidgetItem.__lt__(self, other)
 
 
-class TableWidgetDragRows(QtGui.QTableWidget):
+class TableWidgetDragRows(QtWidgets.QTableWidget):
 
     def __init__(self, rows, cols, parent=None):
-        QtGui.QTableWidget.__init__(self, rows, cols, parent)
+        QtWidgets.QTableWidget.__init__(self, rows, cols, parent)
     
         
         self.setAcceptDrops(True)
@@ -597,15 +611,15 @@ class TableWidgetDragRows(QtGui.QTableWidget):
         self.setDragDropOverwriteMode(False)
         self.setDropIndicatorShown(True)
 
-        self.setSelectionMode(QtGui.QAbstractItemView.SingleSelection) 
-        self.setSelectionBehavior(QtGui.QAbstractItemView.SelectRows)
-        self.setDragDropMode(QtGui.QAbstractItemView.InternalMove)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection) 
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.setDragDropMode(QtWidgets.QAbstractItemView.InternalMove)
         self.setDragEnabled(True)  
         self.setSortingEnabled(False)
         
     
     def dropEvent(self, event):
-        if event.source() == self and (event.dropAction() == QtCore.Qt.MoveAction or self.dragDropMode() == QtGui.QAbstractItemView.InternalMove):
+        if event.source() == self and (event.dropAction() == QtCore.Qt.MoveAction or self.dragDropMode() == QtWidgets.QAbstractItemView.InternalMove):
             
             success, row, col, topIndex = self.dropOn(event)
             if success:             
@@ -634,7 +648,7 @@ class TableWidgetDragRows(QtGui.QTableWidget):
                         r = 0
 
                     for j in range(self.columnCount()):
-                        source = QtGui.QTableWidgetItem(self.item(row, j))
+                        source = QtWidgets.QTableWidgetItem(self.item(row, j))
                         self.setItem(r, j, source)
 
                 event.accept()
@@ -642,7 +656,7 @@ class TableWidgetDragRows(QtGui.QTableWidget):
                 
 
         else:
-            QtGui.QTableView.dropEvent(event)                
+            QtWidgets.QTableView.dropEvent(event)                
 
 
     def getSelectedRowsFast(self):
@@ -656,7 +670,7 @@ class TableWidgetDragRows(QtGui.QTableWidget):
     def droppingOnItself(self, event, index):
         dropAction = event.dropAction()
 
-        if self.dragDropMode() == QtGui.QAbstractItemView.InternalMove:
+        if self.dragDropMode() == QtWidgets.QAbstractItemView.InternalMove:
             dropAction = QtCore.Qt.MoveAction
 
         if event.source() == self and event.possibleActions() & QtCore.Qt.MoveAction and dropAction == QtCore.Qt.MoveAction:
@@ -687,10 +701,10 @@ class TableWidgetDragRows(QtGui.QTableWidget):
             if index != self.rootIndex():
                 dropIndicatorPosition = self.position(event.pos(), self.visualRect(index), index)
 
-                if dropIndicatorPosition == QtGui.QAbstractItemView.AboveItem:
+                if dropIndicatorPosition == QtWidgets.QAbstractItemView.AboveItem:
                     row = index.row()
                     col = index.column()
-                elif dropIndicatorPosition == QtGui.QAbstractItemView.BelowItem:
+                elif dropIndicatorPosition == QtWidgets.QAbstractItemView.BelowItem:
                     row = index.row() + 1
                     col = index.column()
                 else:
@@ -704,17 +718,17 @@ class TableWidgetDragRows(QtGui.QTableWidget):
 
 
     def position(self, pos, rect, index):
-        r = QtGui.QAbstractItemView.OnViewport
+        r = QtWidgets.QAbstractItemView.OnViewport
         margin = 2
         if pos.y() - rect.top() < margin:
-            r = QtGui.QAbstractItemView.AboveItem
+            r = QtWidgets.QAbstractItemView.AboveItem
         elif rect.bottom() - pos.y() < margin:
-            r = QtGui.QAbstractItemView.BelowItem 
+            r = QtWidgets.QAbstractItemView.BelowItem 
         elif rect.contains(pos, True):
-            r = QtGui.QAbstractItemView.OnItem
+            r = QtWidgets.QAbstractItemView.OnItem
 
-        if r == QtGui.QAbstractItemView.OnItem and not (self.model().flags(index) & QtCore.Qt.ItemIsDropEnabled):
-            r = QtGui.QAbstractItemView.AboveItem if pos.y() < rect.center().y() else QtGui.QAbstractItemView.BelowItem
+        if r == QtWidgets.QAbstractItemView.OnItem and not (self.model().flags(index) & QtCore.Qt.ItemIsDropEnabled):
+            r = QtWidgets.QAbstractItemView.AboveItem if pos.y() < rect.center().y() else QtWidgets.QAbstractItemView.BelowItem
 
         return r
     
@@ -939,7 +953,7 @@ class ErrorType(object):
             self.message = message
 
 
-class VersionInfoDialog(QtGui.QDialog):
+class VersionInfoDialog(QtWidgets.QDialog):
     """Dialog class for showing release information."""
     
     def __init__(self, release_dir, version, parent=None):
@@ -948,8 +962,8 @@ class VersionInfoDialog(QtGui.QDialog):
         self.release_dir = release_dir + version + '.txt'
         self.version = version
 
-        self.textBrowser = QtGui.QTextBrowser(self)
-        self.verticalLayout = QtGui.QVBoxLayout(self)
+        self.textBrowser = QtWidgets.QTextBrowser(self)
+        self.verticalLayout = QtWidgets.QVBoxLayout(self)
         self.verticalLayout.addWidget(self.textBrowser)
         
         output = []

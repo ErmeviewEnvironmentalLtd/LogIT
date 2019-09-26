@@ -42,8 +42,7 @@ logger = logging.getLogger(__name__)
 
 
 try:
-    from PyQt4 import QtGui
-    from PyQt4 import QtCore
+    from PyQt5 import QtGui, QtCore, QtWidgets
     HAS_QT = True
 
 except Exception:
@@ -51,7 +50,7 @@ except Exception:
     HAS_QT = False
 
 
-class MyFileDialogs(QtGui.QFileDialog):
+class MyFileDialogs(QtWidgets.QFileDialog):
     """Class for launching file dialogs.
 
     If the Qt modules could not be loaded  when the module was imported all of
@@ -82,7 +81,7 @@ class MyFileDialogs(QtGui.QFileDialog):
             return False
 
         if not multi_file:
-            filename = str(QtGui.QFileDialog.getOpenFileName(self, 'Open File', path, file_types))
+            filename = str(QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', path, file_types))
             if not filename == '':
                 logger.info('Opening file: ' + filename)
                 return filename
@@ -90,7 +89,7 @@ class MyFileDialogs(QtGui.QFileDialog):
                 logger.info('User cancelled file open process')
                 return False
         else:
-            filenames = QtGui.QFileDialog.getOpenFileNames(self, 'Open Files', path, file_types)
+            filenames = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open Files', path, file_types)
             if not len(filenames) < 1:
                 str_names = []
                 for f in filenames:
@@ -114,7 +113,7 @@ class MyFileDialogs(QtGui.QFileDialog):
         Returns:
             str - containing the chosen file path or False if cancelled.
         """
-        filename = str(QtGui.QFileDialog.getSaveFileName(self, 'Save File', path, file_types))
+        filename = str(QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', path, file_types))
         if not filename == '':
             logger.info('Saving file: Filename = ' + filename)
             return filename
@@ -131,9 +130,9 @@ class MyFileDialogs(QtGui.QFileDialog):
         Returns:
             str - containing the chosen file path or False if cancelled.
         """
-        file_path = str(QtGui.QFileDialog.getExistingDirectory(self,
+        file_path = str(QtWidgets.QFileDialog.getExistingDirectory(self,
                                                                caption='Select Directory', directory=path,
-                                                               options=QtGui.QFileDialog.ShowDirsOnly))
+                                                               options=QtWidgets.QFileDialog.ShowDirsOnly))
 
         if not file_path == '':
             logger.info('Selected directory: Filepath = ' + file_path)
@@ -143,7 +142,7 @@ class MyFileDialogs(QtGui.QFileDialog):
             return False
 
 
-class QNumericSortTableWidgetItem (QtGui.QTableWidgetItem):
+class QNumericSortTableWidgetItem (QtWidgets.QTableWidgetItem):
     """Custom implementation of the QTableWidgetItem class.
 
     Allows sorting of numerical values by overridding the default __lt__
@@ -151,7 +150,7 @@ class QNumericSortTableWidgetItem (QtGui.QTableWidgetItem):
     """
 
     def __init__(self, value):
-        super(QNumericSortTableWidgetItem, self).__init__(QtCore.QString('%s' % value))
+        super(QNumericSortTableWidgetItem, self).__init__(str(value))
 
     def __lt__(self, other):
         """Check order of two values.
@@ -173,7 +172,7 @@ class QNumericSortTableWidgetItem (QtGui.QTableWidgetItem):
                 self_data_value = float(self.data(QtCore.Qt.EditRole).toString())
                 other_data_value = float(other.data(QtCore.Qt.EditRole).toString())
             except:
-                return QtGui.QTableWidgetItem.__lt__(self, other)
+                return QtWidgets.QTableWidgetItem.__lt__(self, other)
             return self_data_value < other_data_value
         else:
-            return QtGui.QTableWidgetItem.__lt__(self, other)
+            return QtWidgets.QTableWidgetItem.__lt__(self, other)

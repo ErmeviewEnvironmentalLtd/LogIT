@@ -218,7 +218,7 @@ def createNewDb(db_path):
     
     try:
         logit_db.init(db_path)
-    except Exception, err:
+    except Exception as err:
         logger.exception(err)
         return False
      

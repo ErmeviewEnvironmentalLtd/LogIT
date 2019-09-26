@@ -381,7 +381,7 @@ def deleteRunRow(run_id, delete_recursive=False):
     r = None
     try:
         r = pm.Run.get(pm.Run.id == run_id)
-    except Exception, err:
+    except Exception as err:
         logger.warning('Could not find entry for run_id = %s' % run_id)
         logger.exception(err)
 
@@ -1091,16 +1091,16 @@ def complexQuery(db_path, raw_query):
         for row in cur:
             rows.append(row)
             i=0 
-    except sqlite3.OperationalError, err:
+    except sqlite3.OperationalError as err:
 #         logger.exception(err)
         return None, None, str(err)
-    except sqlite3.DatabaseError, err:
+    except sqlite3.DatabaseError as err:
         logger.exception(err)
         return None, None, str(err)
-    except IOError, err:
+    except IOError as err:
         logger.exception(err)
         return None, None, str(err)
-    except Exception, err:
+    except Exception as err:
         logger.exception(err)
         return None, None, str(err)
     

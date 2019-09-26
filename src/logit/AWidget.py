@@ -50,19 +50,26 @@ import logging
 logger = logging.getLogger(__name__)
 
 import uuid
-import cPickle
+import pickle
 import os
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import Qt, QtCore, QtGui, QtWidgets
 
 import ATool
 
-class AWidget(QtGui.QWidget, ATool.ATool):
+class AWidget(QtWidgets.QWidget, ATool.ATool):
+
+    # Signals
+    statusUpdateSignal = Qt.pyqtSignal(str)
+    setRangeSignal = Qt.pyqtSignal(int)
+    updateProgressSignal = Qt.pyqtSignal(int)
     
-    def __init__(self, tool_name, cwd, parent=None, f=QtCore.Qt.WindowFlags(),
-                 create_data_dir=True):
-        ATool.ATool.__init__(self, tool_name, cwd, create_data_dir)
-        QtGui.QWidget.__init__(self, parent, f)
+#     def __init__(self, tool_name=None, cwd=None, parent=None, f=QtCore.Qt.WindowFlags(),
+#                  create_data_dir=True):
+    def __init__(self, **kwargs):
+#         QtWidgets.QWidget.__init__(self, kwargs['parent'], kwargs['f'])
+#         super().__init__(kwargs['parent'], kwargs['f'])
+        super().__init__(**kwargs)
         self._TEST_MODE = False # Used by some widgets in unittests
         
     
@@ -70,19 +77,19 @@ class AWidget(QtGui.QWidget, ATool.ATool):
         """Launch a QMessageBox
         """
         if type == 'warning':
-            QtGui.QMessageBox.warning(self, title, message)
+            QtWidgets.QMessageBox.warning(self, title, message)
         elif type == 'critical':
-            QtGui.QMessageBox.critical(self, title, message)
+            QtWidgets.QMessageBox.critical(self, title, message)
         elif type == 'info':
-            QtGui.QMessageBox.information(self, title, message)
+            QtWidgets.QMessageBox.information(self, title, message)
             
             
     def launchQtQBox(self, title, message):
         """Launch QtQMessageBox.
         """
-        answer = QtGui.QMessageBox.question(self, title, message,
-                                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No) 
-        if answer == QtGui.QMessageBox.No:
+        answer = QtWidgets.QMessageBox.question(self, title, message,
+                                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No) 
+        if answer == QtWidgets.QMessageBox.No:
             return False
         else:
             return answer
@@ -93,7 +100,7 @@ class AWidget(QtGui.QWidget, ATool.ATool):
         
         Returns False if user cancels or the input text otherwise.
         """
-        input, status = QtGui.QInputDialog.getText(self, title, message)
+        input, status = QtWidgets.QInputDialog.getText(self, title, message)
         if status:
             return input
         else:
@@ -105,10 +112,10 @@ class AWidget(QtGui.QWidget, ATool.ATool):
         Textbox to copy is based on the calling action name.
         """
         text = text_widget.toPlainText()
-        clipboard = QtGui.QApplication.clipboard()
+        clipboard = QtWidgets.QApplication.clipboard()
         clipboard.setText(text)
         event = QtCore.QEvent(QtCore.QEvent.Clipboard)
-        QtGui.QApplication.sendEvent(clipboard, event)
+        QtWidgets.QApplication.sendEvent(clipboard, event)
     
 
     

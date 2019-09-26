@@ -45,7 +45,7 @@ import os
 import sys
 import shutil
 
-from PyQt4 import QtGui
+from PyQt5 import QtGui, QtWidgets
 
 from ship.utils.fileloaders import fileloader as fl
 from qtclasses import MyFileDialogs
@@ -55,14 +55,14 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class IefResolverDialog(QtGui.QDialog):
+class IefResolverDialog(QtWidgets.QDialog):
     """Dialog class for showing ief resolver summary information."""
     
     def __init__(self, summary, ief_fail, required_search=None, parent=None):
         super(IefResolverDialog, self).__init__(parent)
         
-        self.textBrowser = QtGui.QTextBrowser(self)
-        self.verticalLayout = QtGui.QVBoxLayout(self)
+        self.textBrowser = QtWidgets.QTextBrowser(self)
+        self.verticalLayout = QtWidgets.QVBoxLayout(self)
         self.verticalLayout.addWidget(self.textBrowser)
         
         output = []

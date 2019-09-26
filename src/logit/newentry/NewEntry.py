@@ -58,14 +58,14 @@ import os
 import logging
 logger = logging.getLogger(__name__)
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import Qt, QtCore, QtGui, QtWidgets
 
 from qtclasses import MyFileDialogs
     
 from AWidget import AWidget
 import GuiStore
 import Controller
-import NewEntry_Widget as newentrywidget
+from . import NewEntry_Widget_qt5 as newentrywidget
 logger.debug('NewEntry_Widget import complete')
 # from app_metrics import utils as applog
 import globalsettings as gs
@@ -78,7 +78,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
 
     def __init__(self, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
         
-        AWidget.__init__(self, 'New Entry', cwd, parent, f)
+        super().__init__(parent=parent, f=f, tool_name='New Entry', cwd=cwd)
         self.all_logs = None
         self._TEST_MODE = False
         self.setupUi(self)
@@ -90,17 +90,17 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         # It can be drag and dropped into order
         self.multipleModelLayoutH.removeItem(self.multipleModelLayoutV)
         self.loadMultiModelTable = GuiStore.TableWidgetDragRows(0, 3, self)
-        item = QtGui.QTableWidgetItem()
+        item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.loadMultiModelTable.setHorizontalHeaderItem(0, item)
         item.setText('')
         
-        item = QtGui.QTableWidgetItem()
+        item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.loadMultiModelTable.setHorizontalHeaderItem(1, item)
         item.setText("TCF / IEF File Name")
         
-        item = QtGui.QTableWidgetItem()
+        item = QtWidgets.QTableWidgetItem()
         item.setTextAlignment(QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.loadMultiModelTable.setHorizontalHeaderItem(2, item)
         item.setText("Absolute Path")
@@ -294,7 +294,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                     self._updateNewEntryTree()
                     self.submitSingleModelGroup.setEnabled(True)
                     
-            except Exception, err:
+            except Exception as err:
                 self.emit(QtCore.SIGNAL("statusUpdate"), '')
                 msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
                        "all gone terribly wrong. You're on your own dude.\n" +
@@ -364,7 +364,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         try:
             for row in xrange(0, allRows):
                 model_paths.append(str(self.loadMultiModelTable.item(row,2).text()))
-        except AttributeError, err:
+        except AttributeError as err:
             logger.error('Blank entries in load table: ' + str(err))
             self.launchQMsgBox('Corrupted Inputs', 
                                ('Somehow the input table has been corrupted. ' +
@@ -419,7 +419,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 d, fname = os.path.split(str(p))
                 
                 # Create a couple of items and add to the table
-                cbox = QtGui.QTableWidgetItem()
+                cbox = QtWidgets.QTableWidgetItem()
                 cbox.setFlags(QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsDragEnabled | QtCore.Qt.ItemIsDropEnabled)
                 cbox.setCheckState(QtCore.Qt.Unchecked)
                 self.loadMultiModelTable.setItem(row_count, 0, cbox)
@@ -459,7 +459,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         path, exists = gs.getPath('log')
         if not exists:
             if show_dialog:
-                QtGui.QMessageBox.warning(self, "No Database Loaded",
+                QtWidgets.QMessageBox.warning(self, "No Database Loaded",
                         "No log database active. Please load or create one from the file menu.")
             logger.error('No log database found. Load or create one from File menu')
             return False

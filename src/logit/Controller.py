@@ -69,12 +69,12 @@
 import os
 import traceback
 import itertools
-import cPickle
+import pickle
 import shutil
 import zipfile
 from operator import itemgetter
 
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 import logging
 logger = logging.getLogger(__name__)
@@ -284,7 +284,7 @@ def loadSetup(settings_path, errors):
     try:
         # Load the settings dictionary
         open_path = str(settings_path)
-        cur_settings = cPickle.load(open(open_path, "rb"))
+        cur_settings = pickle.load(open(open_path, "rb"))
         cur_settings.cur_settings_path = settings_path
         return cur_settings, errors
     except:

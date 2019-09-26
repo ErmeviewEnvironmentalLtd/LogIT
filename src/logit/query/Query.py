@@ -46,24 +46,29 @@ import logging
 logger = logging.getLogger(__name__)
 
 import os
-from PyQt4 import QtCore, QtGui
+from PyQt5 import Qt, QtCore, QtGui, QtWidgets
 
 from qtclasses import MyFileDialogs
 
 from AWidget import AWidget
-import Query_Widget as querywidget
+from . import Query_Widget_qt5 as querywidget
 import peeweeviews as pv
 import peeweemodels as pm
 import globalsettings as gs
 import GuiStore
-
+from pprint import pprint
 
 class Query_UI(querywidget.Ui_QueryWidget, AWidget):
     
+    # Signals
+    queryFileSummarySignal = Qt.pyqtSignal(list)
 
     def __init__(self, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
+        
+        pprint(AWidget.__mro__)
 
-        AWidget.__init__(self, 'Query', cwd, parent, f, create_data_dir=False)
+#         AWidget.__init__(self, 'Query', cwd, parent, f, create_data_dir=False)
+        super().__init__(parent=parent, f=f, tool_name='Query', cwd=cwd, create_data_dir=False)
         self.setupUi(self)
 
         self.db_design_label = None
@@ -99,8 +104,8 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
         font.setFamily( "Courier" )
         font.setFixedPitch(True)
         font.setPointSize(10)
-        self.complexScriptText = QtGui.QTextEdit()
-        self.complexScriptText.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Ignored)
+        self.complexScriptText = QtWidgets.QTextEdit()
+        self.complexScriptText.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Ignored)
         self.complexScriptText.setFont(font)
         highlighter = MyHighlighter(self.complexScriptText, "Classic")
         self.editorLayout.addWidget(self.complexScriptText)
@@ -114,7 +119,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
         """Adds a TableWidgetDb object to the query layout."""
         query_table = GuiStore.TableWidgetQuery('QUERY', 0, 0)
         self.query_table = query_table
-        self.connect(self.query_table, QtCore.SIGNAL("queryFileSummary"), self._queryFileSummary)
+        self.query_table.queryFileSummarySignal.connect(self._queryFileSummary)
         self.tableQueryGroup.layout().addWidget(self.query_table)
     
     
@@ -221,7 +226,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
                 f.write('version=' + gs.__VERSION__ + '\n')
                 f.write('type=sql\n')
                 f.write(text)
-        except Exception, err:
+        except Exception as err:
             logger.error('Could not write sql script to file')
             logger.exception(err)
             self.launchQMsgBox('Write Error', 'Unable to write script to file')
@@ -274,7 +279,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
             with open(load_path, 'rb') as f:
                 for line in f.readlines():
                     data.append(line)
-        except Exception, err:
+        except Exception as err:
             logger.error('Could not read sql script to file')
             logger.exception(err)
             self.launchQMsgBox('Read Error', 'Unable to read script from file')
@@ -304,7 +309,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
     
     def _listPopup(self):
         """Contex menu for the complex query scripts list."""
-        menu = QtGui.QMenu()
+        menu = QtWidgets.QMenu()
         removeAction = menu.addAction("Remove Script")
         sender_obj = self.sender()
         sender = str(sender_obj.objectName())
@@ -332,7 +337,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
         
         Current only used to show the database design image.
         """
-        menu = QtGui.QMenu()
+        menu = QtWidgets.QMenu()
         dbDesignAction = menu.addAction("Show DB design")
         sender_obj = self.sender()
         sender = str(sender_obj.objectName())
@@ -718,7 +723,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
         
 
 
-class DbDesignLabel(QtGui.QDialog):
+class DbDesignLabel(QtWidgets.QDialog):
     """Display the database design image.
     
     Dialog window containing a label with the image of the database design.
@@ -729,27 +734,27 @@ class DbDesignLabel(QtGui.QDialog):
         Args:
             title(str): window title.
         """
-        QtGui.QDialog.__init__(self, parent, f)
+        QtWidgets.QDialog.__init__(self, parent, f)
         self.resize(800, 600)
        
-        self.layout = QtGui.QVBoxLayout(self)
+        self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.setContentsMargins(0,0,0,0,)
         self.layout.setSpacing(0)
         
-        self.scroll = QtGui.QScrollArea()
+        self.scroll = QtWidgets.QScrollArea()
         self.layout.addWidget(self.scroll)
         
-        self.label = QtGui.QLabel()
+        self.label = QtWidgets.QLabel()
         self.refresh()
         self.layout.addWidget(self.label)
         self.scroll.setWidget(self.label)
         
-        QtGui.QWidget.setWindowTitle(self, title)
+        QtWidgets.QWidget.setWindowTitle(self, title)
     
 
     def refresh(self):
         """Update the graph displayed."""
-        pixmap = QtGui.QPixmap(QtCore.QString.fromUtf8(":/images/db_model_image.png"))
+        pixmap = QtGui.QPixmap(":/images/db_model_image.png")
         self.label.setPixmap(pixmap)
 
     
@@ -779,7 +784,8 @@ class MyHighlighter(QtGui.QSyntaxHighlighter):
         brush = QtGui.QBrush(QtCore.Qt.darkRed, QtCore.Qt.SolidPattern )
         keyword.setForeground( brush )
         keyword.setFontWeight( QtGui.QFont.Bold )
-        keywords = QtCore.QStringList( ["where", "like", "on", "select", "from",
+#         keywords = QtCore.QStringList( ["where", "like", "on", "select", "from",
+        keywords =                     ["where", "like", "on", "select", "from",
                                         "insert", "delete", "drop", "truncate",
                                         "and", "or", "join", "create", "alter",
                                         "into", "in", "inner join", "outer join",
@@ -819,7 +825,7 @@ class MyHighlighter(QtGui.QSyntaxHighlighter):
                                         "DATE", "IFNULL", "LENGTH","LOWER", 
                                         "ROUND", "LTRIM", "RTRIM", "SUBSTR", 
                                         "TRIM", "UPPER", "TIME", "DATETIME", 
-                                        "STRFTIME", "COUNT", "GROUP_CONCAT"])
+                                        "STRFTIME", "COUNT", "GROUP_CONCAT"]
         for word in keywords:
             pattern = QtCore.QRegExp("\\b" + word + "\\b")
             rule = HighlightingRule( pattern, keyword )
@@ -829,9 +835,10 @@ class MyHighlighter(QtGui.QSyntaxHighlighter):
         brush = QtGui.QBrush(QtCore.Qt.darkBlue, QtCore.Qt.SolidPattern )
         reservedClasses.setForeground( brush )
         reservedClasses.setFontWeight( QtGui.QFont.Bold )
-        keywords = QtCore.QStringList(["run", "run_modelfile", "run_subfile",
+#         keywords = QtCore.QStringList(["run", "run_modelfile", "run_subfile",
+        keywords =                    ["run", "run_modelfile", "run_subfile",
                                        "run_ied", "modelfile", "modelfile_subfile",
-                                       "subfile", "dat", "ied"])
+                                       "subfile", "dat", "ied"]
         for word in keywords:
             pattern = QtCore.QRegExp("\\b" + word + "\\b")
             rule = HighlightingRule( pattern, reservedClasses )
@@ -841,7 +848,8 @@ class MyHighlighter(QtGui.QSyntaxHighlighter):
         brush = QtGui.QBrush(QtCore.Qt.darkCyan, QtCore.Qt.SolidPattern )
         fields.setForeground( brush )
         fields.setFontWeight( QtGui.QFont.Bold )
-        keywords = QtCore.QStringList(["id", "dat_id", "run_hash", "setup",
+#         keywords = QtCore.QStringList(["id", "dat_id", "run_hash", "setup",
+        keywords =                    ["id", "dat_id", "run_hash", "setup",
                                        "comments", "ief", "tcf", "initial_conditions",
                                        "isis_results", "tuflow_results", 
                                        "event_duration", "run_Status", "mb",
@@ -852,7 +860,7 @@ class MyHighlighter(QtGui.QSyntaxHighlighter):
                                        "new_file", "sub_file_id", "name",
                                        "amendments", "comments", "ref",
                                        "model_type" 
-                                      ])
+                                      ]
         
         for word in keywords:
             pattern = QtCore.QRegExp("\\b" + word + "\\b")

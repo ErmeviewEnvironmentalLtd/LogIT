@@ -153,11 +153,11 @@ class ModelLoader(object):
         loader = FileLoader()
         try:
             model_file = loader.loadFile(file_path, options)
-        except Exception, err:
+        except Exception as err:
             logger.error('Unable to load model file at:\n' + file_path)
             logger.exception(err)
             self.error = 'Unable to load model file at:\n' + file_path
-            print str(err)
+            print (err)
             return False
         
         # If we have an .ief file; load it first.

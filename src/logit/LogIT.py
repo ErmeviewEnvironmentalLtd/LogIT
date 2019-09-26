@@ -102,15 +102,15 @@
 import os
 import shutil
 import sys
-import cPickle
+import pickle
 import logging
 
 # Stupid imports to make pyinstaller work with pyqtgraph
-import six
-import packaging
-import packaging.version
-import packaging.specifiers
-import packaging.requirements
+#import six
+#import packaging
+#import packaging.version
+#import packaging.specifiers
+#import packaging.requirements
  
 # Setup the logging protocols. Try and create a directory to put the logs into.
 # If that fails we call the console only logger, if not detailed logs will be
@@ -153,13 +153,13 @@ except:
  
 # Have to import PyQt4 like this or it won't compile into an .exe
 try:
-    from PyQt4 import QtCore, QtGui
+    from PyQt5 import Qt, QtCore, QtGui, QtWidgets
 except:
-    logger.error('Cannot import PyQt4 is it installed?')
+    logger.error('Cannot import PyQt5 is it installed?')
  
 # LogIT specific modules.
 logger.debug('Start of Logit imports')
-from LogIT_UI import Ui_MainWindow
+from LogIT_UI_qt5 import Ui_MainWindow
 logger.debug('Main Window import complete')
 import LogBuilder
 logger.debug('LogBuilder import complete')
@@ -177,10 +177,10 @@ import globalsettings as gs
 logger.debug('Global Settings import complete')
 from newentry import NewEntry
 logger.debug('New Entry import complete')
-from extractmodel import ModelExtractor
-logger.debug('Extract Model import complete')
-from runsummary import RunSummary
-logger.debug('Run Summary import complete')
+#from extractmodel import ModelExtractor
+#logger.debug('Extract Model import complete')
+#from runsummary import RunSummary
+#logger.debug('Run Summary import complete')
 import dbmigrations
 logger.debug('db migrations import complete')
 
@@ -190,9 +190,14 @@ logger.debug('Import modules complete')
 
 
 
-class MainGui(QtGui.QMainWindow):
+class MainGui(QtWidgets.QMainWindow):
     """Main GUI application window for the PysisTools software.
     """
+    
+    # Signals
+    statusUpdateSignal = Qt.pyqtSignal(str)
+    setRangeSignal = Qt.pyqtSignal(int)
+    updateProgressSignal = Qt.pyqtSignal(int)
      
     def __init__(self, cur_settings, parent=None):
         """Constructor.
@@ -208,13 +213,13 @@ class MainGui(QtGui.QMainWindow):
         self._on_viewlog = False
         
         icon_path = os.path.join(self.settings.cur_settings_path, 'Logit_Logo.ico')
-        QtGui.QMainWindow.__init__(self, parent)
+        QtWidgets.QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow() # ~
         self.ui.setupUi(self)
         logger.debug('Setup UI complete')
         
         # Add a progress bar to the status bar
-        self.progress_bar = QtGui.QProgressBar(self.ui.statusbar)
+        self.progress_bar = QtWidgets.QProgressBar(self.ui.statusbar)
         self.progress_bar.setMaximumSize(200, 20)
         self.ui.statusbar.addPermanentWidget(self.progress_bar)
         self.progress_bar.setValue(0)
@@ -272,7 +277,7 @@ class MainGui(QtGui.QMainWindow):
         # Add the query widget
         self.query_widget = Query.Query_UI(cur_location)
         self.ui.logViewTab.insertTab(self.ui.logViewTab.count(), self.query_widget, 'Query')
-        self.connect(self.query_widget, QtCore.SIGNAL("queryFileSummary"), self._queryFileSummary)
+        self.query_widget.queryFileSummary_signal.connect(self._queryFileSummary)
         try:
             self.query_widget.loadSettings(self.settings.tool_settings[self.query_widget.tool_name])
         except:
@@ -320,19 +325,19 @@ class MainGui(QtGui.QMainWindow):
         self.ui.modelSelectCbox.currentIndexChanged.connect(self.loadModelDb)
         
         run_table = GuiStore.TableWidgetRun('RUN', 0, 0, hidden_cols=self.settings.main['run_hidden_cols'], parent=self)
-        self.connect(run_table, QtCore.SIGNAL("statusUpdate"), self._updateStatusBar)
-        self.connect(run_table, QtCore.SIGNAL("setRange"), self._updateMaxProgress)
-        self.connect(run_table, QtCore.SIGNAL("updateProgress"), self._updateCurrentProgress)
-        self.connect(run_table, QtCore.SIGNAL("dbUpdated"), self._loadModelLog)
-        self.connect(run_table, QtCore.SIGNAL("runTableContextTool"), self.runTableContextTool)
-        self.connect(run_table, QtCore.SIGNAL("runTableContextPathUpdate"), self.runTableContextPathUpdate)
-        self.connect(run_table, QtCore.SIGNAL("runTableContextStatusUpdate"), self.runTableContextStatusUpdate)
-        self.connect(run_table, QtCore.SIGNAL("queryFileSummary"), self._queryFileSummary)
-        self.connect(run_table, QtCore.SIGNAL("queryRunTable"), self.queryRunTable)
+        run_table.statusUpdateSignal.connect(self._updateStatusBar)
+        run_table.setRangeSignal.connect(self._updateMaxProgress)
+        run_table.updateProgressSignal.connect(self._updateCurrentProgress)
+        run_table.dbUpdatedSignal.connect(self._loadModelLog)
+        run_table.runTableContextToolSignal.connect(self.runTableContextTool)
+        run_table.runTableContextPathSignal.connect(self.runTableContextPathUpdate)
+        run_table.runTableContextStatusSignal.connect(self.runTableContextStatusUpdate)
+        run_table.queryFileSummarySignal.connect(self._queryFileSummary)
+        run_table.queryRunTableSignal.connect(self.queryRunTable)
 
         self.table_info['RUN'] = {'table': run_table}
         self.ui.logViewTab.insertTab(0, run_table, 'Runs')
-        self.ui.logViewTab.widget(0).setLayout(QtGui.QVBoxLayout())
+        self.ui.logViewTab.widget(0).setLayout(QtWidgets.QVBoxLayout())
         self.ui.logViewTab.setCurrentIndex(0)
         
         self.table_info['MODEL'] = {'table': None}
@@ -545,18 +550,18 @@ class MainGui(QtGui.QMainWindow):
 
                 message = 'There are unsaved edits for %s table that will be lost\nSave Now?' % str(table)
                 if include_cancel_button:
-                    answer = QtGui.QMessageBox.question(self, 'Unsaved Edits', message, 
-                                    QtGui.QMessageBox.Yes | QtGui.QMessageBox.No | QtGui.QMessageBox.Cancel)
-                    if answer == QtGui.QMessageBox.Yes:
+                    answer = QtWidgets.QMessageBox.question(self, 'Unsaved Edits', message, 
+                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No | QtWidgets.QMessageBox.Cancel)
+                    if answer == QtWidgets.QMessageBox.Yes:
                         self.table_info[table]['table'].saveTableEdits()
-                    elif answer == QtGui.QMessageBox.Cancel:
+                    elif answer == QtWidgets.QMessageBox.Cancel:
                         return False
                 else:
-                    answer = QtGui.QMessageBox.question(self, 'Unsaved Edits', message, 
-                                    QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-                    if answer == QtGui.QMessageBox.Yes:
+                    answer = QtWidgets.QMessageBox.question(self, 'Unsaved Edits', message, 
+                                    QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                    if answer == QtWidgets.QMessageBox.Yes:
                         self.table_info[table]['table'].saveTableEdits()
-                    elif answer == QtGui.QMessageBox.No:
+                    elif answer == QtWidgets.QMessageBox.No:
                         return False
         
         return True
@@ -622,7 +627,7 @@ class MainGui(QtGui.QMainWindow):
             self.loadModelDb()
             self.loadRunDb()
             self._updateFileSummaryQueryList()
-        except Exception, err:
+        except Exception as err:
             logger.error("Critical error loading database")
             logger.exception(err)
             pm.logit_db.init(None)
@@ -639,7 +644,7 @@ class MainGui(QtGui.QMainWindow):
         path, exists = gs.getPath('log')
         if not exists:
             if show_dialog:
-                QtGui.QMessageBox.warning(self, "No Database Loaded",
+                QtWidgets.QMessageBox.warning(self, "No Database Loaded",
                         "No log database active. Please load or create one from the file menu.")
             logger.error('No log database found. Load or create one from File menu')
             return False
@@ -755,21 +760,24 @@ class MainGui(QtGui.QMainWindow):
         
         
         # Model Extractor
-        model_extractor = ModelExtractor.ModelExtractor_UI(cur_location)
-        self.widgets[model_extractor.tool_name] = model_extractor
-        self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), model_extractor, model_extractor.tool_name)
+#         model_extractor = ModelExtractor.ModelExtractor_UI(cur_location)
+#         self.widgets[model_extractor.tool_name] = model_extractor
+#         self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), model_extractor, model_extractor.tool_name)
         
         # Run Summary
-        run_summary = RunSummary.RunSummary_UI(cur_location) 
-        self.widgets[run_summary.tool_name] = run_summary
-        self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), run_summary, run_summary.tool_name)
+#         run_summary = RunSummary.RunSummary_UI(cur_location) 
+#         self.widgets[run_summary.tool_name] = run_summary
+#         self.ui.tabWidget.insertTab(self.ui.tabWidget.count(), run_summary, run_summary.tool_name)
         
         # Connect slots and load the settings.
         for w in self.widgets.values():
             try:
-                self.connect(w, QtCore.SIGNAL("statusUpdate"), self._updateStatusBar)
-                self.connect(w, QtCore.SIGNAL("setRange"), self._updateMaxProgress)
-                self.connect(w, QtCore.SIGNAL("updateProgress"), self._updateCurrentProgress)
+                w.statusUpdateSignal.connect(self._updateStatusBar)
+                w.setRangeSignal.connect(self._updateMaxProgress)
+                w.updateProgressSignal.connect(self._updateCurrentProgress)
+#                 self.connect(w, QtCore.SIGNAL("statusUpdate"), self._updateStatusBar)
+#                 self.connect(w, QtCore.SIGNAL("setRange"), self._updateMaxProgress)
+#                 self.connect(w, QtCore.SIGNAL("updateProgress"), self._updateCurrentProgress)
             except:
                 logger.warning('Unable to connect slots for %s' % (w.tool_name))
             
@@ -819,14 +827,14 @@ class MainGui(QtGui.QMainWindow):
                     self._updateStatusBar('Downloading LogIT version %s' % is_latest[1])
                     self._updateMaxProgress(0)
                     self._updateCurrentProgress(0)
-                    QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+                    QtWidgets.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
                     success = Controller.downloadNewVersion(cur_location,
                                                             gs.__SERVER_PATH__,
                                                             download_filename)
-                except Exception, err:
+                except Exception as err:
                     logger.exception(err)
                 finally:
-                    QtGui.QApplication.restoreOverrideCursor()
+                    QtWidgets.QApplication.restoreOverrideCursor()
                     self._updateStatusBar('')
                     self._updateMaxProgress(1)
                     self._updateCurrentProgress(0)
@@ -908,7 +916,7 @@ class MainGui(QtGui.QMainWindow):
             
             try:
                 shutil.copy(gs.path_holder['log'], temp_copy)
-            except IOError, err:
+            except IOError as err:
                 logger.warning('Cound not create temp backup')
             
             try:
@@ -923,7 +931,7 @@ class MainGui(QtGui.QMainWindow):
 
                 # Add the new entries to the view table as well
                 self._loadModelLog()
-            except Exception, err:
+            except Exception as err:
                 
                 self._updateStatusBar('')
                 msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
@@ -936,7 +944,7 @@ class MainGui(QtGui.QMainWindow):
                 try:
                     os.remove(gs.path_holder['log'])
                     shutil.copy(temp_copy, gs.path_holder['log'])
-                except IOError, err:
+                except IOError as err:
                     logger.warning('Could not reinstate backup!')
                     p = os.path.normpath(TEMP_PATH)
                     msg = "Couln't auto-reinstate the backup, but you can find\nit here and do it manually:\n" + p
@@ -944,7 +952,7 @@ class MainGui(QtGui.QMainWindow):
                 return
             try:
                 os.remove(temp_copy)
-            except IOError, err:
+            except IOError as err:
                 logger.warning('Cound not delete temp backup')
             
             # Update the status bar message
@@ -963,7 +971,7 @@ class MainGui(QtGui.QMainWindow):
         temp_copy = os.path.join(TEMP_PATH, os.path.basename(gs.path_holder['log']))
         try:
             shutil.copy(gs.path_holder['log'], temp_copy)
-        except IOError, err:
+        except IOError as err:
             logger.warning('Cound not create temp backup')
                 
         errors = GuiStore.ErrorHolder()
@@ -1017,7 +1025,7 @@ class MainGui(QtGui.QMainWindow):
                     continue
 
             self._loadModelLog()
-        except Exception, err:
+        except Exception as err:
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
             msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
@@ -1029,7 +1037,7 @@ class MainGui(QtGui.QMainWindow):
             try:
                 os.remove(gs.path_holder['log'])
                 shutil.copy(temp_copy, gs.path_holder['log'])
-            except IOError, err:
+            except IOError as err:
                 logger.error('Cound not reinstate backup!')
                 p = os.path.normpath(TEMP_PATH)
                 msg = "Couldn't auto-reinstate the backup, but you can find\nit here and do it manually:\n" + p
@@ -1062,7 +1070,7 @@ class MainGui(QtGui.QMainWindow):
 
         try:
             os.remove(temp_copy)
-        except IOError, err:
+        except IOError as err:
             logger.warning('Cound not delete temp backup')
 
 #         if self._TEST_MODE:
@@ -1149,7 +1157,7 @@ class MainGui(QtGui.QMainWindow):
         if settings == None:
             if errors.has_errors:
                 if errors.msgbox_error:
-                    QtGui.QMessageBox.warning(self, errors.msgbox_error.title, 
+                    QtWidgets.QMessageBox.warning(self, errors.msgbox_error.title, 
                                                 errors.msgbox_error.message)
             return
         else:
@@ -1209,11 +1217,11 @@ class MainGui(QtGui.QMainWindow):
             self._updateCurrentProgress(0)
             self._updateStatusBar('Export Complete')
         
-        except Exception, err:
+        except Exception as err:
             self._updateCurrentProgress(0)
             self._updateStatusBar('Export Failed')
             logger.exception(err)
-            QtGui.QMessageBox.warning(self, "Export Failed",
+            QtWidgets.QMessageBox.warning(self, "Export Failed",
                                   "Export to Excel failed!")
         
 
@@ -1252,7 +1260,7 @@ class MainGui(QtGui.QMainWindow):
             self._updateCurrentProgress(0)
             self._updateStatusBar('Cleanup complete')
 
-        except Exception, err:
+        except Exception as err:
             logger.warning('Cleanup database fail')
             logger.exception(err)
     
@@ -1309,7 +1317,7 @@ class MainGui(QtGui.QMainWindow):
         backup_name = os.path.join(path_vars[0], name_vars[0] + 'backup' + name_vars[1])
         try:
             shutil.copyfile(dbpath, backup_name)
-        except Exception, err:
+        except Exception as err:
             logger.exception(err)
             msg = "Could not backup database is it open?\nUpdate Terminated."
             if not gs.__TEST_MODE__:
@@ -1339,7 +1347,7 @@ class MainGui(QtGui.QMainWindow):
                 self.launchQMsgBox('Update Successfull', 'Your database has been updated and loaded into logit')
             else:
                 return 'success'
-        except Exception, err:
+        except Exception as err:
             logger.exception(err)
             # Restore the backup copy if it fails
             shutil.copyfile(backup_name, dbpath)
@@ -1432,7 +1440,7 @@ class MainGui(QtGui.QMainWindow):
         ief_dialog.resize(600, 400)
         ief_dialog.setWindowTitle('Ief Resolver Search Summary')
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(":/icons/images/Logit_Logo2_75x75.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         ief_dialog.setWindowIcon(icon)
         ief_dialog.exec_()
         finalize() 
@@ -1441,9 +1449,9 @@ class MainGui(QtGui.QMainWindow):
     def launchQtQBox(self, title, message):
         """Launch QtQMessageBox.
         """
-        answer = QtGui.QMessageBox.question(self, title, message,
-                QtGui.QMessageBox.Yes | QtGui.QMessageBox.No)
-        if answer == QtGui.QMessageBox.No:
+        answer = QtWidgets.QMessageBox.question(self, title, message,
+                QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+        if answer == QtWidgets.QMessageBox.No:
             return False
         else:
             return answer
@@ -1453,11 +1461,11 @@ class MainGui(QtGui.QMainWindow):
         """Launch a QMessageBox
         """
         if type == 'warning':
-            QtGui.QMessageBox.warning(self, title, message)
+            QtWidgets.QMessageBox.warning(self, title, message)
         elif type == 'critical':
-            QtGui.QMessageBox.critical(self, title, message)
+            QtWidgets.QMessageBox.critical(self, title, message)
         elif type == 'info':
-            QtGui.QMessageBox.information(self, title, message)
+            QtWidgets.QMessageBox.information(self, title, message)
     
     
     def _copyLogs(self):
@@ -1466,7 +1474,7 @@ class MainGui(QtGui.QMainWindow):
         data = QtCore.QMimeData()
         url = QtCore.QUrl.fromLocalFile(zip_log)
         data.setUrls([url])
-        QtGui.QApplication.clipboard().setMimeData(data)
+        QtWidgets.QApplication.clipboard().setMimeData(data)
     
     
 #     def _getColumnWidths(self):
@@ -1505,11 +1513,11 @@ class MainGui(QtGui.QMainWindow):
             version_dialog.resize(400, 400)
             version_dialog.setWindowTitle('LogIT Update Summary')
             icon = QtGui.QIcon()
-            icon.addPixmap(QtGui.QPixmap(QtCore.QString.fromUtf8(":/icons/images/Logit_Logo2_75x75.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+            icon.addPixmap(QtGui.QPixmap(":/icons/images/Logit_Logo2_75x75.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
             version_dialog.setWindowIcon(icon)
             version_dialog.exec_()
         
-        except Exception, err:
+        except Exception as err:
             logger.error('Could not show release notes' + str(err))
             self.settings.main['release_notes_version'] = ''
             
@@ -1537,7 +1545,7 @@ class MainGui(QtGui.QMainWindow):
         if str(self.ui.tabWidget.tabText(int)) == 'View Log': self._on_viewlog = True 
 
         try:
-            QtGui.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+            QtWidgets.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
             self.ui.tabWidget.setEnabled(False)
             current_widget = self.ui.tabWidget.currentWidget()
             
@@ -1565,12 +1573,12 @@ class MainGui(QtGui.QMainWindow):
 
             self._previous_widget = current_widget
 
-        except Exception, err:
+        except Exception as err:
             logger.warning('Exception in activation/deactivation of tab')
             logger.exception(err)
         finally:
             self.ui.tabWidget.setEnabled(True)
-            QtGui.QApplication.restoreOverrideCursor()
+            QtWidgets.QApplication.restoreOverrideCursor()
         
     
     ''' 
@@ -1579,7 +1587,7 @@ class MainGui(QtGui.QMainWindow):
     def _updateStatusBar(self, string): 
         self.ui.statusbar.showMessage(string)
         logger.debug('updating status bar: ' + string)
-        QtGui.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents()
         
     def _updateMaxProgress(self, value):
         """"""
@@ -1588,7 +1596,7 @@ class MainGui(QtGui.QMainWindow):
     def _updateCurrentProgress(self, value):
         """"""
         self.progress_bar.setValue(value)
-        QtGui.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents()
     
 
 
@@ -1651,17 +1659,17 @@ def main():
  
     try:
         # Load the settings dictionary
-        cur_settings = cPickle.load(open(settings_path, "rb"))
+        cur_settings = pickle.load(open(settings_path, "rb"))
         
         # Check that this version of the settings has all the necessary
         # attributes, and if not add the missing ones
         new_set.copySettings(cur_settings)
     except:
-        print 'Unable to load user defined settings'
+        print('Unable to load user defined settings')
     new_set.cur_settings_path = settings_path
          
     # Launch the user interface.
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     app.QT_AUTO_SCREEN_SCALE_FACTOR = "1"
     myapp = MainGui(new_set)
     icon_path = os.path.join(settings_path, 'Logit_Logo.ico')

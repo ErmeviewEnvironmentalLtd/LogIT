@@ -47,21 +47,22 @@
 """
 
 import logging
+from builtins import object
 logger = logging.getLogger(__name__)
 
 
-import cPickle
+import pickle
 import os
 
 
 class ATool(object):
     
-    def __init__(self, tool_name, cwd, create_data_dir=True):
-        self.cur_location = cwd
+    def __init__(self, **kwargs):#tool_name, cwd, create_data_dir):
+        self.cur_location = kwargs['cwd']
         self.settings = self.getSettingsAttrs()
-        self.tool_name = str(tool_name)
+        self.tool_name = kwargs['tool_name']
         self.data_dir = None
-        if create_data_dir:
+        if kwargs.get('create_data_dir', True):
             self.createDataDir()
     
     
@@ -72,14 +73,14 @@ class ATool(object):
         if not os.path.exists(os.path.join(self.cur_location, 'data')):
             try:
                 os.mkdir(os.path.join(self.cur_location, 'data'))
-            except Exception, err:
+            except Exception as err:
                 logger.warning('Could not create data directory')
                 logger.exception(err)
         self.data_dir = os.path.join(self.cur_location, 'data', str(self.tool_name))
         if not os.path.exists(self.data_dir):
             try:
                 os.mkdir(self.data_dir)
-            except Exception, err:
+            except Exception as err:
                 logger.warning('Could not create tool data directory:' + self.data_dir)
                 logger.exception(err)
         
@@ -148,7 +149,7 @@ class ATool(object):
         """Uses pickle to store the state of the given object."""
         try:
             with open(path, "wb") as p:
-                cPickle.dump(cachefile, p)
+                pickle.dump(cachefile, p)
         except IOError:
             logger.error('Unable to cache file:' + path)
             raise
@@ -158,7 +159,7 @@ class ATool(object):
         """Uses pickle to load the state of a pickled object from file."""
         try:
             # Load the settings dictionary
-            cache = cPickle.load(open(cachefile_path, "rb"))
+            cache = pickle.load(open(cachefile_path, "rb"))
             return cache
         except IOError:
             logger.error('Unable to load cache file: ' + cachefile_path)
