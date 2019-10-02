@@ -141,9 +141,9 @@ def createQtTableItem(value, is_editable=False, drag_enabled=False, is_str=True)
     :return: QTableWidgetItem
     """
     if is_str:
-        item = QtGui.QTableWidgetItem(str(value))
+        item = QtWidgets.QTableWidgetItem(str(value))
     else:
-        item = QtGui.QTableWidgetItem(value)
+        item = QtWidgets.QTableWidgetItem(value)
      
     if is_editable:
         if drag_enabled:
@@ -246,7 +246,7 @@ def getRunStatusInfo(tcf_dir, tcf_name, run_options):
     
     tcf_line = None
     try:
-        with open(sim_file, 'rb') as f:
+        with open(sim_file, 'r') as f:
             for line in f:
                 
                 if not 'Licence Change' in line and not 'Started' in line:

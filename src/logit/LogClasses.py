@@ -121,7 +121,10 @@ class AllLogs(object):
         if not self.run['RUN_OPTIONS'].strip() == '':
             rn.append(self.run['RUN_OPTIONS'].strip())
         
-        self.run_hash = hashlib.sha1(';'.join(rn)).hexdigest()
+        hash = hashlib.sha1()
+        hash.update((';'.join(rn)).encode('utf-8'))
+        self.run_hash = hash.hexdigest()
+#         self.run_hash = hashlib.sha1((';'.join(rn)).encode('utf-8')).hexdigest()
     
     
     def updateLogEntry(self, entry, values, index=None):

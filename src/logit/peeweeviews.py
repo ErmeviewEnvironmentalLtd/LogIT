@@ -530,54 +530,63 @@ def updateNewStatus():
     one updated to True.
     """    
     pm.logit_db.connect()
-    query = (pm.ModelFile_SubFile
-                .select(pm.ModelFile_SubFile, pm.ModelFile, pm.SubFile)
-                .distinct(pm.ModelFile_SubFile.sub_file_id)
-                .join(pm.SubFile)
-                .switch(pm.ModelFile_SubFile)
-                .join(pm.ModelFile)
-                .order_by(
-                        pm.ModelFile.model_type, 
-                        pm.ModelFile_SubFile.sub_file_id, 
-                        pm.ModelFile_SubFile.timestamp)
-                )
-    
-    query.execute()
-    
-    
-    query2 = (pm.Run_ModelFile
-                .select(pm.Run_ModelFile, pm.Run, pm.ModelFile)
-                .distinct(pm.Run_ModelFile.model_file_id)
-                .join(pm.ModelFile)
-                .switch(pm.Run_ModelFile)
-                .join(pm.Run)
-                .order_by(
-                        pm.ModelFile.name, 
-                        pm.Run_ModelFile.timestamp)
-                )
-    
-    query2.execute()
-    
-    found_names = []
-    with pm.logit_db.atomic():
-        for q in query:
-            i = q.id
-            n = q.sub_file_id
-            if not n in found_names:
-                found_names.append(n)
-                q = pm.ModelFile_SubFile.update(new_file=True).where(pm.ModelFile_SubFile.id == i)
-                q.execute()
+    try:
+        query = (pm.ModelFile_SubFile
+                    .select(pm.ModelFile_SubFile, pm.ModelFile, pm.SubFile)
+                    #.distinct(pm.ModelFile_SubFile.sub_file_id)
+                    .join(pm.SubFile)
+                    .switch()#pm.ModelFile_SubFile)
+                    .join(pm.ModelFile)
+                    .order_by(
+                            pm.ModelFile.model_type, 
+                            pm.ModelFile_SubFile.sub_file_id, 
+                            pm.ModelFile_SubFile.timestamp)
+                    )
         
-        run_found_names = []
-        for q in query2:
-            ri = q.id
-            rn = q.model_file_id
-            if not rn in run_found_names:
-                run_found_names.append(rn)
-                q = pm.Run_ModelFile.update(new_file=True).where(pm.Run_ModelFile.id == ri)
-                q.execute()
+        query.execute()
+    except:
+        pm.logit_db.close()
+        raise
     
-    pm.logit_db.close()
+    
+    try:
+        query2 = (pm.Run_ModelFile
+                    .select(pm.Run_ModelFile, pm.Run, pm.ModelFile)
+                    #.distinct(pm.Run_ModelFile.model_file_id)
+                    .join(pm.ModelFile)
+                    .switch(pm.Run_ModelFile)
+                    .join(pm.Run)
+                    .order_by(
+                            pm.ModelFile.name, 
+                            pm.Run_ModelFile.timestamp)
+                    )
+        
+        query2.execute()
+    except:
+        pm.logit_db.close()
+        raise
+    
+    try:
+        found_names = []
+        with pm.logit_db.atomic():
+            for q in query:
+                i = q.id
+                n = q.sub_file_id
+                if not n in found_names:
+                    found_names.append(n)
+                    q = pm.ModelFile_SubFile.update(new_file=True).where(pm.ModelFile_SubFile.id == i)
+                    q.execute()
+            
+            run_found_names = []
+            for q in query2:
+                ri = q.id
+                rn = q.model_file_id
+                if not rn in run_found_names:
+                    run_found_names.append(rn)
+                    q = pm.Run_ModelFile.update(new_file=True).where(pm.Run_ModelFile.id == ri)
+                    q.execute()
+    finally:
+        pm.logit_db.close()
 
 
 def updateRunRow(updateDict, run_id):

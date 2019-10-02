@@ -178,8 +178,6 @@ class Ui_MainWindow(object):
         self.menuSettings.addAction(self.menuLoggingLevel.menuAction())
         self.menuSettings.addSeparator()
         self.menuSettings.addAction(self.actionReloadDatabase)
-        self.menuSettings.addSeparator()
-        self.menuSettings.addAction(self.actionCheckForUpdates)
         self.menuTools_2.addAction(self.actionResolveIefFiles)
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuSettings.menuAction())

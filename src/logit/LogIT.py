@@ -198,6 +198,8 @@ class MainGui(QtWidgets.QMainWindow):
     statusUpdateSignal = Qt.pyqtSignal(str)
     setRangeSignal = Qt.pyqtSignal(int)
     updateProgressSignal = Qt.pyqtSignal(int)
+    dbUpdatedSignal = Qt.pyqtSignal()
+    queryModelTableSignal = Qt.pyqtSignal(str, str, str)
      
     def __init__(self, cur_settings, parent=None):
         """Constructor.
@@ -237,7 +239,7 @@ class MainGui(QtWidgets.QMainWindow):
         self.ui.actionLogInfo.triggered.connect(self._updateLoggingLevel)
         self.ui.actionReloadDatabase.triggered.connect(self._loadModelLog)
         self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
-        self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdatesTrue)
+        #self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdatesTrue)
         self.ui.actionResolveIefFiles.triggered.connect(self._resolveIefs)
         self.ui.actionExit.triggered.connect(self.close)
         self.ui.actionUpdateAllRunStatus.triggered.connect(self._updateAllRowStatus)
@@ -277,7 +279,7 @@ class MainGui(QtWidgets.QMainWindow):
         # Add the query widget
         self.query_widget = Query.Query_UI(cur_location)
         self.ui.logViewTab.insertTab(self.ui.logViewTab.count(), self.query_widget, 'Query')
-        self.query_widget.queryFileSummary_signal.connect(self._queryFileSummary)
+        self.query_widget.queryFileSummarySignal.connect(self._queryFileSummary)
         try:
             self.query_widget.loadSettings(self.settings.tool_settings[self.query_widget.tool_name])
         except:
@@ -376,7 +378,7 @@ class MainGui(QtWidgets.QMainWindow):
         self._updateStatusBar('')
         self._updateCurrentProgress(0)
 
-    @QtCore.pyqtSlot(int)
+    #@QtCore.pyqtSlot(int)
     def runTableContextStatusUpdate(self, run_id, errors=[], show_error=True):
         """Update the status of a Run table entry.
         
@@ -672,11 +674,12 @@ class MainGui(QtWidgets.QMainWindow):
                     self.table_info['MODEL']['table'] = None
                 
             model_table = GuiStore.TableWidgetModel('MODEL', 0, 0, subname=cur_text, parent=self)
-            self.connect(model_table, QtCore.SIGNAL("statusUpdate"), self._updateStatusBar)
-            self.connect(model_table, QtCore.SIGNAL("setRange"), self._updateMaxProgress)
-            self.connect(model_table, QtCore.SIGNAL("updateProgress"), self._updateCurrentProgress)
-            self.connect(model_table, QtCore.SIGNAL("dbUpdated"), self._loadModelLog)
-            self.connect(model_table, QtCore.SIGNAL("queryModelTable"), self.queryModelTable)
+            self.statusUpdateSignal.connect(self._updateStatusBar)
+            self.setRangeSignal.connect(self._updateMaxProgress)
+            self.updateProgressSignal.connect(self._updateCurrentProgress)
+            self.dbUpdatedSignal.connect(self._loadModelLog)
+            self.queryModelTableSignal.connect(self.queryModelTable)
+            
             self.table_info['MODEL'] = {'table': model_table}
             self.ui.tableModelGroupLayout.addWidget(model_table)
             cols, rows = pv.getModelData(cur_text)
@@ -708,7 +711,14 @@ class MainGui(QtWidgets.QMainWindow):
 
         if save_path != False:
             if os.path.exists(save_path):
-                os.remove(save_path)
+                try:
+                    os.remove(save_path)
+                except PermissionError:
+                    msg = 'Cannot delete the file because it is being used by another process'
+                    logger.warning(msg)
+                    QtWidgets.QMessageBox.warning(
+                        self, 'Database creation failed', msg
+                    )
         else:
             return
         
@@ -794,59 +804,59 @@ class MainGui(QtWidgets.QMainWindow):
             self._on_viewlog = False
     
     
-    def _checkUpdatesFalse(self):
-        self._checkUpdates(False)
+#     def _checkUpdatesFalse(self):
+#         self._checkUpdates(False)
+#         
+#     def _checkUpdatesTrue(self):
+#         self._checkUpdates(True)
         
-    def _checkUpdatesTrue(self):
-        self._checkUpdates(True)
-        
-    def _checkUpdates(self,  show_has_latest=True):     
-        """Check if this is the latest version or not.
-        
-        If it isn't it gives the user the option to download and install the
-        updated version.
-        """
-        try: 
-            is_latest = Controller.checkVersionInfo(gs.__VERSION__, gs.__VERSION_CHECKPATH__)
-        except IOError as err:
-            logger.warning('Could not connect to updates server at: \n' + gs.__VERSION_CHECKPATH__)
-            return
-        
-        if is_latest[0]:
-            logger.info('Latest version of LogIT (version %s) installed' % (gs.__VERSION__))
-            if show_has_latest:
-                msg = 'You have the latest version of LogIT'
-                self.launchQMsgBox('Version Information', msg, 'info')
-        else:
-            msg = 'There is a new version (%s). Would you like to download it?' % (is_latest[1])
-            download_filename = gs.__DOWNLOAD_FILENAME__ + is_latest[1]
-            
-            response = self.launchQtQBox('New version available', msg)
-            if not response == False:
-                try:
-                    self._updateStatusBar('Downloading LogIT version %s' % is_latest[1])
-                    self._updateMaxProgress(0)
-                    self._updateCurrentProgress(0)
-                    QtWidgets.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-                    success = Controller.downloadNewVersion(cur_location,
-                                                            gs.__SERVER_PATH__,
-                                                            download_filename)
-                except Exception as err:
-                    logger.exception(err)
-                finally:
-                    QtWidgets.QApplication.restoreOverrideCursor()
-                    self._updateStatusBar('')
-                    self._updateMaxProgress(1)
-                    self._updateCurrentProgress(0)
-                    
-                if not success:
-                    msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + gs.__SERVER_PATH__
-                    self.launchQMsgBox('Update Failure', msg)
-                else:
-                    msg = ('Download complete.\nYou can close this version ' +
-                           'and launch the new one.\n' +
-                           'This version can be deleted if you want.')
-                    self.launchQMsgBox('Update Success', msg)
+#     def _checkUpdates(self,  show_has_latest=True):     
+#         """Check if this is the latest version or not.
+#         
+#         If it isn't it gives the user the option to download and install the
+#         updated version.
+#         """
+#         try: 
+#             is_latest = Controller.checkVersionInfo(gs.__VERSION__, gs.__VERSION_CHECKPATH__)
+#         except IOError as err:
+#             logger.warning('Could not connect to updates server at: \n' + gs.__VERSION_CHECKPATH__)
+#             return
+#         
+#         if is_latest[0]:
+#             logger.info('Latest version of LogIT (version %s) installed' % (gs.__VERSION__))
+#             if show_has_latest:
+#                 msg = 'You have the latest version of LogIT'
+#                 self.launchQMsgBox('Version Information', msg, 'info')
+#         else:
+#             msg = 'There is a new version (%s). Would you like to download it?' % (is_latest[1])
+#             download_filename = gs.__DOWNLOAD_FILENAME__ + is_latest[1]
+#             
+#             response = self.launchQtQBox('New version available', msg)
+#             if not response == False:
+#                 try:
+#                     self._updateStatusBar('Downloading LogIT version %s' % is_latest[1])
+#                     self._updateMaxProgress(0)
+#                     self._updateCurrentProgress(0)
+#                     QtWidgets.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
+#                     success = Controller.downloadNewVersion(cur_location,
+#                                                             gs.__SERVER_PATH__,
+#                                                             download_filename)
+#                 except Exception as err:
+#                     logger.exception(err)
+#                 finally:
+#                     QtWidgets.QApplication.restoreOverrideCursor()
+#                     self._updateStatusBar('')
+#                     self._updateMaxProgress(1)
+#                     self._updateCurrentProgress(0)
+#                     
+#                 if not success:
+#                     msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + gs.__SERVER_PATH__
+#                     self.launchQMsgBox('Update Failure', msg)
+#                 else:
+#                     msg = ('Download complete.\nYou can close this version ' +
+#                            'and launch the new one.\n' +
+#                            'This version can be deleted if you want.')
+#                     self.launchQMsgBox('Update Success', msg)
     
     
     def _updateLoggingLevel(self):
@@ -1128,7 +1138,7 @@ class MainGui(QtWidgets.QMainWindow):
 
         try:
             with open(save_path, "wb") as p:
-                cPickle.dump(self.settings, p)
+                pickle.dump(self.settings, p)
         except:
             logger.info('Unable to save user defined settings')
     
@@ -1627,7 +1637,7 @@ class LogitSettings(object):
         """Update this class with another LogitSettings object.
         
         Set the class members equal to those of the loaded settings, ignoring
-        any that are not longer user and adding any new ones. Then set the
+        any that are not longer used and adding any new ones. Then set the
         main dict values with the loaded settings if they exist in the current
         setup as well.
         
@@ -1645,16 +1655,29 @@ class LogitSettings(object):
                 if key in main_dict.keys():
                     self.main[key] = main_dict[key]
         
-        
+         
+def my_except_hook(exctype, value, traceback):
+    # Print the error and traceback
+    print(exctype, value, traceback)
+    # Call the normal Exception hook after
+    sys.__excepthook__(exctype, value, traceback)
+    sys.exit(1)
+#     sys.__excepthook__(cls, exception, traceback)
         
 def main():
+    # Back up the reference to the exceptionhook
+    sys._excepthook = sys.excepthook
+    # Set the exception hook to our wrapping function
+    sys.excepthook = my_except_hook
+
     # Need to do this so that the icons show up properly
     import ctypes
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(gs.__APPID__)
     QPlugin = QtCore.QPluginLoader("qico4.dll")
      
     cur_location = os.getcwd()
-    settings_path = os.path.join(cur_location, 'settings.logset')
+#     settings_path = os.path.join(cur_location, 'settings.logset')
+    settings_path = os.path.join(cur_location, 'settings.json')
     new_set = LogitSettings()
  
     try:

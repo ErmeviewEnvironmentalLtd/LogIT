@@ -62,6 +62,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
     
     # Signals
     queryFileSummarySignal = Qt.pyqtSignal(list)
+    closeDbLabelSignal = Qt.pyqtSignal()
 
     def __init__(self, cwd, parent=None, f=QtCore.Qt.WindowFlags()):
         
@@ -352,7 +353,8 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
                 self.db_design_label = DbDesignLabel(f=QtCore.Qt.WindowStaysOnTopHint) 
                 self.db_design_label.refresh()
                 self.db_design_label.show()
-                self.connect(self.db_design_label, QtCore.SIGNAL("closingForm"), self._closeLabel)
+                self.db_design_label.closeDbLabelSignal.connect(self._closeLabel)
+#                 self.connect(self.db_design_label, QtCore.SIGNAL("closingForm"), self._closeLabel)
     
     def _closeLabel(self):
         """Gracefully shutdown db_design graphics window."""
@@ -392,7 +394,8 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
 
     def _queryFileSummary(self, ids):
         """Slot called by table context menu."""
-        self.emit(QtCore.SIGNAL("queryFileSummary"), ids) 
+#         self.emit(QtCore.SIGNAL("queryFileSummary"), ids) 
+        self.queryFileSummarySignal.emit(ids)
     '''
     ######################
     END COMPLEX QUERY
@@ -627,7 +630,7 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
         a summary of all the files in the chosen runs.
         """
         ids = []
-        for index in xrange(self.fileQuerySelectedList.count()):
+        for index in range(self.fileQuerySelectedList.count()):
             ids.append(self.fileQuerySelectedList.item(index).text())
         
         cols, rows, new_status = pv.getFileSummaryQuery(ids)
@@ -728,6 +731,7 @@ class DbDesignLabel(QtWidgets.QDialog):
     
     Dialog window containing a label with the image of the database design.
     """
+    closeDbLabelSignal = Qt.pyqtSignal()
     
     def __init__(self, title='Database Design', parent=None, f=QtCore.Qt.WindowFlags()):
         """
@@ -760,7 +764,8 @@ class DbDesignLabel(QtWidgets.QDialog):
     
     def closeEvent(self, event):
         """Custom window close event."""
-        self.emit(QtCore.SIGNAL("closingForm"))
+        self.closeDbLabelSignal.emit()
+#         self.emit(QtCore.SIGNAL("closingForm"))
         event.ignore()
 
         
@@ -907,14 +912,15 @@ class MyHighlighter(QtGui.QSyntaxHighlighter):
 
         
 
-    def highlightBlock( self, text ):
+    def highlightBlock(self, text):
+        
         for rule in self.highlightingRules:
             expression = QtCore.QRegExp( rule.pattern )
             index = expression.indexIn( text )
             while index >= 0:
                 length = expression.matchedLength()
                 self.setFormat( index, length, rule.format )
-                index = text.indexOf( expression, index + length )
+                index = expression.indexIn(text, index + length )
         self.setCurrentBlockState( 0 )
 
 

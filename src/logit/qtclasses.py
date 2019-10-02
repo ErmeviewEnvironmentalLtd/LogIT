@@ -81,7 +81,7 @@ class MyFileDialogs(QtWidgets.QFileDialog):
             return False
 
         if not multi_file:
-            filename = str(QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', path, file_types))
+            filename, _ = QtWidgets.QFileDialog.getOpenFileName(self, 'Open File', path, file_types)
             if not filename == '':
                 logger.info('Opening file: ' + filename)
                 return filename
@@ -89,7 +89,7 @@ class MyFileDialogs(QtWidgets.QFileDialog):
                 logger.info('User cancelled file open process')
                 return False
         else:
-            filenames = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open Files', path, file_types)
+            filenames, _ = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open Files', path, file_types)
             if not len(filenames) < 1:
                 str_names = []
                 for f in filenames:
@@ -113,7 +113,7 @@ class MyFileDialogs(QtWidgets.QFileDialog):
         Returns:
             str - containing the chosen file path or False if cancelled.
         """
-        filename = str(QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', path, file_types))
+        filename, _ = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', path, file_types)
         if not filename == '':
             logger.info('Saving file: Filename = ' + filename)
             return filename
@@ -130,9 +130,9 @@ class MyFileDialogs(QtWidgets.QFileDialog):
         Returns:
             str - containing the chosen file path or False if cancelled.
         """
-        file_path = str(QtWidgets.QFileDialog.getExistingDirectory(self,
+        file_path, _ = QtWidgets.QFileDialog.getExistingDirectory(self,
                                                                caption='Select Directory', directory=path,
-                                                               options=QtWidgets.QFileDialog.ShowDirsOnly))
+                                                               options=QtWidgets.QFileDialog.ShowDirsOnly)
 
         if not file_path == '':
             logger.info('Selected directory: Filepath = ' + file_path)

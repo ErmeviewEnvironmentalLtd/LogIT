@@ -204,16 +204,17 @@ def createNewDb(db_path):
             logger.warning('Cannot query database - Sql Error')
             logger.debug(traceback.format_exc())
             success = False
-    except IOError:
+    except OSError:
         conn.rollback()
         logger.error('Could not connect to database')
         logger.debug(traceback.format_exc())
         success = False
     finally:
-        if not conn == None:
+        if conn is not None:
             conn.close()
-    
-    if not success:
+   
+    print(success)
+    if success != True:
         return False
     
     try:

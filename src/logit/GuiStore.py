@@ -63,6 +63,7 @@ from qtclasses import MyFileDialogs
 from qtclasses import QNumericSortTableWidgetItem
 
 import logging
+from PyQt5.Qt import pyqtSignal
 logger = logging.getLogger(__name__)
 
 import LogClasses
@@ -71,6 +72,11 @@ import peeweeviews as pv
 
 class TableWidgetDb(QtWidgets.QTableWidget):
     """Subclass of QTableWidget with Logit Log View specific behaviour."""
+    
+    statusUpdateSignal = Qt.pyqtSignal(str)
+    setRangeSignal = Qt.pyqtSignal(int)
+    updateProgressSignal = Qt.pyqtSignal(int)
+    dbUpdatedSignal = Qt.pyqtSignal()
     
     def __init__(self, name, rows, cols, subname='', hidden_cols={}, parent=None):
         """
@@ -121,7 +127,7 @@ class TableWidgetDb(QtWidgets.QTableWidget):
         for k, c in enumerate(cols):
             item = QtWidgets.QTableWidgetItem()
             item.setTextAlignment(QtCore.Qt.AlignCenter|QtCore.Qt.AlignVCenter)
-            item.setBackgroundColor(QtGui.QColor(187, 185, 185)) # Light Grey
+            item.setBackground(QtGui.QColor(187, 185, 185)) # Light Grey
             self.setHorizontalHeaderItem(k, item)
             item.setText(c)
         
@@ -136,7 +142,7 @@ class TableWidgetDb(QtWidgets.QTableWidget):
                     item.setFlags(QtCore.Qt.ItemIsSelectable | QtCore.Qt.ItemIsEnabled)
                 if custom_highlight:
                     if custom_highlight[i][j]:
-                        item.setBackgroundColor(QtGui.QColor(178, 255, 102)) # Light Green
+                        item.setBackground(QtGui.QColor(178, 255, 102)) # Light Green
                     
                 self.setItem(i, j, item)
         
@@ -158,7 +164,7 @@ class TableWidgetDb(QtWidgets.QTableWidget):
                 self._unsaved_entries.append(id)
                 headercount = self.columnCount()
                 for x in range(0,headercount,1):
-                    self.item(row, x).setBackgroundColor(QtGui.QColor(178, 255, 102)) # Light Green
+                    self.item(row, x).setBackground(QtGui.QColor(178, 255, 102)) # Light Green
                 
                 
     def saveTableEdits(self, callback): 
@@ -173,14 +179,17 @@ class TableWidgetDb(QtWidgets.QTableWidget):
         total_updates = 0
         cur_prog = 1
         total_updates += len(self._unsaved_entries)
-        self.emit(QtCore.SIGNAL("setRange"), total_updates + 1)
+        self.setRangeSignal.emit(total_updates + 1)
+#         self.emit(QtCore.SIGNAL("setRange"), total_updates + 1)
         
         if self._unsaved_entries:
             for row in range(self.rowCount()):
                 id = str(self.item(row, self.id_col).text())
                 if id in self._unsaved_entries:
-                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Updating edit %s of %s' % (cur_prog, total_updates))
-                    self.emit(QtCore.SIGNAL("updateProgress"), cur_prog)
+                    self.statusUpdateSignal.emit('Updating edit %s of %s' % (cur_prog, total_updates))
+                    self.updateProgressSignal.emit(cur_prog)
+#                     self.emit(QtCore.SIGNAL("statusUpdate"), 'Updating edit %s of %s' % (cur_prog, total_updates))
+#                     self.emit(QtCore.SIGNAL("updateProgress"), cur_prog)
 
                     keep_cells = {}
                     headercount = self.columnCount()
@@ -195,9 +204,12 @@ class TableWidgetDb(QtWidgets.QTableWidget):
                     cur_prog += 1
                     
         self._unsaved_entries = []
-        self.emit(QtCore.SIGNAL("updateProgress"), 0)
-        self.emit(QtCore.SIGNAL("statusUpdate"), '')
-        self.emit(QtCore.SIGNAL("dbUpdated"))
+        self.updateProgressSignal.emit(0)
+        self.statusUpdateSignal.emit('')
+        self.dbUpdatedSignal.emit()
+#         self.emit(QtCore.SIGNAL("updateProgress"), 0)
+#         self.emit(QtCore.SIGNAL("statusUpdate"), '')
+#         self.emit(QtCore.SIGNAL("dbUpdated"))
     
     
     def _deleteRowFromDatabase(self, all_entry):
@@ -279,7 +291,7 @@ class TableWidgetDb(QtWidgets.QTableWidget):
 class TableWidgetQuery(TableWidgetDb):
 
     # Signals
-    queryFileSummary_signal = Qt.pyqtSignal(list)
+    queryFileSummarySignal = Qt.pyqtSignal(list)
     
     def __init__(self, name, rows, cols, subname='', hidden_cols={}, parent=None):
         TableWidgetDb.__init__(self, name, rows, cols, subname, hidden_cols, parent)
@@ -318,6 +330,8 @@ class TableWidgetQuery(TableWidgetDb):
             
             
 class TableWidgetModel(TableWidgetDb):
+    
+    dbUpdatedSignal = pyqtSignal()
     
     def __init__(self, name, rows, cols, subname='', hidden_cols={}, parent=None):
         TableWidgetDb.__init__(self, name, rows, cols, subname, hidden_cols, parent)
@@ -368,13 +382,14 @@ class TableWidgetModel(TableWidgetDb):
         else:
             pv.deleteModelRow(row_id)
 
-        self.emit(QtCore.SIGNAL("dbUpdated"))
+        self.dbUpdatedSignal.emit()
+#         self.emit(QtCore.SIGNAL("dbUpdated"))
     
     
     def _tablePopup(self, pos):
         index = self.itemAt(pos)
         if index is None: return
-        menu = QtGui.QMenu()
+        menu = QtWidgets.QMenu()
         copyAction = menu.addAction("Copy")
         updateRowsAction = menu.addAction("Save updates")
         deleteRowAction = menu.addAction("Delete row")
@@ -391,7 +406,7 @@ class TableWidgetModel(TableWidgetDb):
 
         if action is None: return
         if action == copyAction:
-            clipboard = QtGui.QApplication.clipboard()
+            clipboard = QtWidgets.QApplication.clipboard()
             clipboard.setText(self.currentItem().text())
             
         elif action == updateRowsAction:
@@ -415,7 +430,7 @@ class TableWidgetRun(TableWidgetDb):
     dbUpdatedSignal = Qt.pyqtSignal()
     runTableContextToolSignal = Qt.pyqtSignal(str, int)
     runTableContextPathSignal = Qt.pyqtSignal(str, int)
-    runTableContextStatusSignal = Qt.pyqtSignal(int, list, bool)
+    runTableContextStatusSignal = Qt.pyqtSignal(int)
     queryFileSummarySignal = Qt.pyqtSignal(list)
     queryRunTableSignal = Qt.pyqtSignal(str, int)
     
@@ -462,28 +477,29 @@ class TableWidgetRun(TableWidgetDb):
             return
         
         try:
-            self.emit(QtCore.SIGNAL("setRange"), 3)
-            self.emit(QtCore.SIGNAL("updateProgress"), 1)
-            self.emit(QtCore.SIGNAL("statusUpdate"), 'Deleting Run and Model files ...')
+            self.setRangeSignal.emit(3)
+            self.updateProgressSignal.emit(1)
+            self.statusUpdateSignal.emit('Deleting Run and Model files...')
             pv.deleteRunRow(int(row_id), delete_recursive=all_entry)
-            self.emit(QtCore.SIGNAL("statusUpdate"), 'Deleting orphaned files ...')
+            self.statusUpdateSignal.emit('Deleting orpaned files...')
             pv.deleteOrphanFiles(int(row_id))
-            self.emit(QtCore.SIGNAL("updateProgress"), 2)
-            self.emit(QtCore.SIGNAL("statusUpdate"), 'Recalculating file status ...')
+            self.updateProgressSignal.emit(2)
+            self.statusUpdateSignal.emit('Recalculating file status...')
             pv.updateNewStatus()
-            self.emit(QtCore.SIGNAL("statusUpdate"), 'Delete complete')
-            self.emit(QtCore.SIGNAL("updateProgress"), 0)
+            self.statusUpdateSignal.emit('Delete complete...')
+            self.updateProgressSignal.emit(0)
 
         except Exception as err:
-            self.emit(QtCore.SIGNAL("statusUpdate"), 'Delete failed')
-            self.emit(QtCore.SIGNAL("updateProgress"), 0)
+            self.statusUpdateSignal.emit('Delete failed...')
+            self.updateProgressSignal.emit(0)
             msg = ('There was an issue deleting some of the components of ' +
                    'this run.\nYou should run the Clean Database tool to ' +
                    'make sure all orphaned files have been removed.')
             self.launchQMsgBox('Database Error', msg)
             logger.exception(err)
         
-        self.emit(QtCore.SIGNAL("dbUpdated"))
+        self.dbUpdatedSignal.emit()
+#         self.emit(QtCore.SIGNAL("dbUpdated"))
 
     
     def _tablePopup(self, pos):
@@ -534,7 +550,8 @@ class TableWidgetRun(TableWidgetDb):
             ids = []
             for s in selected:
                 ids.append(int(self.item(s.row(), 0).text()))
-            self.emit(QtCore.SIGNAL("queryFileSummary"), ids)
+            self.queryFileSummarySignal.emit(ids)
+#             self.emit(QtCore.SIGNAL("queryFileSummary"), ids)
             
         
         if action == queryRunModelFilesNewAction or action == queryRunModelFilesAction or \
@@ -542,7 +559,8 @@ class TableWidgetRun(TableWidgetDb):
                     action == queryRunDatAction or action == queryRunIedAction:
             row = self.currentRow()
             id = str(self.item(row, self.id_col).text())
-            self.emit(QtCore.SIGNAL("queryRunTable"), str(action.text()), int(id))
+            self.queryRunTableSignal.emit(str(action.text()), int(id))
+#             self.emit(QtCore.SIGNAL("queryRunTable"), str(action.text()), int(id))
     
         if action == deleteAllRowAction:
             self._deleteRowFromDatabase(True)
@@ -552,19 +570,22 @@ class TableWidgetRun(TableWidgetDb):
         elif action == extractRowAction or action == addToRunSummaryAction:
             row = self.currentRow()
             id = str(self.item(row, self.id_col).text())
-            self.emit(QtCore.SIGNAL("runTableContextTool"), str(action.text()), id)
+            self.runTableContextToolSignal.emit(str(action.text()), id)
+#             self.emit(QtCore.SIGNAL("runTableContextTool"), str(action.text()), id)
         
         # Update IEF_DIR, TCF_DIR, or LOG_DIR
         elif action == updateIefRowAction or action == updateTcfRowAction or action == updateLogRowAction:
             row = self.currentRow()
             id = str(self.item(row, self.id_col).text())
-            self.emit(QtCore.SIGNAL("runTableContextPathUpdate"), str(action.text()), id)
+            self.runTableContextPathSignal.emit(str(action.text()), id)
+#             self.emit(QtCore.SIGNAL("runTableContextPathUpdate"), str(action.text()), id)
             
         # Update the MB and RUN_STATUS values
         elif action == updateStatusAction:
             row = self.currentRow()
-            id = str(self.item(row, self.id_col).text())
-            self.emit(QtCore.SIGNAL("runTableContextStatusUpdate"), id)
+            id = int(self.item(row, self.id_col).text())
+            self.runTableContextStatusSignal.emit(id)
+#             self.emit(QtCore.SIGNAL("runTableContextStatusUpdate"), id)
 
 
 class TableWidgetItemDb(QtWidgets.QTableWidgetItem):

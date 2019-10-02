@@ -393,8 +393,6 @@ p, li { white-space: pre-wrap; }
     <addaction name="menuLoggingLevel"/>
     <addaction name="separator"/>
     <addaction name="actionReloadDatabase"/>
-    <addaction name="separator"/>
-    <addaction name="actionCheckForUpdates"/>
    </widget>
    <widget class="QMenu" name="menuTools_2">
     <property name="title">

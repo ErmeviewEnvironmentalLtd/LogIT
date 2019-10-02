@@ -283,7 +283,8 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 if errors.has_errors:
                         self.launchQMsgBox("Load Error", errors.formatErrors())
                 else:
-                    self.emit(QtCore.SIGNAL("statusUpdate"), 'Loaded model at: %s' % (open_path))
+                    self.statusUpdateSignal.emit('Loaded model at: %s' % (open_path))
+#                     self.emit(QtCore.SIGNAL("statusUpdate"), 'Loaded model at: %s' % (open_path))
                     input_vars = self.getInputVars()
                     self.all_logs.run['MODELLER'] = self.settings['modeller'] = input_vars['MODELLER']
                     self.all_logs.run['TUFLOW_BUILD'] = self.settings['tuflow_model'] = input_vars['TUFLOW_BUILD'] 
@@ -295,7 +296,8 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                     self.submitSingleModelGroup.setEnabled(True)
                     
             except Exception as err:
-                self.emit(QtCore.SIGNAL("statusUpdate"), '')
+                self.statusUpdateSignal.emit('')
+#                 self.emit(QtCore.SIGNAL("statusUpdate"), '')
                 msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
                        "all gone terribly wrong. You're on your own dude.\n" +
                        "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
@@ -338,7 +340,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
                 data[type_text].append(temp_dict)
         
         # Update the log pages with any user corrections
-        for log_key, log in data.iteritems():
+        for log_key, log in data.items():
             for i in log:
                 self.all_logs.updateLogEntry(log_key, i)
 #             self.all_logs.updateSubLog(log, log_key)
@@ -362,7 +364,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         allRows = self.loadMultiModelTable.rowCount()
         run_options = str(self.runOptionsTextbox.text())
         try:
-            for row in xrange(0, allRows):
+            for row in range(0, allRows):
                 model_paths.append(str(self.loadMultiModelTable.item(row,2).text()))
         except AttributeError as err:
             logger.error('Blank entries in load table: ' + str(err))
