@@ -15,6 +15,7 @@ data/
 
 logit-env/
 
+settings.json
 *.log
 *.logset
 *.logdb

@@ -616,7 +616,9 @@ def autoResolvePath(ief_path, search_folder_depth=4):
         return False, ief_holder 
     
     # Find the place where the ief file and the found file meet
-    ief_holder.root_folder_new = prefix = longestCommonPrefix(ief_path, reference_location)
+    ief_holder.root_folder_new = prefix = longestCommonPrefix(
+        os.path.normpath(ief_path), os.path.normpath(reference_location)
+    )
     
     # Then split the path of the reference location with the new root.
     # This will given us only the section left after the root.
