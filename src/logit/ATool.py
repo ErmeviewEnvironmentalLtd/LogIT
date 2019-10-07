@@ -109,7 +109,7 @@ class ATool(object):
             settings(ToolSettings): containing member variable states to 
                 update.
         """
-        for key, val in self.settings.iteritems():
+        for key, val in self.settings.items():
             if key in settings.keys():
                 self.settings[key] = settings[key]
         

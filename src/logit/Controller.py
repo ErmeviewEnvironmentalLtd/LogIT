@@ -69,6 +69,7 @@
 import os
 import traceback
 import itertools
+import json
 import pickle
 import shutil
 import zipfile
@@ -284,8 +285,9 @@ def loadSetup(settings_path, errors):
     try:
         # Load the settings dictionary
         open_path = str(settings_path)
-        cur_settings = pickle.load(open(open_path, "rb"))
-        cur_settings.cur_settings_path = settings_path
+#         cur_settings = pickle.load(open(open_path, "rb"))
+        cur_settings = json.load(open(open_path, "r"))
+        cur_settings['cur_settings_path'] = open_path
         return cur_settings, errors
     except:
         errors.addError(errors.SETTINGS_LOAD, msg_add='from:\n%s' % (open_path),

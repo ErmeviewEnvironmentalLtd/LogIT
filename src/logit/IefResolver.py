@@ -87,9 +87,9 @@ class IefResolverDialog(QtWidgets.QDialog):
         title = 'Updated Files'
         formatted.append(self.getTitleParagraphIn() + title + self.getStandardParagraphOut())
         
-        for k, v in summary.iteritems():
+        for k, v in summary.items():
             formatted.append(self.getStandardParagraphIn() + '<em style="font-weight: bold">Ief file: ' + k + '</em>: ' + self.getStandardParagraphOut())
-            for i, p in v.iteritems():
+            for i, p in v.items():
                 if i == 'Ied':
                     for entry in p:
                         formatted.append(self.getStandardParagraphIn() + i + ': ' + entry['file'] + self.getStandardParagraphOut())
@@ -140,7 +140,7 @@ class IefResolverDialog(QtWidgets.QDialog):
                  "updates. These are outlined here.\n" +
                  "There is a full summary of all updated files below\n\n\n")
         formatted.append(self.getSpaceParagraphIn() + msg + self.getStandardParagraphOut())
-        for k, v in required_search.iteritems():
+        for k, v in required_search.items():
             
             if len(v['in']) < 1: continue
             formatted.append(self.getStandardParagraphIn() + '<em style="font-weight: bold">Some paths required guessing for file</em>: ' + k + self.getStandardParagraphOut())
@@ -230,7 +230,7 @@ class IefHolder(object):
         p = p + '_LOGIT' + e
         self.ief_obj.path_holder.setAbsolutePath(p)
         
-        for k, v in self.single_types.iteritems():
+        for k, v in self.single_types.items():
             if k == '.dat':
                 if v['out'] == '': continue
                 self.ief_obj.event_header['Datafile'] = v['out']            
@@ -293,7 +293,7 @@ class IefHolder(object):
             list - keys of the file types that couldn't be set.
         """
         missing = []
-        for k, v in self.missing_types.iteritems():
+        for k, v in self.missing_types.items():
             if self.has_types[k] == True and v == True:
                 missing.append(k)
         return missing
@@ -334,9 +334,9 @@ def writeUpdatedFiles(ief_objs):
     for ief in ief_objs:
         contents = ief.getPrintableContents()
         try:
-            ft.writeFile(contents, ief.path_holder.getAbsolutePath())
+            ft.writeFile(contents, ief.path_holder.absolutePath())
         except IOError:
-            logger.error('Could nto write new ief file at:\n' + ief.path_holder.getAbsolutePath())
+            logger.error('Could not write new ief file at:\n' + ief.path_holder.absolutePath())
             return False
     return True
 
@@ -357,7 +357,7 @@ def getUpdateSummary(ief_objs):
         twod = ief.getValue('2DFile')
         ieds = ief.getIedData()
         if twod is None: twod = ''        
-        summary[ief.path_holder.getFileNameAndExtension()] = {
+        summary[ief.path_holder.filenameAndExtension()] = {
                                                              'Datafile': dat,
                                                              'Results': result,
                                                              '2DFile': twod,
@@ -393,7 +393,7 @@ def resolveUnfoundPaths(ief_holders):
     for ief_holder in ief_holders:
 
         in_out_list = {'in': [], 'out': []}
-        for k, v in ief_holder.missing_types.iteritems():
+        for k, v in ief_holder.missing_types.items():
             
             # If it's a missing file
             if ief_holder.has_types[k] == True and v == True:

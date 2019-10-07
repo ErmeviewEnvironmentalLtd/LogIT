@@ -104,6 +104,7 @@ import shutil
 import sys
 import pickle
 import logging
+import json
 
 # Stupid imports to make pyinstaller work with pyqtgraph
 #import six
@@ -280,10 +281,10 @@ class MainGui(QtWidgets.QMainWindow):
         self.query_widget = Query.Query_UI(cur_location)
         self.ui.logViewTab.insertTab(self.ui.logViewTab.count(), self.query_widget, 'Query')
         self.query_widget.queryFileSummarySignal.connect(self._queryFileSummary)
-        try:
-            self.query_widget.loadSettings(self.settings.tool_settings[self.query_widget.tool_name])
-        except:
-            logger.info('No loadSettings() found for %s' % (self.query_widget.tool_name))
+#         try:
+        self.query_widget.loadSettings(self.settings.tool_settings[self.query_widget.tool_name])
+#         except:
+#             logger.info('No loadSettings() found for %s' % (self.query_widget.tool_name))
         self._addWidgets()
         logger.debug('Add Widgets complete')
 #         self._setColumnWidths()
@@ -1133,12 +1134,16 @@ class MainGui(QtWidgets.QMainWindow):
 #             self._getColumnWidths()
             _writeWidgetSettings()
         except:
-            logger.error('Unable to save settings - resetting to new')
-            self.settings = LogitSettings()
+            logger.error('Unable to save settings')# - resetting to new')
+            #self.settings = LogitSettings()
 
+        self.settings.main['window_width'] = self.frameGeometry().width()
+        self.settings.main['window_height'] = self.frameGeometry().height()
         try:
-            with open(save_path, "wb") as p:
-                pickle.dump(self.settings, p)
+            settings = json.dumps(self.settings.toDict(), indent=4)
+            with open(save_path, "w") as p:
+                p.write(settings)
+                #pickle.dump(self.settings, p)
         except:
             logger.info('Unable to save user defined settings')
     
@@ -1147,8 +1152,9 @@ class MainGui(QtWidgets.QMainWindow):
         """Write the current LogIT setup to file.
         """
         d = MyFileDialogs(parent=self)
-        save_path = d.saveFileDialog(path=os.path.split(gs.path_holder['log'])[0], 
-                                     file_types='Log Settings (*.logset)')
+        save_path = d.saveFileDialog(
+            self.settings.cur_settings_path, file_types='Log Settings (*.json)'
+        )
         
         if save_path == False:
             return
@@ -1161,7 +1167,7 @@ class MainGui(QtWidgets.QMainWindow):
         errors = GuiStore.ErrorHolder()
         d = MyFileDialogs(parent=self)
         open_path = d.openFileDialog(self.settings.cur_settings_path, 
-                        file_types='Log Settings (*.logset)')
+                        file_types='Log Settings (*.json)')
         settings, errors = Controller.loadSetup(open_path, errors)
          
         if settings == None:
@@ -1171,7 +1177,10 @@ class MainGui(QtWidgets.QMainWindow):
                                                 errors.msgbox_error.message)
             return
         else:
-            self.settings = settings
+            self.settings = LogitSettings(settings['cur_settings_path'])
+            self.settings.fromJson(settings)
+            self.settings.cur_settings_path = settings['cur_settings_path']
+            gs.path_holder = self.settings.cur_settings_path
             self._loadSettings()
         
     
@@ -1406,7 +1415,7 @@ class MainGui(QtWidgets.QMainWindow):
         # If we couldn't find the reference file
         if not ief_holders:
             msg = ('Could not locate intial reference file(s). This means that\n' +
-                   'it will not be possible to automated the update of these ' +
+                   'it will not be possible to automate the update of these ' +
                    'iefs.')
             self.launchQMsgBox('Ief Update Error', msg)
             finalize()
@@ -1615,23 +1624,46 @@ class LogitSettings(object):
    stored.
     """
     
-    def __init__(self):
+    def __init__(self, settings_path):
         """Constructor.
         """
         self.path_holder = {}
         self.tool_settings = {}
         self.main = self.getMainToolSettings()
-        self.cur_settings_path = ''
+        self.cur_settings_path = settings_path
         self.logging_level = 0
-
-    
+        
+    def toDict(self):
+        return {
+            'main': self.main,
+            'tools': self.tool_settings,
+            'path_holder': self.path_holder,
+            'cur_settings_path': self.cur_settings_path,
+            'logging_level': self.logging_level,
+        }
+        
+    def getMainWindowSize(self):
+        width = self.main.get('window_width', -1)
+        height = self.main.get('window_height', -1)
+        if width == -1 or height == -1:
+            raise AttributeError
+        else:
+            return width, height
+        
     def getMainToolSettings(self):
         """"""
         return {
-                'release_notes_version': '', 'column_widths': {}, 'cur_tab': 0,
-                'run_hidden_cols': {}
-                }
-    
+            'release_notes_version': '', 'column_widths': {}, 'cur_tab': 0,
+            'run_hidden_cols': {}, 'window_width': -1, 'window_height': -1,
+        }
+        
+    def fromJson(self, json_data):
+        """"""
+        self.path_holder = json_data.get('path_holder', {})
+        self.tool_settings = json_data.get('tools', {})
+        self.main = json_data.get('main', self.getMainToolSettings())
+        self.cur_settings_path = json_data.get('cur_settings_path', self.cur_settings_path)
+        self.logging_level = json_data.get('logging_level', self.logging_level)
     
     def copySettings(self, existing_settings):
         """Update this class with another LogitSettings object.
@@ -1678,18 +1710,19 @@ def main():
     cur_location = os.getcwd()
 #     settings_path = os.path.join(cur_location, 'settings.logset')
     settings_path = os.path.join(cur_location, 'settings.json')
-    new_set = LogitSettings()
+    new_set = LogitSettings(settings_path)
  
     try:
         # Load the settings dictionary
-        cur_settings = pickle.load(open(settings_path, "rb"))
+    #         cur_settings = pickle.load(open(settings_path, "rb"))
+        cur_settings = json.load(open(settings_path, "r"))
         
         # Check that this version of the settings has all the necessary
         # attributes, and if not add the missing ones
-        new_set.copySettings(cur_settings)
+        new_set.fromJson(cur_settings)
     except:
         print('Unable to load user defined settings')
-    new_set.cur_settings_path = settings_path
+#     new_set.cur_settings_path = settings_path
          
     # Launch the user interface.
     app = QtWidgets.QApplication(sys.argv)
@@ -1697,6 +1730,10 @@ def main():
     myapp = MainGui(new_set)
     icon_path = os.path.join(settings_path, 'Logit_Logo.ico')
     app.setWindowIcon(QtGui.QIcon(':images/Logit_Logo.png'))
+    try:
+        width, height = new_set.getMainWindowSize()
+        myapp.resize(width, height)
+    except AttributeError: pass
     myapp.show()
     if not gs.__DEV_MODE__:
         myapp.startupChecks()

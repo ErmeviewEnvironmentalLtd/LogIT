@@ -123,6 +123,7 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         self.removeMultiModelButton.clicked.connect(self._updateMultipleLogSelection)
         self.multiModelErrorClearButton.clicked.connect(self._clearMultiErrorText)
         self.multiModelErrorCopyButton.clicked.connect(self._copyToClipboard)
+        self.modelEntryTreeView.header().sectionResized.connect(self._singleModelResize)
         # Keyboard shortcuts
         self.loadModelButton.setToolTip('Load a new model into table (Ctrl-L)')
         self.loadModelButton.setShortcut("Ctrl+L")
@@ -131,6 +132,12 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         self.removeMultiModelButton.setToolTip('Remove selected models from multiple model list (Ctrl-X)')
         self.removeMultiModelButton.setShortcut("Ctrl+X")
     
+    def _singleModelResize(self, index, oldSize, newSize):
+        if index == 0:
+            self.settings['singleload_column_width'] = self.modelEntryTreeView.columnWidth(0)
+            print('Index {0}'.format(index))
+            print('Old Size {0}'.format(oldSize))
+            print('New Size {0}'.format(newSize))
 
     def getInputVars(self):
         """Get the main user supplied variables from the input boxes.
@@ -531,7 +538,6 @@ class NewEntry_UI(newentrywidget.Ui_NewEntryWidget, AWidget):
         self.settings['event_name'] = str(self.eventNameTextbox.text())
         self.settings['run_options'] = str(self.runOptionsTextbox.text())
         self.settings['cur_load_tab'] = self.loadModelTab.currentIndex()
-        self.settings['singleload_column_width'] = self.modelEntryTreeView.columnWidth(0)
         return self.settings
     
     

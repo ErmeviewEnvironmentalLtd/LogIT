@@ -324,10 +324,12 @@ class ModelLoader(object):
         dat = filetools.getFileName(self.ief.getValue('Datafile'), True)
         run_cols['ISIS_RESULTS'] = self.ief.getValue('Results')
         
-        if self.ief.event_details.has_key('InitialConditions'):
+#         if self.ief.event_details.has_key('InitialConditions'):
+        if 'InitialConditions' not in self.ief.event_details:
             run_cols['INITIAL_CONDITIONS'] = os.path.basename(self.ief.getValue('InitialConditions'))
         
-        if self.ief.event_details.has_key('Finish'):    
+#         if self.ief.event_details.has_key('Finish'):    
+        if 'Finish' not in self.ief.event_details:
             start = self.ief.event_details['Start']
             end = self.ief.event_details['Finish']
             run_cols['EVENT_DURATION'] = str(float(end) - float(start))
