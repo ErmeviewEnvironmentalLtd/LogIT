@@ -1,4 +1,5 @@
 {
-	"Output_Folder": "../Dist/src",
+	"Source_Output_Folder": "../Dist/src",
+	"Dist_Folder": "../Dist",
 	"Version": "v2.0.0"
 }

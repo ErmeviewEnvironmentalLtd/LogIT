@@ -85,24 +85,14 @@ from ship.utils import utilfunctions as uf
 
 # Local modules
 import LogBuilder
-# logger.debug('Import LogBuilder complete')
-import Exporters
-# logger.debug('Import Exporters complete')
-from app_metrics import utils as applog
-logger.debug('Import app_metrics complete')
-import globalsettings as gs
 
 import peeweeviews as pv
-import peeweemodels as pm
-from peewee import *
-from playhouse import shortcuts
-from playhouse.dataset import DataSet
 
 
 def reverse_enumerate(iterable):
     """Enumerate over an iterable in reverse order while retaining proper indexes
     """
-    return itertools.izip(reversed(xrange(len(iterable))), reversed(iterable))
+    return zip(reversed(range(len(iterable))), reversed(iterable))
 
 
 # class DbQueue(object):
