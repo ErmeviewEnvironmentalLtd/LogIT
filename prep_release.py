@@ -44,6 +44,7 @@ import os
 import sys
 import shutil
 import json
+import zipfile
 
 # Load local configuration file for release setup
 release_config = None
@@ -62,8 +63,8 @@ COPY_FOLDER = os.path.join(INPUT_DIR, 'src')
 
 VERSION_PLACEHOLDER = '~VERSION~'
 VERSION_FILES = [
-    os.path.join(INPUT_DIR, 'src', 'logit', 'LogIT_UI.py'),
-    os.path.join(INPUT_DIR, 'src', 'logit', 'LogIT_UI.ui')
+    os.path.join(INPUT_DIR, 'src', 'logit', 'LogIT_UI_qt5.py'),
+    os.path.join(INPUT_DIR, 'src', 'logit', 'LogIT_UI_qt5.ui')
 ]
                  
 README_FILE = os.path.join(INPUT_DIR, 'src', 'READ_ME.txt')
@@ -91,7 +92,7 @@ PYTHON_EXE = os.path.join(
     ENV_PATH, 'Scripts', 'python.exe'
 )
 PYINSTALLER_PATH = os.path.join(
-    env_path, 'Scripts', 'pyinstaller.exe'
+    ENV_PATH, 'Scripts', 'pyinstaller.exe'
 )
 PROJECT_NAME = 'LogIT'
 
@@ -108,8 +109,8 @@ EXTRAS_DIR_IN = os.path.join(DIST_DIR, 'src')
 RELEASE_NAME = 'logIT_' + VERSION
 #r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogIT\Dist'
 FINAL_OUTPUT_DIR = os.path.join(DIST_DIR, RELEASE_NAME)
-SRC_DIR_OUT = os.path.join(OUTPUT_DIR, 'src')
-ZIP_LOG = OUTPUT_DIR + '.zip'
+SRC_DIR_OUT = os.path.join(FINAL_OUTPUT_DIR, 'src')
+ZIP_LOG = FINAL_OUTPUT_DIR + '.zip'
 
 
 def setupOutputDir(dir):
@@ -124,7 +125,7 @@ def setupOutputDir(dir):
     return True
 
 
-def cleanDir(dir):
+def cleanDirPrep(dir):
     """Deletes the contents of the output directory.
     """
     for the_file in os.listdir(dir):
@@ -281,7 +282,7 @@ def copyTree(src, dst, symlinks=False, ignore=None):
         else:
             shutil.copy2(s, d)
             
-def copyExtras(output_dst):
+def copyExtrasPrep(output_dst):
     """Copy any extra files like READ_ME's.
     """
     shutil.copy(README_FILE, output_dst)
@@ -299,9 +300,11 @@ def resetReadmeVersion():
         print('Unable to update VERSION in READ_ME file')
 
 
-def cleanDir(dir):
+def cleanDirExport(dir):
     """Deletes the contents of the output directory.
     """
+    if not os.path.exists(dir):
+        return
     for the_file in os.listdir(dir):
         file_path = os.path.join(dir, the_file)
         try:
@@ -324,11 +327,11 @@ def copyTree(src, dst, symlinks=False, ignore=None):
             shutil.copy2(s, d)
             
 
-def copyExtras():
+def copyExtrasExport():
     """Copy any extra files like READ_ME's.
     """
-    shutil.copy(os.path.join(EXTRAS_DIR_IN, 'READ_ME.txt'), OUTPUT_DIR)
-    shutil.copy(os.path.join(EXTRAS_DIR_IN, 'Release_Notes.txt'), OUTPUT_DIR)
+    shutil.copy(os.path.join(EXTRAS_DIR_IN, 'READ_ME.txt'), FINAL_OUTPUT_DIR)
+    shutil.copy(os.path.join(EXTRAS_DIR_IN, 'Release_Notes.txt'), FINAL_OUTPUT_DIR)
 
 
 def zipupRelease():
@@ -384,7 +387,7 @@ def prepRelease():
     setupOutputDir(OUTPUT_DIR)
     
     print('Cleaning output directory...')
-    cleanDir(OUTPUT_DIR)
+    cleanDirPrep(OUTPUT_DIR)
     
     print('Updating version info in files...')
     updateVersion(VERSION_PLACEHOLDER, VERSION); updateGlobalSettingsVersion()
@@ -399,7 +402,7 @@ def prepRelease():
     copyTree(COPY_FOLDER, OUTPUT_SRC)
     
     print('Copying any extra files across...')
-    copyExtras(OUTPUT_DIR)
+    copyExtrasPrep(OUTPUT_DIR)
     
     print('Resetting VERSION...')
     updateVersion(VERSION, VERSION_PLACEHOLDER)
@@ -416,13 +419,23 @@ def prepRelease():
 def buildExe():
     """"""
 #     execfile(activate_this_file, dict(__file__=activate_this_file))
+    exec(open(activate_this_file).read(), dict(__file__=activate_this_file))
+#     exec(open("./filename").read())
 #     PROJECT_MAIN_SCRIPT = "main_script.py"
     #MAKESPEC_CMD = """%s %s\Makespec.py -X -n %s -F %s""" % (PYTHON_EXECUTABLE, PYINSTALLER_PATH, PROJECT_NAME, PROJECT_MAIN_SCRIPT)
     spec_file = os.path.join(DIST_DIR, 'LogIT.spec')
-    BUILD_CMD = """%s %s\Build.py %s""" % (PYTHON_EXE, PYINSTALLER_PATH, spec_file)
+    dist_dir = os.path.join(DIST_DIR, 'dist')
+    build_dir = os.path.join(DIST_DIR, 'build')
+#     BUILD_CMD = """%s %s\Build.py %s""" % (PYTHON_EXE, PYINSTALLER_PATH, spec_file)
+    #BUILD_CMD = """%s --noconfirm --log-level=WARN %s""" % (PYINSTALLER_PATH, spec_file)
+    BUILD_CMD = '"{0} --noconfirm --log-level=WARN --workpath={1} --distpath={2} {3}"'.format(
+        PYINSTALLER_PATH, build_dir, dist_dir, spec_file 
+    )
 
 #     os.system(MAKESPEC_CMD)
-    os.system(BUILD_CMD)
+    if os.system(BUILD_CMD):
+        raise RuntimeError('program {} failed!'.format(BUILD_CMD))
+#     os.system(BUILD_CMD)
     
     
 def export():
@@ -431,8 +444,8 @@ def export():
     setupOutputDir(SRC_DIR_OUT)
     
     print('Cleaning SRC output directory...')
-    cleanDir(FINAL_OUTPUT_DIR)
-    cleanDir(SRC_DIR_OUT)
+    cleanDirExport(FINAL_OUTPUT_DIR)
+    cleanDirExport(SRC_DIR_OUT)
 
     print('Copying executable files...')
     copyTree(BINARY_DIR, FINAL_OUTPUT_DIR)
@@ -446,7 +459,7 @@ def export():
     copyTree(SRC_DIR_IN, SRC_DIR_OUT)
 
     print('Copying extra files...')
-    copyExtras()
+    copyExtrasExport()
     
     print('Deleting logs if found...')
     deleteExistingLogs()
@@ -471,5 +484,6 @@ def export():
 
 if __name__ == '__main__':
     prepRelease()
-    buildExe()
-    export()
+    #buildExe()
+    #export()
+    print("\n\nRELEASE COMPLETE")

@@ -102,9 +102,14 @@
 import os
 import shutil
 import sys
-import pickle
+# import pickle
 import logging
 import json
+from PyQt5 import sip
+
+# import encodings
+# import future
+# from PyQt5.sip import *
 
 # Stupid imports to make pyinstaller work with pyqtgraph
 #import six
@@ -284,10 +289,10 @@ class MainGui(QtWidgets.QMainWindow):
         self.query_widget = Query.Query_UI(cur_location)
         self.ui.logViewTab.insertTab(self.ui.logViewTab.count(), self.query_widget, 'Query')
         self.query_widget.queryFileSummarySignal.connect(self._queryFileSummary)
-#         try:
-        self.query_widget.loadSettings(self.settings.tool_settings[self.query_widget.tool_name])
-#         except:
-#             logger.info('No loadSettings() found for %s' % (self.query_widget.tool_name))
+        try:
+            self.query_widget.loadSettings(self.settings.tool_settings[self.query_widget.tool_name])
+        except:
+            logger.info('No loadSettings() found for %s' % (self.query_widget.tool_name))
         self._addWidgets()
         logger.debug('Add Widgets complete')
         
@@ -764,7 +769,6 @@ class MainGui(QtWidgets.QMainWindow):
         """Check for new versions and show release notes if needed."""
         if self.settings.main['release_notes_version'] != gs.__VERSION__:
             self._showReleaseNotes()
-        self._checkUpdatesFalse()
         
     
     def _addWidgets(self):
