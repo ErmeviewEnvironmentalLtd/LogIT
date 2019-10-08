@@ -320,7 +320,7 @@ class TableWidgetQuery(TableWidgetDb):
         if action == copyAction:
             clipboard = QtWidgets.QApplication.clipboard()
             clipboard.setText(self.currentItem().text())
-        if action == queryFileAction:
+        elif action == queryFileAction:
             selected = self.selectionModel().selectedRows()
             ids = []
             for s in selected:

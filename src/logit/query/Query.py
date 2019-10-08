@@ -171,7 +171,8 @@ class Query_UI(querywidget.Ui_QueryWidget, AWidget):
         self.settings['active_script'] = name
         for i, val in enumerate(self.settings['scripts'].keys()):
             if str(self.complexScriptList.item(i).text()) == name:
-                self.complexScriptList.setItemSelected(self.complexScriptList.item(i), True)
+                self.complexScriptList.item(i).setSelected = True
+#                 self.complexScriptList.setItemSelected(self.complexScriptList.item(i), True)
                 self.complexScriptList.setCurrentRow(i)
                 self.current_script_row = i
         
