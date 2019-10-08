@@ -1,0 +1,2 @@
+- Initial release on Github. Setting the license to open source.
+- Removed some stuff and fixed a few bugs.

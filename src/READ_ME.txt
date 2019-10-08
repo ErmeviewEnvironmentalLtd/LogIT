@@ -5,23 +5,19 @@
 ###############################################################################
 
 
-Name: LogIT (Logger for Isis and Tuflow) 
+Name: LogIT
 Version: ~VERSION~
 Author: Duncan Runnacles
-Copyright: (C) 2015 Duncan Runnacles
-email: duncan.runnacles@thomasmackay.co.uk
-License: GPL v2 - See below under section LICENSE
+Copyright: (C) 2019 Duncan Runnacles
+email: duncan.runnacles@ermeviewenvironmental.co.uk
+License: MIT - Permitted under PYQT GPL v2 with exeptions- See below under section LICENSE
 
-This program is free software; you can redistribute it and/or modify it under 
-the terms of the GNU General Public License as published by the Free Software 
-Foundation; either version 2 of the license, or (at your option) any later 
-version.
-This program is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRENTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE. See the GNU General Public License for more details.
-You should have received a copy of the GNU General Public License along with 
-this program; if not, write to the Free Software Foundation, Inc., 51 Franklin 
-Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+WHY THE NAME
+============================
+Flood Modeller Pro used to be called ISIS, which worked well for the 
+name "LogIT". Unfortunately LogFT doesn't have the same ring to it. Maybe just
+consider the "I" a "1" and think of it as a logger for 1D models and Tuflow?
 
 
 INSTALLING
@@ -37,16 +33,17 @@ within the distibution or LogIT will not work.
 
 If the software does not launch as expected it is likely to be an issue with
 your virus software. LogIT requires a couple of windows system files in order
-to run which may not be on your computer. These files are included in the 
+to run, these might not be on your computer so they are included in the 
 distribution. Virus software doesn't like programs it doesn't know playing with
 system files. If this happens just tell your virus software to allow the
 program access and it should work fine. If you wish you can exclude the folder
 that you place logit it from the huersistics checks of your antivirus. This 
 will stop it from automatially deleting any updates that you recieve, but still
-allow it to be scanned like normal. LogIT WILL NOT change any files or 
-settings on your computer except: creating a logs folder and a settings file in
-the folder containing the executable and creating the databases and excel files
-that you request.
+allow it to be scanned like normal. 
+
+LogIT WILL NOT change any files or settings on your computer except: creating a 
+logs folder and a settings file in the folder containing the executable and 
+creating the databases and excel files where you request.
 
 
 EXCEL EXPORT
@@ -73,15 +70,58 @@ The jumbled output from the software should now be nicely formatted :)
 VERSION HISTORY
 =============================
 
-v2-0:
-- Initial release on Github. Setting the license to open source.
-- Removed some stuff and fixed a few bugs.
-
+v2.0.0:
+    - Initial release on Github. Setting the license to open source.
+    - Removed some stuff and fixed a few bugs.
 
 ##~##
 
 LICENSE
 =============================
+
+NOTE:
+LogIT is license under the permissive MIT license. However, at least for the
+time being, it uses the PyQT5 library for UI bindings (which also in turn the 
+QT libraries). PyQT5 uses the GNU license with an exception to allow for a 
+number of other licenses (like MIT).
+
+
+LogIT - MIT License:
+
+Copyright 2019 Duncan Runnacles
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to use, 
+copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the 
+Software, and to permit persons to whom the Software is furnished to do so, 
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION 
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE 
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
+This program is free software; you can redistribute it and/or modify it under 
+the terms of the GNU General Public License as published by the Free Software 
+Foundation; either version 2 of the license, or (at your option) any later 
+version.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRENTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with 
+this program; if not, write to the Free Software Foundation, Inc., 51 Franklin 
+Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+
+PyQT5 - GNU License:
 
  GNU GENERAL PUBLIC LICENSE
                        Version 2, June 1991

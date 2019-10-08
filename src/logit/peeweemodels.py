@@ -188,6 +188,13 @@ def createTableList(tables, connect_db=True):
 #         logger.info("Database user_version updated to: %s" % (DATABASE_VERSION_NO))
 
 
+def connectDB():
+    logit_db.connect(reuse_if_open=True)
+    
+def disconnectDB():
+    logit_db.close()
+
+
 def createNewDb(db_path):
     """Create a new sqlite database and setup version number."""
     
