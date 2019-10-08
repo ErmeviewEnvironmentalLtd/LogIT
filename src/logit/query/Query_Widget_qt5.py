@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\Query_Widget_qt5.ui'
+# Form implementation generated from reading ui file '.\query\Query_Widget_qt5.ui'
 #
 # Created by: PyQt5 UI code generator 5.13.0
 #
@@ -401,7 +401,7 @@ class Ui_QueryWidget(object):
         self.verticalLayout.addWidget(self.tableQueryGroup)
 
         self.retranslateUi(QueryWidget)
-        self.queryTabWidget.setCurrentIndex(2)
+        self.queryTabWidget.setCurrentIndex(0)
         self.queryFilterRunCbox.toggled['bool'].connect(self.queryRunIdSbox.setEnabled)
         QtCore.QMetaObject.connectSlotsByName(QueryWidget)
 

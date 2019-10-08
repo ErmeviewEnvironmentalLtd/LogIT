@@ -241,6 +241,7 @@ class MainGui(QtWidgets.QMainWindow):
         self.ui.actionLogInfo.triggered.connect(self._updateLoggingLevel)
         self.ui.actionReloadDatabase.triggered.connect(self._loadModelLog)
         self.ui.actionCopyLogsToClipboard.triggered.connect(self._copyLogs)
+        self.ui.actionReleaseNotes.triggered.connect(self._showReleaseNotes)
         #self.ui.actionCheckForUpdates.triggered.connect(self._checkUpdatesTrue)
         self.ui.actionResolveIefFiles.triggered.connect(self._resolveIefs)
         self.ui.actionExit.triggered.connect(self.close)
@@ -275,6 +276,7 @@ class MainGui(QtWidgets.QMainWindow):
         
         # Load the user settings from the last time the software was used 
         self._loadSettings()
+        self._setHelpVersion()
         lpath, e = gs.getPath('last_path')
         if not e: gs.path_holder['last_path'] = self.settings.cur_settings_path
         logger.debug('Load settings complete')
@@ -288,8 +290,6 @@ class MainGui(QtWidgets.QMainWindow):
 #             logger.info('No loadSettings() found for %s' % (self.query_widget.tool_name))
         self._addWidgets()
         logger.debug('Add Widgets complete')
-#         self._setColumnWidths()
-#         logger.debug('Set column widths complete')
         
         # Use those settings to get the file path and try and load the last log
         # database that the user had open
@@ -314,6 +314,18 @@ class MainGui(QtWidgets.QMainWindow):
         self._previous_widget = self.ui.tabWidget.currentWidget()
         logger.debug('MainGui construction complete')
 
+    def _setHelpVersion(self):
+        """"""
+        version = gs.__VERSION__
+        self.ui.textEdit.textCursor().beginEditBlock()
+        doc = self.ui.textEdit.document()
+        cursor = QtGui.QTextCursor(doc)
+        while True:
+            cursor = doc.find('~VERSION~', cursor)
+            if cursor.isNull():
+                break
+            cursor.insertText(version)
+        self.ui.textEdit.textCursor().endEditBlock()
 
     def _setupDbTabs(self):
         """Adds Run Tab to the Log View tab holder and sets up table refs.
@@ -750,7 +762,8 @@ class MainGui(QtWidgets.QMainWindow):
     
     def startupChecks(self):
         """Check for new versions and show release notes if needed."""
-        self._showReleaseNotes()
+        if self.settings.main['release_notes_version'] != gs.__VERSION__:
+            self._showReleaseNotes()
         self._checkUpdatesFalse()
         
     
@@ -804,61 +817,6 @@ class MainGui(QtWidgets.QMainWindow):
             self._on_viewlog = True
         else:
             self._on_viewlog = False
-    
-    
-#     def _checkUpdatesFalse(self):
-#         self._checkUpdates(False)
-#         
-#     def _checkUpdatesTrue(self):
-#         self._checkUpdates(True)
-        
-#     def _checkUpdates(self,  show_has_latest=True):     
-#         """Check if this is the latest version or not.
-#         
-#         If it isn't it gives the user the option to download and install the
-#         updated version.
-#         """
-#         try: 
-#             is_latest = Controller.checkVersionInfo(gs.__VERSION__, gs.__VERSION_CHECKPATH__)
-#         except IOError as err:
-#             logger.warning('Could not connect to updates server at: \n' + gs.__VERSION_CHECKPATH__)
-#             return
-#         
-#         if is_latest[0]:
-#             logger.info('Latest version of LogIT (version %s) installed' % (gs.__VERSION__))
-#             if show_has_latest:
-#                 msg = 'You have the latest version of LogIT'
-#                 self.launchQMsgBox('Version Information', msg, 'info')
-#         else:
-#             msg = 'There is a new version (%s). Would you like to download it?' % (is_latest[1])
-#             download_filename = gs.__DOWNLOAD_FILENAME__ + is_latest[1]
-#             
-#             response = self.launchQtQBox('New version available', msg)
-#             if not response == False:
-#                 try:
-#                     self._updateStatusBar('Downloading LogIT version %s' % is_latest[1])
-#                     self._updateMaxProgress(0)
-#                     self._updateCurrentProgress(0)
-#                     QtWidgets.QApplication.setOverrideCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-#                     success = Controller.downloadNewVersion(cur_location,
-#                                                             gs.__SERVER_PATH__,
-#                                                             download_filename)
-#                 except Exception as err:
-#                     logger.exception(err)
-#                 finally:
-#                     QtWidgets.QApplication.restoreOverrideCursor()
-#                     self._updateStatusBar('')
-#                     self._updateMaxProgress(1)
-#                     self._updateCurrentProgress(0)
-#                     
-#                 if not success:
-#                     msg = 'Failed to autoinstall new version. It can be downloaded from here:\n' + gs.__SERVER_PATH__
-#                     self.launchQMsgBox('Update Failure', msg)
-#                 else:
-#                     msg = ('Download complete.\nYou can close this version ' +
-#                            'and launch the new one.\n' +
-#                            'This version can be deleted if you want.')
-#                     self.launchQMsgBox('Update Success', msg)
     
     
     def _updateLoggingLevel(self):
@@ -1550,9 +1508,6 @@ class MainGui(QtWidgets.QMainWindow):
     
     def _showReleaseNotes(self):
         """Show the release notes for this version to the user."""
-        if gs.__DEV_MODE__ == True: return
-        
-        if self.settings.main['release_notes_version'] == gs.__VERSION__: return
         
         self.settings.main['release_notes_version'] = gs.__VERSION__
         

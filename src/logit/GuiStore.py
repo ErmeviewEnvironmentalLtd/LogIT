@@ -977,10 +977,10 @@ class ErrorType(object):
 class VersionInfoDialog(QtWidgets.QDialog):
     """Dialog class for showing release information."""
     
-    def __init__(self, release_dir, version, parent=None):
+    def __init__(self, release_notes_path, version, parent=None):
         super(VersionInfoDialog, self).__init__(parent)
         
-        self.release_dir = release_dir + version + '.txt'
+        self.release_notes_path = release_notes_path #+ version + '.txt'
         self.version = version
 
         self.textBrowser = QtWidgets.QTextBrowser(self)
@@ -1001,7 +1001,7 @@ class VersionInfoDialog(QtWidgets.QDialog):
         out = []
         input = []
         try:
-            with open(self.release_dir, 'rb') as f:
+            with open(self.release_notes_path, 'r') as f:
                 lines = f.readlines()
                 for l in lines:
                     input.append(l.strip())

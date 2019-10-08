@@ -8,12 +8,19 @@
     easily get out of sync when harcoded into many places.
 """
 
+import os
+
+path_holder = {}
 __VERSION__ = 'v2.0.0'
 __APPID__ = 'LogIT.1-0-Beta'
-__SERVER_PATH__ = r'P:\04 IT\utils\beta\LogIT'
+# __SERVER_PATH__ = r'P:\04 IT\utils\beta\LogIT'
 __DOWNLOAD_FILENAME__ = 'Logit_'
-__VERSION_CHECKPATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\v1\versioninfo.ver'
-__RELEASE_NOTES_PATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\v1\Release_Notes_'
+# __VERSION_CHECKPATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\v1\versioninfo.ver'
+# __RELEASE_NOTES_PATH__ = r'P:\04 IT\utils\beta\LogIT\Version_Info\v1\Release_Notes_'
+__RELEASE_NOTES_PATH__ = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.realpath(__file__)), '..', 'Release_Notes.txt'
+))
 
 __DEV_MODE__ = True
 __TEST_MODE__ = False
@@ -33,7 +40,6 @@ __TEST_MODE__ = False
 '''
 import os
 
-path_holder = {}
 def setPath(key, path):
     """Sets a path and converts to str in case of QString."""
     path_holder[key] = str(path)
