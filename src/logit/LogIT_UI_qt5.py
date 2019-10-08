@@ -156,7 +156,10 @@ class Ui_MainWindow(object):
         self.actionSetdb.setObjectName("actionSetdb")
         self.actionCleanDatabase = QtWidgets.QAction(MainWindow)
         self.actionCleanDatabase.setObjectName("actionCleanDatabase")
+        self.actionExportToJson = QtWidgets.QAction(MainWindow)
+        self.actionExportToJson.setObjectName("actionExportToJson")
         self.menuExport.addAction(self.actionExportToExcel)
+        self.menuExport.addAction(self.actionExportToJson)
         self.menuFile.addAction(self.actionNewModelLog)
         self.menuFile.addAction(self.actionLoad)
         self.menuFile.addSeparator()
@@ -184,7 +187,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuTools_2.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         self.logViewTab.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.tabWidget, self.logViewTab)
@@ -407,4 +410,6 @@ class Ui_MainWindow(object):
         self.actionNewdb.setText(_translate("MainWindow", "newdb"))
         self.actionSetdb.setText(_translate("MainWindow", "setdb"))
         self.actionCleanDatabase.setText(_translate("MainWindow", "Clean Database"))
+        self.actionExportToJson.setText(_translate("MainWindow", "JSON"))
+        self.actionExportToJson.setToolTip(_translate("MainWindow", "Export to JSON file"))
 import LogIT_RC_qt5_rc

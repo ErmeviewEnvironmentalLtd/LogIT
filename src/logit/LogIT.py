@@ -229,7 +229,8 @@ class MainGui(QtWidgets.QMainWindow):
 
         # Connect the slots
         self.ui.actionLoad.triggered.connect(self._loadNewModelLog)
-        self.ui.actionExportToExcel.triggered.connect(self._exportDatabase)
+        self.ui.actionExportToExcel.triggered.connect(self._exportToExcel)
+        self.ui.actionExportToJson.triggered.connect(self._exportToJson)
         self.ui.actionNewModelLog.triggered.connect(self._createNewLogDatabase)
         self.ui.actionUpdateDatabaseSchema.triggered.connect(self._updateDatabaseVersion)
         self.ui.actionCleanDatabase.triggered.connect(self.cleanDatabase)
@@ -1026,8 +1027,9 @@ class MainGui(QtWidgets.QMainWindow):
                     dat = pv.addDat(all_logs.dat)
                 else:
                     dat = None
-                run = pv.addRun(all_logs.run, all_logs.run_hash, all_logs.ief_dir, 
-                                all_logs.tcf_dir, dat)
+                run = pv.addRun(
+                    all_logs.run, all_logs.run_hash, all_logs.ief_dir, all_logs.tcf_dir, dat
+                )
                 pv.addAllIed(all_logs.ieds, run)
                 pv.addAllModel(all_logs.models, run)
 
@@ -1040,8 +1042,8 @@ class MainGui(QtWidgets.QMainWindow):
             self._updateStatusBar('')
             self._updateCurrentProgress(0)
             msg = ("Critical Error - Oooohhh Nnnooooooooo....\nThis has " +
-                   "all gone terribly wrong. You're on your own dude.\n" +
-                   "Don't look at me...DON'T LOOK AT MMMEEEEE!!!\n" +
+                   "all gone terribly wrong.\n" +
+                   "Don't look at me!!\n" +
                    "<-((+_+))->")
             logger.error('Critical error in multiple model load.')
             logger.exception(err)
@@ -1200,10 +1202,7 @@ class MainGui(QtWidgets.QMainWindow):
         save_path = self.settings.cur_settings_path
         self._writeSettings(save_path)
 
- 
-    def _exportDatabase(self, call_name):
-        """Exports the database based on calling action.
-        """
+    def _exportToExcel(self, call_name):
         if not self.checkDbLoaded(): return
         p = gs.path_holder['log']
         if 'export' in gs.path_holder.keys(): p = gs.path_holder['export']
@@ -1216,33 +1215,65 @@ class MainGui(QtWidgets.QMainWindow):
         save_path = str(save_path)
         gs.setPath('export', save_path)
         errors = GuiStore.ErrorHolder()
+        data = self.exportDatabase(errors)
+        self._updateCurrentProgress(4)
+        self._updateStatusBar('Writing to Excel ...')
+        Exporters.newExportToExcel(
+            data['run_out'], data['run_header'], data['dat_out'], data['dat_header'], 
+            data['model_out'], data['ied_out'], data['ied_header'], save_path
+        )
+        self._updateCurrentProgress(0)
+        self._updateStatusBar('Export Complete')
+
+    def _exportToJson(self, call_name):
+        if not self.checkDbLoaded(): return
+        p = gs.path_holder['log']
+        if 'export' in gs.path_holder.keys(): p = gs.path_holder['export']
+        d = MyFileDialogs(parent=self)
+        save_path = d.saveFileDialog(path=gs.path_holder['log'], 
+                                     file_types='JSON File (*.json)')
+        if save_path == False:
+            return
+
+        save_path = str(save_path)
+        gs.setPath('export', save_path)
+        errors = GuiStore.ErrorHolder()
+        data = self.exportDatabase(errors)
+        self._updateCurrentProgress(4)
+        self._updateStatusBar('Writing to JSON ...')
+        Exporters.exportToJson(data, save_path)
+#             data['run_out'], data['run_header'], data['dat_out'], data['dat_header'], 
+#             data['model_out'], data['ied_out'], data['ied_header'], save_path
+#         )
+        self._updateCurrentProgress(0)
+        self._updateStatusBar('Export Complete')
+ 
+    def exportDatabase(self, error_holder):
+        """Exports the database.
+        
+        Collects all of the data in the database and returns it in a dict.
+        """
 
         try:
+            data = {}
             # Setup the progress stuff
             self._updateMaxProgress(5)
             self._updateCurrentProgress(1)
             self._updateStatusBar('Exporting Model Files ...')
-            model_out = pv.createModelExport()
+            data['model_out'] = pv.createModelExport()
             self._updateCurrentProgress(2)
             self._updateStatusBar('Exporting Run Files ...')
-            run_out, run_header, dat_out, dat_header = pv.createRunDatExport()
+            data['run_out'], data['run_header'], data['dat_out'], data['dat_header'] = pv.createRunDatExport()
             self._updateCurrentProgress(3)
             self._updateStatusBar('Exporting Ied Files ...')
-            ied_out, ied_header = pv.createIedExport()
-            self._updateCurrentProgress(4)
-            self._updateStatusBar('Writing to Excel ...')
-            Exporters.newExportToExcel(run_out, run_header, dat_out, dat_header, 
-                                       model_out, ied_out, ied_header, save_path)
-            self._updateCurrentProgress(0)
-            self._updateStatusBar('Export Complete')
+            data['ied_out'], data['ied_header'] = pv.createIedExport()
+            return data
         
         except Exception as err:
             self._updateCurrentProgress(0)
             self._updateStatusBar('Export Failed')
             logger.exception(err)
-            QtWidgets.QMessageBox.warning(self, "Export Failed",
-                                  "Export to Excel failed!")
-        
+            QtWidgets.QMessageBox.warning(self, "Export Failed", "Export failed!")
 
     def _getModelFileDialog(self, multi_paths=False, path=None):
         """Launches an open file dialog to get .ief or .tcf files.

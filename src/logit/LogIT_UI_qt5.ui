@@ -58,7 +58,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="helpTab">
        <attribute name="title">
@@ -353,6 +353,7 @@ p, li { white-space: pre-wrap; }
       <string>Export</string>
      </property>
      <addaction name="actionExportToExcel"/>
+     <addaction name="actionExportToJson"/>
     </widget>
     <addaction name="actionNewModelLog"/>
     <addaction name="actionLoad"/>
@@ -603,6 +604,14 @@ p, li { white-space: pre-wrap; }
   <action name="actionCleanDatabase">
    <property name="text">
     <string>Clean Database</string>
+   </property>
+  </action>
+  <action name="actionExportToJson">
+   <property name="text">
+    <string>JSON</string>
+   </property>
+   <property name="toolTip">
+    <string>Export to JSON file</string>
    </property>
   </action>
  </widget>

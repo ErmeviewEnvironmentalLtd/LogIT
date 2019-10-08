@@ -52,6 +52,8 @@
 # Import python standard modules
 import sqlite3 as sqlite
 import os
+import json
+
 import logging
 logger = logging.getLogger(__name__)
 
@@ -62,6 +64,37 @@ except:
     logger.error('Cannot import xlwt (is it installed?):\n'+
                   'Cannot export database to Excel')  
 
+
+def exportToJson(data, save_path):
+    """Export database run data to JSON file.
+    
+    Args:
+        data(dict): all the run data from the database.
+        save_path(str): file path to save the JSON file to.
+        
+    """
+    output = {
+        'runs': [], 'model_files': {}, 'dat_files': [], 'ied_files': [],
+    }
+    for run in data['run_out'].values():
+        output['runs'].append(dict(zip(data['run_header'], run)))
+    
+    for key, val in data['model_out'].items():
+        for model in val:
+            if not key in output['model_files']:
+                output['model_files'][key] = []
+            output['model_files'][key].append(model)
+            
+    for dat in data['dat_out']:
+        output['dat_files'].append(dict(zip(data['dat_header'], dat)))
+
+    for ied in data['ied_out']:
+        output['ied_files'].append(dict(zip(data['ied_header'], ied)))
+        
+    json_data = json.dumps(output, indent=4)
+    with open(save_path, 'w') as f:
+        f.write(json_data)
+    
 
 def newExportToExcel(run, runh, dat, dath, model, ied, iedh, xlspath):
     """Export database data to Excel .xls format.
