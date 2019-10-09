@@ -54,11 +54,13 @@ except:
     print('UNABLE TO LOAD release_configuration.json FILE')
     sys.exit()
 
+#
 # - PREP CONFIG -
+#
 INPUT_DIR = os.getcwd()
 VERSION = release_config['Version']
-OUTPUT_DIR = os.path.abspath(release_config['Source_Output_Folder'])
-OUTPUT_SRC = OUTPUT_DIR
+DIST_DIR = os.path.abspath(release_config['Dist_Folder'])
+OUTPUT_DIR = os.path.join(DIST_DIR, 'src')
 COPY_FOLDER = os.path.join(INPUT_DIR, 'src')
 
 VERSION_PLACEHOLDER = '~VERSION~'
@@ -75,7 +77,14 @@ SETTINGS_LINE_DEV = '__DEV_MODE__ = True'
 SETTINGS_FILE = os.path.join(INPUT_DIR, 'src', 'logit', 'globalsettings.py')
 
 
+#
 # - BUILD CONFIG -
+#
+# If True the executable will be built into a smaller single file.
+# If False it will include a separate folder with dependencies, but be
+# a lot bigger (> 100MB bigger)
+BUILD_ONEFILE = True
+
 # The activate_this.py file in the virtual env. This should be included in 
 # your virtual environment. 
 # On Windows it will be something like:
@@ -96,21 +105,22 @@ PYINSTALLER_PATH = os.path.join(
 )
 PROJECT_NAME = 'LogIT'
 
-
+#
 # - EXPORT CONFIG -
+#
 # Zip up and prep for exporting config
-# INPUT_DIR = r'C:\Users\duncan.runnacles\Documents\Programming\Python\Logit\Dist'
-DIST_DIR = os.path.abspath(release_config['Dist_Folder'])
 BINARY_DIR = os.path.join(DIST_DIR, 'dist')
 #TEMPLATE_DIR = os.path.join(INPUT_DIR, 'templates')
 SRC_DIR_IN = os.path.join(DIST_DIR, 'src', 'logit')
 EXTRAS_DIR_IN = os.path.join(DIST_DIR, 'src')
 
 RELEASE_NAME = 'logIT_' + VERSION
-#r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogIT\Dist'
 FINAL_OUTPUT_DIR = os.path.join(DIST_DIR, RELEASE_NAME)
 SRC_DIR_OUT = os.path.join(FINAL_OUTPUT_DIR, 'src')
-TOOL_SETTINGS_FILE = os.path.join(SRC_DIR_OUT, 'settings.json')
+TOOL_SETTINGS_FILES = [
+    os.path.join(SRC_DIR_OUT, 'settings.json'),
+    os.path.join(FINAL_OUTPUT_DIR, 'settings.json'),
+]
 ZIP_LOG = FINAL_OUTPUT_DIR + '.zip'
 
 
@@ -400,7 +410,7 @@ def prepRelease():
     updateReadme()
     
     print('Copying files across...')
-    copyTree(COPY_FOLDER, OUTPUT_SRC)
+    copyTree(COPY_FOLDER, OUTPUT_DIR)
     
     print('Copying any extra files across...')
     copyExtrasPrep(OUTPUT_DIR)
@@ -420,18 +430,21 @@ def prepRelease():
 def buildExe():
     """"""
     print('\nBuilding executable with PyInstaller...')
-#     execfile(activate_this_file, dict(__file__=activate_this_file))
     exec(open(activate_this_file).read(), dict(__file__=activate_this_file))
-#     exec(open("./filename").read())
-#     PROJECT_MAIN_SCRIPT = "main_script.py"
     #MAKESPEC_CMD = """%s %s\Makespec.py -X -n %s -F %s""" % (PYTHON_EXECUTABLE, PYINSTALLER_PATH, PROJECT_NAME, PROJECT_MAIN_SCRIPT)
-    spec_file = os.path.join(DIST_DIR, 'LogIT.spec')
+    
+    # Creates an executable with required packages in a separate folder (big ~ 170MB)
+    spec_file = os.path.join(DIST_DIR, '..', 'LogIT.spec')
+    # Creates a standalone executable without additional folder (much smaller ~50MB)
+    onefile_spec = os.path.join(DIST_DIR, '..', 'LogIT_Onefile.spec')
     dist_dir = os.path.join(DIST_DIR, 'dist')
     build_dir = os.path.join(DIST_DIR, 'build')
-#     BUILD_CMD = """%s %s\Build.py %s""" % (PYTHON_EXE, PYINSTALLER_PATH, spec_file)
-    #BUILD_CMD = """%s --noconfirm --log-level=WARN %s""" % (PYINSTALLER_PATH, spec_file)
-    BUILD_CMD = '"{0} --noconfirm --log-level=ERROR --workpath={1} --distpath={2} {3}"'.format(
-        PYINSTALLER_PATH, build_dir, dist_dir, spec_file 
+    
+    spec = onefile_spec
+    if BUILD_ONEFILE:
+        spec = spec_file
+    BUILD_CMD = '"{0} --noconfirm --log-level=ERROR --onefile --workpath={1} --distpath={2} {3}"'.format(
+        PYINSTALLER_PATH, build_dir, dist_dir, spec 
     )
 
 #     os.system(MAKESPEC_CMD)
@@ -468,16 +481,17 @@ def export():
     deleteExistingLogs()
         
     print('Deleting settings if found...')
-    try:
-        os.remove(TOOL_SETTINGS_FILE)
-    except:
-        print('\t-> Settings file not found.')
+    for tsf in TOOL_SETTINGS_FILES:
+        try:
+            os.remove(tsf)
+        except:
+            pass
     
-#     print('Deleting unwanted second .exe...')
-#     try:
-#         os.remove(os.path.join(FINAL_OUTPUT_DIR, 'LogIT', 'LogIT.exe'))
-#     except:
-#         print('\t-> Failed to delete unwanted .exe file')
+    print('Deleting unwanted second .exe...')
+    try:
+        os.remove(os.path.join(FINAL_OUTPUT_DIR, 'LogIT', 'LogIT.exe'))
+    except:
+        print('\t-> Failed to delete unwanted .exe file')
     
     print('Zipping up release...')
     zipupRelease()

@@ -1,19 +1,20 @@
-/.project
-/.pydevproject
-/settings.logset
-/logs
-/.metadata
-/.settings
-/src/logit/logs/
-backup_creator.sh
-#prep_release.py
-send_to_server.py
-/src/logit/local_regression_tests/
-/local_regression_tests/
-src/tests/logs/
-data/
+#####################################
+# Logit Specific exclusions
+#####################################
 
-logit-env/
+# Logit Settings files
+/settings.logset
+# Log files
+/logs
+logs
+local_regression_tests
+#/src/logit/logs/
+#backup_creator.sh
+#/src/logit/local_regression_tests/
+#/local_regression_tests/
+#src/tests/logs/
+data/
+Dist/
 
 settings.json
 *.log
@@ -21,6 +22,10 @@ settings.json
 *.logdb
 *.pyc
 *logs.zip
+
+# Note a change has been put in at the standard PyInstaller
+# ignore section to not ignore the "LogIT.spec" file. Search
+# for filename to find it.
 
 #####################################
 # Standard Python template stuff
@@ -71,6 +76,7 @@ var/
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
+!LogIT.spec
 
 # Installer logs
 pip-log.txt
