@@ -325,7 +325,7 @@ class ModelLoader(object):
         run_cols['ISIS_RESULTS'] = self.ief.getValue('Results')
         
 #         if self.ief.event_details.has_key('InitialConditions'):
-        if 'InitialConditions' not in self.ief.event_details:
+        if 'InitialConditions' in self.ief.event_details:
             run_cols['INITIAL_CONDITIONS'] = os.path.basename(self.ief.getValue('InitialConditions'))
         
 #         if self.ief.event_details.has_key('Finish'):    

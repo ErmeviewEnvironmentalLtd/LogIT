@@ -110,6 +110,7 @@ RELEASE_NAME = 'logIT_' + VERSION
 #r'C:\Users\duncan.runnacles\Documents\Programming\Python\LogIT\Dist'
 FINAL_OUTPUT_DIR = os.path.join(DIST_DIR, RELEASE_NAME)
 SRC_DIR_OUT = os.path.join(FINAL_OUTPUT_DIR, 'src')
+TOOL_SETTINGS_FILE = os.path.join(SRC_DIR_OUT, 'settings.json')
 ZIP_LOG = FINAL_OUTPUT_DIR + '.zip'
 
 
@@ -418,6 +419,7 @@ def prepRelease():
     
 def buildExe():
     """"""
+    print('\nBuilding executable with PyInstaller...')
 #     execfile(activate_this_file, dict(__file__=activate_this_file))
     exec(open(activate_this_file).read(), dict(__file__=activate_this_file))
 #     exec(open("./filename").read())
@@ -428,7 +430,7 @@ def buildExe():
     build_dir = os.path.join(DIST_DIR, 'build')
 #     BUILD_CMD = """%s %s\Build.py %s""" % (PYTHON_EXE, PYINSTALLER_PATH, spec_file)
     #BUILD_CMD = """%s --noconfirm --log-level=WARN %s""" % (PYINSTALLER_PATH, spec_file)
-    BUILD_CMD = '"{0} --noconfirm --log-level=WARN --workpath={1} --distpath={2} {3}"'.format(
+    BUILD_CMD = '"{0} --noconfirm --log-level=ERROR --workpath={1} --distpath={2} {3}"'.format(
         PYINSTALLER_PATH, build_dir, dist_dir, spec_file 
     )
 
@@ -436,6 +438,7 @@ def buildExe():
     if os.system(BUILD_CMD):
         raise RuntimeError('program {} failed!'.format(BUILD_CMD))
 #     os.system(BUILD_CMD)
+    print('Exe build complete.\n')
     
     
 def export():
@@ -484,6 +487,6 @@ def export():
 
 if __name__ == '__main__':
     prepRelease()
-    #buildExe()
-    #export()
+    buildExe()
+    export()
     print("\n\nRELEASE COMPLETE")

@@ -86,7 +86,10 @@ def addDat(dat):
     """
     pm.connectDB()
     try:
-        d, crtd = pm.Dat.create_or_get(name=dat['NAME'], amendments=dat['AMENDMENTS'], comments=dat['COMMENTS'])
+        d, created = pm.Dat.get_or_create(
+            name=dat['NAME'], amendments=dat['AMENDMENTS'], 
+            comments=dat['COMMENTS']
+        )
     finally:
         pm.disconnectDB()
     return d
@@ -109,24 +112,24 @@ def addRun(run, run_hash, ief_dir, tcf_dir, dat=None):
     pm.connectDB()
     
     try:
-        if dat is not None:
-            r = pm.Run(dat=dat, run_hash=run_hash, setup=run['SETUP'], modeller=run['MODELLER'],
-                    ief=run['IEF'], tcf=run['TCF'], initial_conditions=run['INITIAL_CONDITIONS'], 
-                    isis_results=run['ISIS_RESULTS'], tuflow_results=run['TUFLOW_RESULTS'],
-                    estry_results=run['ESTRY_RESULTS'], event_duration=run['EVENT_DURATION'],
-                    comments=run['COMMENTS'], isis_version=run['ISIS_BUILD'], tuflow_version=run['TUFLOW_BUILD'],
-                    event_name=run['EVENT_NAME'], ief_dir=ief_dir, tcf_dir=tcf_dir,
-                    log_dir=run['LOG_DIR'], run_options=run['RUN_OPTIONS'], 
-                    run_status=run['RUN_STATUS'], mb=run['MB'])
-        else:
-            r = pm.Run(run_hash=run_hash, setup=run['SETUP'], modeller=run['MODELLER'],
-                    ief=run['IEF'], tcf=run['TCF'], initial_conditions=run['INITIAL_CONDITIONS'], 
-                    isis_results=run['ISIS_RESULTS'], tuflow_results=run['TUFLOW_RESULTS'],
-                    estry_results=run['ESTRY_RESULTS'], event_duration=run['EVENT_DURATION'],
-                    comments=run['COMMENTS'], isis_version=run['ISIS_BUILD'], tuflow_version=run['TUFLOW_BUILD'],
-                    event_name=run['EVENT_NAME'], ief_dir=ief_dir, tcf_dir=tcf_dir,
-                    log_dir=run['LOG_DIR'], run_options=run['RUN_OPTIONS'],
-                    run_status=run['RUN_STATUS'], mb=run['MB'])
+#         if dat is not None:
+        r = pm.Run(dat=dat, run_hash=run_hash, setup=run['SETUP'], modeller=run['MODELLER'],
+                ief=run['IEF'], tcf=run['TCF'], initial_conditions=run['INITIAL_CONDITIONS'], 
+                isis_results=run['ISIS_RESULTS'], tuflow_results=run['TUFLOW_RESULTS'],
+                estry_results=run['ESTRY_RESULTS'], event_duration=run['EVENT_DURATION'],
+                comments=run['COMMENTS'], isis_version=run['ISIS_BUILD'], tuflow_version=run['TUFLOW_BUILD'],
+                event_name=run['EVENT_NAME'], ief_dir=ief_dir, tcf_dir=tcf_dir,
+                log_dir=run['LOG_DIR'], run_options=run['RUN_OPTIONS'], 
+                run_status=run['RUN_STATUS'], mb=run['MB'])
+#         else:
+#             r = pm.Run(run_hash=run_hash, setup=run['SETUP'], modeller=run['MODELLER'],
+#                     ief=run['IEF'], tcf=run['TCF'], initial_conditions=run['INITIAL_CONDITIONS'], 
+#                     isis_results=run['ISIS_RESULTS'], tuflow_results=run['TUFLOW_RESULTS'],
+#                     estry_results=run['ESTRY_RESULTS'], event_duration=run['EVENT_DURATION'],
+#                     comments=run['COMMENTS'], isis_version=run['ISIS_BUILD'], tuflow_version=run['TUFLOW_BUILD'],
+#                     event_name=run['EVENT_NAME'], ief_dir=ief_dir, tcf_dir=tcf_dir,
+#                     log_dir=run['LOG_DIR'], run_options=run['RUN_OPTIONS'],
+#                     run_status=run['RUN_STATUS'], mb=run['MB'])
         r.save()
     finally:
         pm.disconnectDB()
@@ -430,17 +433,17 @@ def deleteRunRow(run_id, delete_recursive=False):
         
         with pm.logit_db.atomic():
             if dat is not None: 
-                deleteDatRow(dat)
+                deleteDatRow(dat, connect_db=False)
             for m in model_del:
-                deleteModelRow(m, remove_orphans=False)
+                deleteModelRow(m, remove_orphans=False, connect_db=False)
             for i in ied_del:
-                deleteIedRow(i, remove_orphans=False)
+                deleteIedRow(i, remove_orphans=False, connect_db=False)
 
     finally:
         pm.disconnectDB()
     
 
-def deleteDatRow(dat_name):
+def deleteDatRow(dat_name, connect_db=True):
     """Delete a record in the Dat table.
     
     Deletes the specified Dat record.
@@ -448,15 +451,17 @@ def deleteDatRow(dat_name):
     Args:
         dat_name(str): the Dat.name to query against.
     """
-    pm.connectDB()
+    if connect_db:
+        pm.connectDB()
     try:
         d = pm.Dat.get(pm.Dat.name == dat_name)
         d.delete_instance()
     finally:
-        pm.disconnectDB()
+        if connect_db:
+            pm.disconnectDB()
     
 
-def deleteIedRow(ied_name, remove_orphans=True):
+def deleteIedRow(ied_name, remove_orphans=True, connect_db=True):
     """Delete a record in the Ied table.
     
     Deletes the specified Ied record.
@@ -464,15 +469,17 @@ def deleteIedRow(ied_name, remove_orphans=True):
     Args:
         ied_name(str): the Ied.name to query against.
     """
-    pm.connectDB()
+    if connect_db:
+        pm.connectDB()
     try:
         i = pm.Ied.get(pm.Ied.name == ied_name)
         i.delete_instance()
     finally:
-        pm.disconnectDB()
+        if connect_db:
+            pm.disconnectDB()
     
 
-def deleteModelRow(model_name, remove_orphans=True):
+def deleteModelRow(model_name, remove_orphans=True, connect_db=True):
     """Delete a record in the ModelFile table.
     
     Deletes the specified ModelFile record and any foreign key associations.
@@ -481,7 +488,8 @@ def deleteModelRow(model_name, remove_orphans=True):
         model_name(str): the ModelFile.name to query against.
         remove_orphans=True(bool): if True will call deleteOrphanFiles after.
     """
-    pm.connectDB()
+    if connect_db:
+        pm.connectDB()
     try:
         m = pm.ModelFile.get(pm.ModelFile.name == model_name)
         m.delete_instance(recursive=True)
@@ -491,10 +499,11 @@ def deleteModelRow(model_name, remove_orphans=True):
             deleteOrphanFiles(execute=True)
         
     finally:
-        pm.disconnectDB()
+        if connect_db:
+            pm.disconnectDB()
 
 
-def deleteOrphanFiles(run_id=-1, execute=True):
+def deleteOrphanFiles(run_id=-1, execute=True, connect_db=True):
     """Find any orphaned file references and delete them from the database.
     
     Checks the SubFile table for and SubFile.name values that aren't in the
@@ -504,8 +513,8 @@ def deleteOrphanFiles(run_id=-1, execute=True):
         execute=True(bool): I don't think this does anything? Should probably
             always leave as default until further notice. DEBUG.
     """    
-    pm.connectDB()
-
+    if connect_db:
+        pm.connectDB()
     try:
         # Delete any orphaned subfiles
         subs = pm.ModelFile_SubFile.select(pm.ModelFile_SubFile.sub_file_id)
@@ -530,7 +539,8 @@ def deleteOrphanFiles(run_id=-1, execute=True):
                 iquery.execute()
     
     finally:
-        pm.disconnectDB()
+        if connect_db:
+            pm.disconnectDB()
     
 
 def updateNewStatus():

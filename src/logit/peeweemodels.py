@@ -189,7 +189,11 @@ def createTableList(tables, connect_db=True):
 
 
 def connectDB():
-    logit_db.connect(reuse_if_open=True)
+    try:
+        logit_db.connect(reuse_if_open=True)
+    except InterfaceError:
+        logger.warning('Cannot connect to Database, it has not been initialised')
+        raise
     
 def disconnectDB():
     logit_db.close()

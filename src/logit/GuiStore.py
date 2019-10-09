@@ -1008,6 +1008,8 @@ class VersionInfoDialog(QtWidgets.QDialog):
 #                     output.append(self.getStandardParagraphIn() + l.rstrip() + self.getStandardParagraphOut())
         except:
             self.textBrowser.append('Failed to load release notes from server')
+            logger.warning('Failed to load release notes from server')
+            logger.warning('Release notes path: {0}'.format(self.release_notes_path))
             out.append('\nFailed to load release notes from server')
             return out
         

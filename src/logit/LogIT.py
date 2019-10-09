@@ -106,6 +106,7 @@ import sys
 import logging
 import json
 from PyQt5 import sip
+from peewee import InterfaceError
 
 # import encodings
 # import future
@@ -1272,6 +1273,9 @@ class MainGui(QtWidgets.QMainWindow):
             self._updateCurrentProgress(0)
             self._updateStatusBar('Cleanup complete')
 
+        except InterfaceError:
+            logger.warning('No database setup')
+            self.launchQMsgBox('No database loaded', 'You need to load or create a database first.')
         except Exception as err:
             logger.warning('Cleanup database fail')
             logger.exception(err)
@@ -1514,10 +1518,11 @@ class MainGui(QtWidgets.QMainWindow):
         """Show the release notes for this version to the user."""
         
         self.settings.main['release_notes_version'] = gs.__VERSION__
+        notes_path = os.path.join(os.getcwd(), 'Release_Notes.txt') 
         
         try:
             version_dialog = GuiStore.VersionInfoDialog(
-                        gs.__RELEASE_NOTES_PATH__,
+                        notes_path,#gs.__RELEASE_NOTES_PATH__,
                         gs.__VERSION__, parent=self)
             version_dialog.resize(400, 400)
             version_dialog.setWindowTitle('LogIT Update Summary')
@@ -1698,13 +1703,11 @@ def main():
     QPlugin = QtCore.QPluginLoader("qico4.dll")
      
     cur_location = os.getcwd()
-#     settings_path = os.path.join(cur_location, 'settings.logset')
     settings_path = os.path.join(cur_location, 'settings.json')
     new_set = LogitSettings(settings_path)
  
     try:
         # Load the settings dictionary
-    #         cur_settings = pickle.load(open(settings_path, "rb"))
         cur_settings = json.load(open(settings_path, "r"))
         
         # Check that this version of the settings has all the necessary
@@ -1712,7 +1715,6 @@ def main():
         new_set.fromJson(cur_settings)
     except:
         print('Unable to load user defined settings')
-#     new_set.cur_settings_path = settings_path
          
     # Launch the user interface.
     app = QtWidgets.QApplication(sys.argv)
@@ -1732,5 +1734,13 @@ def main():
 
  
  
-if __name__ == '__main__': main()
-
+if __name__ == '__main__':
+    args = sys.argv
+    if len(args) > 1:
+        if args[1] == '--delete-settings':
+            cur_location = os.getcwd()
+            settings_path = os.path.join(cur_location, 'settings.json')
+            if os.path.exists(settings_path):
+                os.remove(settings_path)
+            
+    main()
