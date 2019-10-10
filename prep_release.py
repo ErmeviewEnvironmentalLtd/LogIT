@@ -390,6 +390,14 @@ def deleteExistingLogs():
     except:
         print('\t-> Could not remove regression test folder')
 
+
+def deleteBuildFiles():
+    try:
+        shutil.rmtree(os.path.join(DIST_DIR, 'dist'))
+        shutil.rmtree(os.path.join(DIST_DIR, 'build'))
+        shutil.rmtree(os.path.join(DIST_DIR, 'src'))
+    except:
+        print('\nFailed to delete build file folders')
     
     
 def prepRelease():
@@ -495,12 +503,22 @@ def export():
     
     print('Zipping up release...')
     zipupRelease()
-
+    
+    if BUILD_ONEFILE:
+        print('Removing unwanted dependecy folder...')
+        try:
+            shutil.rmtree(os.path.join(FINAL_OUTPUT_DIR, 'LogIT'))
+        except:
+            print('Failed to remove unwanted dependency folder')
 
 
 
 if __name__ == '__main__':
+    args = sys.argv
     prepRelease()
     buildExe()
     export()
+    
+    if len(args) > 1 and args[1] == '--del-build-files':
+        deleteBuildFiles()
     print("\n\nRELEASE COMPLETE")
