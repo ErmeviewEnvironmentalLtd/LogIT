@@ -29,7 +29,8 @@ can be run directly without installation.
 
 ## Installation
 
-- You can download a zip file containing an executable from the "Releases" tab here: INSERT LINK. 
+- You can download a zip file containing an executable from the 
+  <a href="https://github.com/ErmeviewEnvironmentalLtd/LogIT/releases">Releases page</a>. 
   This can be unzipped anywhere on your computer then double-click the LogIT.exe application to 
   run, no installation necessary.
 - Clone this repo and set it up yourself. There are two requirements files; If you only need to run 
