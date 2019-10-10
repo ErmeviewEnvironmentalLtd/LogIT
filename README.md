@@ -21,6 +21,7 @@ can be run directly without installation.
 
 - [Installation](#installation)
 - [Features](#features)
+- [Screenshots](#screenshots)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -51,14 +52,13 @@ can be run directly without installation.
 ## Screenshots
 
 Querying example:
-![Querying example](icons/images/query_example.png)
-
+![Querying example](icons/images/query_example.PNG)
 
 Complex query example:
-![Complex querying example](icons/images/complex_query_example.png)
+![Complex querying example](icons/images/complex_query_example.PNG)
 
 Model load example:
-![Model load example](icons/images/model_load_example.png)
+![Model load example](icons/images/model_load_example.PNG)
 
 
 ## Contributing

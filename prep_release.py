@@ -59,6 +59,7 @@ except:
 #
 INPUT_DIR = os.getcwd()
 VERSION = release_config['Version']
+SYSTEM_BUILD = release_config['System_Build']
 DIST_DIR = os.path.abspath(release_config['Dist_Folder'])
 OUTPUT_DIR = os.path.join(DIST_DIR, 'src')
 COPY_FOLDER = os.path.join(INPUT_DIR, 'src')
@@ -114,7 +115,7 @@ BINARY_DIR = os.path.join(DIST_DIR, 'dist')
 SRC_DIR_IN = os.path.join(DIST_DIR, 'src', 'logit')
 EXTRAS_DIR_IN = os.path.join(DIST_DIR, 'src')
 
-RELEASE_NAME = 'logIT_' + VERSION
+RELEASE_NAME = 'logIT_' + VERSION + '_' + SYSTEM_BUILD
 FINAL_OUTPUT_DIR = os.path.join(DIST_DIR, RELEASE_NAME)
 SRC_DIR_OUT = os.path.join(FINAL_OUTPUT_DIR, 'src')
 TOOL_SETTINGS_FILES = [
