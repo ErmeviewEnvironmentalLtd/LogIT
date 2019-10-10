@@ -501,9 +501,6 @@ def export():
     except:
         print('\t-> Failed to delete unwanted .exe file')
     
-    print('Zipping up release...')
-    zipupRelease()
-    
     if BUILD_ONEFILE:
         print('Removing unwanted dependecy folder...')
         try:
@@ -511,6 +508,9 @@ def export():
         except:
             print('Failed to remove unwanted dependency folder')
 
+    print('Zipping up release...')
+    zipupRelease()
+    
 
 
 if __name__ == '__main__':
