@@ -1,5 +1,6 @@
 {
 	"Source_Output_Folder": "./Dist/src",
 	"Dist_Folder": "./Dist",
-	"Version": "v2.0.0"
+	"Version": "v2.0.0",
+	"System_Build": "Win_x64"
 }
